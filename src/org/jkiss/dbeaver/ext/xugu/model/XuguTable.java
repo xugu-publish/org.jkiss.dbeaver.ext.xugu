@@ -130,21 +130,14 @@ public class XuguTable extends XuguTablePhysical implements DBPScriptObject, DBD
         ResultSet dbResult)
     {
         super(schema, dbResult);
-        String typeOwner = JDBCUtils.safeGetString(dbResult, "TABLE_TYPE_OWNER");
+        //xfc 修改了模式名获取的方式
+        String typeOwner = schema.getName();
         if (!CommonUtils.isEmpty(typeOwner)) {
             tableType = XuguDataType.resolveDataType(
                 monitor,
                 schema.getDataSource(),
                 typeOwner,
                 JDBCUtils.safeGetString(dbResult, "TABLE_TYPE"));
-        }
-        this.iotType = JDBCUtils.safeGetString(dbResult, "IOT_TYPE");
-        this.iotName = JDBCUtils.safeGetString(dbResult, "IOT_NAME");
-        this.temporary = JDBCUtils.safeGetBoolean(dbResult, "TEMPORARY", "Y");
-        this.secondary = JDBCUtils.safeGetBoolean(dbResult, "SECONDARY", "Y");
-        this.nested = JDBCUtils.safeGetBoolean(dbResult, "NESTED", "Y");
-        if (!CommonUtils.isEmpty(iotName)) {
-            //this.setName(iotName);
         }
     }
 

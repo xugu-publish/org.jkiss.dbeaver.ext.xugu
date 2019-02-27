@@ -23,6 +23,8 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.ModelPreferences;
 import org.jkiss.dbeaver.ext.xugu.XuguConstants;
+import org.jkiss.dbeaver.ext.xugu.XuguExecuteSQL_DBA;
+import org.jkiss.dbeaver.ext.xugu.XuguExecuteSQL_NORMAL;
 import org.jkiss.dbeaver.ext.xugu.model.XuguCharset;
 import org.jkiss.dbeaver.ext.xugu.XuguExecuteSQL_SYSDBA;
 import org.jkiss.dbeaver.ext.xugu.XuguMessages;
@@ -81,6 +83,8 @@ public class XuguDataSource extends JDBCDataSource
     private boolean isAdminVisible;
     private String planTableName;
     private boolean useRuleHint;
+    //xfc 添加了用户角色属性
+    private String userRole;
     
     private List<XuguCharset> charsets;
 
@@ -318,6 +322,7 @@ public class XuguDataSource extends JDBCDataSource
 
     public XuguSchema getSchema(DBRProgressMonitor monitor, String name) throws DBException {
         if (publicSchema != null && publicSchema.getName().equals(name)) {
+        	System.out.println("inhere 2");
             return publicSchema;
         }
         return schemaCache.getObject(monitor, this, name);
@@ -366,10 +371,10 @@ public class XuguDataSource extends JDBCDataSource
         return publicSchema.getDatabaseLinks(monitor);
     }
 
-    @Association
-    public Collection<XuguRecycledObject> getUserRecycledObjects(DBRProgressMonitor monitor) throws DBException {
-        return publicSchema.getRecycledObjects(monitor);
-    }
+//    @Association
+//    public Collection<XuguRecycledObject> getUserRecycledObjects(DBRProgressMonitor monitor) throws DBException {
+//        return publicSchema.getRecycledObjects(monitor);
+//    }
 
     public boolean isAtLeastV9() {
         return getInfo().getDatabaseVersion().getMajor() >= 9;
@@ -393,32 +398,21 @@ public class XuguDataSource extends JDBCDataSource
         super.initialize(monitor);
 
         DBPConnectionConfiguration connectionInfo = getContainer().getConnectionConfiguration();
-
+        
         {
             String useRuleHintProp = connectionInfo.getProviderProperty(XuguConstants.PROP_USE_RULE_HINT);
             if (useRuleHintProp != null) {
                 useRuleHint = CommonUtils.getBoolean(useRuleHintProp, false);
             }
         }
-
+        //xfc 从连接信息中获取userRole
+        this.userRole = connectionInfo.getProviderProperty(XuguConstants.PROP_INTERNAL_LOGON);
+        
         this.publicSchema = new XuguSchema(this, 1, XuguConstants.USER_PUBLIC);
         {
             try (JDBCSession session = DBUtils.openMetaSession(monitor, this, "Load data source meta info")) {
-                // Check DBA role
-//                this.isAdmin = "YES".equals(
-//                    JDBCUtils.queryString(
-//                        session,
-//                        "SELECT 'YES' FROM USER_ROLE_PRIVS WHERE GRANTED_ROLE='SYSDBA'"));
-//                this.isAdminVisible = isAdmin;
-//                if (!isAdminVisible) {
-//                    String showAdmin = connectionInfo.getProviderProperty(XuguConstants.PROP_ALWAYS_SHOW_DBA);
-//                    if (showAdmin != null) {
-//                        isAdminVisible = CommonUtils.getBoolean(showAdmin, false);
-//                    }
-//                }
-
                 // Get active schema
-                this.activeSchemaName = XuguUtils.getCurrentSchema(session);
+                this.activeSchemaName = XuguUtils.getCurrentSchema(session, this.userRole);
                 if (this.activeSchemaName != null) {
                     if (this.activeSchemaName.isEmpty()) {
                         this.activeSchemaName = null;
@@ -518,7 +512,7 @@ public class XuguDataSource extends JDBCDataSource
     @Override
     public boolean refreshDefaultObject(@NotNull DBCSession session) throws DBException {
         try {
-            final String currentSchema = XuguUtils.getCurrentSchema((JDBCSession) session);
+            final String currentSchema = XuguUtils.getCurrentSchema((JDBCSession) session, this.userRole);
             if (currentSchema != null && !CommonUtils.equalObjects(currentSchema, activeSchemaName)) {
                 final XuguSchema newSchema = schemaCache.getCachedObject(currentSchema);
                 if (newSchema != null) {
@@ -839,42 +833,40 @@ public class XuguDataSource extends JDBCDataSource
         SchemaCache() {
             setListOrderComparator(DBUtils.<XuguSchema>nameComparator());
         }
-
+        
         @Override
         protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguDataSource owner) throws SQLException {
             StringBuilder schemasQuery = new StringBuilder();
-//            boolean manyObjects = "false".equals(owner.getContainer().getConnectionConfiguration().getProviderProperty(XuguConstants.PROP_CHECK_SCHEMA_CONTENT));
-//            schemasQuery.append("SELECT U.* FROM ").append(XuguUtils.getAdminAllViewPrefix(session.getProgressMonitor(), owner, "USERS")).append(" U\n");
-//
-//                if (owner.isAdmin() && false) {
-//                    schemasQuery.append(
-//                        "WHERE (U.USER_ID IN (SELECT DISTINCT OWNER# FROM SYS.OBJ$) ");
-//                } else {
-//            schemasQuery.append(
-//                "WHERE (");
-//            if (manyObjects) {
-//                schemasQuery.append("U.USERNAME IS NOT NULL");
-//            } else {
-//                schemasQuery.append("U.USERNAME IN (SELECT DISTINCT OWNER FROM ").append(XuguUtils.getAdminAllViewPrefix(session.getProgressMonitor(), owner, "OBJECTS")).append(")");
-//            }
-//                }
 
             //过滤条件
             DBSObjectFilter schemaFilters = owner.getContainer().getObjectFilter(XuguSchema.class, null, false);
-            if (schemaFilters != null) {
-                JDBCUtils.appendFilterClause(schemasQuery, schemaFilters, "U.USERNAME", false);
-            }
-//            schemasQuery.append(")");
+//            if (schemaFilters != null) {
+//            	System.out.println("FFFilter is not null!");
+//                JDBCUtils.appendFilterClause(schemasQuery, schemaFilters, "U.USERNAME", false);
+//            }
+            
             if (!CommonUtils.isEmpty(owner.activeSchemaName)) {
 //            schemasQuery.append("\nUNION ALL SELECT '").append(owner.activeSchemaName).append("' AS USERNAME FROM DUAL");
-            	schemasQuery.append(XuguExecuteSQL_SYSDBA.gui_dialog_create_CreateRealJobDialog_schema);
+            	//xfc 根据owner的用户角色选取不同的语句来查询schema
+            	String userRole = owner.userRole;
+            	if(userRole.equals("SYSDBA"))
+            		schemasQuery.append("select * from sys_schemas");
+            		//schemasQuery.append(XuguExecuteSQL_SYSDBA.gui_dialog_create_CreateRealJobDialog_schema);
+            	else if(userRole.equals("DBA"))
+            		schemasQuery.append("select * from dba_schemas");
+            		//schemasQuery.append(XuguExecuteSQL_DBA.gui_dialog_create_CreateRealJobDialog_schema);
+            	else
+            		schemasQuery.append("select * from all_schemas");
+            		//schemasQuery.append(XuguExecuteSQL_NORMAL.gui_dialog_create_CreateRealJobDialog_schema);
             }
 //            schemasQuery.append("\nORDER BY USERNAME");
             System.out.println("QQQQQQ "+schemasQuery.toString());
-              JDBCPreparedStatement dbStat = session.prepareStatement(schemasQuery.toString());
-//            if (schemaFilters != null) {
-//                JDBCUtils.setFilterParameters(dbStat, 1, schemaFilters);
-//            }
+            JDBCPreparedStatement dbStat = session.prepareStatement(schemasQuery.toString());
+            if (schemaFilters != null) {
+            	System.out.println("FFFilter is not null! 2");
+                JDBCUtils.setFilterParameters(dbStat, 1, schemaFilters);
+            }
+            System.out.println("QQQQQQ "+dbStat.getQueryString());
             return dbStat;
         }
 

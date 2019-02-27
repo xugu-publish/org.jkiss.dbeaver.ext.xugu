@@ -18,6 +18,8 @@ package org.jkiss.dbeaver.ext.xugu.model;
 
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.ext.xugu.XuguExecuteSQL_DBA;
+import org.jkiss.dbeaver.ext.xugu.XuguExecuteSQL_NORMAL;
 import org.jkiss.dbeaver.ext.xugu.XuguExecuteSQL_SYSDBA;
 import org.jkiss.dbeaver.ext.xugu.XuguMessages;
 import org.jkiss.dbeaver.ext.xugu.model.source.XuguSourceObject;
@@ -144,10 +146,18 @@ public class XuguUtils {
             "ALTER SESSION SET CURRENT_SCHEMA=" + DBUtils.getQuotedIdentifier(session.getDataSource(), schema));
     }
 
-    public static String getCurrentSchema(JDBCSession session) throws SQLException {
-        return JDBCUtils.queryString(
-            session,
-            XuguExecuteSQL_SYSDBA.gui_dialog_create_CreateRealJobDialog_schema);
+    public static String getCurrentSchema(JDBCSession session, String role) throws SQLException {
+    	String sql = "";
+    	if(role.equals("SYSDBA")) {
+    		sql = XuguExecuteSQL_SYSDBA.gui_dialog_create_CreateRealJobDialog_schema;
+    	}else if(role.equals("DBA")) {
+    		sql = XuguExecuteSQL_DBA.gui_dialog_create_CreateRealJobDialog_schema;
+    	}else {
+    		sql = XuguExecuteSQL_NORMAL.gui_dialog_create_CreateRealJobDialog_schema;
+    	}
+    	return JDBCUtils.queryString(
+	            session,
+	            sql);
     }
 
     public static String normalizeSourceName(XuguSourceObject object, boolean body)

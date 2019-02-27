@@ -66,11 +66,11 @@ public class XuguTableColumn extends JDBCTableColumn<XuguTableBase> implements D
     {
         super(table, true);
         // Read default value first because it is of LONG type and has to be read before others
-        setDefaultValue(JDBCUtils.safeGetString(dbResult, "DATA_DEFAULT"));
-
-        setName(JDBCUtils.safeGetString(dbResult, "COLUMN_NAME"));
-        setOrdinalPosition(JDBCUtils.safeGetInt(dbResult, "COLUMN_ID"));
-        this.typeName = JDBCUtils.safeGetString(dbResult, "DATA_TYPE");
+        //xfc 修改字段
+        setDefaultValue(JDBCUtils.safeGetString(dbResult, "DEF_VAL"));
+        setName(JDBCUtils.safeGetString(dbResult, "COL_NAME"));
+        setOrdinalPosition(JDBCUtils.safeGetInt(dbResult, "COL_NO"));
+        this.typeName = JDBCUtils.safeGetString(dbResult, "TYPE_NAME");
         this.type = XuguDataType.resolveDataType(
             monitor,
             getDataSource(),

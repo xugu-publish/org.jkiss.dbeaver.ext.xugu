@@ -280,6 +280,9 @@ public class XuguConnectionPage extends ConnectionPageAbstract implements ICompo
                 connectionInfo.setProviderProperty(XuguConstants.PROP_SERVER_TIMEZONE, serverTimezoneCombo.getText());
             }
         }
+        //xfc 根据下拉框设置用户选择的角色
+        connectionInfo.setProviderProperty(XuguConstants.PROP_INTERNAL_LOGON, roleCombo.getText().toUpperCase(Locale.ENGLISH));
+        
 //        if (homesSelector != null) {
 //              connectionInfo.setClientHomeId(homesSelector.getSelectedHome());
 //        }

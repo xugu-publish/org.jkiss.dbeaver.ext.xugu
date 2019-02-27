@@ -61,19 +61,19 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
     final public IndexCache indexCache = new IndexCache();
     final public DataTypeCache dataTypeCache = new DataTypeCache();
     final public SequenceCache sequenceCache = new SequenceCache();
-    final public QueueCache queueCache = new QueueCache();
+    //final public QueueCache queueCache = new QueueCache();
     final public PackageCache packageCache = new PackageCache();
     final public SynonymCache synonymCache = new SynonymCache();
     final public DBLinkCache dbLinkCache = new DBLinkCache();
     final public ProceduresCache proceduresCache = new ProceduresCache();
-    final public JavaCache javaCache = new JavaCache();
+    //final public JavaCache javaCache = new JavaCache();
     final public SchedulerJobCache schedulerJobCache = new SchedulerJobCache();
-    final public SchedulerProgramCache schedulerProgramCache = new SchedulerProgramCache();
-    final public RecycleBin recycleBin = new RecycleBin();
+//    final public SchedulerProgramCache schedulerProgramCache = new SchedulerProgramCache();
+//    final public RecycleBin recycleBin = new RecycleBin();
 
     private long id;
     private String name;
-    private Date createTime;
+    //private Date createTime;
     private transient XuguUser user;
 
     public XuguSchema(XuguDataSource dataSource, long id, String name)
@@ -86,13 +86,13 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
     public XuguSchema(@NotNull XuguDataSource dataSource, @NotNull ResultSet dbResult)
     {
         super(dataSource, true);
-        this.id = JDBCUtils.safeGetLong(dbResult, "USER_ID");
-        this.name = JDBCUtils.safeGetString(dbResult, "USERNAME");
+        this.id = JDBCUtils.safeGetLong(dbResult, "SCHEMA_ID");
+        this.name = JDBCUtils.safeGetString(dbResult, "SCHEMA_NAME");
         if (CommonUtils.isEmpty(this.name)) {
             log.warn("Empty schema name fetched");
             this.name = "? " + super.hashCode();
         }
-        this.createTime = JDBCUtils.safeGetTimestamp(dbResult, "CREATED");
+        //this.createTime = JDBCUtils.safeGetTimestamp(dbResult, "CREATED");
     }
 
     public boolean isPublic()
@@ -106,10 +106,10 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         return id;
     }
 
-    @Property(order = 190)
-    public Date getCreateTime() {
-        return createTime;
-    }
+//    @Property(order = 190)
+//    public Date getCreateTime() {
+//        return createTime;
+//    }
 
     @NotNull
     @Override
@@ -211,12 +211,12 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         }
     }
 
-    @Association
-    public Collection<XuguQueue> getQueues(DBRProgressMonitor monitor)
-        throws DBException
-    {
-        return queueCache.getAllObjects(monitor, this);
-    }
+//    @Association
+//    public Collection<XuguQueue> getQueues(DBRProgressMonitor monitor)
+//        throws DBException
+//    {
+//        return queueCache.getAllObjects(monitor, this);
+//    }
 
     @Association
     public Collection<XuguSequence> getSequences(DBRProgressMonitor monitor)
@@ -280,12 +280,12 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         return dbLinkCache.getAllObjects(monitor, this);
     }
 
-    @Association
-    public Collection<XuguJavaClass> getJavaClasses(DBRProgressMonitor monitor)
-        throws DBException
-    {
-        return javaCache.getAllObjects(monitor, this);
-    }
+//    @Association
+//    public Collection<XuguJavaClass> getJavaClasses(DBRProgressMonitor monitor)
+//        throws DBException
+//    {
+//        return javaCache.getAllObjects(monitor, this);
+//    }
 
     @Association
     public Collection<XuguSchedulerJob> getSchedulerJobs(DBRProgressMonitor monitor)
@@ -294,19 +294,19 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         return schedulerJobCache.getAllObjects(monitor, this);
     }
 
-    @Association
-    public Collection<XuguSchedulerProgram> getSchedulerPrograms(DBRProgressMonitor monitor)
-            throws DBException
-    {
-        return schedulerProgramCache.getAllObjects(monitor, this);
-    }
+//    @Association
+//    public Collection<XuguSchedulerProgram> getSchedulerPrograms(DBRProgressMonitor monitor)
+//            throws DBException
+//    {
+//        return schedulerProgramCache.getAllObjects(monitor, this);
+//    }
 
-    @Association
-    public Collection<XuguRecycledObject> getRecycledObjects(DBRProgressMonitor monitor)
-        throws DBException
-    {
-        return recycleBin.getAllObjects(monitor, this);
-    }
+//    @Association
+//    public Collection<XuguRecycledObject> getRecycledObjects(DBRProgressMonitor monitor)
+//        throws DBException
+//    {
+//        return recycleBin.getAllObjects(monitor, this);
+//    }
 
     @Property(order = 90)
     public XuguUser getSchemaUser(DBRProgressMonitor monitor) throws DBException {
@@ -380,7 +380,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         sequenceCache.clearCache();
         synonymCache.clearCache();
         schedulerJobCache.clearCache();
-        recycleBin.clearCache();
+        //recycleBin.clearCache();
         return this;
     }
 
@@ -417,20 +417,12 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         @NotNull
         @Override
         public JDBCStatement prepareLookupStatement(@NotNull JDBCSession session, @NotNull XuguSchema owner, @Nullable XuguTableBase object, @Nullable String objectName) throws SQLException {
-            final JDBCPreparedStatement dbStat = session.prepareStatement(
-                "\tSELECT " + XuguUtils.getSysCatalogHint(owner.getDataSource()) + " t.OWNER,t.TABLE_NAME as TABLE_NAME,'TABLE' as OBJECT_TYPE,'VALID' as STATUS,t.TABLE_TYPE_OWNER,t.TABLE_TYPE,t.TABLESPACE_NAME,t.PARTITIONED,t.IOT_TYPE,t.IOT_NAME,t.TEMPORARY,t.SECONDARY,t.NESTED,t.NUM_ROWS \n" +
-                    "\tFROM " + XuguUtils.getAdminAllViewPrefix(session.getProgressMonitor(), owner.getDataSource(), "ALL_TABLES") + " t\n" +
-                    "\tWHERE t.OWNER=? AND NESTED='NO'" + (object == null && objectName == null ? "": " AND t.TABLE_NAME=?") + "\n" +
-                "UNION ALL\n" +
-                    "\tSELECT " + XuguUtils.getSysCatalogHint(owner.getDataSource()) + " o.OWNER,o.OBJECT_NAME as TABLE_NAME,'VIEW' as OBJECT_TYPE,o.STATUS,NULL,NULL,NULL,'NO',NULL,NULL,o.TEMPORARY,o.SECONDARY,'NO',0 \n" +
-                    "\tFROM " + XuguUtils.getAdminAllViewPrefix(session.getProgressMonitor(), owner.getDataSource(), "OBJECTS") + " o \n" +
-                    "\tWHERE o.OWNER=? AND o.OBJECT_TYPE='VIEW'" + (object == null && objectName == null  ? "": " AND o.OBJECT_NAME=?") + "\n"
-                );
-            int index = 1;
-            dbStat.setString(index++, owner.getName());
-            if (object != null || objectName != null) dbStat.setString(index++, object != null ? object.getName() : objectName);
-            dbStat.setString(index++, owner.getName());
-            if (object != null || objectName != null) dbStat.setString(index, object != null ? object.getName() : objectName);
+        	//xfc 根据schema name 查询所有表
+        	StringBuilder sql = new StringBuilder();
+        	sql.append("select * from all_tables where schema_id ="+owner.id);
+        	final JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
+        	System.out.println("prepareLookup stmt "+dbStat.getQueryString());
+        
             return dbStat;
         }
 
@@ -438,43 +430,31 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         protected XuguTableBase fetchObject(@NotNull JDBCSession session, @NotNull XuguSchema owner, @NotNull JDBCResultSet dbResult)
             throws SQLException, DBException
         {
-            final String tableType = JDBCUtils.safeGetString(dbResult, "OBJECT_TYPE");
-            if ("TABLE".equals(tableType)) {
+        	//xfc 修改object_type字段为table_type 并修改为int类型
+            final int tableType = JDBCUtils.safeGetInt(dbResult, "TABLE_TYPE");
+            if (tableType==0) {
                 return new XuguTable(session.getProgressMonitor(), owner, dbResult);
             } else {
                 return new XuguView(owner, dbResult);
             }
         }
 
+        // 获取列信息
         @Override
         protected JDBCStatement prepareChildrenStatement(@NotNull JDBCSession session, @NotNull XuguSchema owner, @Nullable XuguTableBase forTable)
             throws SQLException
         {
-            String colsView = "ALL_TAB_COLS";
-            if (!owner.getDataSource().isViewAvailable(session.getProgressMonitor(), XuguConstants.SCHEMA_SYS, colsView)) {
-                colsView = "ALL_TAB_COLUMNS";
-            }
+        	//xfc 修改了获取列信息的sql
+            String colsTable = "all_columns";
             StringBuilder sql = new StringBuilder(500);
-            sql
-                .append("SELECT ").append(XuguUtils.getSysCatalogHint(owner.getDataSource())).append("\nc.* " +
-                    "FROM SYS.").append(colsView).append(" c\n" +
-//                    "LEFT OUTER JOIN SYS.ALL_COL_COMMENTS cc ON CC.OWNER=c.OWNER AND cc.TABLE_NAME=c.TABLE_NAME AND cc.COLUMN_NAME=c.COLUMN_NAME\n" +
-                    "WHERE c.OWNER=?");
+            sql.append("SELECT * FROM ");
+            sql.append(colsTable);
             if (forTable != null) {
-                sql.append(" AND c.TABLE_NAME=?");
+                sql.append(" where TABLE_ID=(SELECT TABLE_ID FROM all_tables where TABLE_NAME='");
+                sql.append(forTable.getName());
+                sql.append("')");
             }
-/*
-            sql.append("\nORDER BY ");
-            if (forTable != null) {
-                sql.append("c.TABLE_NAME,");
-            }
-            sql.append("c.COLUMN_ID");
-*/
             JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
-            dbStat.setString(1, owner.getName());
-            if (forTable != null) {
-                dbStat.setString(2, forTable.getName());
-            }
             return dbStat;
         }
 
@@ -499,7 +479,8 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
     class ConstraintCache extends JDBCCompositeCache<XuguSchema, XuguTableBase, XuguTableConstraint, XuguTableConstraintColumn> {
         ConstraintCache()
         {
-            super(tableCache, XuguTableBase.class, "TABLE_NAME", "CONSTRAINT_NAME");
+        	//xfc 修改约束名字段为 CONS_NAME
+            super(tableCache, XuguTableBase.class, "TABLE_NAME", "CONS_NAME");
         }
 
         @NotNull
@@ -507,23 +488,17 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         protected JDBCStatement prepareObjectsStatement(JDBCSession session, XuguSchema owner, XuguTableBase forTable)
             throws SQLException
         {
+        	//xfc 修改了获取约束信息的sql
+        	String constsTable = "all_constraints";
             StringBuilder sql = new StringBuilder(500);
-            sql
-                .append("SELECT ").append(XuguUtils.getSysCatalogHint(owner.getDataSource())).append("\n" +
-                    "c.TABLE_NAME, c.CONSTRAINT_NAME,c.CONSTRAINT_TYPE,c.STATUS,c.SEARCH_CONDITION," +
-                    "col.COLUMN_NAME,col.POSITION\n" +
-                    "FROM SYS.ALL_CONSTRAINTS c, SYS.ALL_CONS_COLUMNS col\n" +
-                    "WHERE c.CONSTRAINT_TYPE<>'R' AND c.OWNER=? AND c.OWNER=col.OWNER AND c.CONSTRAINT_NAME=col.CONSTRAINT_NAME");
+            sql.append("SELECT * FROM ");
+            sql.append(constsTable);
             if (forTable != null) {
-                sql.append(" AND c.TABLE_NAME=?");
+                sql.append(" where TABLE_ID=(SELECT TABLE_ID FROM all_tables where TABLE_NAME='");
+                sql.append(forTable.getName());
+                sql.append("')");
             }
-            sql.append("\nORDER BY c.CONSTRAINT_NAME,col.POSITION");
-
             JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
-            dbStat.setString(1, XuguSchema.this.getName());
-            if (forTable != null) {
-                dbStat.setString(2, forTable.getName());
-            }
             return dbStat;
         }
 
@@ -543,10 +518,11 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
             throws SQLException, DBException
         {
             final XuguTableColumn tableColumn = getTableColumn(session, parent, dbResult);
+            //xfc 修改字段名为COL_NO 表示列位置
             return tableColumn == null ? null : new XuguTableConstraintColumn[] { new XuguTableConstraintColumn(
                 object,
                 tableColumn,
-                JDBCUtils.safeGetInt(dbResult, "POSITION")) };
+                JDBCUtils.safeGetInt(dbResult, "COL_NO")) };
         }
 
         @Override
@@ -559,7 +535,8 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
     class ForeignKeyCache extends JDBCCompositeCache<XuguSchema, XuguTable, XuguTableForeignKey, XuguTableForeignKeyColumn> {
         ForeignKeyCache()
         {
-            super(tableCache, XuguTable.class, "TABLE_NAME", "CONSTRAINT_NAME");
+        	//xfc 修改约束名字段为 CONS_NAME
+            super(tableCache, XuguTable.class, "TABLE_NAME", "CONS_NAME");
         }
 
         @Override
@@ -578,24 +555,16 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         protected JDBCStatement prepareObjectsStatement(JDBCSession session, XuguSchema owner, XuguTable forTable)
             throws SQLException
         {
+        	//xfc 修改了获取外键信息的sql
             StringBuilder sql = new StringBuilder(500);
-            sql.append("SELECT ").append(XuguUtils.getSysCatalogHint(owner.getDataSource())).append(" \r\n" +
-                "c.TABLE_NAME, c.CONSTRAINT_NAME,c.CONSTRAINT_TYPE,c.STATUS,c.R_OWNER,c.R_CONSTRAINT_NAME,rc.TABLE_NAME as R_TABLE_NAME,c.DELETE_RULE, \n" +
-                "col.COLUMN_NAME,col.POSITION\r\n" +
-                "FROM SYS.ALL_CONSTRAINTS c, SYS.ALL_CONS_COLUMNS col, SYS.ALL_CONSTRAINTS rc\n" +
-                "WHERE c.CONSTRAINT_TYPE='R' AND c.OWNER=?\n" +
-                "AND c.OWNER=col.OWNER AND c.CONSTRAINT_NAME=col.CONSTRAINT_NAME\n" +
-                "AND rc.OWNER=c.r_OWNER AND rc.CONSTRAINT_NAME=c.R_CONSTRAINT_NAME");
+            sql.append("SELECT * FROM all_constraints WHERE CONS_TYPE='F'");
             if (forTable != null) {
-                sql.append(" AND c.TABLE_NAME=?");
+                sql.append(" AND TABLE_ID=(SELECT TABLE_ID FROM all_tables where TABLE_NAME='");
+                sql.append(forTable.getName());
+                sql.append("')");
             }
-            sql.append("\nORDER BY c.CONSTRAINT_NAME,col.POSITION");
-
             JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
-            dbStat.setString(1, XuguSchema.this.getName());
-            if (forTable != null) {
-                dbStat.setString(2, forTable.getName());
-            }
+
             return dbStat;
         }
 
@@ -644,28 +613,15 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         protected JDBCStatement prepareObjectsStatement(JDBCSession session, XuguSchema owner, XuguTablePhysical forTable)
             throws SQLException
         {
+        	//xfc 修改了获取索引信息的sql
             StringBuilder sql = new StringBuilder();
-            sql.append("SELECT ").append(XuguUtils.getSysCatalogHint(owner.getDataSource())).append(" " +
-                    "i.OWNER,i.INDEX_NAME,i.INDEX_TYPE,i.TABLE_OWNER,i.TABLE_NAME,i.UNIQUENESS,i.TABLESPACE_NAME,i.STATUS,i.NUM_ROWS,i.SAMPLE_SIZE,\n" +
-                    "ic.COLUMN_NAME,ic.COLUMN_POSITION,ic.COLUMN_LENGTH,ic.DESCEND,iex.COLUMN_EXPRESSION\n" +
-                    "FROM SYS.ALL_INDEXES i\n" +
-                    "JOIN SYS.ALL_IND_COLUMNS ic ON ic.INDEX_OWNER=i.OWNER AND ic.INDEX_NAME=i.INDEX_NAME \n" +
-                    "LEFT OUTER JOIN SYS.ALL_IND_EXPRESSIONS iex ON iex.INDEX_OWNER=i.OWNER AND iex.INDEX_NAME=i.INDEX_NAME AND iex.COLUMN_POSITION=ic.COLUMN_POSITION\n" +
-                    "WHERE ");
-            if (forTable == null) {
-                sql.append("i.OWNER=?");
-            } else {
-                sql.append("i.TABLE_OWNER=? AND i.TABLE_NAME=?");
+            sql.append("SELECT * FROM all_indexes");
+            if (forTable != null) {
+                sql.append(" where TABLE_ID=(SELECT TABLE_ID FROM all_tables where TABLE_NAME='");
+                sql.append(forTable.getName());
+                sql.append("')");
             }
-            sql.append("\nORDER BY i.INDEX_NAME,ic.COLUMN_POSITION");
-
             JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
-            if (forTable == null) {
-                dbStat.setString(1, XuguSchema.this.getName());
-            } else {
-                dbStat.setString(1, XuguSchema.this.getName());
-                dbStat.setString(2, forTable.getName());
-            }
             return dbStat;
         }
 
@@ -684,8 +640,8 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
             XuguTablePhysical parent, XuguTableIndex object, JDBCResultSet dbResult)
             throws SQLException, DBException
         {
-            String columnName = JDBCUtils.safeGetStringTrimmed(dbResult, "COLUMN_NAME");
-            int ordinalPosition = JDBCUtils.safeGetInt(dbResult, "COLUMN_POSITION");
+            String columnName = JDBCUtils.safeGetStringTrimmed(dbResult, "COL_NAME");
+            int ordinalPosition = JDBCUtils.safeGetInt(dbResult, "COL_NO");
             boolean isAscending = "ASC".equals(JDBCUtils.safeGetStringTrimmed(dbResult, "DESCEND"));
             String columnExpression = JDBCUtils.safeGetStringTrimmed(dbResult, "COLUMN_EXPRESSION");
 
@@ -717,9 +673,9 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         @Override
         protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguSchema owner) throws SQLException
         {
+        	//xfc 修改了获取数据类型的sql语句
             JDBCPreparedStatement dbStat = session.prepareStatement(
-                "SELECT " + XuguUtils.getSysCatalogHint(owner.getDataSource()) + " * FROM SYS.ALL_TYPES WHERE OWNER=? ORDER BY TYPE_NAME");
-            dbStat.setString(1, owner.getName());
+                "SELECT * FROM all_types WHERE SCHEMA_ID="+owner.id);
             return dbStat;
         }
 
@@ -737,9 +693,9 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         @Override
         protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguSchema owner) throws SQLException
         {
+        	//xfc 修改了获取sequence信息的sql
             final JDBCPreparedStatement dbStat = session.prepareStatement(
-                "SELECT " + XuguUtils.getSysCatalogHint(owner.getDataSource()) + " * FROM SYS.ALL_SEQUENCES WHERE SEQUENCE_OWNER=? ORDER BY SEQUENCE_NAME");
-            dbStat.setString(1, owner.getName());
+                "SELECT * FROM ALL_SEQUENCES ORDER BY SEQUENCE_NAME");
             return dbStat;
         }
 
@@ -753,22 +709,22 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
     /**
      * Queue cache implementation
      */
-    static class QueueCache extends JDBCObjectCache<XuguSchema, XuguQueue> {
-        @Override
-        protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguSchema owner) throws SQLException
-        {
-            final JDBCPreparedStatement dbStat = session.prepareStatement(
-                "SELECT " + XuguUtils.getSysCatalogHint(owner.getDataSource()) + " * FROM SYS.ALL_QUEUES WHERE OWNER=? ORDER BY NAME");
-            dbStat.setString(1, owner.getName());
-            return dbStat;
-        }
-
-        @Override
-        protected XuguQueue fetchObject(@NotNull JDBCSession session, @NotNull XuguSchema owner, @NotNull JDBCResultSet resultSet) throws SQLException, DBException
-        {
-            return new XuguQueue(owner, resultSet);
-        }
-    }
+//    static class QueueCache extends JDBCObjectCache<XuguSchema, XuguQueue> {
+//        @Override
+//        protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguSchema owner) throws SQLException
+//        {
+//            final JDBCPreparedStatement dbStat = session.prepareStatement(
+//                "SELECT " + XuguUtils.getSysCatalogHint(owner.getDataSource()) + " * FROM SYS.ALL_QUEUES WHERE OWNER=? ORDER BY NAME");
+//            dbStat.setString(1, owner.getName());
+//            return dbStat;
+//        }
+//
+//        @Override
+//        protected XuguQueue fetchObject(@NotNull JDBCSession session, @NotNull XuguSchema owner, @NotNull JDBCResultSet resultSet) throws SQLException, DBException
+//        {
+//            return new XuguQueue(owner, resultSet);
+//        }
+//    }
 
     /**
      * Procedures cache implementation
@@ -778,15 +734,9 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         @NotNull
         @Override
         public JDBCStatement prepareLookupStatement(@NotNull JDBCSession session, @NotNull XuguSchema owner, @Nullable XuguProcedureStandalone object, @Nullable String objectName) throws SQLException {
-            JDBCPreparedStatement dbStat = session.prepareStatement(
-                "SELECT " + XuguUtils.getSysCatalogHint(owner.getDataSource()) + " * FROM " +
-                    XuguUtils.getAdminAllViewPrefix(session.getProgressMonitor(), owner.getDataSource(), "OBJECTS") + " " +
-                    "WHERE OBJECT_TYPE IN ('PROCEDURE','FUNCTION') " +
-                    "AND OWNER=? " +
-                    (object == null && objectName == null ? "" : "AND OBJECT_NAME=? ") +
-                    "ORDER BY OBJECT_NAME");
-            dbStat.setString(1, owner.getName());
-            if (object != null || objectName != null) dbStat.setString(2, object != null ? object.getName() : objectName);
+            //xfc 修改了获取存储过程信息的sql语句
+        	JDBCPreparedStatement dbStat = session.prepareStatement(
+                "SELECT * FROM all_procedures WHERE schema_id="+owner.id);
             return dbStat;
         }
 
@@ -805,12 +755,9 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguSchema owner)
             throws SQLException
         {
+        	//xfc 修改了获取所有包信息的sql语句
             JDBCPreparedStatement dbStat = session.prepareStatement(
-                "SELECT " + XuguUtils.getSysCatalogHint(owner.getDataSource()) + " * FROM " +
-                XuguUtils.getAdminAllViewPrefix(session.getProgressMonitor(), owner.getDataSource(), "OBJECTS") +
-                " WHERE OBJECT_TYPE='PACKAGE' AND OWNER=? " +
-                " ORDER BY OBJECT_NAME");
-            dbStat.setString(1, owner.getName());
+                "SELECT * FROM all_packages WHERE schema_ID="+owner.id);
             return dbStat;
         }
 
@@ -830,23 +777,9 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         @Override
         protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguSchema owner) throws SQLException
         {
-            String synonymTypeFilter = (session.getDataSource().getContainer().getPreferenceStore().getBoolean(XuguConstants.PREF_DBMS_READ_ALL_SYNONYMS) ?
-                "" :
-                "AND O.OBJECT_TYPE NOT IN ('JAVA CLASS','PACKAGE BODY')\n");
-
+        	//xfc 修改了获取同义词信息的语句
             JDBCPreparedStatement dbStat = session.prepareStatement(
-                "SELECT OWNER, SYNONYM_NAME, MAX(TABLE_OWNER) as TABLE_OWNER, MAX(TABLE_NAME) as TABLE_NAME, MAX(DB_LINK) as DB_LINK, MAX(OBJECT_TYPE) as OBJECT_TYPE FROM (\n" +
-                    "SELECT S.*, NULL OBJECT_TYPE FROM " + XuguUtils.getAdminAllViewPrefix(session.getProgressMonitor(), owner.getDataSource(), "SYNONYMS") + " S WHERE S.OWNER = ?\n" +
-                    "UNION ALL\n" +
-                    "SELECT S.*,O.OBJECT_TYPE FROM " + XuguUtils.getAdminAllViewPrefix(session.getProgressMonitor(), owner.getDataSource(), "SYNONYMS") + " S, " + XuguUtils.getAdminAllViewPrefix(session.getProgressMonitor(), owner.getDataSource(), "OBJECTS") + " O\n" +
-                    "WHERE S.OWNER = ?\n" +
-                    synonymTypeFilter +
-                    "AND O.OWNER=S.TABLE_OWNER AND O.OBJECT_NAME=S.TABLE_NAME\n" +
-                    ")\n" +
-                    "GROUP BY OWNER, SYNONYM_NAME\n" +
-                    "ORDER BY SYNONYM_NAME");
-            dbStat.setString(1, owner.getName());
-            dbStat.setString(2, owner.getName());
+                "SELECT * FROM all_synonyms WHERE schema_id="+owner.id);
             return dbStat;
         }
 
@@ -863,10 +796,9 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguSchema owner)
             throws SQLException
         {
+        	//xfc 修改了获取所有视图信息的sql
             JDBCPreparedStatement dbStat = session.prepareStatement(
-                "SELECT * FROM SYS.ALL_MVIEWS WHERE OWNER=? " +
-                "ORDER BY MVIEW_NAME");
-            dbStat.setString(1, owner.getName());
+                "SELECT * FROM ALL_VIEWS WHERE ="+owner.id);
             return dbStat;
         }
 
@@ -885,10 +817,9 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguSchema owner)
             throws SQLException
         {
+        	//xfc 修改了获取所有dblink信息的sql
             JDBCPreparedStatement dbStat = session.prepareStatement(
-                "SELECT * FROM SYS.ALL_DB_LINKS WHERE OWNER=? " +
-                " ORDER BY DB_LINK");
-            dbStat.setString(1, owner.getName());
+                "SELECT * FROM SYS_DBLINKS");
             return dbStat;
         }
 
@@ -906,11 +837,9 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         @Override
         protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguSchema schema) throws SQLException
         {
+        	//xfc 修改了获取所有触发器信息的sql语句
             JDBCPreparedStatement dbStat = session.prepareStatement(
-                "SELECT *\n" +
-                "FROM " + XuguUtils.getAdminAllViewPrefix(session.getProgressMonitor(), schema.getDataSource(), "TRIGGERS") + " WHERE OWNER=? AND TRIM(BASE_OBJECT_TYPE) IN ('DATABASE','SCHEMA')\n" +
-                "ORDER BY TRIGGER_NAME");
-            dbStat.setString(1, schema.getName());
+                "SELECT * FROM ALL_TRIGGERS WHERE SCHEMA_ID="+schema.id);
             return dbStat;
         }
 
@@ -921,26 +850,26 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         }
     }
 
-    static class JavaCache extends JDBCObjectCache<XuguSchema, XuguJavaClass> {
-
-        @Override
-        protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguSchema owner)
-            throws SQLException
-        {
-            JDBCPreparedStatement dbStat = session.prepareStatement(
-                "SELECT * FROM SYS.ALL_JAVA_CLASSES WHERE OWNER=? ");
-            dbStat.setString(1, owner.getName());
-            return dbStat;
-        }
-
-        @Override
-        protected XuguJavaClass fetchObject(@NotNull JDBCSession session, @NotNull XuguSchema owner, @NotNull JDBCResultSet dbResult)
-            throws SQLException, DBException
-        {
-            return new XuguJavaClass(owner, dbResult);
-        }
-
-    }
+//    static class JavaCache extends JDBCObjectCache<XuguSchema, XuguJavaClass> {
+//
+//        @Override
+//        protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguSchema owner)
+//            throws SQLException
+//        {
+//            JDBCPreparedStatement dbStat = session.prepareStatement(
+//                "SELECT * FROM SYS.ALL_JAVA_CLASSES WHERE OWNER=? ");
+//            dbStat.setString(1, owner.getName());
+//            return dbStat;
+//        }
+//
+//        @Override
+//        protected XuguJavaClass fetchObject(@NotNull JDBCSession session, @NotNull XuguSchema owner, @NotNull JDBCResultSet dbResult)
+//            throws SQLException, DBException
+//        {
+//            return new XuguJavaClass(owner, dbResult);
+//        }
+//
+//    }
 
     static class SchedulerJobCache extends JDBCObjectCache<XuguSchema, XuguSchedulerJob> {
 
@@ -948,9 +877,9 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguSchema owner)
                 throws SQLException
         {
+        	//xfc 修改了获取所有job信息的sql语句
             JDBCPreparedStatement dbStat = session.prepareStatement(
-                    "SELECT * FROM SYS.ALL_SCHEDULER_JOBS WHERE OWNER=? ORDER BY JOB_NAME");
-            dbStat.setString(1, owner.getName());
+                    "SELECT * FROM ALL_JOBS");
             return dbStat;
         }
 
@@ -963,51 +892,51 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
 
     }
 
-    static class SchedulerProgramCache extends JDBCObjectCache<XuguSchema, XuguSchedulerProgram> {
+//    static class SchedulerProgramCache extends JDBCObjectCache<XuguSchema, XuguSchedulerProgram> {
+//
+//        @Override
+//        protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguSchema owner)
+//                throws SQLException
+//        {
+//            JDBCPreparedStatement dbStat = session.prepareStatement(
+//                    "SELECT * FROM SYS.ALL_SCHEDULER_PROGRAMS WHERE OWNER=? ORDER BY PROGRAM_NAME");
+//            dbStat.setString(1, owner.getName());
+//            return dbStat;
+//        }
+//
+//        @Override
+//        protected XuguSchedulerProgram fetchObject(@NotNull JDBCSession session, @NotNull XuguSchema owner, @NotNull JDBCResultSet dbResult)
+//                throws SQLException, DBException
+//        {
+//            return new XuguSchedulerProgram(owner, dbResult);
+//        }
+//
+//    }
 
-        @Override
-        protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguSchema owner)
-                throws SQLException
-        {
-            JDBCPreparedStatement dbStat = session.prepareStatement(
-                    "SELECT * FROM SYS.ALL_SCHEDULER_PROGRAMS WHERE OWNER=? ORDER BY PROGRAM_NAME");
-            dbStat.setString(1, owner.getName());
-            return dbStat;
-        }
-
-        @Override
-        protected XuguSchedulerProgram fetchObject(@NotNull JDBCSession session, @NotNull XuguSchema owner, @NotNull JDBCResultSet dbResult)
-                throws SQLException, DBException
-        {
-            return new XuguSchedulerProgram(owner, dbResult);
-        }
-
-    }
-
-    static class RecycleBin extends JDBCObjectCache<XuguSchema, XuguRecycledObject> {
-
-        @Override
-        protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguSchema owner)
-            throws SQLException
-        {
-            final boolean isPublic = owner.isPublic();
-            JDBCPreparedStatement dbStat = session.prepareStatement(
-                isPublic ?
-                    "SELECT * FROM SYS.USER_RECYCLEBIN" :
-                    "SELECT * FROM SYS.DBA_RECYCLEBIN WHERE OWNER=?");
-            if (!isPublic) {
-                dbStat.setString(1, owner.getName());
-            }
-            return dbStat;
-        }
-
-        @Override
-        protected XuguRecycledObject fetchObject(@NotNull JDBCSession session, @NotNull XuguSchema owner, @NotNull JDBCResultSet dbResult)
-            throws SQLException, DBException
-        {
-            return new XuguRecycledObject(owner, dbResult);
-        }
-
-    }
+//    static class RecycleBin extends JDBCObjectCache<XuguSchema, XuguRecycledObject> {
+//
+//        @Override
+//        protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguSchema owner)
+//            throws SQLException
+//        {
+//            final boolean isPublic = owner.isPublic();
+//            JDBCPreparedStatement dbStat = session.prepareStatement(
+//                isPublic ?
+//                    "SELECT * FROM SYS.USER_RECYCLEBIN" :
+//                    "SELECT * FROM SYS.DBA_RECYCLEBIN WHERE OWNER=?");
+//            if (!isPublic) {
+//                dbStat.setString(1, owner.getName());
+//            }
+//            return dbStat;
+//        }
+//
+//        @Override
+//        protected XuguRecycledObject fetchObject(@NotNull JDBCSession session, @NotNull XuguSchema owner, @NotNull JDBCResultSet dbResult)
+//            throws SQLException, DBException
+//        {
+//            return new XuguRecycledObject(owner, dbResult);
+//        }
+//
+//    }
 
 }

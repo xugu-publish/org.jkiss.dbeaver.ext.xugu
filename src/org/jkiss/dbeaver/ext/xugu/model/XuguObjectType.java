@@ -55,13 +55,13 @@ public enum XuguObjectType implements DBSObjectType {
     }),
 	INDEX_PARTITION("INDEX PARTITION", null, DBSObject.class, null),
 	INDEXTYPE("INDEXTYPE", null, DBSObject.class, null),
-	JAVA_CLASS("JAVA CLASS", DBIcon.TREE_JAVA_CLASS, XuguJavaClass.class, new ObjectFinder() {
-        @Override
-        public XuguJavaClass findObject(DBRProgressMonitor monitor, XuguSchema schema, String objectName) throws DBException
-        {
-            return schema.javaCache.getObject(monitor, schema, objectName);
-        }
-    }),
+//	JAVA_CLASS("JAVA CLASS", DBIcon.TREE_JAVA_CLASS, XuguJavaClass.class, new ObjectFinder() {
+//        @Override
+//        public XuguJavaClass findObject(DBRProgressMonitor monitor, XuguSchema schema, String objectName) throws DBException
+//        {
+//            return schema.javaCache.getObject(monitor, schema, objectName);
+//        }
+//    }),
 	JAVA_DATA("JAVA DATA", null, DBSObject.class, null),
 	JAVA_RESOURCE("JAVA RESOURCE", null, DBSObject.class, null),
 	JOB("JOB", null, DBSObject.class, null),
@@ -92,13 +92,13 @@ public enum XuguObjectType implements DBSObjectType {
         }
     }),
 	PROGRAM("PROGRAM", null, DBSObject.class, null),
-    QUEUE("QUEUE", null, XuguQueue.class, new ObjectFinder() {
-        @Override
-        public XuguQueue findObject(DBRProgressMonitor monitor, XuguSchema schema, String objectName) throws DBException
-        {
-            return schema.queueCache.getObject(monitor, schema, objectName);
-        }
-    }),
+//    QUEUE("QUEUE", null, XuguQueue.class, new ObjectFinder() {
+//        @Override
+//        public XuguQueue findObject(DBRProgressMonitor monitor, XuguSchema schema, String objectName) throws DBException
+//        {
+//            return schema.queueCache.getObject(monitor, schema, objectName);
+//        }
+//    }),
 	RULE("RULE", null, DBSObject.class, null),
 	RULE_SET("RULE SET", null, DBSObject.class, null),
 	SCHEDULE("SCHEDULE", null, DBSObject.class, null),

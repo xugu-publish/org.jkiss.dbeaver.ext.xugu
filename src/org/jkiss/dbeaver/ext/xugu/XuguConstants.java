@@ -217,11 +217,12 @@ public class XuguConstants {
 	public static final String PROP_SESSION_TERRITORY = null;
 	public static final String PROP_SESSION_LANGUAGE = null;
 	public static final String PROP_SESSION_NLS_DATE_FORMAT = null;
-	public static final String PROP_INTERNAL_LOGON = null;
+	//xfc 用户角色 SYSDBA DBA NORMAL
+	public static final String PROP_INTERNAL_LOGON = "SYSDBA";
 	public static final int EC_FEATURE_NOT_SUPPORTED = 0;
 	public static final String OS_AUTH_PROP = null;
 	public static final String PROP_USE_RULE_HINT = null;
-	public static final String USER_PUBLIC = null;
+	public static final String USER_PUBLIC = "GUEST";
 	public static final Object TYPE_FQ_XML = null;
 	public static final Object TYPE_NAME_XML = null;
 	public static final String PREF_EXPLAIN_TABLE_NAME = null;
