@@ -85,6 +85,7 @@ public class XuguDataSource extends JDBCDataSource
     private boolean useRuleHint;
     //xfc 添加了用户角色属性
     private String userRole;
+    private String roleFlag;
     
     private List<XuguCharset> charsets;
 
@@ -315,6 +316,10 @@ public class XuguDataSource extends JDBCDataSource
         return useRuleHint;
     }
 
+    public String getRoleFlag() {
+    	return this.roleFlag;
+    }
+    
     @Association
     public Collection<XuguSchema> getSchemas(DBRProgressMonitor monitor) throws DBException {
         return schemaCache.getAllObjects(monitor, this);
@@ -407,7 +412,13 @@ public class XuguDataSource extends JDBCDataSource
         }
         //xfc 从连接信息中获取userRole
         this.userRole = connectionInfo.getProviderProperty(XuguConstants.PROP_INTERNAL_LOGON);
-        
+        if(this.userRole.equals("SYSDBA")) {
+        	this.roleFlag = "SYS";
+        }else if(this.userRole.equals("DBA")) {
+        	this.roleFlag = "DBA";
+        }else {
+        	this.roleFlag = "USER";
+        }
         this.publicSchema = new XuguSchema(this, 1, XuguConstants.USER_PUBLIC);
         {
             try (JDBCSession session = DBUtils.openMetaSession(monitor, this, "Load data source meta info")) {
@@ -848,16 +859,9 @@ public class XuguDataSource extends JDBCDataSource
             if (!CommonUtils.isEmpty(owner.activeSchemaName)) {
 //            schemasQuery.append("\nUNION ALL SELECT '").append(owner.activeSchemaName).append("' AS USERNAME FROM DUAL");
             	//xfc 根据owner的用户角色选取不同的语句来查询schema
-            	String userRole = owner.userRole;
-            	if(userRole.equals("SYSDBA"))
-            		schemasQuery.append("select * from sys_schemas");
-            		//schemasQuery.append(XuguExecuteSQL_SYSDBA.gui_dialog_create_CreateRealJobDialog_schema);
-            	else if(userRole.equals("DBA"))
-            		schemasQuery.append("select * from dba_schemas");
-            		//schemasQuery.append(XuguExecuteSQL_DBA.gui_dialog_create_CreateRealJobDialog_schema);
-            	else
-            		schemasQuery.append("select * from all_schemas");
-            		//schemasQuery.append(XuguExecuteSQL_NORMAL.gui_dialog_create_CreateRealJobDialog_schema);
+            	schemasQuery.append("SELECT * FROM ");
+            	schemasQuery.append(owner.roleFlag);
+            	schemasQuery.append("_SCHEMAS");
             }
 //            schemasQuery.append("\nORDER BY USERNAME");
             System.out.println("QQQQQQ "+schemasQuery.toString());

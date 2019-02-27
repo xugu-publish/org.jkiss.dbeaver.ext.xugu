@@ -73,6 +73,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
 
     private long id;
     private String name;
+    private String roleFlag;
     //private Date createTime;
     private transient XuguUser user;
 
@@ -81,6 +82,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         super(dataSource, id > 0);
         this.id = id;
         this.name = name;
+        this.roleFlag = dataSource.getRoleFlag();
     }
 
     public XuguSchema(@NotNull XuguDataSource dataSource, @NotNull ResultSet dbResult)
@@ -88,6 +90,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         super(dataSource, true);
         this.id = JDBCUtils.safeGetLong(dbResult, "SCHEMA_ID");
         this.name = JDBCUtils.safeGetString(dbResult, "SCHEMA_NAME");
+        this.roleFlag = dataSource.getRoleFlag();
         if (CommonUtils.isEmpty(this.name)) {
             log.warn("Empty schema name fetched");
             this.name = "? " + super.hashCode();
@@ -419,7 +422,10 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         public JDBCStatement prepareLookupStatement(@NotNull JDBCSession session, @NotNull XuguSchema owner, @Nullable XuguTableBase object, @Nullable String objectName) throws SQLException {
         	//xfc 根据schema name 查询所有表
         	StringBuilder sql = new StringBuilder();
-        	sql.append("select * from all_tables where schema_id ="+owner.id);
+        	sql.append("SELECT * FROM ");
+        	sql.append(owner.roleFlag);
+        	sql.append("_TABLES WHERE SCHEMA_ID=");
+        	sql.append(owner.id);
         	final JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
         	System.out.println("prepareLookup stmt "+dbStat.getQueryString());
         
@@ -445,12 +451,14 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
             throws SQLException
         {
         	//xfc 修改了获取列信息的sql
-            String colsTable = "all_columns";
             StringBuilder sql = new StringBuilder(500);
             sql.append("SELECT * FROM ");
-            sql.append(colsTable);
+        	sql.append(owner.roleFlag);
+        	sql.append("_COLUMNS");
             if (forTable != null) {
-                sql.append(" where TABLE_ID=(SELECT TABLE_ID FROM all_tables where TABLE_NAME='");
+                sql.append(" where TABLE_ID=(SELECT TABLE_ID FROM");
+                sql.append(owner.roleFlag);
+                sql.append("_TABLES WHERE TABLE_NAME='");
                 sql.append(forTable.getName());
                 sql.append("')");
             }
@@ -489,12 +497,14 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
             throws SQLException
         {
         	//xfc 修改了获取约束信息的sql
-        	String constsTable = "all_constraints";
             StringBuilder sql = new StringBuilder(500);
             sql.append("SELECT * FROM ");
-            sql.append(constsTable);
+        	sql.append(owner.roleFlag);
+        	sql.append("_CONSTRAINTS");
             if (forTable != null) {
-                sql.append(" where TABLE_ID=(SELECT TABLE_ID FROM all_tables where TABLE_NAME='");
+                sql.append(" WHERE TABLE_ID=(SELECT TABLE_ID FROM");
+                sql.append(owner.roleFlag);
+                sql.append("_TABLES WHERE TABLE_NAME='");
                 sql.append(forTable.getName());
                 sql.append("')");
             }
@@ -557,9 +567,13 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         {
         	//xfc 修改了获取外键信息的sql
             StringBuilder sql = new StringBuilder(500);
-            sql.append("SELECT * FROM all_constraints WHERE CONS_TYPE='F'");
+            sql.append("SELECT * FROM ");
+            sql.append(owner.roleFlag);
+            sql.append("_CONSTRAINTS WHERE CONS_TYPE='F'");
             if (forTable != null) {
-                sql.append(" AND TABLE_ID=(SELECT TABLE_ID FROM all_tables where TABLE_NAME='");
+                sql.append(" AND TABLE_ID=(SELECT TABLE_ID FROM");
+                sql.append(owner.roleFlag);
+                sql.append("_TABLES WHERE TABLE_NAME='");
                 sql.append(forTable.getName());
                 sql.append("')");
             }
@@ -615,9 +629,13 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         {
         	//xfc 修改了获取索引信息的sql
             StringBuilder sql = new StringBuilder();
-            sql.append("SELECT * FROM all_indexes");
+            sql.append("SELECT * FROM ");
+            sql.append(owner.roleFlag);
+            sql.append("_INDEXES");
             if (forTable != null) {
-                sql.append(" where TABLE_ID=(SELECT TABLE_ID FROM all_tables where TABLE_NAME='");
+                sql.append(" WHERE TABLE_ID=(SELECT TABLE_ID FROM");
+                sql.append(owner.roleFlag);
+                sql.append("_TABLES WHERE TABLE_NAME='");
                 sql.append(forTable.getName());
                 sql.append("')");
             }
@@ -674,8 +692,12 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguSchema owner) throws SQLException
         {
         	//xfc 修改了获取数据类型的sql语句
-            JDBCPreparedStatement dbStat = session.prepareStatement(
-                "SELECT * FROM all_types WHERE SCHEMA_ID="+owner.id);
+        	StringBuilder sql = new StringBuilder();
+        	sql.append("SELECT * FROM ");
+        	sql.append(owner.roleFlag);
+        	sql.append("_TYPES WHERE SCHEMA_ID=");
+        	sql.append(owner.id);
+            JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
             return dbStat;
         }
 
@@ -694,8 +716,11 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguSchema owner) throws SQLException
         {
         	//xfc 修改了获取sequence信息的sql
-            final JDBCPreparedStatement dbStat = session.prepareStatement(
-                "SELECT * FROM ALL_SEQUENCES ORDER BY SEQUENCE_NAME");
+        	StringBuilder sql = new StringBuilder();
+        	sql.append("SELECT * FROM ");
+        	sql.append(owner.roleFlag);
+        	sql.append("_SEQUENCES ORDER BY SEQUENCE_NAME");
+            final JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
             return dbStat;
         }
 
@@ -735,8 +760,12 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         @Override
         public JDBCStatement prepareLookupStatement(@NotNull JDBCSession session, @NotNull XuguSchema owner, @Nullable XuguProcedureStandalone object, @Nullable String objectName) throws SQLException {
             //xfc 修改了获取存储过程信息的sql语句
-        	JDBCPreparedStatement dbStat = session.prepareStatement(
-                "SELECT * FROM all_procedures WHERE schema_id="+owner.id);
+        	StringBuilder sql = new StringBuilder();
+        	sql.append("SELECT * FROM ");
+        	sql.append(owner.roleFlag);
+        	sql.append("_PROCEDURES WHERE SCHEMA_ID=");
+        	sql.append(owner.id);
+        	JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
             return dbStat;
         }
 
@@ -756,8 +785,12 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
             throws SQLException
         {
         	//xfc 修改了获取所有包信息的sql语句
-            JDBCPreparedStatement dbStat = session.prepareStatement(
-                "SELECT * FROM all_packages WHERE schema_ID="+owner.id);
+        	StringBuilder sql = new StringBuilder();
+        	sql.append("SELECT * FROM ");
+        	sql.append(owner.roleFlag);
+        	sql.append("_PACKAGES WHERE SCHEMA_ID=");
+        	sql.append(owner.id);
+            JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
             return dbStat;
         }
 
@@ -778,8 +811,12 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguSchema owner) throws SQLException
         {
         	//xfc 修改了获取同义词信息的语句
-            JDBCPreparedStatement dbStat = session.prepareStatement(
-                "SELECT * FROM all_synonyms WHERE schema_id="+owner.id);
+        	StringBuilder sql = new StringBuilder();
+        	sql.append("SELECT * FROM ");
+        	sql.append(owner.roleFlag);
+        	sql.append("_SYNONYMS WHERE SCHEMA_ID=");
+        	sql.append(owner.id);
+            JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
             return dbStat;
         }
 
@@ -797,8 +834,12 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
             throws SQLException
         {
         	//xfc 修改了获取所有视图信息的sql
-            JDBCPreparedStatement dbStat = session.prepareStatement(
-                "SELECT * FROM ALL_VIEWS WHERE ="+owner.id);
+        	StringBuilder sql = new StringBuilder();
+        	sql.append("SELECT * FROM ");
+        	sql.append(owner.roleFlag);
+        	sql.append("_VIEWS WHERE SCHEMA_ID=");
+        	sql.append(owner.roleFlag);
+            JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
             return dbStat;
         }
 
@@ -818,8 +859,11 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
             throws SQLException
         {
         	//xfc 修改了获取所有dblink信息的sql
-            JDBCPreparedStatement dbStat = session.prepareStatement(
-                "SELECT * FROM SYS_DBLINKS");
+        	StringBuilder sql = new StringBuilder();
+        	sql.append("SELECT * FROM ");
+        	sql.append(owner.roleFlag);
+        	sql.append("_DBLINKS");
+            JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
             return dbStat;
         }
 
@@ -838,8 +882,12 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguSchema schema) throws SQLException
         {
         	//xfc 修改了获取所有触发器信息的sql语句
-            JDBCPreparedStatement dbStat = session.prepareStatement(
-                "SELECT * FROM ALL_TRIGGERS WHERE SCHEMA_ID="+schema.id);
+        	StringBuilder sql = new StringBuilder();
+        	sql.append("SELECT * FROM ");
+        	sql.append(schema.roleFlag);
+        	sql.append("_TRIGGERS WHERE SCHEMA_ID=");
+        	sql.append(schema.id);
+            JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
             return dbStat;
         }
 
@@ -878,8 +926,11 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
                 throws SQLException
         {
         	//xfc 修改了获取所有job信息的sql语句
-            JDBCPreparedStatement dbStat = session.prepareStatement(
-                    "SELECT * FROM ALL_JOBS");
+        	StringBuilder sql = new StringBuilder();
+        	sql.append("SELECT * FROM ");
+        	sql.append(owner.roleFlag);
+        	sql.append("_JOBS");
+            JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
             return dbStat;
         }
 
