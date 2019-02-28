@@ -152,8 +152,10 @@ public class XuguDataSource extends JDBCDataSource
 */
 
         try {
+        	System.out.println("PPPPPPP? "+purpose);
             return super.openConnection(monitor, remoteInstance, purpose);
         } catch (DBCException e) {
+        	System.out.println("PPPPPPP? "+purpose);
             if (e.getErrorCode() == XuguConstants.EC_PASSWORD_EXPIRED) {
                 // Here we could try to ask for expired password change
                 // This is supported  for thin driver since xugu 12.2
@@ -851,19 +853,13 @@ public class XuguDataSource extends JDBCDataSource
 
             //过滤条件
             DBSObjectFilter schemaFilters = owner.getContainer().getObjectFilter(XuguSchema.class, null, false);
-//            if (schemaFilters != null) {
-//            	System.out.println("FFFilter is not null!");
-//                JDBCUtils.appendFilterClause(schemasQuery, schemaFilters, "U.USERNAME", false);
-//            }
             
             if (!CommonUtils.isEmpty(owner.activeSchemaName)) {
-//            schemasQuery.append("\nUNION ALL SELECT '").append(owner.activeSchemaName).append("' AS USERNAME FROM DUAL");
             	//xfc 根据owner的用户角色选取不同的语句来查询schema
             	schemasQuery.append("SELECT * FROM ");
             	schemasQuery.append(owner.roleFlag);
             	schemasQuery.append("_SCHEMAS");
             }
-//            schemasQuery.append("\nORDER BY USERNAME");
             System.out.println("QQQQQQ "+schemasQuery.toString());
             JDBCPreparedStatement dbStat = session.prepareStatement(schemasQuery.toString());
             if (schemaFilters != null) {
@@ -893,9 +889,8 @@ public class XuguDataSource extends JDBCDataSource
     static class DataTypeCache extends JDBCObjectCache<XuguDataSource, XuguDataType> {
         @Override
         protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguDataSource owner) throws SQLException {
-            return session.prepareStatement(
-                "SELECT " + XuguUtils.getSysCatalogHint(owner.getDataSource()) + " * FROM " +
-                   XuguUtils.getAdminAllViewPrefix(session.getProgressMonitor(), owner, "TYPES") + " WHERE OWNER IS NULL ORDER BY TYPE_NAME");
+            //xfc 修改了获取数据类型的sql语句
+        	return session.prepareStatement("SELECT * FROM SYS_DATATYPES");
         }
 
         @Override
@@ -907,8 +902,9 @@ public class XuguDataSource extends JDBCDataSource
     static class TablespaceCache extends JDBCObjectCache<XuguDataSource, XuguTablespace> {
         @Override
         protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguDataSource owner) throws SQLException {
-            return session.prepareStatement(
-                "SELECT * FROM " + XuguUtils.getSysUserViewName(session.getProgressMonitor(), owner, "TABLESPACES") + " ORDER BY TABLESPACE_NAME");
+            //xfc 修改了获取表空间信息的sql语句
+        	return session.prepareStatement(
+                "SELECT * FROM "+owner.roleFlag+"TABLESPACES");
         }
 
         @Override
@@ -920,8 +916,9 @@ public class XuguDataSource extends JDBCDataSource
     static class UserCache extends JDBCObjectCache<XuguDataSource, XuguUser> {
         @Override
         protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguDataSource owner) throws SQLException {
-            return session.prepareStatement(
-                "SELECT * FROM " + XuguUtils.getAdminAllViewPrefix(session.getProgressMonitor(), owner, "USERS") + " ORDER BY USERNAME");
+            //xfc 修改了获取用户信息的sql语句
+        	return session.prepareStatement(
+                "SELECT * FROM "+owner.roleFlag+"_USERS");
         }
 
         @Override

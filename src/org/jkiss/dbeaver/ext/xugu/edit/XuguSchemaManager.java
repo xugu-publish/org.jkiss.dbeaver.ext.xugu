@@ -77,9 +77,8 @@ public class XuguSchemaManager extends SQLObjectEditor<XuguSchema, XuguDataSourc
                 if (dialog.open() != IDialogConstants.OK_ID) {
                     return null;
                 }
-                XuguSchema newSchema = new XuguSchema(parent, -1, dialog.getUser().getName());
+                XuguSchema newSchema = new XuguSchema(parent, -1, dialog.getSchema().getName());
                 newSchema.setUser(dialog.getUser());
-
                 return newSchema;
             }
         }.execute();
@@ -88,12 +87,11 @@ public class XuguSchemaManager extends SQLObjectEditor<XuguSchema, XuguDataSourc
     @Override
     protected void addObjectCreateActions(DBRProgressMonitor monitor, List<DBEPersistAction> actions, ObjectCreateCommand command, Map<String, Object> options)
     {
+    	//xfc 修改了创建模式的sql语句 暂时不支持设置数据库
         XuguUser user = command.getObject().getUser();
-        String sql = "CREATE USER " + DBUtils.getQuotedIdentifier(user);
-        if (!CommonUtils.isEmpty(user.getPassword())) {
-            sql += " IDENTIFIED BY \"" + user.getPassword() + "\"";
-        }
-
+        XuguSchema schema = command.getObject();
+        String sql = "CREATE SCHEMA " + schema.getName() +" AUTHORIZATION " +user.getName();
+        System.out.println("CCCCCSQL "+sql);		
         actions.add(new SQLDatabasePersistAction("Create schema", sql));
     }
 
@@ -102,10 +100,10 @@ public class XuguSchemaManager extends SQLObjectEditor<XuguSchema, XuguDataSourc
     {
         actions.add(
             new SQLDatabasePersistAction("Drop schema",
-                "DROP USER " + DBUtils.getQuotedIdentifier(command.getObject()) + " CASCADE") //$NON-NLS-2$
+                "DROP SCHEMA " + DBUtils.getQuotedIdentifier(command.getObject()) + " CASCADE") //$NON-NLS-2$
         );
     }
-
+    
     @Override
     public void renameObject(DBECommandContext commandContext, XuguSchema schema, String newName) throws DBException
     {
@@ -113,15 +111,19 @@ public class XuguSchemaManager extends SQLObjectEditor<XuguSchema, XuguDataSourc
     }
 
     static class NewUserDialog extends Dialog {
-
-        private XuguUser user;
+    	
+    	private XuguSchema schema;
+    	private XuguUser user;
         private Text nameText;
-        private Text passwordText;
+        //private Text dbNameText;
+        private Text userNameText;
+		
 
         public NewUserDialog(Shell parentShell, XuguDataSource dataSource)
         {
             super(parentShell);
-            this.user = new XuguUser(dataSource);
+            this.schema = new XuguSchema(dataSource, -1, null);
+            this.user = new XuguUser(dataSource);   
         }
 
         public XuguUser getUser()
@@ -129,6 +131,10 @@ public class XuguSchemaManager extends SQLObjectEditor<XuguSchema, XuguDataSourc
             return user;
         }
 
+        public XuguSchema getSchema() {
+        	return schema;
+        }
+        
         @Override
         protected boolean isResizable()
         {
@@ -138,18 +144,23 @@ public class XuguSchemaManager extends SQLObjectEditor<XuguSchema, XuguDataSourc
         @Override
         protected Control createDialogArea(Composite parent)
         {
-            getShell().setText("Set schema/user properties");
+            getShell().setText("Set schema properties");
 
             Control container = super.createDialogArea(parent);
-            Composite composite = UIUtils.createPlaceholder((Composite) container, 2, 5);
+            Composite composite = UIUtils.createPlaceholder((Composite) container, 3, 5);
             composite.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-            nameText = UIUtils.createLabelText(composite, "Schema/User Name", null);
+            nameText = UIUtils.createLabelText(composite, "Schema Name", null);
             nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-            passwordText = UIUtils.createLabelText(composite, "User Password", null, SWT.BORDER | SWT.PASSWORD);
-            passwordText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+            
+            //xfc 增加了设置数据库名和用户名
+//            dbNameText  = UIUtils.createLabelText(composite, "DB Name", null);
+//            dbNameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+            
+            userNameText = UIUtils.createLabelText(composite, "User Name", null);
+            userNameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-            UIUtils.createInfoLabel(composite, "Creating a schema is the same as creating a user.\nYou need to specify a password.", GridData.FILL_HORIZONTAL, 2);
+            UIUtils.createInfoLabel(composite, "Creating a schema.", GridData.FILL_HORIZONTAL, 2);
 
             return parent;
         }
@@ -157,8 +168,9 @@ public class XuguSchemaManager extends SQLObjectEditor<XuguSchema, XuguDataSourc
         @Override
         protected void okPressed()
         {
-            user.setName(DBObjectNameCaseTransformer.transformObjectName(user, nameText.getText()));
-            user.setPassword(passwordText.getText());
+            user.setName(DBObjectNameCaseTransformer.transformObjectName(user, userNameText.getText()));
+            schema.setName(DBObjectNameCaseTransformer.transformObjectName(schema,nameText.getText()));
+            schema.setUser(user);
             super.okPressed();
         }
 

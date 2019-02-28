@@ -267,6 +267,13 @@
                 class="org.jkiss.dbeaver.ext.xugu.views.XuguConnectionPage">
         </view>
     </extension>
+    
+    <extension point="org.jkiss.dbeaver.ui.propertyConfigurator">
+        <propertyConfigurator class="org.jkiss.dbeaver.ext.mysql.model.net.MySQLSSLHandlerImpl" uiClass="org.jkiss.dbeaver.ext.mysql.views.MySQLSSLConfigurator"/>
+    	<view
+    		id="org.jkiss.dbeaver.ext.xugu.testView">
+    	</view>
+    </extension>
 
     <extension point="org.jkiss.dbeaver.objectManager">
         <manager class="org.jkiss.dbeaver.ext.xugu.edit.XuguDataTypeManager" objectType="org.jkiss.dbeaver.ext.xugu.model.XuguDataType"/>

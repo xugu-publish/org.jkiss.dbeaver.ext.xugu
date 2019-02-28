@@ -49,7 +49,6 @@ import org.jkiss.utils.CommonUtils;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.TimeZone;
-
 /**
  * XuguConnectionPage
  */
