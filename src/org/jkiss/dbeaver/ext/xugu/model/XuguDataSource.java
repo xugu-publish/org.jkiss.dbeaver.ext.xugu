@@ -904,7 +904,7 @@ public class XuguDataSource extends JDBCDataSource
         protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguDataSource owner) throws SQLException {
             //xfc 修改了获取表空间信息的sql语句
         	return session.prepareStatement(
-                "SELECT * FROM "+owner.roleFlag+"TABLESPACES");
+                "SELECT * FROM "+owner.roleFlag+"_TABLESPACES");
         }
 
         @Override

@@ -32,9 +32,13 @@
                   icon="icons/xugu_icon.png"
                   label="Xugu data source"
                   path="xugu">
+                  <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguUser" label="%tree.users.node.name" icon="#folder_user" description="Users">
+                    	<items label="%tree.user.node.name" path="user" property="users" icon="#user"/>
+                	</folder>
                 <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguSchema" label="%tree.schemas.node.name" icon="#folder_schema" description="Database schemas">
                     <items label="%tree.schema.node.name" path="schema" property="schemas" icon="#schema">
                         <icon if="object.system" icon="#schema_system"/>
+                      
                       <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguTable" label="%tree.tables.node.name" icon="#folder_table" description="Tables">
                             <items label="%tree.table.node.name" path="table" property="tables" icon="#table">
                                 <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguTableColumn" label="%tree.columns.node.name" icon="#columns" description="Table columns">
@@ -276,6 +280,7 @@
     </extension>
 
     <extension point="org.jkiss.dbeaver.objectManager">
+    	<manager class="org.jkiss.dbeaver.ext.xugu.edit.XuguUserManager" objectType="org.jkiss.dbeaver.ext.xugu.model.XuguUser"/>
         <manager class="org.jkiss.dbeaver.ext.xugu.edit.XuguDataTypeManager" objectType="org.jkiss.dbeaver.ext.xugu.model.XuguDataType"/>
         <manager class="org.jkiss.dbeaver.ext.xugu.edit.XuguSchemaManager" objectType="org.jkiss.dbeaver.ext.xugu.model.XuguSchema"/>
         <manager class="org.jkiss.dbeaver.ext.xugu.edit.XuguTableManager" objectType="org.jkiss.dbeaver.ext.xugu.model.XuguTable"/>
@@ -318,6 +323,15 @@
             label="DDL" description="DDL" icon="#sql_text" position="additions_middle"
             contributor="org.jkiss.dbeaver.ui.editors.sql.SQLEditorContributorNested" type="folder">
             <objectType name="org.jkiss.dbeaver.ext.xugu.model.XuguTable"/>
+        </editor>
+        <editor
+            id="org.jkiss.dbeaver.ext.xugu.editors.XuguUserEditorGeneral"
+            class="org.jkiss.dbeaver.ext.xugu.editors.XuguUserEditorGeneral"
+            objectType="org.jkiss.dbeaver.ext.xugu.model.XuguUser"
+            main="true"
+            label="%editor.general.name"
+            description="General user settings"
+            icon="#user">
         </editor>
         <editor
                 id="org.jkiss.dbeaver.ext.xugu.editors.SchedulerJobLogEditor"

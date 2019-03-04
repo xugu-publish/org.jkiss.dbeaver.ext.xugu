@@ -20,15 +20,17 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.model.DBPRefreshableObject;
+import org.jkiss.dbeaver.model.DBPSaveableObject;
 import org.jkiss.dbeaver.model.access.DBAUser;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
 import org.jkiss.dbeaver.model.meta.Association;
-import org.jkiss.dbeaver.model.meta.IPropertyCacheValidator;
-import org.jkiss.dbeaver.model.meta.LazyProperty;
-import org.jkiss.dbeaver.model.meta.Property;
+//import org.jkiss.dbeaver.model.meta.IPropertyCacheValidator;
+//import org.jkiss.dbeaver.model.meta.LazyProperty;
+//import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSObject;
-import org.jkiss.dbeaver.model.struct.DBSObjectLazy;
+//import org.jkiss.dbeaver.model.struct.DBSObjectLazy;
 
 import java.sql.ResultSet;
 import java.sql.Timestamp;
@@ -37,23 +39,35 @@ import java.util.Collection;
 /**
  * OracleUser
  */
-public class XuguUser extends XuguGrantee implements DBAUser, DBSObjectLazy<XuguDataSource>
+public class XuguUser extends XuguGrantee implements DBAUser, DBPRefreshableObject, DBPSaveableObject
 {
     private static final Log log = Log.getLog(XuguUser.class);
-
-    private long id;
-    private String name;
-    private String externalName;
-    private String status;
-    private Timestamp createDate;
-    private Timestamp lockDate;
-    private Timestamp expiryDate;
-    private Object defaultTablespace;
-    private Object tempTablespace;
-    private Object profile;
-    private String consumerGroup;
-    private transient String password;
-
+    
+    //xfc 修改了用户信息的字段
+    private int db_id;
+	private int user_id;
+    private String user_name;
+    private boolean is_role;
+    private byte[] password;
+    private Timestamp start_time;
+    private Timestamp until_time;
+    private boolean locked;
+    private boolean expired;
+    private Timestamp pass_set_time;
+    private Timestamp pass_set_period;
+    private String alias;
+    private boolean is_sys;
+    private String trust_ip;
+    private int mem_quota;
+    private int temp_space_quota;
+    private int undo_space_quota;
+    private int cursor_quota;
+    private int session_quota;
+    private int io_quota;
+    private Timestamp create_time;
+    private Timestamp last_modi_time;
+    
+    
     public XuguUser(XuguDataSource dataSource)
     {
         super(dataSource);
@@ -61,123 +75,162 @@ public class XuguUser extends XuguGrantee implements DBAUser, DBSObjectLazy<Xugu
 
     public XuguUser(XuguDataSource dataSource, ResultSet resultSet) {
         super(dataSource);
-        this.id = JDBCUtils.safeGetLong(resultSet, "USER_ID");
-        this.name = JDBCUtils.safeGetString(resultSet, "USERNAME");
-        this.externalName = JDBCUtils.safeGetString(resultSet, "EXTERNAL_NAME");
-        this.status = JDBCUtils.safeGetString(resultSet, "ACCOUNT_STATUS");
-
-        this.createDate = JDBCUtils.safeGetTimestamp(resultSet, "CREATED");
-        this.lockDate = JDBCUtils.safeGetTimestamp(resultSet, "LOCK_DATE");
-        this.expiryDate = JDBCUtils.safeGetTimestamp(resultSet, "EXPIRY_DATE");
-        this.defaultTablespace = JDBCUtils.safeGetString(resultSet, "DEFAULT_TABLESPACE");
-        this.tempTablespace = JDBCUtils.safeGetString(resultSet, "TEMPORARY_TABLESPACE");
-
-        this.profile = JDBCUtils.safeGetString(resultSet, "PROFILE");
-        this.consumerGroup = JDBCUtils.safeGetString(resultSet, "INITIAL_RSRC_CONSUMER_GROUP");
-    }
-
-    @Property(order = 1)
-    public long getId()
-    {
-        return id;
-    }
-
-    @NotNull
-    @Override
-    @Property(viewable = true, order = 2)
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
-    }
-
-    @Property(order = 3)
-    public String getExternalName()
-    {
-        return externalName;
-    }
-
-    @Property(viewable = true, order = 4)
-    public String getStatus()
-    {
-        return status;
-    }
-
-    @Property(viewable = true, order = 5)
-    public Timestamp getCreateDate()
-    {
-        return createDate;
-    }
-
-    @Property(order = 6)
-    public Timestamp getLockDate()
-    {
-        return lockDate;
-    }
-
-    @Property(order = 7)
-    public Timestamp getExpiryDate()
-    {
-        return expiryDate;
-    }
-
-    @Property(order = 8)
-    @LazyProperty(cacheValidator = XuguTablespace.TablespaceReferenceValidator.class)
-    public Object getDefaultTablespace(DBRProgressMonitor monitor) throws DBException
-    {
-        return XuguTablespace.resolveTablespaceReference(monitor, this, "defaultTablespace");
-    }
-
-    @Property(order = 9)
-    @LazyProperty(cacheValidator = XuguTablespace.TablespaceReferenceValidator.class)
-    public Object getTempTablespace(DBRProgressMonitor monitor) throws DBException
-    {
-        return XuguTablespace.resolveTablespaceReference(monitor, this, "tempTablespace");
-    }
-
-    @Override
-    public Object getLazyReference(Object propertyId)
-    {
-        if ("defaultTablespace".equals(propertyId)) {
-            return defaultTablespace;
-        } else if ("tempTablespace".equals(propertyId)) {
-            return tempTablespace;
-        } else if ("profile".equals(propertyId)) {
-            return profile;
-        } else {
-            return null;
+        if(resultSet!=null) {
+        	this.db_id = JDBCUtils.safeGetInt(resultSet, "DB_ID");
+            this.user_id = JDBCUtils.safeGetInt(resultSet, "USER_ID");
+            this.user_name = JDBCUtils.safeGetString(resultSet, "USER_NAME");
+            this.is_role = JDBCUtils.safeGetBoolean(resultSet, "IS_ROLE");
+            this.password = JDBCUtils.safeGetBytes(resultSet, "PASSWORD");
+            this.start_time = JDBCUtils.safeGetTimestamp(resultSet, "START_TIME");
+            this.until_time = JDBCUtils.safeGetTimestamp(resultSet, "UNTIL_TIME");
+            this.locked = JDBCUtils.safeGetBoolean(resultSet, "LOCKED");
+            this.expired = JDBCUtils.safeGetBoolean(resultSet, "EXPIRED");
+            this.pass_set_time = JDBCUtils.safeGetTimestamp(resultSet, "PASS_SET_TIME");
+            this.pass_set_period = JDBCUtils.safeGetTimestamp(resultSet, "PASS_SET_PERIOD");
+            this.alias = JDBCUtils.safeGetString(resultSet, "ALIAS");
+            this.is_sys = JDBCUtils.safeGetBoolean(resultSet, "IS_SYS");
+            this.trust_ip = JDBCUtils.safeGetString(resultSet, "TRUST_IP");
+            this.mem_quota = JDBCUtils.safeGetInt(resultSet, "MEM_QUOTA");
+            this.temp_space_quota = JDBCUtils.safeGetInt(resultSet, "TEMP_SPACE_QUOTA");
+            this.undo_space_quota = JDBCUtils.safeGetInt(resultSet, "UNDO_SPACE_QUOTA");
+            this.cursor_quota = JDBCUtils.safeGetInt(resultSet, "CURSOR_QUOTA");
+            this.session_quota = JDBCUtils.safeGetInt(resultSet, "SESSION_QUOTA");
+            this.io_quota = JDBCUtils.safeGetInt(resultSet, "IO_QUOTA");
+            this.create_time = JDBCUtils.safeGetTimestamp(resultSet, "CREATE_TIME");
+            this.last_modi_time = JDBCUtils.safeGetTimestamp(resultSet, "LAST_MODI_TIME");
         }
     }
 
-    @Property(order = 10)
-    @LazyProperty(cacheValidator = ProfileReferenceValidator.class)
-    public Object getProfile(DBRProgressMonitor monitor) throws DBException
-    {
-        return XuguUtils.resolveLazyReference(monitor, getDataSource(), getDataSource().profileCache, this, "profile");
-    }
+    public static Log getLog() {
+		return log;
+	}
 
-    @Property(order = 11)
-    public String getConsumerGroup()
-    {
-        return consumerGroup;
-    }
+	public int getDb_id() {
+		return db_id;
+	}
 
-    /**
-     * Passwords are never read from database. It is used to create/alter schema/user
-     * @return password or null
-     */
-    public String getPassword()
-    {
-        return password;
-    }
+	public int getUser_id() {
+		return user_id;
+	}
 
-    public void setPassword(String password)
+	@Override
+	public String getName() {
+		return user_name;
+	}
+
+    public void setName(String name)
+    {
+        this.user_name = name;
+    }
+	
+    public byte[] getPassword() {
+    	return this.password;
+    }
+    
+    public void setPassword(byte[] password)
     {
         this.password = password;
     }
+    
+	public boolean isIs_role() {
+		return is_role;
+	}
+
+	public Timestamp getStart_time() {
+		return start_time;
+	}
+
+	public Timestamp getUntil_time() {
+		return until_time;
+	}
+
+	public boolean isLocked() {
+		return locked;
+	}
+
+	public boolean isExpired() {
+		return expired;
+	}
+
+	public Timestamp getPass_set_time() {
+		return pass_set_time;
+	}
+
+	public Timestamp getPass_set_period() {
+		return pass_set_period;
+	}
+
+	public String getAlias() {
+		return alias;
+	}
+
+	public boolean isIs_sys() {
+		return is_sys;
+	}
+
+	public String getTrust_ip() {
+		return trust_ip;
+	}
+
+	public int getMem_quota() {
+		return mem_quota;
+	}
+
+	public int getTemp_space_quota() {
+		return temp_space_quota;
+	}
+
+	public int getUndo_space_quota() {
+		return undo_space_quota;
+	}
+
+	public int getCursor_quota() {
+		return cursor_quota;
+	}
+
+	public int getSession_quota() {
+		return session_quota;
+	}
+
+	public int getIo_quota() {
+		return io_quota;
+	}
+
+	public Timestamp getCreate_time() {
+		return create_time;
+	}
+
+	public Timestamp getLast_modi_time() {
+		return last_modi_time;
+	}
+
+//    @Property(order = 8)
+//    @LazyProperty(cacheValidator = XuguTablespace.TablespaceReferenceValidator.class)
+//    public Object getDefaultTablespace(DBRProgressMonitor monitor) throws DBException
+//    {
+//        return XuguTablespace.resolveTablespaceReference(monitor, this, "defaultTablespace");
+//    }
+//
+//    @Property(order = 9)
+//    @LazyProperty(cacheValidator = XuguTablespace.TablespaceReferenceValidator.class)
+//    public Object getTempTablespace(DBRProgressMonitor monitor) throws DBException
+//    {
+//        return XuguTablespace.resolveTablespaceReference(monitor, this, "tempTablespace");
+//    }
+
+//    @Override
+//    public Object getLazyReference(Object propertyId)
+//    {
+//        if ("defaultTablespace".equals(propertyId)) {
+//            return defaultTablespace;
+//        } else if ("tempTablespace".equals(propertyId)) {
+//            return tempTablespace;
+//        } else if ("profile".equals(propertyId)) {
+//            return profile;
+//        } else {
+//            return null;
+//        }
+//    }
 
     @Override
     @Association
@@ -192,15 +245,15 @@ public class XuguUser extends XuguGrantee implements DBAUser, DBSObjectLazy<Xugu
         return super.refreshObject(monitor);
     }
 
-    public static class ProfileReferenceValidator implements IPropertyCacheValidator<XuguUser> {
-        @Override
-        public boolean isPropertyCached(XuguUser object, Object propertyId)
-        {
-            return
-                object.getLazyReference(propertyId) instanceof XuguUserProfile ||
-                object.getLazyReference(propertyId) == null ||
-                object.getDataSource().profileCache.isFullyCached();
-        }
-    }
+//    public static class ProfileReferenceValidator implements IPropertyCacheValidator<XuguUser> {
+//        @Override
+//        public boolean isPropertyCached(XuguUser object, Object propertyId)
+//        {
+//            return
+//                object.getLazyReference(propertyId) instanceof XuguUserProfile ||
+//                object.getLazyReference(propertyId) == null ||
+//                object.getDataSource().profileCache.isFullyCached();
+//        }
+//    }
 
 }

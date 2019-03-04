@@ -456,12 +456,13 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         	sql.append(owner.roleFlag);
         	sql.append("_COLUMNS");
             if (forTable != null) {
-                sql.append(" where TABLE_ID=(SELECT TABLE_ID FROM");
+                sql.append(" where TABLE_ID=(SELECT TABLE_ID FROM ");
                 sql.append(owner.roleFlag);
                 sql.append("_TABLES WHERE TABLE_NAME='");
                 sql.append(forTable.getName());
                 sql.append("')");
             }
+            System.out.println("sql... "+sql.toString());
             JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
             return dbStat;
         }
@@ -502,7 +503,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         	sql.append(owner.roleFlag);
         	sql.append("_CONSTRAINTS");
             if (forTable != null) {
-                sql.append(" WHERE TABLE_ID=(SELECT TABLE_ID FROM");
+                sql.append(" WHERE TABLE_ID=(SELECT TABLE_ID FROM ");
                 sql.append(owner.roleFlag);
                 sql.append("_TABLES WHERE TABLE_NAME='");
                 sql.append(forTable.getName());
@@ -571,7 +572,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
             sql.append(owner.roleFlag);
             sql.append("_CONSTRAINTS WHERE CONS_TYPE='F'");
             if (forTable != null) {
-                sql.append(" AND TABLE_ID=(SELECT TABLE_ID FROM");
+                sql.append(" AND TABLE_ID=(SELECT TABLE_ID FROM ");
                 sql.append(owner.roleFlag);
                 sql.append("_TABLES WHERE TABLE_NAME='");
                 sql.append(forTable.getName());
@@ -633,7 +634,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
             sql.append(owner.roleFlag);
             sql.append("_INDEXES");
             if (forTable != null) {
-                sql.append(" WHERE TABLE_ID=(SELECT TABLE_ID FROM");
+                sql.append(" WHERE TABLE_ID=(SELECT TABLE_ID FROM ");
                 sql.append(owner.roleFlag);
                 sql.append("_TABLES WHERE TABLE_NAME='");
                 sql.append(forTable.getName());
