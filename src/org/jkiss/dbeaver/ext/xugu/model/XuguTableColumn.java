@@ -71,12 +71,12 @@ public class XuguTableColumn extends JDBCTableColumn<XuguTableBase> implements D
         setName(JDBCUtils.safeGetString(dbResult, "COL_NAME"));
         setOrdinalPosition(JDBCUtils.safeGetInt(dbResult, "COL_NO"));
         this.typeName = JDBCUtils.safeGetString(dbResult, "TYPE_NAME");
-        this.type = XuguDataType.resolveDataType(
-            monitor,
-            getDataSource(),
-            JDBCUtils.safeGetString(dbResult, "DATA_TYPE_OWNER"),
-            this.typeName);
-        this.typeMod = XuguDataTypeModifier.resolveTypeModifier(JDBCUtils.safeGetString(dbResult, "DATA_TYPE_MOD"));
+//        this.type = XuguDataType.resolveDataType(
+//            monitor,
+//            getDataSource(),
+//            JDBCUtils.safeGetString(dbResult, "DATA_TYPE_OWNER"),
+//            this.typeName);
+//        this.typeMod = XuguDataTypeModifier.resolveTypeModifier(JDBCUtils.safeGetString(dbResult, "DATA_TYPE_MOD"));
         if (this.type != null) {
             this.typeName = type.getFullyQualifiedName(DBPEvaluationContext.DDL);
             this.valueType = type.getTypeID();
@@ -84,12 +84,12 @@ public class XuguTableColumn extends JDBCTableColumn<XuguTableBase> implements D
         if (typeMod == XuguDataTypeModifier.REF) {
             this.valueType = Types.REF;
         }
-        String charUsed = JDBCUtils.safeGetString(dbResult, "CHAR_USED");
-        setMaxLength(JDBCUtils.safeGetLong(dbResult, "C".equals(charUsed) ? "CHAR_LENGTH" : "DATA_LENGTH"));
-        setRequired(!"Y".equals(JDBCUtils.safeGetString(dbResult, "NULLABLE")));
-        setScale(JDBCUtils.safeGetInteger(dbResult, "DATA_SCALE"));
-        setPrecision(JDBCUtils.safeGetInteger(dbResult, "DATA_PRECISION"));
-        this.hidden = JDBCUtils.safeGetBoolean(dbResult, "HIDDEN_COLUMN", XuguConstants.YES);
+//        String charUsed = JDBCUtils.safeGetString(dbResult, "CHAR_USED");
+//        setMaxLength(JDBCUtils.safeGetLong(dbResult, "C".equals(charUsed) ? "CHAR_LENGTH" : "DATA_LENGTH"));
+        setRequired(!"Y".equals(JDBCUtils.safeGetString(dbResult, "NOT_NULL")));
+        setScale(JDBCUtils.safeGetInteger(dbResult, "SCALE"));
+//        setPrecision(JDBCUtils.safeGetInteger(dbResult, "DATA_PRECISION"));
+//        this.hidden = JDBCUtils.safeGetBoolean(dbResult, "HIDDEN_COLUMN", XuguConstants.YES);
     }
 
     @NotNull

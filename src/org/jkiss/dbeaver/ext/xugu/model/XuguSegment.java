@@ -51,7 +51,7 @@ public class XuguSegment<PARENT extends DBSObject> extends XuguObject<PARENT> {
         final long fileNo = JDBCUtils.safeGetInt(dbResult, "RELATIVE_FNO");
         final Object tablespace = getTablespace(monitor);
         if (tablespace instanceof XuguTablespace) {
-            this.file = ((XuguTablespace)tablespace).getFile(monitor, fileNo);
+//            this.file = ((XuguTablespace)tablespace).getFile(monitor, fileNo);
         }
         if (getDataSource().isAdmin()) {
             String ownerName = JDBCUtils.safeGetStringTrimmed(dbResult, "OWNER");

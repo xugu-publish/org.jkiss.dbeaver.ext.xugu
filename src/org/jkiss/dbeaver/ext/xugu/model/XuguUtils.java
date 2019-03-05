@@ -276,12 +276,12 @@ public class XuguUtils {
     {
         boolean useDBAView = CommonUtils.toBoolean(dataSource.getContainer().getConnectionConfiguration().getProviderProperty(XuguConstants.PROP_ALWAYS_USE_DBA_VIEWS));
         if (useDBAView) {
-            String dbaView = "DBA_" + viewName;
-            if (dataSource.isViewAvailable(monitor, XuguConstants.SCHEMA_SYS, dbaView)) {
-                return XuguConstants.SCHEMA_SYS + "." + dbaView;
+            String dbaView = "DBA_";
+            if (dataSource.isViewAvailable(monitor, XuguConstants.SCHEMA_SYS, dbaView+ viewName)) {
+                return XuguConstants.SCHEMA_SYS + viewName;
             }
         }
-        return XuguConstants.SCHEMA_SYS + ".ALL_" + viewName;
+        return "ALL_" + viewName;
     }
 
     public static String getSysCatalogHint(XuguDataSource dataSource)
@@ -319,6 +319,7 @@ public class XuguUtils {
         }
     }
 
+    //xfc 修改了获取对象状态的sql和逻辑
     public static boolean getObjectStatus(
         DBRProgressMonitor monitor,
         XuguStatefulObject object,
@@ -327,13 +328,13 @@ public class XuguUtils {
     {
         try (JDBCSession session = DBUtils.openMetaSession(monitor, object, "Refresh state of " + objectType.getTypeName() + " '" + object.getName() + "'")) {
             try (JDBCPreparedStatement dbStat = session.prepareStatement(
-                "SELECT STATUS FROM SYS.ALL_OBJECTS WHERE OBJECT_TYPE=? AND OWNER=? AND OBJECT_NAME=?")) {
-                dbStat.setString(1, objectType.getTypeName());
-                dbStat.setString(2, object.getSchema().getName());
+                "SELECT * FROM ALL_OBJECTS WHERE OBJ_TYPE=? AND SCHEMA_ID=? AND OBJ_NAME=?")) {
+                dbStat.setInt(1, Integer.parseInt(objectType.getTypeName()));
+                dbStat.setLong(2, object.getSchema().getId());
                 dbStat.setString(3, DBObjectNameCaseTransformer.transformObjectName(object, object.getName()));
                 try (JDBCResultSet dbResult = dbStat.executeQuery()) {
                     if (dbResult.next()) {
-                        return "VALID".equals(dbResult.getString("STATUS"));
+                        return true;
                     } else {
                         log.warn(objectType.getTypeName() + " '" + object.getName() + "' not found in system dictionary");
                         return false;

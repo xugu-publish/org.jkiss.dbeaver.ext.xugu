@@ -16,6 +16,7 @@
  */
 package org.jkiss.dbeaver.ext.xugu.model;
 
+import org.eclipse.swt.widgets.DateTime;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -36,6 +37,7 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.utils.CommonUtils;
 
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -46,16 +48,60 @@ import java.util.Map;
 /**
  * OracleTable
  */
-public class XuguTable extends XuguTablePhysical implements DBPScriptObject, DBDPseudoAttributeContainer, DBPImageProvider
+public class XuguTable extends XuguTablePhysical implements DBPScriptObject
 {
     private static final Log log = Log.getLog(XuguTable.class);
 
     private XuguDataType tableType;
-    private String iotType;
-    private String iotName;
-    private boolean temporary;
-    private boolean secondary;
-    private boolean nested;
+    //xfc 修改了用户信息的字段
+    private int db_id;
+	private int user_id;
+    private int schema_id;
+    private int table_id;
+    private String table_name;
+    private int temp_type;
+    private int field_num;
+    
+    private int parti_type;
+    private int parti_num;
+    private String parti_key;
+    private int auto_parti_type;
+    private int auto_parti_span;
+    
+    private int subparti_type;
+    private int subparti_num;
+    private String subparti_key;
+    
+    private int gsto_no;
+    private int copy_num;
+    private int block_size;
+    private int chunk_size;
+    private long record_num;
+    private int pctfree;
+    private String file_type;
+    private String file_path;
+    private String row_delimiter;
+    private String col_delimiter;
+    private String bad_file;
+    private String missing_val;
+    private boolean use_cache;
+    private String online;
+    private boolean is_sys;
+    private boolean is_encr;
+    private boolean have_policy;
+    private boolean on_commit_del;
+    private boolean ena_trans;
+    private boolean ena_logging;
+    private boolean valid;
+    private boolean deleted;
+    private int acl_mask;
+    private Date create_time;
+    private String comments;
+    
+    
+//    private boolean temporary;
+//    private boolean secondary;
+//    private boolean nested;
 
     public class AdditionalInfo extends TableAdditionalInfo {
         private int pctFree;
@@ -139,6 +185,53 @@ public class XuguTable extends XuguTablePhysical implements DBPScriptObject, DBD
                 typeOwner,
                 JDBCUtils.safeGetString(dbResult, "TABLE_TYPE"));
         }
+        if(dbResult!=null) {
+        	this.table_name = JDBCUtils.safeGetString(dbResult, "TABLE_NAME");
+        	this.db_id = JDBCUtils.safeGetInt(dbResult, "DB_ID");
+        	this.user_id = JDBCUtils.safeGetInt(dbResult, "USER_ID");
+            this.schema_id = JDBCUtils.safeGetInt(dbResult, "SCHEMA_ID");
+            this.table_id = JDBCUtils.safeGetInt(dbResult, "TABLE_ID");
+            this.table_name = JDBCUtils.safeGetString(dbResult, "TABLE_NAME");
+            this.temp_type = JDBCUtils.safeGetInt(dbResult, "TEMP_TYPE");
+            this.field_num = JDBCUtils.safeGetInt(dbResult, "FIELD_NUM");
+            
+            this.parti_type = JDBCUtils.safeGetInt(dbResult, "PARTI_TYPE");
+            this.parti_num = JDBCUtils.safeGetInt(dbResult, "PARTI_NUM");
+            this.parti_key = JDBCUtils.safeGetString(dbResult, "PARTI_KEY");
+            this.auto_parti_type = JDBCUtils.safeGetInt(dbResult, "AUTO_PARTI_TYPE");
+            this.auto_parti_span = JDBCUtils.safeGetInt(dbResult, "AUTO_PARTI_SPAN");
+            
+            this.subparti_type = JDBCUtils.safeGetInt(dbResult, "SUBPARTI_TYPE");
+            this.subparti_num = JDBCUtils.safeGetInt(dbResult, "SUBPARTI_NUM");
+            this.subparti_key = JDBCUtils.safeGetString(dbResult, "SUBPARTI_KEY");
+            
+            this.gsto_no = JDBCUtils.safeGetInt(dbResult, "GSTO_NO");
+            this.copy_num = JDBCUtils.safeGetInt(dbResult, "COPY_NUM");
+            this.block_size = JDBCUtils.safeGetInt(dbResult, "BLOCK_SIZE");
+            this.chunk_size = JDBCUtils.safeGetInt(dbResult, "CHUNK_SIZE");
+            this.record_num = JDBCUtils.safeGetLong(dbResult, "RECORD_NUM");
+            this.pctfree = JDBCUtils.safeGetInt(dbResult, "PCTFREE");
+//            this.file_type = JDBCUtils.safeGetString(dbResult, "FILE_TYPE");
+//            this.file_path = JDBCUtils.safeGetString(dbResult, "FILE_PATH");
+//            this.row_delimiter = JDBCUtils.safeGetString(dbResult, "ROW_DELIMITER");
+//            this.col_delimiter = JDBCUtils.safeGetString(dbResult, "COL_DELIMITER");
+//            this.bad_file = JDBCUtils.safeGetString(dbResult, "BAD_FILE");
+//            this.missing_val = JDBCUtils.safeGetString(dbResult, "MISSING_VAL");
+            this.use_cache = JDBCUtils.safeGetBoolean(dbResult, "USE_CACHE");
+            this.online = JDBCUtils.safeGetString(dbResult, "ONLINE");
+            this.is_sys = JDBCUtils.safeGetBoolean(dbResult, "IS_SYS");
+//            this.is_encr = JDBCUtils.safeGetBoolean(dbResult, "IS_ENCR");
+//            this.have_policy = JDBCUtils.safeGetBoolean(dbResult, "HAVE_POLICY");
+            this.on_commit_del = JDBCUtils.safeGetBoolean(dbResult, "ON_COMMIT_DEL");
+            this.ena_trans = JDBCUtils.safeGetBoolean(dbResult, "ENA_TRANS");
+            this.ena_logging = JDBCUtils.safeGetBoolean(dbResult, "ENA_LOGGING");
+            this.valid = JDBCUtils.safeGetBoolean(dbResult, "VALID");
+//            this.deleted = JDBCUtils.safeGetBoolean(dbResult, "DELETED");
+            this.acl_mask = JDBCUtils.safeGetInt(dbResult, "ACL_MASK");
+            this.create_time = JDBCUtils.safeGetDate(dbResult, "CREATE_TIME");
+            this.comments = JDBCUtils.safeGetString(dbResult, "COMMENTS");
+            System.out.println("Xugu table load success");
+        }
     }
 
     @Override
@@ -177,35 +270,35 @@ public class XuguTable extends XuguTablePhysical implements DBPScriptObject, DBD
         return tableType;
     }
 
-    @Property(viewable = false, order = 6)
-    public String getIotType()
-    {
-        return iotType;
-    }
-
-    @Property(viewable = false, order = 7)
-    public String getIotName()
-    {
-        return iotName;
-    }
-
-    @Property(viewable = false, order = 10)
-    public boolean isTemporary()
-    {
-        return temporary;
-    }
-
-    @Property(viewable = false, order = 11)
-    public boolean isSecondary()
-    {
-        return secondary;
-    }
-
-    @Property(viewable = false, order = 12)
-    public boolean isNested()
-    {
-        return nested;
-    }
+//    @Property(viewable = false, order = 6)
+//    public String getIotType()
+//    {
+//        return iotType;
+//    }
+//
+//    @Property(viewable = false, order = 7)
+//    public String getIotName()
+//    {
+//        return iotName;
+//    }
+//
+//    @Property(viewable = false, order = 10)
+//    public boolean isTemporary()
+//    {
+//        return temporary;
+//    }
+//
+//    @Property(viewable = false, order = 11)
+//    public boolean isSecondary()
+//    {
+//        return secondary;
+//    }
+//
+//    @Property(viewable = false, order = 12)
+//    public boolean isNested()
+//    {
+//        return nested;
+//    }
 
     @Override
     public XuguTableColumn getAttribute(@NotNull DBRProgressMonitor monitor, @NotNull String attributeName) throws DBException {
@@ -263,18 +356,18 @@ public class XuguTable extends XuguTablePhysical implements DBPScriptObject, DBD
         return super.refreshObject(monitor);
     }
 
-    @Override
-    public DBDPseudoAttribute[] getPseudoAttributes() throws DBException
-    {
-        if (CommonUtils.isEmpty(this.iotType) && getDataSource().getContainer().getPreferenceStore().getBoolean(XuguConstants.PREF_SUPPORT_ROWID)) {
-            // IOT tables have index id instead of ROWID
-            return new DBDPseudoAttribute[] {
-                XuguConstants.PSEUDO_ATTR_ROWID
-            };
-        } else {
-            return null;
-        }
-    }
+//    @Override
+//    public DBDPseudoAttribute[] getPseudoAttributes() throws DBException
+//    {
+//        if (CommonUtils.isEmpty(this.iotType) && getDataSource().getContainer().getPreferenceStore().getBoolean(XuguConstants.PREF_SUPPORT_ROWID)) {
+//            // IOT tables have index id instead of ROWID
+//            return new DBDPseudoAttribute[] {
+//                XuguConstants.PSEUDO_ATTR_ROWID
+//            };
+//        } else {
+//            return null;
+//        }
+//    }
 
     @Override
     protected void appendSelectSource(DBRProgressMonitor monitor, StringBuilder query, String tableAlias, DBDPseudoAttribute rowIdAttribute) {
@@ -301,59 +394,59 @@ public class XuguTable extends XuguTablePhysical implements DBPScriptObject, DBD
     }
 
 
-    @Nullable
-    @Override
-    public DBPImage getObjectImage() {
-        if (CommonUtils.isEmpty(iotType)) {
-            return DBIcon.TREE_TABLE;
-        } else {
-            return DBIcon.TREE_TABLE_INDEX;
-        }
-    }
+//    @Nullable
+//    @Override
+//    public DBPImage getObjectImage() {
+//        if (CommonUtils.isEmpty(iotType)) {
+//            return DBIcon.TREE_TABLE;
+//        } else {
+//            return DBIcon.TREE_TABLE_INDEX;
+//        }
+//    }
 
     private void loadAdditionalInfo(DBRProgressMonitor monitor) throws DBException
     {
-        if (!isPersisted()) {
-            additionalInfo.loaded = true;
-            return;
-        }
-        try (JDBCSession session = DBUtils.openMetaSession(monitor, this, "Load table status")) {
-            try (JDBCPreparedStatement dbStat = session.prepareStatement(
-                "SELECT * FROM SYS.ALL_TABLES WHERE OWNER=? AND TABLE_NAME=?")) {
-                dbStat.setString(1, getContainer().getName());
-                dbStat.setString(2, getName());
-                try (JDBCResultSet dbResult = dbStat.executeQuery()) {
-                    if (dbResult.next()) {
-                        additionalInfo.pctFree = JDBCUtils.safeGetInt(dbResult, "PCT_FREE");
-                        additionalInfo.pctUsed = JDBCUtils.safeGetInt(dbResult, "PCT_USED");
-                        additionalInfo.iniTrans = JDBCUtils.safeGetInt(dbResult, "INI_TRANS");
-                        additionalInfo.maxTrans = JDBCUtils.safeGetInt(dbResult, "MAX_TRANS");
-                        additionalInfo.initialExtent = JDBCUtils.safeGetInt(dbResult, "INITIAL_EXTENT");
-                        additionalInfo.nextExtent = JDBCUtils.safeGetInt(dbResult, "NEXT_EXTENT");
-                        additionalInfo.minExtents = JDBCUtils.safeGetInt(dbResult, "MIN_EXTENTS");
-                        additionalInfo.maxExtents = JDBCUtils.safeGetInt(dbResult, "MAX_EXTENTS");
-                        additionalInfo.pctIncrease = JDBCUtils.safeGetInt(dbResult, "PCT_INCREASE");
-                        additionalInfo.freelists = JDBCUtils.safeGetInt(dbResult, "FREELISTS");
-                        additionalInfo.freelistGroups = JDBCUtils.safeGetInt(dbResult, "FREELIST_GROUPS");
-
-                        additionalInfo.blocks = JDBCUtils.safeGetInt(dbResult, "BLOCKS");
-                        additionalInfo.emptyBlocks = JDBCUtils.safeGetInt(dbResult, "EMPTY_BLOCKS");
-                        additionalInfo.avgSpace = JDBCUtils.safeGetInt(dbResult, "AVG_SPACE");
-                        additionalInfo.chainCount = JDBCUtils.safeGetInt(dbResult, "CHAIN_CNT");
-
-                        additionalInfo.avgRowLen = JDBCUtils.safeGetInt(dbResult, "AVG_ROW_LEN");
-                        additionalInfo.avgSpaceFreelistBlocks = JDBCUtils.safeGetInt(dbResult, "AVG_SPACE_FREELIST_BLOCKS");
-                        additionalInfo.numFreelistBlocks = JDBCUtils.safeGetInt(dbResult, "NUM_FREELIST_BLOCKS");
-                    } else {
-                        log.warn("Cannot find table '" + getFullyQualifiedName(DBPEvaluationContext.UI) + "' metadata");
-                    }
-                    additionalInfo.loaded = true;
-                }
-            }
-        }
-        catch (SQLException e) {
-            throw new DBCException(e, getDataSource());
-        }
+//        if (!isPersisted()) {
+//            additionalInfo.loaded = true;
+//            return;
+//        }
+//        try (JDBCSession session = DBUtils.openMetaSession(monitor, this, "Load table status")) {
+//            try (JDBCPreparedStatement dbStat = session.prepareStatement(
+//                "SELECT * FROM SYS.ALL_TABLES WHERE OWNER=? AND TABLE_NAME=?")) {
+//                dbStat.setString(1, getContainer().getName());
+//                dbStat.setString(2, getName());
+//                try (JDBCResultSet dbResult = dbStat.executeQuery()) {
+//                    if (dbResult.next()) {
+//                        additionalInfo.pctFree = JDBCUtils.safeGetInt(dbResult, "PCT_FREE");
+//                        additionalInfo.pctUsed = JDBCUtils.safeGetInt(dbResult, "PCT_USED");
+//                        additionalInfo.iniTrans = JDBCUtils.safeGetInt(dbResult, "INI_TRANS");
+//                        additionalInfo.maxTrans = JDBCUtils.safeGetInt(dbResult, "MAX_TRANS");
+//                        additionalInfo.initialExtent = JDBCUtils.safeGetInt(dbResult, "INITIAL_EXTENT");
+//                        additionalInfo.nextExtent = JDBCUtils.safeGetInt(dbResult, "NEXT_EXTENT");
+//                        additionalInfo.minExtents = JDBCUtils.safeGetInt(dbResult, "MIN_EXTENTS");
+//                        additionalInfo.maxExtents = JDBCUtils.safeGetInt(dbResult, "MAX_EXTENTS");
+//                        additionalInfo.pctIncrease = JDBCUtils.safeGetInt(dbResult, "PCT_INCREASE");
+//                        additionalInfo.freelists = JDBCUtils.safeGetInt(dbResult, "FREELISTS");
+//                        additionalInfo.freelistGroups = JDBCUtils.safeGetInt(dbResult, "FREELIST_GROUPS");
+//
+//                        additionalInfo.blocks = JDBCUtils.safeGetInt(dbResult, "BLOCKS");
+//                        additionalInfo.emptyBlocks = JDBCUtils.safeGetInt(dbResult, "EMPTY_BLOCKS");
+//                        additionalInfo.avgSpace = JDBCUtils.safeGetInt(dbResult, "AVG_SPACE");
+//                        additionalInfo.chainCount = JDBCUtils.safeGetInt(dbResult, "CHAIN_CNT");
+//
+//                        additionalInfo.avgRowLen = JDBCUtils.safeGetInt(dbResult, "AVG_ROW_LEN");
+//                        additionalInfo.avgSpaceFreelistBlocks = JDBCUtils.safeGetInt(dbResult, "AVG_SPACE_FREELIST_BLOCKS");
+//                        additionalInfo.numFreelistBlocks = JDBCUtils.safeGetInt(dbResult, "NUM_FREELIST_BLOCKS");
+//                    } else {
+//                        log.warn("Cannot find table '" + getFullyQualifiedName(DBPEvaluationContext.UI) + "' metadata");
+//                    }
+//                    additionalInfo.loaded = true;
+//                }
+//            }
+//        }
+//        catch (SQLException e) {
+//            throw new DBCException(e, getDataSource());
+//        }
 
     }
 

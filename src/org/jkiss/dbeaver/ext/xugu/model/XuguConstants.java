@@ -32,7 +32,7 @@ public class XuguConstants {
 
     public static final int DEFAULT_PORT = 5138;
 
-    public static final String SCHEMA_SYS = "SYSDBA";
+    public static final String SCHEMA_SYS = "SYS";
     public static final String VIEW_ALL_SOURCE = "ALL_SOURCE";
     public static final String VIEW_DBA_SOURCE = "DBA_SOURCE";
     public static final String VIEW_DBA_TAB_PRIVS = "DBA_TAB_PRIVS";

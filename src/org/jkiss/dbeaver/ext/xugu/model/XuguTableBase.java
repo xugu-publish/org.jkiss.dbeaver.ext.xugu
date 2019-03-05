@@ -52,7 +52,8 @@ import java.util.Collection;
 import java.util.Map;
 
 /**
- * OracleTable base
+ * XuguTable base
+ * 查询并加载表元信息
  */
 public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema>
     implements DBPNamedObject2, DBPRefreshableObject, XuguStatefulObject
@@ -82,7 +83,7 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
     }
 
     public final TriggerCache triggerCache = new TriggerCache();
-    private final TablePrivCache tablePrivCache = new TablePrivCache();
+//    private final TablePrivCache tablePrivCache = new TablePrivCache();
 
     public abstract TableAdditionalInfo getAdditionalInfo();
 
@@ -100,7 +101,7 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
     {
         super(oracleSchema, true);
         setName(JDBCUtils.safeGetString(dbResult, "TABLE_NAME"));
-        this.valid = "VALID".equals(JDBCUtils.safeGetString(dbResult, "STATUS"));
+//        this.valid = "VALID".equals(JDBCUtils.safeGetString(dbResult, "STATUS"));
         //this.comment = JDBCUtils.safeGetString(dbResult, "COMMENTS");
     }
 
@@ -141,19 +142,24 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
             this);
     }
 
+    //获取表注释信息
     @Property(viewable = true, editable = true, updatable = true, multiline = true, order = 100)
     @LazyProperty(cacheValidator = CommentsValidator.class)
     public String getComment(DBRProgressMonitor monitor)
         throws DBException
     {
         if (comment == null) {
+        	System.out.println("CCCComents "+getTableTypeName());
+        	int tableType = 0;
+        	if(getTableTypeName().equals("VIEW")) {
+        		tableType = 1;
+        	}
             try (JDBCSession session = DBUtils.openMetaSession(monitor, this, "Load table comments")) {
                 comment = JDBCUtils.queryString(
                     session,
-                    "SELECT COMMENTS FROM ALL_TAB_COMMENTS WHERE OWNER=? AND TABLE_NAME=? AND TABLE_TYPE=?",
-                    getSchema().getName(),
+                    "SELECT COMMENTS FROM ALL_TABLES WHERE TABLE_NAME=? AND TABLE_TYPE=?",
                     getName(),
-                    getTableTypeName());
+                    tableType);
                 if (comment == null) {
                     comment = "";
                 }
@@ -164,12 +170,12 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
         return comment;
     }
 
+    //获取列名及注释信息
     void loadColumnComments(DBRProgressMonitor monitor) {
         try {
             try (JDBCSession session = DBUtils.openMetaSession(monitor, this, "Load table column comments")) {
-                try (JDBCPreparedStatement stat = session.prepareStatement("SELECT COLUMN_NAME,COMMENTS FROM SYS.ALL_COL_COMMENTS cc WHERE CC.OWNER=? AND cc.TABLE_NAME=?")) {
-                    stat.setString(1, getSchema().getName());
-                    stat.setString(2, getName());
+                try (JDBCPreparedStatement stat = session.prepareStatement("SELECT COL_NAME,COMMENTS FROM ALL_COLUMNS cc WHERE cc.TABLE_ID=(SELECT TABLE_ID FROM ALL_TABLES WHERE TABLE_NAME=?)")) {
+                    stat.setString(1, getName());
                     try (JDBCResultSet resultSet = stat.executeQuery()) {
                         while (resultSet.next()) {
                             String colName = resultSet.getString(1);
@@ -297,11 +303,11 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
         }
     }
 
-    @Association
-    public Collection<XuguPrivTable> getTablePrivs(DBRProgressMonitor monitor) throws DBException
-    {
-        return tablePrivCache.getAllObjects(monitor, this);
-    }
+//    @Association
+//    public Collection<XuguPrivTable> getTablePrivs(DBRProgressMonitor monitor) throws DBException
+//    {
+//        return tablePrivCache.getAllObjects(monitor, this);
+//    }
 
 
     static class TriggerCache extends JDBCStructCache<XuguTableBase, XuguTableTrigger, XuguTriggerColumn> {
@@ -309,13 +315,16 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
         {
             super("TRIGGER_NAME");
         }
-
+        
+        //获取触发器信息
         @Override
         protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguTableBase owner) throws SQLException
         {
             JDBCPreparedStatement dbStat = session.prepareStatement(
                 "SELECT *\n" +
-                    "FROM " + XuguUtils.getAdminAllViewPrefix(session.getProgressMonitor(), owner.getDataSource(), "TRIGGERS") + " WHERE TABLE_OWNER=? AND TABLE_NAME=?\n" +
+                    "FROM " + XuguUtils.getAdminAllViewPrefix(session.getProgressMonitor(), owner.getDataSource(), "TRIGGERS") + 
+                    " WHERE SCHEMA_ID=(SELECT SCHEMA_ID FROM ALL_SCHEMAS WHERE SCHEMA_NAME=?) AND "
+                    + "TABLE_ID=(SELECT TABLE_ID FROM ALL_TABLES WHERE TABLE_NAME=?)\n" +
                     "ORDER BY TRIGGER_NAME");
             dbStat.setString(1, owner.getSchema().getName());
             dbStat.setString(2, owner.getName());
@@ -331,59 +340,62 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
         @Override
         protected JDBCStatement prepareChildrenStatement(@NotNull JDBCSession session, @NotNull XuguTableBase owner, @Nullable XuguTableTrigger forObject) throws SQLException
         {
+//            JDBCPreparedStatement dbStat = session.prepareStatement(
+//                "SELECT * FROM ALL_TRIGGER_COLS WHERE TABLE_OWNER=? AND TABLE_NAME=?" +
+//                    (forObject == null ? "" : " AND TRIGGER_NAME=?") +
+//                    "\nORDER BY TRIGGER_NAME");
+//            dbStat.setString(1, owner.getContainer().getName());
+//            dbStat.setString(2, owner.getName());
+//            if (forObject != null) {
+//                dbStat.setString(3, forObject.getName());
+//            }
+            //do nothing
             JDBCPreparedStatement dbStat = session.prepareStatement(
-                "SELECT TRIGGER_NAME,TABLE_OWNER,TABLE_NAME,COLUMN_NAME,COLUMN_LIST,COLUMN_USAGE\n" +
-                    "FROM SYS.ALL_TRIGGER_COLS WHERE TABLE_OWNER=? AND TABLE_NAME=?" +
-                    (forObject == null ? "" : " AND TRIGGER_NAME=?") +
-                    "\nORDER BY TRIGGER_NAME");
-            dbStat.setString(1, owner.getContainer().getName());
-            dbStat.setString(2, owner.getName());
-            if (forObject != null) {
-                dbStat.setString(3, forObject.getName());
-            }
+                    "");
             return dbStat;
         }
 
         @Override
         protected XuguTriggerColumn fetchChild(@NotNull JDBCSession session, @NotNull XuguTableBase owner, @NotNull XuguTableTrigger parent, @NotNull JDBCResultSet dbResult) throws SQLException, DBException
         {
-            XuguTableBase refTable = XuguTableBase.findTable(
-                session.getProgressMonitor(),
-                owner.getDataSource(),
-                JDBCUtils.safeGetString(dbResult, "TABLE_OWNER"),
-                JDBCUtils.safeGetString(dbResult, "TABLE_NAME"));
-            if (refTable != null) {
-                final String columnName = JDBCUtils.safeGetString(dbResult, "COLUMN_NAME");
-                XuguTableColumn tableColumn = refTable.getAttribute(session.getProgressMonitor(), columnName);
-                if (tableColumn == null) {
-                    log.debug("Column '" + columnName + "' not found in table '" + refTable.getFullyQualifiedName(DBPEvaluationContext.DDL) + "' for trigger '" + parent.getName() + "'");
-                }
-                return new XuguTriggerColumn(session.getProgressMonitor(), parent, tableColumn, dbResult);
-            }
+//            XuguTableBase refTable = XuguTableBase.findTable(
+//                session.getProgressMonitor(),
+//                owner.getDataSource(),
+//                JDBCUtils.safeGetString(dbResult, "TABLE_OWNER"),
+//                JDBCUtils.safeGetString(dbResult, "TABLE_NAME"));
+//            if (refTable != null) {
+//                final String columnName = JDBCUtils.safeGetString(dbResult, "COLUMN_NAME");
+//                XuguTableColumn tableColumn = refTable.getAttribute(session.getProgressMonitor(), columnName);
+//                if (tableColumn == null) {
+//                    log.debug("Column '" + columnName + "' not found in table '" + refTable.getFullyQualifiedName(DBPEvaluationContext.DDL) + "' for trigger '" + parent.getName() + "'");
+//                }
+//                return new XuguTriggerColumn(session.getProgressMonitor(), parent, tableColumn, dbResult);
+//            }
+        	// do nothing
             return null;
         }
 
     }
 
-    static class TablePrivCache extends JDBCObjectCache<XuguTableBase, XuguPrivTable> {
-        @Override
-        protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguTableBase tableBase) throws SQLException
-        {
-            boolean hasDBA = tableBase.getDataSource().isViewAvailable(session.getProgressMonitor(), XuguConstants.SCHEMA_SYS, XuguConstants.VIEW_DBA_TAB_PRIVS);
-            final JDBCPreparedStatement dbStat = session.prepareStatement(
-                "SELECT p.*\n" +
-                    "FROM " + (hasDBA ? "DBA_TAB_PRIVS p" : "ALL_TAB_PRIVS p") + "\n" +
-                    "WHERE p."+ (hasDBA ? "OWNER": "TABLE_SCHEMA") +"=? AND p.TABLE_NAME =?");
-            dbStat.setString(1, tableBase.getSchema().getName());
-            dbStat.setString(2, tableBase.getName());
-            return dbStat;
-        }
-
-        @Override
-        protected XuguPrivTable fetchObject(@NotNull JDBCSession session, @NotNull XuguTableBase tableBase, @NotNull JDBCResultSet resultSet) throws SQLException, DBException
-        {
-            return new XuguPrivTable(tableBase, resultSet);
-        }
-    }
+//    static class TablePrivCache extends JDBCObjectCache<XuguTableBase, XuguPrivTable> {
+//        @Override
+//        protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguTableBase tableBase) throws SQLException
+//        {
+//            boolean hasDBA = tableBase.getDataSource().isViewAvailable(session.getProgressMonitor(), XuguConstants.SCHEMA_SYS, XuguConstants.VIEW_DBA_TAB_PRIVS);
+//            final JDBCPreparedStatement dbStat = session.prepareStatement(
+//                "SELECT p.*\n" +
+//                    "FROM " + (hasDBA ? "DBA_TAB_PRIVS p" : "ALL_TAB_PRIVS p") + "\n" +
+//                    "WHERE p."+ (hasDBA ? "OWNER": "TABLE_SCHEMA") +"=? AND p.TABLE_NAME =?");
+//            dbStat.setString(1, tableBase.getSchema().getName());
+//            dbStat.setString(2, tableBase.getName());
+//            return dbStat;
+//        }
+//
+//        @Override
+//        protected XuguPrivTable fetchObject(@NotNull JDBCSession session, @NotNull XuguTableBase tableBase, @NotNull JDBCResultSet resultSet) throws SQLException, DBException
+//        {
+//            return new XuguPrivTable(tableBase, resultSet);
+//        }
+//    }
 
 }

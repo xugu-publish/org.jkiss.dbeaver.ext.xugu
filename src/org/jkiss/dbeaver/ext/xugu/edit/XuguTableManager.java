@@ -22,10 +22,12 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.ext.xugu.model.*;
 import org.jkiss.dbeaver.model.DBPEvaluationContext;
+import org.jkiss.dbeaver.model.DBPScriptObject;
 import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.edit.DBECommandContext;
 import org.jkiss.dbeaver.model.edit.DBEObjectRenamer;
 import org.jkiss.dbeaver.model.edit.DBEPersistAction;
+import org.jkiss.dbeaver.model.impl.DBObjectNameCaseTransformer;
 import org.jkiss.dbeaver.model.impl.DBSObjectCache;
 import org.jkiss.dbeaver.model.impl.edit.SQLDatabasePersistAction;
 import org.jkiss.dbeaver.model.impl.sql.edit.struct.SQLTableManager;
@@ -33,8 +35,11 @@ import org.jkiss.dbeaver.model.messages.ModelMessages;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.sql.SQLUtils;
 import org.jkiss.dbeaver.model.struct.DBSObject;
+import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.CommonUtils;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -68,7 +73,87 @@ public class XuguTableManager extends SQLTableManager<XuguTable, XuguSchema> imp
         }
         return table; //$NON-NLS-1$
     }
+    
+    @Override
+    protected void setTableName(DBRProgressMonitor monitor,  XuguSchema parent, XuguTable table) throws DBException {
+        table.setName(getNewChildName(monitor, parent, "NEWTABLE"));
+        System.out.println("prepare create table "+table.getName());
+    }
 
+    @Override
+    protected String getNewChildName(DBRProgressMonitor monitor, XuguSchema parent, String baseName) throws DBException {
+        for (int i = 0; ; i++) {
+            String tableName = i == 0 ? baseName : (baseName + "_" + i);
+            DBSObject child = parent.getChild(monitor, tableName);
+            if (child == null) {
+                return tableName;
+            }
+        }
+    }
+    
+    @Override
+    protected void addStructObjectCreateActions(DBRProgressMonitor monitor, List<DBEPersistAction> actions, StructCreateCommand command, Map<String, Object> options) throws DBException {
+    	XuguTable table = command.getObject();
+        NestedObjectCommand tableProps = command.getObjectCommands().get(table);
+        if (tableProps == null) {
+            log.warn("Object change command not found"); //$NON-NLS-1$
+            return;
+        }
+        //获取完整的表名
+        String tableName = CommonUtils.getOption(options, DBPScriptObject.OPTION_FULLY_QUALIFIED_NAMES, true) ?
+            table.getFullyQualifiedName(DBPEvaluationContext.DDL) : DBUtils.getQuotedIdentifier(table);
+        System.out.println("table name? "+tableName);
+        String slComment = SQLUtils.getDialectFromObject(table).getSingleLineComments()[0];
+        String lineSeparator = GeneralUtils.getDefaultLineSeparator();
+        StringBuilder createQuery = new StringBuilder(100);
+        createQuery.append("CREATE ").append(getCreateTableType(table)).append(" ").append(tableName).append(" (").append(lineSeparator); //$NON-NLS-1$ //$NON-NLS-2$
+        boolean hasNestedDeclarations = false;
+        Collection<NestedObjectCommand> orderedCommands = getNestedOrderedCommands(command);
+        for (NestedObjectCommand nestedCommand : orderedCommands) {
+            if (nestedCommand.getObject() == table) {
+                continue;
+            }
+            if (excludeFromDDL(nestedCommand, orderedCommands)) {
+                continue;
+            }
+            final String nestedDeclaration = nestedCommand.getNestedDeclaration(monitor, table, options);
+            if (!CommonUtils.isEmpty(nestedDeclaration)) {
+                // Insert nested declaration
+                if (hasNestedDeclarations) {
+                    // Check for embedded comment
+                    int lastLFPos = createQuery.lastIndexOf(lineSeparator);
+                    int lastCommentPos = createQuery.lastIndexOf(slComment);
+                    if (lastCommentPos != -1) {
+                        while (lastCommentPos > 0 && Character.isWhitespace(createQuery.charAt(lastCommentPos - 1))) {
+                            lastCommentPos--;
+                        }
+                    }
+                    if (lastCommentPos < 0 || lastCommentPos < lastLFPos) {
+                        createQuery.append(","); //$NON-NLS-1$
+                    } else {
+                        createQuery.insert(lastCommentPos, ","); //$NON-NLS-1$
+                    }
+                    createQuery.append(lineSeparator); //$NON-NLS-1$
+                }
+                createQuery.append("\t").append(nestedDeclaration); //$NON-NLS-1$
+                hasNestedDeclarations = true;
+            } else {
+                // This command should be executed separately
+                final DBEPersistAction[] nestedActions = nestedCommand.getPersistActions(monitor, options);
+                if (nestedActions != null) {
+                    Collections.addAll(actions, nestedActions);
+                }
+            }
+        }
+
+        createQuery.append(lineSeparator).append(")"); //$NON-NLS-1$
+        appendTableModifiers(monitor, table, tableProps, createQuery, false);
+
+        actions.add( 0, new SQLDatabasePersistAction(ModelMessages.model_jdbc_create_new_table, createQuery.toString()) );
+        //刷新？
+        table.getDataSource().refreshObject(monitor);
+    }
+    
     @Override
     protected void addObjectModifyActions(DBRProgressMonitor monitor, List<DBEPersistAction> actionList, ObjectChangeCommand command, Map<String, Object> options)
     {
@@ -105,7 +190,8 @@ public class XuguTableManager extends SQLTableManager<XuguTable, XuguSchema> imp
             }
         }
     }
-
+    
+    //修改表名、视图名
     @Override
     protected void addObjectRenameActions(DBRProgressMonitor monitor, List<DBEPersistAction> actions, ObjectRenameCommand command, Map<String, Object> options)
     {
@@ -117,6 +203,7 @@ public class XuguTableManager extends SQLTableManager<XuguTable, XuguSchema> imp
         );
     }
 
+    //删除表、视图
     @Override
     protected void addObjectDeleteActions(List<DBEPersistAction> actions, ObjectDeleteCommand command, Map<String, Object> options)
     {

@@ -44,7 +44,8 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * Oracle physical table
+ * Xugu physical table
+ * 加载表相关物理信息（分区信息）
  */
 public abstract class XuguTablePhysical extends XuguTableBase implements DBSObjectLazy<XuguDataSource>
 {
@@ -56,7 +57,7 @@ public abstract class XuguTablePhysical extends XuguTableBase implements DBSObje
     private long rowCount;
     private Long realRowCount;
     private Object tablespace;
-    private boolean partitioned;
+    private Integer partitioned;
     private PartitionInfo partitionInfo;
     private PartitionCache partitionCache;
 
@@ -70,12 +71,12 @@ public abstract class XuguTablePhysical extends XuguTableBase implements DBSObje
         ResultSet dbResult)
     {
         super(schema, dbResult);
-        this.rowCount = JDBCUtils.safeGetLong(dbResult, "NUM_ROWS");
+//        this.rowCount = JDBCUtils.safeGetLong(dbResult, "NUM_ROWS");
         //this.valid = "VALID".equals(JDBCUtils.safeGetString(dbResult, "STATUS"));
-        this.tablespace = JDBCUtils.safeGetString(dbResult, "TABLESPACE_NAME");
+//        this.tablespace = JDBCUtils.safeGetString(dbResult, "TABLESPACE_NAME");
 
-        this.partitioned = JDBCUtils.safeGetBoolean(dbResult, "PARTITIONED", "Y");
-        this.partitionCache = partitioned ? new PartitionCache() : null;
+        this.partitioned = JDBCUtils.safeGetInteger(dbResult, "PARTI_TYPE");
+        this.partitionCache = this.partitioned==null ? null : new PartitionCache();
     }
 
     @Property(category = CAT_STATISTICS, viewable = true, order = 20)
@@ -144,15 +145,15 @@ public abstract class XuguTablePhysical extends XuguTableBase implements DBSObje
         return this.getContainer().indexCache.getObject(monitor, getContainer(), this, name);
     }
 
+    //获取表分区信息
     @PropertyGroup
     @LazyProperty(cacheValidator = PartitionInfoValidator.class)
     public PartitionInfo getPartitionInfo(DBRProgressMonitor monitor) throws DBException
     {
-        if (partitionInfo == null && partitioned) {
+        if (partitionInfo == null && partitioned != null) {
             try (final JDBCSession session = DBUtils.openMetaSession(monitor, this, "Load partitioning info")) {
-                try (JDBCPreparedStatement dbStat = session.prepareStatement("SELECT * FROM ALL_PART_TABLES WHERE OWNER=? AND TABLE_NAME=?")) {
-                    dbStat.setString(1, getContainer().getName());
-                    dbStat.setString(2, getName());
+                try (JDBCPreparedStatement dbStat = session.prepareStatement("SELECT * FROM ALL_PARTIS WHERE TABLE_ID=(SELECT TABLE_ID FROM ALL_TABLES WHERE TABLE_NAME=?)")) {
+                    dbStat.setString(1, getName());
                     try (JDBCResultSet dbResult = dbStat.executeQuery()) {
                         if (dbResult.next()) {
                             partitionInfo = new PartitionInfo(monitor, this.getDataSource(), dbResult);
@@ -203,9 +204,9 @@ public abstract class XuguTablePhysical extends XuguTableBase implements DBSObje
         protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguTablePhysical table) throws SQLException
         {
             final JDBCPreparedStatement dbStat = session.prepareStatement(
-                "SELECT * FROM SYS.ALL_TAB_PARTITIONS " +
-                "WHERE TABLE_OWNER=? AND TABLE_NAME=? " +
-                "ORDER BY PARTITION_POSITION");
+                "SELECT * FROM ALL_PARTIS " +
+                "WHERE TABLE_ID=(SELECT TABLE_ID FROM ALL_TABLES WHERE TABLE_NAME=?) " +
+                "ORDER BY PARTI_NO");
             dbStat.setString(1, table.getContainer().getName());
             dbStat.setString(2, table.getName());
             return dbStat;
@@ -221,10 +222,10 @@ public abstract class XuguTablePhysical extends XuguTableBase implements DBSObje
         protected JDBCStatement prepareChildrenStatement(@NotNull JDBCSession session, @NotNull XuguTablePhysical table, @Nullable XuguTablePartition forObject) throws SQLException
         {
             final JDBCPreparedStatement dbStat = session.prepareStatement(
-                "SELECT * FROM SYS.ALL_TAB_SUBPARTITIONS " +
-                "WHERE TABLE_OWNER=? AND TABLE_NAME=? " +
+                "SELECT * FROM ALL_SUBPARTIS " +
+                "WHERE TABLE_ID=(SELECT TABLE_ID FROM ALL_TABLES WHERE TABLE_NAME=?) " +
                 (forObject == null ? "" : "AND PARTITION_NAME=?") +
-                "ORDER BY SUBPARTITION_POSITION");
+                "ORDER BY SUBPARTI_NO");
             dbStat.setString(1, table.getContainer().getName());
             dbStat.setString(2, table.getName());
             if (forObject != null) {
@@ -254,7 +255,7 @@ public abstract class XuguTablePhysical extends XuguTableBase implements DBSObje
         @Override
         public boolean isPropertyCached(XuguTablePhysical object, Object propertyId)
         {
-            return object.partitioned && object.partitionInfo != null;
+            return object.partitioned!=null && object.partitionInfo != null;
         }
     }
 

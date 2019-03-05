@@ -116,7 +116,7 @@ public enum XuguObjectType implements DBSObjectType {
             return schema.synonymCache.getObject(monitor, schema, objectName);
         }
     }),
-	TABLE("TABLE", DBIcon.TREE_TABLE, XuguTable.class, new ObjectFinder() {
+	TABLE("5", DBIcon.TREE_TABLE, XuguTable.class, new ObjectFinder() {
         @Override
         public XuguTableBase findObject(DBRProgressMonitor monitor, XuguSchema schema, String objectName) throws DBException
         {

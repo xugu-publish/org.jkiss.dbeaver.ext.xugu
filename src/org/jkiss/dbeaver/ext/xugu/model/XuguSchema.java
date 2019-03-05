@@ -331,8 +331,13 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
     public DBSObject getChild(@NotNull DBRProgressMonitor monitor, @NotNull String childName)
         throws DBException
     {
-        final XuguTableBase table = tableCache.getObject(monitor, this, childName);
+        XuguTableBase table = null;
+        //下拉菜单已经展开时才处理tableCache
+        //避免了当下拉菜单没有展开时就点击新建表会无限循环加载的问题
+        if(!tableCache.isFullyCached())
+        	table = tableCache.getObject(monitor, this, childName);
         if (table != null) {
+            System.out.println("TTTTTTTTt "+table.getName());
             return table;
         }
         XuguSynonym synonym = synonymCache.getObject(monitor, this, childName);
@@ -420,7 +425,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         @NotNull
         @Override
         public JDBCStatement prepareLookupStatement(@NotNull JDBCSession session, @NotNull XuguSchema owner, @Nullable XuguTableBase object, @Nullable String objectName) throws SQLException {
-        	//xfc 根据schema name 查询所有表
+        	//xfc 根据schema name 查询所有表信息
         	StringBuilder sql = new StringBuilder();
         	sql.append("SELECT * FROM ");
         	sql.append(owner.roleFlag);
@@ -475,9 +480,9 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         }
 
         @Override
-        protected void cacheChildren(XuguTableBase parent, List<XuguTableColumn> oracleTableColumns) {
-            oracleTableColumns.sort(DBUtils.orderComparator());
-            super.cacheChildren(parent, oracleTableColumns);
+        protected void cacheChildren(XuguTableBase parent, List<XuguTableColumn> xuguTableColumns) {
+        	xuguTableColumns.sort(DBUtils.orderComparator());
+            super.cacheChildren(parent, xuguTableColumns);
         }
 
     }
