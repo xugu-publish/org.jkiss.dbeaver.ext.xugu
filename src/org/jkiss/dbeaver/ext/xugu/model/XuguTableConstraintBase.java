@@ -37,15 +37,15 @@ public abstract class XuguTableConstraintBase extends JDBCTableConstraint<XuguTa
     private XuguObjectStatus status;
     private List<XuguTableConstraintColumn> columns;
 
-    public XuguTableConstraintBase(XuguTableBase oracleTable, String name, DBSEntityConstraintType constraintType, XuguObjectStatus status, boolean persisted)
+    public XuguTableConstraintBase(XuguTableBase xuguTable, String name, DBSEntityConstraintType constraintType, XuguObjectStatus status, boolean persisted)
     {
-        super(oracleTable, name, null, constraintType, persisted);
+        super(xuguTable, name, null, constraintType, persisted);
         this.status = status;
     }
 
-    protected XuguTableConstraintBase(XuguTableBase oracleTableBase, String name, String description, DBSEntityConstraintType constraintType, boolean persisted)
+    protected XuguTableConstraintBase(XuguTableBase xuguTableBase, String name, String description, DBSEntityConstraintType constraintType, boolean persisted)
     {
-        super(oracleTableBase, name, description, constraintType, persisted);
+        super(xuguTableBase, name, description, constraintType, persisted);
     }
 
     @NotNull

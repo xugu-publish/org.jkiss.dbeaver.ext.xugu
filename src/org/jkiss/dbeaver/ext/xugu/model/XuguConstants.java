@@ -77,12 +77,10 @@ public class XuguConstants {
     public static final int TIMESTAMP_TYPE_LENGTH = 13;
     public static final int DATE_TYPE_LENGTH = 7;
 
-    public static final DBSIndexType INDEX_TYPE_NORMAL = new DBSIndexType("NORMAL", "Normal");
-    public static final DBSIndexType INDEX_TYPE_BITMAP = new DBSIndexType("BITMAP", "Bitmap");
-    public static final DBSIndexType INDEX_TYPE_FUNCTION_BASED_NORMAL = new DBSIndexType("FUNCTION-BASED NORMAL", "Function-based Normal");
-    public static final DBSIndexType INDEX_TYPE_FUNCTION_BASED_BITMAP = new DBSIndexType("FUNCTION-BASED BITMAP", "Function-based Bitmap");
-    public static final DBSIndexType INDEX_TYPE_DOMAIN = new DBSIndexType("DOMAIN", "Domain");
-
+    public static final DBSIndexType INDEX_TYPE_BTREE = new DBSIndexType("BTREE", "BTree");
+    public static final DBSIndexType INDEX_TYPE_RTREE = new DBSIndexType("RTREE", "RTree");
+    public static final DBSIndexType INDEX_TYPE_FULL_TEXT = new DBSIndexType("FULL_TEXT","Full text");
+    
     public static final String PROP_OBJECT_DEFINITION = "objectDefinitionText";
     public static final String PROP_OBJECT_BODY_DEFINITION = "extendedDefinitionText";
 
@@ -126,7 +124,8 @@ public class XuguConstants {
     public static final DBSEntityConstraintType CONSTRAINT_HASH_EXPRESSION = new DBSEntityConstraintType("H", "Hash expression", null, false, false, false);
     public static final DBSEntityConstraintType CONSTRAINT_REF_COLUMN = new DBSEntityConstraintType("F", "Constraint that involves a REF column", null, false, false, false);
     public static final DBSEntityConstraintType CONSTRAINT_SUPPLEMENTAL_LOGGING = new DBSEntityConstraintType("S", "Supplemental logging", null, false, false, false);
-
+    public static final DBSEntityConstraintType CONSTRAINT_DEFAULT = new DBSEntityConstraintType("D","Constraint that indicates a default value", null, false, false, false);
+    public static final DBSEntityConstraintType CONSTRAINT_NOT_NULL = new DBSEntityConstraintType("N","Constraint that indicates this column can not be null", null, false, false, false);
     /**
      * Xugu error codes
      */

@@ -32,11 +32,11 @@ public class XuguTablePartition extends XuguPartitionBase<XuguTablePhysical> {
     private List<XuguTablePartition> subPartitions;
 
     protected XuguTablePartition(
-        XuguTablePhysical oracleTable,
+        XuguTablePhysical xuguTable,
         boolean subpartition,
         ResultSet dbResult)
     {
-        super(oracleTable, subpartition, dbResult);
+        super(xuguTable, subpartition, dbResult);
     }
 
     @Association

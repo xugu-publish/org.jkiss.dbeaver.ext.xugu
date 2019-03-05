@@ -35,6 +35,14 @@ public class XuguTableConstraint extends XuguTableConstraintBase {
     private static final Log log = Log.getLog(XuguTableConstraint.class);
 
     private String searchCondition;
+    private String cons_name;
+    private char match_type;
+    private boolean deferrable;
+    private boolean initdeferred;
+    private String define;
+    private char update_act;
+    private char delete_act;
+    private boolean is_sys;
 
     public XuguTableConstraint(XuguTableBase oracleTable, String name, DBSEntityConstraintType constraintType, String searchCondition, XuguObjectStatus status)
     {
@@ -46,21 +54,69 @@ public class XuguTableConstraint extends XuguTableConstraintBase {
     {
         super(
             table,
-            JDBCUtils.safeGetString(dbResult, "CONSTRAINT_NAME"),
-            getConstraintType(JDBCUtils.safeGetString(dbResult, "CONSTRAINT_TYPE")),
-            CommonUtils.notNull(
-                CommonUtils.valueOf(XuguObjectStatus.class, JDBCUtils.safeGetStringTrimmed(dbResult, "STATUS")),
-                XuguObjectStatus.ENABLED),
+            JDBCUtils.safeGetString(dbResult, "CONS_NAME"),
+            getConstraintType(JDBCUtils.safeGetString(dbResult, "CONS_TYPE")),
+            JDBCUtils.safeGetBoolean(dbResult, "ENABLE") && JDBCUtils.safeGetBoolean(dbResult, "VALID")?XuguObjectStatus.ENABLED:XuguObjectStatus.DISABLED,
             true);
-        this.searchCondition = JDBCUtils.safeGetString(dbResult, "SEARCH_CONDITION");
+        if(dbResult!=null) {
+        	//this.searchCondition = JDBCUtils.safeGetString(dbResult, "SEARCH_CONDITION");
+            this.cons_name = JDBCUtils.safeGetString(dbResult, "CONS_NAME");
+            String s1 = JDBCUtils.safeGetString(dbResult, "MATCH_TYPE");
+            if(s1!=null) {
+            	this.match_type = s1.charAt(0);
+            }
+            this.deferrable = JDBCUtils.safeGetBoolean(dbResult, "DEFERRABLE");
+            this.initdeferred = JDBCUtils.safeGetBoolean(dbResult, "INITDEFERRED");
+            this.define = JDBCUtils.safeGetString(dbResult, "DEFINE");
+            String s2 = JDBCUtils.safeGetString(dbResult, "UPDATE_ACTION");
+            if(s2!=null) {
+            	this.update_act = s2.charAt(0);
+            }
+            String s3 = JDBCUtils.safeGetString(dbResult, "DELETE_ACTION");
+            if(s3!=null) {
+            	this.delete_act = s3.charAt(0);
+            }
+            this.is_sys = JDBCUtils.safeGetBoolean(dbResult, "IS_SYS");
+        }
     }
-
-    @Property(viewable = true, editable = true, order = 4)
+    
     public String getSearchCondition()
     {
-        return searchCondition;
+        return this.searchCondition;
+    }
+    
+    public String getConstraintName()
+    {
+        return this.cons_name;
+    } 
+    
+    public char getMatchType() {
+    	return this.match_type;
+    }
+    
+    public boolean getDeferrable() {
+    	return this.deferrable;
     }
 
+    public boolean getInitDeferrable() {
+    	return this.initdeferred;
+    }
+    
+    public String getDefine() {
+    	return this.define;
+    }
+    
+    public char getUpdateAction() {
+    	return this.update_act;
+    }
+    
+    public char getDeleteAction() {
+    	return this.delete_act;
+    }
+    
+    public boolean getIsSys() {
+    	return this.is_sys;
+    }
     @NotNull
     @Override
     public String getFullyQualifiedName(DBPEvaluationContext context)
@@ -74,26 +130,22 @@ public class XuguTableConstraint extends XuguTableConstraintBase {
     public static DBSEntityConstraintType getConstraintType(String code)
     {
         switch (code) {
-            case "C":
+	        case "F":
+	            return DBSEntityConstraintType.FOREIGN_KEY;
+	        case "R":
+                return XuguConstants.CONSTRAINT_REF_COLUMN;
+	        case "C":
                 return DBSEntityConstraintType.CHECK;
+	        case "D":
+                return XuguConstants.CONSTRAINT_DEFAULT;
+	        case "U":
+                return DBSEntityConstraintType.UNIQUE_KEY;
             case "P":
                 return DBSEntityConstraintType.PRIMARY_KEY;
-            case "U":
-                return DBSEntityConstraintType.UNIQUE_KEY;
-            case "R":
-                return DBSEntityConstraintType.FOREIGN_KEY;
-            case "V":
-                return XuguConstants.CONSTRAINT_WITH_CHECK_OPTION;
-            case "O":
-                return XuguConstants.CONSTRAINT_WITH_READ_ONLY;
-            case "H":
-                return XuguConstants.CONSTRAINT_HASH_EXPRESSION;
-            case "F":
-                return XuguConstants.CONSTRAINT_REF_COLUMN;
-            case "S":
-                return XuguConstants.CONSTRAINT_SUPPLEMENTAL_LOGGING;
+            case "N":
+                return XuguConstants.CONSTRAINT_NOT_NULL;
             default:
-                log.debug("Unsupported Oracle constraint type: " + code);
+                log.debug("Unsupported Xugu constraint type: " + code);
                 return DBSEntityConstraintType.CHECK;
         }
     }

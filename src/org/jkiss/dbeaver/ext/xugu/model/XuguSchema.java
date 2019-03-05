@@ -406,10 +406,13 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
 
     private static XuguTableColumn getTableColumn(JDBCSession session, XuguTableBase parent, ResultSet dbResult) throws DBException
     {
-        String columnName = JDBCUtils.safeGetStringTrimmed(dbResult, "COLUMN_NAME");
+        String columnName = JDBCUtils.safeGetStringTrimmed(dbResult, "COL_NAME");
+        //将keys字段中的引号去掉（是否可支持多列？）
+        columnName = columnName.replaceAll("\"", "");
+        //que 获取到的列为空？
         XuguTableColumn tableColumn = columnName == null ? null : parent.getAttribute(session.getProgressMonitor(), columnName);
         if (tableColumn == null) {
-            log.debug("Column '" + columnName + "' not found in table '" + parent.getName() + "'");
+            log.debug("GetTableColumn Column '" + columnName + "' not found in table '" + parent.getName() + "'");
         }
         return tableColumn;
     }
@@ -504,16 +507,20 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         {
         	//xfc 修改了获取约束信息的sql
             StringBuilder sql = new StringBuilder(500);
-            sql.append("SELECT * FROM ");
+            sql.append("SELECT *, DEFINE AS COL_NAME FROM ");
         	sql.append(owner.roleFlag);
-        	sql.append("_CONSTRAINTS");
+        	sql.append("_CONSTRAINTS INNER JOIN (SELECT s.SCHEMA_NAME, t.TABLE_ID FROM ");
+            sql.append(owner.roleFlag);
+            sql.append("_SCHEMAS s INNER JOIN ");
+            sql.append(owner.roleFlag);
+            sql.append("_TABLES t USING(SCHEMA_ID) ");
             if (forTable != null) {
-                sql.append(" WHERE TABLE_ID=(SELECT TABLE_ID FROM ");
-                sql.append(owner.roleFlag);
-                sql.append("_TABLES WHERE TABLE_NAME='");
+                sql.append("WHERE TABLE_NAME='");
                 sql.append(forTable.getName());
-                sql.append("')");
+                sql.append("'");
             }
+            sql.append(") USING(TABLE_ID)");
+            System.out.println("SSSSS "+sql.toString());
             JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
             return dbStat;
         }
@@ -573,16 +580,20 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         {
         	//xfc 修改了获取外键信息的sql
             StringBuilder sql = new StringBuilder(500);
-            sql.append("SELECT * FROM ");
+            sql.append("SELECT *, DEFINE AS COL_NAME FROM ");
+        	sql.append(owner.roleFlag);
+        	sql.append("_CONSTRAINTS INNER JOIN (SELECT s.SCHEMA_NAME, t.TABLE_ID FROM ");
             sql.append(owner.roleFlag);
-            sql.append("_CONSTRAINTS WHERE CONS_TYPE='F'");
+            sql.append("_SCHEMAS s INNER JOIN ");
+            sql.append(owner.roleFlag);
+            sql.append("_TABLES t USING(SCHEMA_ID) ");
             if (forTable != null) {
-                sql.append(" AND TABLE_ID=(SELECT TABLE_ID FROM ");
-                sql.append(owner.roleFlag);
-                sql.append("_TABLES WHERE TABLE_NAME='");
+                sql.append("WHERE TABLE_NAME='");
                 sql.append(forTable.getName());
-                sql.append("')");
+                sql.append("'");
             }
+            sql.append(") USING(TABLE_ID) WHERE CONS_TYPE='F'");
+            System.out.println("GGGet FFFFkey "+sql.toString());
             JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
 
             return dbStat;
@@ -635,9 +646,13 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         {
         	//xfc 修改了获取索引信息的sql
             StringBuilder sql = new StringBuilder();
-            sql.append("SELECT * FROM ");
+            sql.append("SELECT *, KEYS AS COL_NAME FROM ");
             sql.append(owner.roleFlag);
-            sql.append("_INDEXES");
+            sql.append("_INDEXES i INNER JOIN (SELECT * FROM ");
+            sql.append(owner.roleFlag);
+            sql.append("_COLUMNS) as x INNER JOIN ");
+            sql.append(owner.roleFlag);
+            sql.append("_TABLES USING(TABLE_ID) USING(TABLE_ID)");
             if (forTable != null) {
                 sql.append(" WHERE TABLE_ID=(SELECT TABLE_ID FROM ");
                 sql.append(owner.roleFlag);
@@ -645,6 +660,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
                 sql.append(forTable.getName());
                 sql.append("')");
             }
+            System.out.println("GGGet index column "+sql.toString());
             JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
             return dbStat;
         }
@@ -664,11 +680,16 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
             XuguTablePhysical parent, XuguTableIndex object, JDBCResultSet dbResult)
             throws SQLException, DBException
         {
-            String columnName = JDBCUtils.safeGetStringTrimmed(dbResult, "COL_NAME");
+            String columnName = JDBCUtils.safeGetStringTrimmed(dbResult, "KEYS");
+            columnName = columnName.replaceAll("\"", "");
             int ordinalPosition = JDBCUtils.safeGetInt(dbResult, "COL_NO");
-            boolean isAscending = "ASC".equals(JDBCUtils.safeGetStringTrimmed(dbResult, "DESCEND"));
-            String columnExpression = JDBCUtils.safeGetStringTrimmed(dbResult, "COLUMN_EXPRESSION");
+//            boolean isAscending = "ASC".equals(JDBCUtils.safeGetStringTrimmed(dbResult, "DESCEND"));
+//            String columnExpression = JDBCUtils.safeGetStringTrimmed(dbResult, "COLUMN_EXPRESSION");
 
+            //que 这两个字段对应关系是??
+            boolean isAscending = false;
+            String columnExpression = "";
+            
             XuguTableColumn tableColumn = columnName == null ? null : parent.getAttribute(session.getProgressMonitor(), columnName);
             if (tableColumn == null) {
                 log.debug("Column '" + columnName + "' not found in table '" + parent.getName() + "' for index '" + object.getName() + "'");

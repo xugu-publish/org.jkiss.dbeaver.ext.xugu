@@ -45,13 +45,13 @@ public class XuguTableForeignKey extends XuguTableConstraintBase implements DBST
     private DBSForeignKeyModifyRule deleteRule;
 
     public XuguTableForeignKey(
-        @NotNull XuguTableBase oracleTable,
+        @NotNull XuguTableBase xuguTable,
         @Nullable String name,
         @Nullable XuguObjectStatus status,
         @NotNull XuguTableConstraint referencedKey,
         @NotNull DBSForeignKeyModifyRule deleteRule)
     {
-        super(oracleTable, name, DBSEntityConstraintType.FOREIGN_KEY, status, false);
+        super(xuguTable, name, DBSEntityConstraintType.FOREIGN_KEY, status, false);
         this.referencedKey = referencedKey;
         this.deleteRule = deleteRule;
     }
@@ -64,16 +64,14 @@ public class XuguTableForeignKey extends XuguTableConstraintBase implements DBST
     {
         super(
             table,
-            JDBCUtils.safeGetString(dbResult, "CONSTRAINT_NAME"),
+            JDBCUtils.safeGetString(dbResult, "CONS_NAME"),
             DBSEntityConstraintType.FOREIGN_KEY,
-            CommonUtils.notNull(
-                CommonUtils.valueOf(XuguObjectStatus.class, JDBCUtils.safeGetStringTrimmed(dbResult, "STATUS")),
-                XuguObjectStatus.ENABLED),
+            JDBCUtils.safeGetBoolean(dbResult, "ENABLE") && JDBCUtils.safeGetBoolean(dbResult, "VALID")?XuguObjectStatus.ENABLED:XuguObjectStatus.DISABLED,
             true);
 
-        String refName = JDBCUtils.safeGetString(dbResult, "R_CONSTRAINT_NAME");
-        String refOwnerName = JDBCUtils.safeGetString(dbResult, "R_OWNER");
-        String refTableName = JDBCUtils.safeGetString(dbResult, "R_TABLE_NAME");
+        String refName = JDBCUtils.safeGetString(dbResult, "CONS_NAME");
+        String refOwnerName = JDBCUtils.safeGetString(dbResult, "SCHEMA_NAME");
+        String refTableName = JDBCUtils.safeGetString(dbResult, "REF_TABLE_NAME");
         XuguTableBase refTable = XuguTableBase.findTable(
             monitor,
             table.getDataSource(),
