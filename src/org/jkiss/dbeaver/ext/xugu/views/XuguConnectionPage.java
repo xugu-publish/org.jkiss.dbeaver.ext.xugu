@@ -78,7 +78,7 @@ public class XuguConnectionPage extends ConnectionPageAbstract implements ICompo
     private boolean activated = false;
 
     private static ImageDescriptor Xugu_LOGO_IMG = Activator.getImageDescriptor("icons/Xugu_logo.png");
-    private static ImageDescriptor MARIADB_LOGO_IMG = Activator.getImageDescriptor("icons/mariadb_logo.png");
+//    private static ImageDescriptor MARIADB_LOGO_IMG = Activator.getImageDescriptor("icons/mariadb_logo.png");
     private Combo serverTimezoneCombo;
     private Combo roleCombo;
 
@@ -163,18 +163,20 @@ public class XuguConnectionPage extends ConnectionPageAbstract implements ICompo
 
         UIUtils.createHorizontalLine(addrGroup, 2, 10);
 
-        if (!XuguUtils.isMariaDB(getSite().getDriver())) {
-            serverTimezoneCombo = UIUtils.createLabelCombo(addrGroup, XuguMessages.dialog_connection_server_timezone, SWT.DROP_DOWN);
-            serverTimezoneCombo.add(XuguMessages.dialog_connection_auto_detect);
-            {
-                String[] tzList = TimeZone.getAvailableIDs();
-                for (String tzID : tzList) {
-                    //TimeZone timeZone = TimeZone.getTimeZone(tzID);
-                    serverTimezoneCombo.add(tzID);
-                }
+        serverTimezoneCombo = UIUtils.createLabelCombo(addrGroup, XuguMessages.dialog_connection_server_timezone, SWT.DROP_DOWN);
+        serverTimezoneCombo.add(XuguMessages.dialog_connection_auto_detect);
+        {
+            String[] tzList = TimeZone.getAvailableIDs();
+            for (String tzID : tzList) {
+                //TimeZone timeZone = TimeZone.getTimeZone(tzID);
+                serverTimezoneCombo.add(tzID);
             }
-            serverTimezoneCombo.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING));
         }
+        serverTimezoneCombo.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING));
+        
+//        if (!XuguUtils.isMariaDB(getSite().getDriver())) {
+//            
+//        }
 //
 //        homesSelector = new ClientHomesSelector(addrGroup, SWT.NONE, XuguMessages.dialog_connection_local_client);
 //        gd = new GridData(GridData.FILL_HORIZONTAL | GridData.HORIZONTAL_ALIGN_BEGINNING);
@@ -202,11 +204,12 @@ public class XuguConnectionPage extends ConnectionPageAbstract implements ICompo
         if (!activated) {
             // We set image only once at activation
             // There is a bug in Eclipse which leads to SWTException after wizard image change
-            if (driver != null && driver.getId().equalsIgnoreCase(XuguConstants.DRIVER_ID_MARIA_DB)) {
-                setImageDescriptor(MARIADB_LOGO_IMG);
-            } else {
-                setImageDescriptor(Xugu_LOGO_IMG);
-            }
+        	setImageDescriptor(Xugu_LOGO_IMG);
+//            if (driver != null && driver.getId().equalsIgnoreCase(XuguConstants.DRIVER_ID_MARIA_DB)) {
+//                setImageDescriptor(MARIADB_LOGO_IMG);
+//            } else {
+//                
+//            }
         }
 
         // Load values from new connection info
