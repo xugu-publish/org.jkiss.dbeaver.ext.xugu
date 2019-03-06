@@ -183,7 +183,8 @@ public abstract class XuguTablePhysical extends XuguTableBase implements DBSObje
     @Override
     public DBSObject refreshObject(@NotNull DBRProgressMonitor monitor) throws DBException
     {
-        this.getContainer().indexCache.clearObjectCache(this);
+        getContainer().indexCache.clearObjectCache(this);
+    	//return this;
         return super.refreshObject(monitor);
     }
 

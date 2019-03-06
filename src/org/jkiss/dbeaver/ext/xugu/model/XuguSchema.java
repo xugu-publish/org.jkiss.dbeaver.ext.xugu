@@ -331,13 +331,13 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
     public DBSObject getChild(@NotNull DBRProgressMonitor monitor, @NotNull String childName)
         throws DBException
     {
-        XuguTableBase table = null;
+        XuguTableBase table = tableCache.getObject(monitor, this, childName);;
         //下拉菜单已经展开时才处理tableCache
         //避免了当下拉菜单没有展开时就点击新建表会无限循环加载的问题
-        if(!tableCache.isFullyCached())
-        	table = tableCache.getObject(monitor, this, childName);
+        //if(!tableCache.isFullyCached())
+        	
         if (table != null) {
-            System.out.println("TTTTTTTTt "+table.getName());
+            System.out.println("TTTTTTTTt "+table.getName()+" ");
             return table;
         }
         XuguSynonym synonym = synonymCache.getObject(monitor, this, childName);
@@ -434,6 +434,12 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         	sql.append(owner.roleFlag);
         	sql.append("_TABLES WHERE SCHEMA_ID=");
         	sql.append(owner.id);
+        	//当有检索条件时 只查询指定表 用于新建表之后的刷新工作
+        	if(object!=null) {
+        		sql.append(" AND TABLE_NAME = '");
+        		sql.append(object.getName());
+        		sql.append("'");
+        	}
         	final JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
         	System.out.println("prepareLookup stmt "+dbStat.getQueryString());
         

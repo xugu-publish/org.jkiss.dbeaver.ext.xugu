@@ -93,65 +93,66 @@ public class XuguTableManager extends SQLTableManager<XuguTable, XuguSchema> imp
     
     @Override
     protected void addStructObjectCreateActions(DBRProgressMonitor monitor, List<DBEPersistAction> actions, StructCreateCommand command, Map<String, Object> options) throws DBException {
-    	XuguTable table = command.getObject();
-        NestedObjectCommand tableProps = command.getObjectCommands().get(table);
-        if (tableProps == null) {
-            log.warn("Object change command not found"); //$NON-NLS-1$
-            return;
-        }
-        //获取完整的表名
-        String tableName = CommonUtils.getOption(options, DBPScriptObject.OPTION_FULLY_QUALIFIED_NAMES, true) ?
-            table.getFullyQualifiedName(DBPEvaluationContext.DDL) : DBUtils.getQuotedIdentifier(table);
-        System.out.println("table name? "+tableName);
-        String slComment = SQLUtils.getDialectFromObject(table).getSingleLineComments()[0];
-        String lineSeparator = GeneralUtils.getDefaultLineSeparator();
-        StringBuilder createQuery = new StringBuilder(100);
-        createQuery.append("CREATE ").append(getCreateTableType(table)).append(" ").append(tableName).append(" (").append(lineSeparator); //$NON-NLS-1$ //$NON-NLS-2$
-        boolean hasNestedDeclarations = false;
-        Collection<NestedObjectCommand> orderedCommands = getNestedOrderedCommands(command);
-        for (NestedObjectCommand nestedCommand : orderedCommands) {
-            if (nestedCommand.getObject() == table) {
-                continue;
-            }
-            if (excludeFromDDL(nestedCommand, orderedCommands)) {
-                continue;
-            }
-            final String nestedDeclaration = nestedCommand.getNestedDeclaration(monitor, table, options);
-            if (!CommonUtils.isEmpty(nestedDeclaration)) {
-                // Insert nested declaration
-                if (hasNestedDeclarations) {
-                    // Check for embedded comment
-                    int lastLFPos = createQuery.lastIndexOf(lineSeparator);
-                    int lastCommentPos = createQuery.lastIndexOf(slComment);
-                    if (lastCommentPos != -1) {
-                        while (lastCommentPos > 0 && Character.isWhitespace(createQuery.charAt(lastCommentPos - 1))) {
-                            lastCommentPos--;
-                        }
-                    }
-                    if (lastCommentPos < 0 || lastCommentPos < lastLFPos) {
-                        createQuery.append(","); //$NON-NLS-1$
-                    } else {
-                        createQuery.insert(lastCommentPos, ","); //$NON-NLS-1$
-                    }
-                    createQuery.append(lineSeparator); //$NON-NLS-1$
-                }
-                createQuery.append("\t").append(nestedDeclaration); //$NON-NLS-1$
-                hasNestedDeclarations = true;
-            } else {
-                // This command should be executed separately
-                final DBEPersistAction[] nestedActions = nestedCommand.getPersistActions(monitor, options);
-                if (nestedActions != null) {
-                    Collections.addAll(actions, nestedActions);
-                }
-            }
-        }
-
-        createQuery.append(lineSeparator).append(")"); //$NON-NLS-1$
-        appendTableModifiers(monitor, table, tableProps, createQuery, false);
-
-        actions.add( 0, new SQLDatabasePersistAction(ModelMessages.model_jdbc_create_new_table, createQuery.toString()) );
-        //刷新？
-        table.getDataSource().refreshObject(monitor);
+    	super.addStructObjectCreateActions(monitor, actions, command, options);
+//    	XuguTable table = command.getObject();
+//        NestedObjectCommand tableProps = command.getObjectCommands().get(table);
+//        if (tableProps == null) {
+//            log.warn("Object change command not found"); //$NON-NLS-1$
+//            return;
+//        }
+//        //获取完整的表名
+//        String tableName = CommonUtils.getOption(options, DBPScriptObject.OPTION_FULLY_QUALIFIED_NAMES, true) ?
+//            table.getFullyQualifiedName(DBPEvaluationContext.DDL) : DBUtils.getQuotedIdentifier(table);
+//        System.out.println("table name? "+tableName);
+//        String slComment = SQLUtils.getDialectFromObject(table).getSingleLineComments()[0];
+//        String lineSeparator = GeneralUtils.getDefaultLineSeparator();
+//        StringBuilder createQuery = new StringBuilder(100);
+//        createQuery.append("CREATE ").append(getCreateTableType(table)).append(" ").append(tableName).append(" (").append(lineSeparator); //$NON-NLS-1$ //$NON-NLS-2$
+//        boolean hasNestedDeclarations = false;
+//        Collection<NestedObjectCommand> orderedCommands = getNestedOrderedCommands(command);
+//        for (NestedObjectCommand nestedCommand : orderedCommands) {
+//            if (nestedCommand.getObject() == table) {
+//                continue;
+//            }
+//            if (excludeFromDDL(nestedCommand, orderedCommands)) {
+//                continue;
+//            }
+//            final String nestedDeclaration = nestedCommand.getNestedDeclaration(monitor, table, options);
+//            if (!CommonUtils.isEmpty(nestedDeclaration)) {
+//                // Insert nested declaration
+//                if (hasNestedDeclarations) {
+//                    // Check for embedded comment
+//                    int lastLFPos = createQuery.lastIndexOf(lineSeparator);
+//                    int lastCommentPos = createQuery.lastIndexOf(slComment);
+//                    if (lastCommentPos != -1) {
+//                        while (lastCommentPos > 0 && Character.isWhitespace(createQuery.charAt(lastCommentPos - 1))) {
+//                            lastCommentPos--;
+//                        }
+//                    }
+//                    if (lastCommentPos < 0 || lastCommentPos < lastLFPos) {
+//                        createQuery.append(","); //$NON-NLS-1$
+//                    } else {
+//                        createQuery.insert(lastCommentPos, ","); //$NON-NLS-1$
+//                    }
+//                    createQuery.append(lineSeparator); //$NON-NLS-1$
+//                }
+//                createQuery.append("\t").append(nestedDeclaration); //$NON-NLS-1$
+//                hasNestedDeclarations = true;
+//            } else {
+//                // This command should be executed separately
+//                final DBEPersistAction[] nestedActions = nestedCommand.getPersistActions(monitor, options);
+//                if (nestedActions != null) {
+//                    Collections.addAll(actions, nestedActions);
+//                }
+//            }
+//        }
+//
+//        createQuery.append(lineSeparator).append(")"); //$NON-NLS-1$
+//        appendTableModifiers(monitor, table, tableProps, createQuery, false);
+//
+//        actions.add( 0, new SQLDatabasePersistAction(ModelMessages.model_jdbc_create_new_table, createQuery.toString()) );
+//        //刷新？
+//        table.getDataSource().refreshObject(monitor);
     }
     
     @Override

@@ -60,6 +60,8 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
 {
     private static final Log log = Log.getLog(XuguTableBase.class);
 
+    private int id;
+    
     public static class TableAdditionalInfo {
         volatile boolean loaded = false;
 
@@ -101,6 +103,7 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
     {
         super(oracleSchema, true);
         setName(JDBCUtils.safeGetString(dbResult, "TABLE_NAME"));
+        this.id = JDBCUtils.safeGetInt(dbResult, "TABLE_ID");
 //        this.valid = "VALID".equals(JDBCUtils.safeGetString(dbResult, "STATUS"));
         //this.comment = JDBCUtils.safeGetString(dbResult, "COMMENTS");
     }
@@ -142,6 +145,10 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
             this);
     }
 
+    public int getID() {
+    	return this.id;
+    }
+    
     //获取表注释信息
     @Property(viewable = true, editable = true, updatable = true, multiline = true, order = 100)
     @LazyProperty(cacheValidator = CommentsValidator.class)
@@ -226,7 +233,7 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
     public DBSObject refreshObject(@NotNull DBRProgressMonitor monitor) throws DBException
     {
         getContainer().constraintCache.clearObjectCache(this);
-
+        System.out.println("right owner? right this?"+getContainer().getName()+" "+this.getName());
         return getContainer().tableCache.refreshObject(monitor, getContainer(), this);
     }
 
