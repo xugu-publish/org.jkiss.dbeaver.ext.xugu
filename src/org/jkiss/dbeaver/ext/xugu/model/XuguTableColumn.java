@@ -220,7 +220,10 @@ public class XuguTableColumn extends JDBCTableColumn<XuguTableBase> implements D
         {
             List<DBSDataType> dataTypes = new ArrayList<>(column.getTable().getDataSource().getLocalDataTypes());
             if (!dataTypes.contains(column.getDataType())) {
-                dataTypes.add(column.getDataType());
+            	XuguDataType t=column.getDataType();
+            	if(t!=null) {
+            		dataTypes.add(column.getDataType());
+            	}
             }
             Collections.sort(dataTypes, DBUtils.nameComparator());
             return dataTypes.toArray(new DBSDataType[dataTypes.size()]);

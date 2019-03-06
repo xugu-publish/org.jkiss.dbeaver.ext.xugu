@@ -72,6 +72,7 @@ public class XuguTableColumnManager extends SQLTableColumnManager<XuguTableColum
         return column;
     }
 
+    //修改了表结构修改的sql语句
     @Override
     protected void addObjectModifyActions(DBRProgressMonitor monitor, List<DBEPersistAction> actionList, ObjectChangeCommand command, Map<String, Object> options)
     {
@@ -81,7 +82,7 @@ public class XuguTableColumnManager extends SQLTableColumnManager<XuguTableColum
             actionList.add(new SQLDatabasePersistAction(
                 "Modify column",
                 "ALTER TABLE " + column.getTable().getFullyQualifiedName(DBPEvaluationContext.DDL) + //$NON-NLS-1$
-                " MODIFY " + getNestedDeclaration(monitor, column.getTable(), command, options))); //$NON-NLS-1$
+                " ALTER COLUMN " + getNestedDeclaration(monitor, column.getTable(), command, options))); //$NON-NLS-1$
         }
         if (hasComment) {
             actionList.add(new SQLDatabasePersistAction(
