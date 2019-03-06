@@ -66,6 +66,7 @@ public class XuguDataType extends XuguObject<DBSObject>
         final int precision;
         final int minScale;
         final int maxScale;
+        
         private TypeDesc(DBPDataKind dataKind, int valueType, int precision, int minScale, int maxScale)
         {
             this.dataKind = dataKind;
@@ -78,63 +79,44 @@ public class XuguDataType extends XuguObject<DBSObject>
 
     static final Map<String, TypeDesc> PREDEFINED_TYPES = new HashMap<>();
     static final Map<Integer, TypeDesc> PREDEFINED_TYPE_IDS = new HashMap<>();
+    //修改了数据类型定义
     static  {
-        PREDEFINED_TYPES.put("BFILE", new TypeDesc(DBPDataKind.CONTENT, Types.OTHER, 0, 0, 0));
-        PREDEFINED_TYPES.put("BINARY ROWID", new TypeDesc(DBPDataKind.ROWID, Types.ROWID, 0, 0, 0));
-        PREDEFINED_TYPES.put("BINARY_DOUBLE", new TypeDesc(DBPDataKind.NUMERIC, Types.DOUBLE, 63, 127, -84));
-        PREDEFINED_TYPES.put("BINARY_FLOAT", new TypeDesc(DBPDataKind.NUMERIC, Types.FLOAT, 63, 127, -84));
-        PREDEFINED_TYPES.put("BLOB", new TypeDesc(DBPDataKind.CONTENT, Types.BLOB, 0, 0, 0));
-        PREDEFINED_TYPES.put("CANONICAL", new TypeDesc(DBPDataKind.UNKNOWN, Types.OTHER, 0, 0, 0));
-        PREDEFINED_TYPES.put("CFILE", new TypeDesc(DBPDataKind.CONTENT, Types.OTHER, 0, 0, 0));
-        PREDEFINED_TYPES.put("CHAR", new TypeDesc(DBPDataKind.STRING, Types.CHAR, 0, 0, 0));
-        PREDEFINED_TYPES.put("CLOB", new TypeDesc(DBPDataKind.CONTENT, Types.CLOB, 0, 0, 0));
-        PREDEFINED_TYPES.put("CONTIGUOUS ARRAY", new TypeDesc(DBPDataKind.ARRAY, Types.ARRAY, 0, 0, 0));
-        // DATE IS TIMESTAMP. It always keeps time value. But sometimes it is visualized as DATE (see #2457)
-        PREDEFINED_TYPES.put("DATE", new TypeDesc(DBPDataKind.DATETIME, Types.TIMESTAMP, 0, 0, 0));
-        PREDEFINED_TYPES.put("DECIMAL", new TypeDesc(DBPDataKind.NUMERIC, Types.DECIMAL, 63, 127, -84));
-        PREDEFINED_TYPES.put("DOUBLE PRECISION", new TypeDesc(DBPDataKind.NUMERIC, Types.DOUBLE, 63, 127, -84));
-        PREDEFINED_TYPES.put("FLOAT", new TypeDesc(DBPDataKind.NUMERIC, Types.FLOAT, 63, 127, -84));
-        PREDEFINED_TYPES.put("INTEGER", new TypeDesc(DBPDataKind.NUMERIC, Types.INTEGER, 63, 127, -84));
-        PREDEFINED_TYPES.put("INTERVAL DAY TO SECOND", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 0, 0, 0));
-        PREDEFINED_TYPES.put("INTERVAL YEAR TO MONTH", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 0, 0, 0));
-        PREDEFINED_TYPES.put("CONTENT POINTER", new TypeDesc(DBPDataKind.CONTENT, Types.BLOB, 0, 0, 0));
-        PREDEFINED_TYPES.put("NAMED COLLECTION", new TypeDesc(DBPDataKind.ARRAY, Types.ARRAY, 0, 0, 0));
-        PREDEFINED_TYPES.put("NAMED OBJECT", new TypeDesc(DBPDataKind.OBJECT, Types.STRUCT, 0, 0, 0));
-        PREDEFINED_TYPES.put("NUMBER", new TypeDesc(DBPDataKind.NUMERIC, Types.NUMERIC, 63, 127, -84));
-        PREDEFINED_TYPES.put("OCTET", new TypeDesc(DBPDataKind.BINARY, Types.OTHER, 0, 0, 0));
-        PREDEFINED_TYPES.put("OID", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 0, 0, 0));
-        PREDEFINED_TYPES.put("POINTER", new TypeDesc(DBPDataKind.UNKNOWN, Types.OTHER, 0, 0, 0));
-        PREDEFINED_TYPES.put("RAW", new TypeDesc(DBPDataKind.BINARY, Types.OTHER, 0, 0, 0));
-        PREDEFINED_TYPES.put("REAL", new TypeDesc(DBPDataKind.NUMERIC, Types.REAL, 63, 127, -84));
-        PREDEFINED_TYPES.put("REF", new TypeDesc(DBPDataKind.REFERENCE, Types.OTHER, 0, 0, 0));
-        PREDEFINED_TYPES.put("SIGNED BINARY INTEGER", new TypeDesc(DBPDataKind.NUMERIC, Types.INTEGER, 63, 127, -84));
-        PREDEFINED_TYPES.put("SMALLINT", new TypeDesc(DBPDataKind.NUMERIC, Types.SMALLINT, 63, 127, -84));
-        PREDEFINED_TYPES.put("TABLE", new TypeDesc(DBPDataKind.OBJECT, Types.OTHER, 0, 0, 0));
-        PREDEFINED_TYPES.put("TIME", new TypeDesc(DBPDataKind.DATETIME, Types.TIMESTAMP, 0, 0, 0));
-        PREDEFINED_TYPES.put("TIME WITH TZ", new TypeDesc(DBPDataKind.DATETIME, Types.TIMESTAMP, 0, 0, 0));
-        PREDEFINED_TYPES.put("TIMESTAMP", new TypeDesc(DBPDataKind.DATETIME, Types.TIMESTAMP, 0, 0, 0));
-        PREDEFINED_TYPES.put("TIMESTAMP WITH LOCAL TZ", new TypeDesc(DBPDataKind.DATETIME, XuguConstants.DATA_TYPE_TIMESTAMP_WITH_LOCAL_TIMEZONE, 0, 0, 0));
-        PREDEFINED_TYPES.put("TIMESTAMP WITH TZ", new TypeDesc(DBPDataKind.DATETIME, XuguConstants.DATA_TYPE_TIMESTAMP_WITH_TIMEZONE, 0, 0, 0));
-        PREDEFINED_TYPES.put("TIMESTAMP WITH LOCAL TIME ZONE", new TypeDesc(DBPDataKind.DATETIME, XuguConstants.DATA_TYPE_TIMESTAMP_WITH_LOCAL_TIMEZONE, 0, 0, 0));
-        PREDEFINED_TYPES.put("TIMESTAMP WITH TIME ZONE", new TypeDesc(DBPDataKind.DATETIME, XuguConstants.DATA_TYPE_TIMESTAMP_WITH_TIMEZONE, 0, 0, 0));
-        PREDEFINED_TYPES.put("UNSIGNED BINARY INTEGER", new TypeDesc(DBPDataKind.NUMERIC, Types.BIGINT, 63, 127, -84));
-        PREDEFINED_TYPES.put("UROWID", new TypeDesc(DBPDataKind.ROWID, Types.ROWID, 0, 0, 0));
-        PREDEFINED_TYPES.put("VARCHAR", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 0, 0, 0));
-        PREDEFINED_TYPES.put("VARCHAR2", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 0, 0, 0));
-        PREDEFINED_TYPES.put("VARYING ARRAY", new TypeDesc(DBPDataKind.ARRAY, Types.ARRAY, 0, 0, 0));
-
-        PREDEFINED_TYPES.put("VARRAY", new TypeDesc(DBPDataKind.ARRAY, Types.ARRAY, 0, 0, 0));
-        PREDEFINED_TYPES.put("ROWID", new TypeDesc(DBPDataKind.ROWID, Types.ROWID, 0, 0, 0));
-        PREDEFINED_TYPES.put("LONG", new TypeDesc(DBPDataKind.BINARY, Types.LONGVARBINARY, 0, 0, 0));
-        PREDEFINED_TYPES.put("RAW", new TypeDesc(DBPDataKind.BINARY, Types.LONGVARBINARY, 0, 0, 0));
-        PREDEFINED_TYPES.put("LONG RAW", new TypeDesc(DBPDataKind.BINARY, Types.LONGVARBINARY, 0, 0, 0));
-        PREDEFINED_TYPES.put("NVARCHAR2", new TypeDesc(DBPDataKind.STRING, Types.NVARCHAR, 0, 0, 0));
-        PREDEFINED_TYPES.put("NCHAR", new TypeDesc(DBPDataKind.STRING, Types.NCHAR, 0, 0, 0));
-        PREDEFINED_TYPES.put("NCLOB", new TypeDesc(DBPDataKind.CONTENT, Types.NCLOB, 0, 0, 0));
-        PREDEFINED_TYPES.put("LOB POINTER", new TypeDesc(DBPDataKind.CONTENT, Types.BLOB, 0, 0, 0));
-
-        PREDEFINED_TYPES.put("REF CURSOR", new TypeDesc(DBPDataKind.REFERENCE, -10, 0, 0, 0));
-
+    	PREDEFINED_TYPES.put("INTEGER", new TypeDesc(DBPDataKind.NUMERIC, Types.INTEGER, 63, 127, -84));
+    	PREDEFINED_TYPES.put("BIGINT", new TypeDesc(DBPDataKind.NUMERIC, Types.BIGINT, 63, 127, -84));
+    	PREDEFINED_TYPES.put("FLOAT", new TypeDesc(DBPDataKind.NUMERIC, Types.FLOAT, 63, 127, -84));
+    	PREDEFINED_TYPES.put("DOUBLE", new TypeDesc(DBPDataKind.NUMERIC, Types.DOUBLE, 63, 127, -84));
+    	PREDEFINED_TYPES.put("TINYINT", new TypeDesc(DBPDataKind.NUMERIC, Types.TINYINT, 63, 127, -84));
+    	PREDEFINED_TYPES.put("SMALLINT", new TypeDesc(DBPDataKind.NUMERIC, Types.SMALLINT, 63, 127, -84));
+    	PREDEFINED_TYPES.put("NUMERIC", new TypeDesc(DBPDataKind.NUMERIC, Types.NUMERIC, 63, 127, -84));
+    	PREDEFINED_TYPES.put("CHAR", new TypeDesc(DBPDataKind.STRING, Types.CHAR, 0, 0, 0));
+    	PREDEFINED_TYPES.put("VARCHAR", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 0, 0, 0));
+    	PREDEFINED_TYPES.put("CLOB", new TypeDesc(DBPDataKind.CONTENT, Types.CLOB, 0, 0, 0));
+    	PREDEFINED_TYPES.put("BOOLEAN", new TypeDesc(DBPDataKind.BOOLEAN, Types.BOOLEAN, 0, 0, 0));
+    	PREDEFINED_TYPES.put("BLOB", new TypeDesc(DBPDataKind.CONTENT, Types.BLOB, 0, 0, 0));
+        
+    	PREDEFINED_TYPES.put("GUID", new TypeDesc(DBPDataKind.ROWID, Types.ROWID, 0, 0, 0));
+    	PREDEFINED_TYPES.put("ROWVERSION", new TypeDesc(DBPDataKind.ROWID, Types.ROWID, 0, 0, 0));
+    	
+    	PREDEFINED_TYPES.put("DATE", new TypeDesc(DBPDataKind.DATETIME, Types.TIMESTAMP, 0, 0, 0));
+    	PREDEFINED_TYPES.put("DATETIME", new TypeDesc(DBPDataKind.DATETIME, Types.TIMESTAMP, 0, 0, 0));
+    	PREDEFINED_TYPES.put("DATETIME WITH TIME ZONE", new TypeDesc(DBPDataKind.DATETIME, Types.TIMESTAMP, 0, 0, 0));
+    	PREDEFINED_TYPES.put("TIME", new TypeDesc(DBPDataKind.DATETIME, Types.TIMESTAMP, 0, 0, 0));
+    	PREDEFINED_TYPES.put("TIME WITH TIME ZONE", new TypeDesc(DBPDataKind.DATETIME, Types.TIMESTAMP, 0, 0, 0));
+        
+    	PREDEFINED_TYPES.put("INTERVAL YEAR", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 9, 0, 0));
+    	PREDEFINED_TYPES.put("INTERVAL MONTH", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 9, 0, 0));
+    	PREDEFINED_TYPES.put("INTERVAL DAY", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 9, 0, 0));
+    	PREDEFINED_TYPES.put("INTERVAL HOUR", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 9, 0, 0));
+    	PREDEFINED_TYPES.put("INTERVAL MINUTE", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 9, 0, 0));
+    	PREDEFINED_TYPES.put("INTERVAL SECOND", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 9, 0, 6));
+    	PREDEFINED_TYPES.put("INTERVAL YEAR TO MONTH", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 8, 0, 0));
+    	PREDEFINED_TYPES.put("INTERVAL DAY TO HOUR", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 7, 0, 0));
+    	PREDEFINED_TYPES.put("INTERVAL DAY TO MINUTE", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 6, 0, 0));
+    	PREDEFINED_TYPES.put("INTERVAL DAY TO SECOND", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 6, 0, 6));
+    	PREDEFINED_TYPES.put("INTERVAL HOUR TO MINUTE", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 7, 0, 0));
+    	PREDEFINED_TYPES.put("INTERVAL HOUR TO SECOND", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 7, 0, 6));
+    	PREDEFINED_TYPES.put("INTERVAL MINUTE TO SECOND", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 7, 0, 6));
+       
         for (TypeDesc type : PREDEFINED_TYPES.values()) {
             PREDEFINED_TYPE_IDS.put(type.valueType, type);
         }
@@ -143,8 +125,8 @@ public class XuguDataType extends XuguObject<DBSObject>
     private String typeCode;
     private byte[] typeOID;
     private Object superType;
-    private final AttributeCache attributeCache;
-    private final MethodCache methodCache;
+//    private final AttributeCache attributeCache;
+//    private final MethodCache methodCache;
     private boolean flagPredefined;
     private boolean flagIncomplete;
     private boolean flagFinal;
@@ -158,65 +140,65 @@ public class XuguDataType extends XuguObject<DBSObject>
     public XuguDataType(DBSObject owner, String typeName, boolean persisted)
     {
         super(owner, typeName, persisted);
-        this.attributeCache = new AttributeCache();
-        this.methodCache = new MethodCache();
+//        this.attributeCache = new AttributeCache();
+//        this.methodCache = new MethodCache();
         if (owner instanceof XuguDataSource) {
             flagPredefined = true;
             findTypeDesc(typeName);
         }
     }
 
-    public XuguDataType(DBSObject owner, ResultSet dbResult)
-    {
-        super(owner, JDBCUtils.safeGetString(dbResult, "TYPE_NAME"), true);
-        this.typeCode = JDBCUtils.safeGetString(dbResult, "TYPECODE");
-        this.typeOID = JDBCUtils.safeGetBytes(dbResult, "TYPE_OID");
-        this.flagPredefined = JDBCUtils.safeGetBoolean(dbResult, "PREDEFINED", XuguConstants.YES);
-        this.flagIncomplete = JDBCUtils.safeGetBoolean(dbResult, "INCOMPLETE", XuguConstants.YES);
-        this.flagFinal = JDBCUtils.safeGetBoolean(dbResult, "FINAL", XuguConstants.YES);
-        this.flagInstantiable = JDBCUtils.safeGetBoolean(dbResult, "INSTANTIABLE", XuguConstants.YES);
-        String superTypeOwner = JDBCUtils.safeGetString(dbResult, "SUPERTYPE_OWNER");
-        boolean hasAttributes;
-        boolean hasMethods;
-        if (!CommonUtils.isEmpty(superTypeOwner)) {
-            this.superType = new XuguLazyReference(
-                superTypeOwner,
-                JDBCUtils.safeGetString(dbResult, "SUPERTYPE_NAME"));
-            hasAttributes = JDBCUtils.safeGetInt(dbResult, "LOCAL_ATTRIBUTES") > 0;
-            hasMethods = JDBCUtils.safeGetInt(dbResult, "LOCAL_METHODS") > 0;
-        } else {
-            hasAttributes = JDBCUtils.safeGetInt(dbResult, "ATTRIBUTES") > 0;
-            hasMethods = JDBCUtils.safeGetInt(dbResult, "METHODS") > 0;
-        }
-        attributeCache = hasAttributes ? new AttributeCache() : null;
-        methodCache = hasMethods ? new MethodCache() : null;
-        
-        if (owner instanceof XuguDataSource && flagPredefined) {
-            // Determine value type for predefined types
-            findTypeDesc(name);
-        } else {
-            if (TYPE_CODE_COLLECTION.equals(this.typeCode)) {
-                this.valueType = java.sql.Types.ARRAY;
-            } else if (TYPE_CODE_OBJECT.equals(this.typeCode)) {
-                this.valueType = java.sql.Types.STRUCT;
-            } else {
-                if (this.name.equals(XuguConstants.TYPE_NAME_XML) && owner.getName().equals(XuguConstants.SCHEMA_SYS)) {
-                    this.valueType = java.sql.Types.SQLXML;
-                }
-            }
-        }
-    }
+//    public XuguDataType(DBSObject owner, ResultSet dbResult)
+//    {
+//        super(owner, JDBCUtils.safeGetString(dbResult, "TYPE_NAME"), true);
+//        this.typeCode = JDBCUtils.safeGetString(dbResult, "TYPECODE");
+//        this.typeOID = JDBCUtils.safeGetBytes(dbResult, "TYPE_OID");
+//        this.flagPredefined = JDBCUtils.safeGetBoolean(dbResult, "PREDEFINED", XuguConstants.YES);
+//        this.flagIncomplete = JDBCUtils.safeGetBoolean(dbResult, "INCOMPLETE", XuguConstants.YES);
+//        this.flagFinal = JDBCUtils.safeGetBoolean(dbResult, "FINAL", XuguConstants.YES);
+//        this.flagInstantiable = JDBCUtils.safeGetBoolean(dbResult, "INSTANTIABLE", XuguConstants.YES);
+//        String superTypeOwner = JDBCUtils.safeGetString(dbResult, "SUPERTYPE_OWNER");
+//        boolean hasAttributes;
+//        boolean hasMethods;
+//        if (!CommonUtils.isEmpty(superTypeOwner)) {
+//            this.superType = new XuguLazyReference(
+//                superTypeOwner,
+//                JDBCUtils.safeGetString(dbResult, "SUPERTYPE_NAME"));
+//            hasAttributes = JDBCUtils.safeGetInt(dbResult, "LOCAL_ATTRIBUTES") > 0;
+//            hasMethods = JDBCUtils.safeGetInt(dbResult, "LOCAL_METHODS") > 0;
+//        } else {
+//            hasAttributes = JDBCUtils.safeGetInt(dbResult, "ATTRIBUTES") > 0;
+//            hasMethods = JDBCUtils.safeGetInt(dbResult, "METHODS") > 0;
+//        }
+////        attributeCache = hasAttributes ? new AttributeCache() : null;
+////        methodCache = hasMethods ? new MethodCache() : null;
+//        
+//        if (owner instanceof XuguDataSource && flagPredefined) {
+//            // Determine value type for predefined types
+//            findTypeDesc(name);
+//        } else {
+//            if (TYPE_CODE_COLLECTION.equals(this.typeCode)) {
+//                this.valueType = java.sql.Types.ARRAY;
+//            } else if (TYPE_CODE_OBJECT.equals(this.typeCode)) {
+//                this.valueType = java.sql.Types.STRUCT;
+//            } else {
+//                if (this.name.equals(XuguConstants.TYPE_NAME_XML) && owner.getName().equals(XuguConstants.SCHEMA_SYS)) {
+//                    this.valueType = java.sql.Types.SQLXML;
+//                }
+//            }
+//        }
+//    }
 
-    // Use by tree navigator thru reflection
-    public boolean hasMethods()
-    {
-        return methodCache != null;
-    }
-    // Use by tree navigator thru reflection
-    public boolean hasAttributes()
-    {
-        return attributeCache != null;
-    }
+//    // Use by tree navigator thru reflection
+//    public boolean hasMethods()
+//    {
+//        return methodCache != null;
+//    }
+//    // Use by tree navigator thru reflection
+//    public boolean hasAttributes()
+//    {
+//        return attributeCache != null;
+//    }
 
     private boolean findTypeDesc(String typeName)
     {
@@ -448,7 +430,8 @@ public class XuguDataType extends XuguObject<DBSObject>
     public Collection<XuguDataTypeAttribute> getAttributes(@NotNull DBRProgressMonitor monitor)
         throws DBException
     {
-        return attributeCache != null ? attributeCache.getAllObjects(monitor, this) : null;
+//        return attributeCache != null ? attributeCache.getAllObjects(monitor, this) : null;
+    	return null;
     }
 
     @Nullable
@@ -461,7 +444,8 @@ public class XuguDataType extends XuguObject<DBSObject>
     @Override
     public XuguDataTypeAttribute getAttribute(@NotNull DBRProgressMonitor monitor, @NotNull String attributeName) throws DBException
     {
-        return attributeCache != null ? attributeCache.getObject(monitor, this, attributeName) : null;
+//        return attributeCache != null ? attributeCache.getObject(monitor, this, attributeName) : null;
+    	return null;
     }
 
     @Nullable
@@ -469,7 +453,8 @@ public class XuguDataType extends XuguObject<DBSObject>
     public Collection<XuguDataTypeMethod> getMethods(DBRProgressMonitor monitor)
         throws DBException
     {
-        return methodCache != null ? methodCache.getAllObjects(monitor, this) : null;
+//        return methodCache != null ? methodCache.getAllObjects(monitor, this) : null;
+    	return null;
     }
 
     @Override
@@ -544,20 +529,21 @@ public class XuguDataType extends XuguObject<DBSObject>
         typeName = normalizeTypeName(typeName);
         XuguSchema typeSchema = null;
         XuguDataType type = null;
-        if (typeOwner != null) {
-            try {
-                typeSchema = dataSource.getSchema(monitor, typeOwner);
-                if (typeSchema == null) {
-                    log.error("Type attr schema '" + typeOwner + "' not found");
-                } else {
-                    type = typeSchema.getDataType(monitor, typeName);
-                }
-            } catch (DBException e) {
-                log.error(e);
-            }
-        } else {
-            type = (XuguDataType)dataSource.getLocalDataType(typeName);
-        }
+        PREDEFINED_TYPES.get(typeName);
+//        if (typeOwner != null) {
+//            try {
+//                typeSchema = dataSource.getSchema(monitor, typeOwner);
+//                if (typeSchema == null) {
+//                    log.error("Type attr schema '" + typeOwner + "' not found");
+//                } else {
+//                    type = typeSchema.getDataType(monitor, typeName);
+//                }
+//            } catch (DBException e) {
+//                log.error(e);
+//            }
+//        } else {
+//            type = (XuguDataType)dataSource.getLocalDataType(typeName);
+//        }
         if (type == null) {
             log.debug("Data type '" + typeName + "' not found - declare new one");
             type = new XuguDataType(typeSchema == null ? dataSource : typeSchema, typeName, true);

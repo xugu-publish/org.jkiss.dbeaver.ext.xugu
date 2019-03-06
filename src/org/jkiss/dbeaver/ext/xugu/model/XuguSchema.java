@@ -731,7 +731,8 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         @Override
         protected XuguDataType fetchObject(@NotNull JDBCSession session, @NotNull XuguSchema owner, @NotNull JDBCResultSet resultSet) throws SQLException
         {
-            return new XuguDataType(owner, resultSet);
+            //return new XuguDataType(owner, resultSet);
+        	return null;
         }
     }
 

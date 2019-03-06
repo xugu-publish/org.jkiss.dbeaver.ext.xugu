@@ -895,7 +895,8 @@ public class XuguDataSource extends JDBCDataSource
 
         @Override
         protected XuguDataType fetchObject(@NotNull JDBCSession session, @NotNull XuguDataSource owner, @NotNull JDBCResultSet resultSet) throws SQLException, DBException {
-            return new XuguDataType(owner, resultSet);
+            //return new XuguDataType(owner, resultSet);
+        	return null;
         }
     }
 

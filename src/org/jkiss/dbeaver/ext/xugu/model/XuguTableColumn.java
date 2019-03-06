@@ -32,6 +32,7 @@ import org.jkiss.dbeaver.model.meta.LazyProperty;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSDataType;
+import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.DBSTypedObjectEx;
 import org.jkiss.dbeaver.model.struct.rdb.DBSTableColumn;
 
@@ -71,11 +72,14 @@ public class XuguTableColumn extends JDBCTableColumn<XuguTableBase> implements D
         setName(JDBCUtils.safeGetString(dbResult, "COL_NAME"));
         setOrdinalPosition(JDBCUtils.safeGetInt(dbResult, "COL_NO"));
         this.typeName = JDBCUtils.safeGetString(dbResult, "TYPE_NAME");
+        this.type = new XuguDataType(this, this.typeName, true);
 //        this.type = XuguDataType.resolveDataType(
 //            monitor,
 //            getDataSource(),
-//            JDBCUtils.safeGetString(dbResult, "DATA_TYPE_OWNER"),
+//            table.getContainer().getName(),
 //            this.typeName);
+        System.out.println("TTTType "+this.type.getFullTypeName()+" "+this.type.getMaxLength()+" "+this.type.getMinScale()+" ");
+        System.out.print(this.type.getPrecision()+" ");
 //        this.typeMod = XuguDataTypeModifier.resolveTypeModifier(JDBCUtils.safeGetString(dbResult, "DATA_TYPE_MOD"));
         if (this.type != null) {
             this.typeName = type.getFullyQualifiedName(DBPEvaluationContext.DDL);
