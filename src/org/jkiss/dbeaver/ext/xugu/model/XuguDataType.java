@@ -142,10 +142,11 @@ public class XuguDataType extends XuguObject<DBSObject>
         super(owner, typeName, persisted);
 //        this.attributeCache = new AttributeCache();
 //        this.methodCache = new MethodCache();
-        if (owner instanceof XuguDataSource) {
-            flagPredefined = true;
-            findTypeDesc(typeName);
-        }
+        flagPredefined = true;
+        findTypeDesc(typeName);
+//        if (owner instanceof XuguDataSource) {
+//            
+//        }
     }
 
 //    public XuguDataType(DBSObject owner, ResultSet dbResult)

@@ -73,14 +73,8 @@ public class XuguTableColumn extends JDBCTableColumn<XuguTableBase> implements D
         setOrdinalPosition(JDBCUtils.safeGetInt(dbResult, "COL_NO"));
         this.typeName = JDBCUtils.safeGetString(dbResult, "TYPE_NAME");
         this.type = new XuguDataType(this, this.typeName, true);
-//        this.type = XuguDataType.resolveDataType(
-//            monitor,
-//            getDataSource(),
-//            table.getContainer().getName(),
-//            this.typeName);
         System.out.println("TTTType "+this.type.getFullTypeName()+" "+this.type.getMaxLength()+" "+this.type.getMinScale()+" ");
         System.out.print(this.type.getPrecision()+" ");
-//        this.typeMod = XuguDataTypeModifier.resolveTypeModifier(JDBCUtils.safeGetString(dbResult, "DATA_TYPE_MOD"));
         if (this.type != null) {
             this.typeName = type.getFullyQualifiedName(DBPEvaluationContext.DDL);
             this.valueType = type.getTypeID();
@@ -92,7 +86,7 @@ public class XuguTableColumn extends JDBCTableColumn<XuguTableBase> implements D
 //        setMaxLength(JDBCUtils.safeGetLong(dbResult, "C".equals(charUsed) ? "CHAR_LENGTH" : "DATA_LENGTH"));
         setRequired(!"Y".equals(JDBCUtils.safeGetString(dbResult, "NOT_NULL")));
         setScale(JDBCUtils.safeGetInteger(dbResult, "SCALE"));
-//        setPrecision(JDBCUtils.safeGetInteger(dbResult, "DATA_PRECISION"));
+        setPrecision(this.type.getPrecision());
 //        this.hidden = JDBCUtils.safeGetBoolean(dbResult, "HIDDEN_COLUMN", XuguConstants.YES);
     }
 
