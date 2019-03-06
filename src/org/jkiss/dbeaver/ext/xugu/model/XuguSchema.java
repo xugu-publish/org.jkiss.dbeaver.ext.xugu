@@ -541,11 +541,11 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
             throws SQLException, DBException
         {
             final XuguTableColumn tableColumn = getTableColumn(session, parent, dbResult);
-            //xfc 修改字段名为COL_NO 表示列位置
+            //xfc COL_NO无法从结果集直接获取 选择从column中调用get方法
             return tableColumn == null ? null : new XuguTableConstraintColumn[] { new XuguTableConstraintColumn(
                 object,
                 tableColumn,
-                JDBCUtils.safeGetInt(dbResult, "COL_NO")) };
+                tableColumn.getOrdinalPosition()) };
         }
 
         @Override
