@@ -149,46 +149,10 @@ public class XuguDataType extends XuguObject<DBSObject>
 //        }
     }
 
-//    public XuguDataType(DBSObject owner, ResultSet dbResult)
-//    {
-//        super(owner, JDBCUtils.safeGetString(dbResult, "TYPE_NAME"), true);
-//        this.typeCode = JDBCUtils.safeGetString(dbResult, "TYPECODE");
-//        this.typeOID = JDBCUtils.safeGetBytes(dbResult, "TYPE_OID");
-//        this.flagPredefined = JDBCUtils.safeGetBoolean(dbResult, "PREDEFINED", XuguConstants.YES);
-//        this.flagIncomplete = JDBCUtils.safeGetBoolean(dbResult, "INCOMPLETE", XuguConstants.YES);
-//        this.flagFinal = JDBCUtils.safeGetBoolean(dbResult, "FINAL", XuguConstants.YES);
-//        this.flagInstantiable = JDBCUtils.safeGetBoolean(dbResult, "INSTANTIABLE", XuguConstants.YES);
-//        String superTypeOwner = JDBCUtils.safeGetString(dbResult, "SUPERTYPE_OWNER");
-//        boolean hasAttributes;
-//        boolean hasMethods;
-//        if (!CommonUtils.isEmpty(superTypeOwner)) {
-//            this.superType = new XuguLazyReference(
-//                superTypeOwner,
-//                JDBCUtils.safeGetString(dbResult, "SUPERTYPE_NAME"));
-//            hasAttributes = JDBCUtils.safeGetInt(dbResult, "LOCAL_ATTRIBUTES") > 0;
-//            hasMethods = JDBCUtils.safeGetInt(dbResult, "LOCAL_METHODS") > 0;
-//        } else {
-//            hasAttributes = JDBCUtils.safeGetInt(dbResult, "ATTRIBUTES") > 0;
-//            hasMethods = JDBCUtils.safeGetInt(dbResult, "METHODS") > 0;
-//        }
-////        attributeCache = hasAttributes ? new AttributeCache() : null;
-////        methodCache = hasMethods ? new MethodCache() : null;
-//        
-//        if (owner instanceof XuguDataSource && flagPredefined) {
-//            // Determine value type for predefined types
-//            findTypeDesc(name);
-//        } else {
-//            if (TYPE_CODE_COLLECTION.equals(this.typeCode)) {
-//                this.valueType = java.sql.Types.ARRAY;
-//            } else if (TYPE_CODE_OBJECT.equals(this.typeCode)) {
-//                this.valueType = java.sql.Types.STRUCT;
-//            } else {
-//                if (this.name.equals(XuguConstants.TYPE_NAME_XML) && owner.getName().equals(XuguConstants.SCHEMA_SYS)) {
-//                    this.valueType = java.sql.Types.SQLXML;
-//                }
-//            }
-//        }
-//    }
+    public XuguDataType(DBSObject owner, ResultSet dbResult)
+    {
+        super(owner, JDBCUtils.safeGetString(dbResult, "TYPE_NAME"), true);
+    }
 
 //    // Use by tree navigator thru reflection
 //    public boolean hasMethods()
@@ -545,16 +509,16 @@ public class XuguDataType extends XuguObject<DBSObject>
 //        } else {
 //            type = (XuguDataType)dataSource.getLocalDataType(typeName);
 //        }
-        if (type == null) {
-            log.debug("Data type '" + typeName + "' not found - declare new one");
-            type = new XuguDataType(typeSchema == null ? dataSource : typeSchema, typeName, true);
-            type.flagPredefined = true;
-            if (typeSchema == null) {
-                dataSource.dataTypeCache.cacheObject(type);
-            } else {
-                typeSchema.dataTypeCache.cacheObject(type);
-            }
-        }
+//        if (type == null) {
+//            log.debug("Data type '" + typeName + "' not found - declare new one");
+//            type = new XuguDataType(typeSchema == null ? dataSource : typeSchema, typeName, true);
+//            type.flagPredefined = true;
+//            if (typeSchema == null) {
+//                dataSource.dataTypeCache.cacheObject(type);
+//            } else {
+//                typeSchema.dataTypeCache.cacheObject(type);
+//            }
+//        }
         return type;
     }
 

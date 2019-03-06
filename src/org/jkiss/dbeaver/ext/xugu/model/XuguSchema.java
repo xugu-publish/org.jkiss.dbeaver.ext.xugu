@@ -724,13 +724,8 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         @Override
         protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguSchema owner) throws SQLException
         {
-        	//xfc 修改了获取数据类型的sql语句
-        	StringBuilder sql = new StringBuilder();
-        	sql.append("SELECT * FROM ");
-        	sql.append(owner.roleFlag);
-        	sql.append("_TYPES WHERE SCHEMA_ID=");
-        	sql.append(owner.id);
-            JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
+        	//do nothing
+            JDBCPreparedStatement dbStat = session.prepareStatement("");
             return dbStat;
         }
 

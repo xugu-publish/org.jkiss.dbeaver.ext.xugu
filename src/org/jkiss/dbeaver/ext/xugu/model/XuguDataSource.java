@@ -71,11 +71,12 @@ public class XuguDataSource extends JDBCDataSource
 
     final public SchemaCache schemaCache = new SchemaCache();
     final DataTypeCache dataTypeCache = new DataTypeCache();
+    
     final TablespaceCache tablespaceCache = new TablespaceCache();
     final UserCache userCache = new UserCache();
     final ProfileCache profileCache = new ProfileCache();
     final RoleCache roleCache = new RoleCache();
-
+    
     private xuguOutputReader outputReader;
     private XuguSchema publicSchema;
     private String activeSchemaName;
@@ -443,8 +444,14 @@ public class XuguDataSource extends JDBCDataSource
             for (Map.Entry<String, XuguDataType.TypeDesc> predefinedType : XuguDataType.PREDEFINED_TYPES.entrySet()) {
                 XuguDataType dataType = new XuguDataType(this, predefinedType.getKey(), true);
                 dtList.add(dataType);
+                System.out.println("add data type "+dataType.name);
             }
             this.dataTypeCache.setCache(dtList);
+            List<XuguDataType> ttt = this.dataTypeCache.getCachedObjects();
+            for(XuguDataType t:ttt) {
+            	System.out.println("AAAAAA after add data type "+t.name);
+            }
+            System.out.println("");
         }
     }
 
@@ -885,12 +892,12 @@ public class XuguDataSource extends JDBCDataSource
             }
         }
     }
-
+    
     static class DataTypeCache extends JDBCObjectCache<XuguDataSource, XuguDataType> {
         @Override
         protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguDataSource owner) throws SQLException {
-            //xfc 修改了获取数据类型的sql语句
-        	return session.prepareStatement("SELECT * FROM SYS_DATATYPES");
+        	//do nothing
+        	return session.prepareStatement("");
         }
 
         @Override

@@ -52,7 +52,7 @@ public class XuguTable extends XuguTablePhysical implements DBPScriptObject
 {
     private static final Log log = Log.getLog(XuguTable.class);
 
-    private XuguDataType tableType;
+    //private XuguDataType tableType;
     //xfc 修改了用户信息的字段
     private int db_id;
 	private int user_id;
@@ -178,13 +178,13 @@ public class XuguTable extends XuguTablePhysical implements DBPScriptObject
         super(schema, dbResult);
         //xfc 修改了模式名获取的方式
         String typeOwner = schema.getName();
-        if (!CommonUtils.isEmpty(typeOwner)) {
-            tableType = XuguDataType.resolveDataType(
-                monitor,
-                schema.getDataSource(),
-                typeOwner,
-                JDBCUtils.safeGetString(dbResult, "TABLE_TYPE"));
-        }
+//        if (!CommonUtils.isEmpty(typeOwner)) {
+//            tableType = XuguDataType.resolveDataType(
+//                monitor,
+//                schema.getDataSource(),
+//                typeOwner,
+//                JDBCUtils.safeGetString(dbResult, "TABLE_TYPE"));
+//        }
         if(dbResult!=null) {
         	this.table_name = JDBCUtils.safeGetString(dbResult, "TABLE_NAME");
         	this.db_id = JDBCUtils.safeGetInt(dbResult, "DB_ID");
@@ -255,11 +255,11 @@ public class XuguTable extends XuguTablePhysical implements DBPScriptObject
         return false;
     }
 
-    @Property(viewable = false, order = 5)
-    public XuguDataType getTableType()
-    {
-        return tableType;
-    }
+//    @Property(viewable = false, order = 5)
+//    public XuguDataType getTableType()
+//    {
+//        return tableType;
+//    }
 
 //    @Property(viewable = false, order = 6)
 //    public String getIotType()
@@ -305,14 +305,14 @@ public class XuguTable extends XuguTablePhysical implements DBPScriptObject
     }
 
     @Nullable
-    private XuguTableColumn getXMLColumn(DBRProgressMonitor monitor) throws DBException {
-        for (XuguTableColumn col : CommonUtils.safeCollection(getAttributes(monitor))) {
-            if (col.getDataType() == tableType) {
-                return col;
-            }
-        }
-        return null;
-    }
+//    private XuguTableColumn getXMLColumn(DBRProgressMonitor monitor) throws DBException {
+//        for (XuguTableColumn col : CommonUtils.safeCollection(getAttributes(monitor))) {
+//            if (col.getDataType() == tableType) {
+//                return col;
+//            }
+//        }
+//        return null;
+//    }
 
 
     @Override
@@ -360,24 +360,24 @@ public class XuguTable extends XuguTablePhysical implements DBPScriptObject
 //        }
 //    }
 
-    @Override
-    protected void appendSelectSource(DBRProgressMonitor monitor, StringBuilder query, String tableAlias, DBDPseudoAttribute rowIdAttribute) {
-        if (tableType != null && tableType.getName().equals(XuguConstants.TYPE_NAME_XML)) {
-            try {
-                XuguTableColumn xmlColumn = getXMLColumn(monitor);
-                if (xmlColumn != null) {
-                    query.append("XMLType(").append(tableAlias).append(".").append(xmlColumn.getName()).append(".getClobval()) as ").append(xmlColumn.getName());
-                    if (rowIdAttribute != null) {
-                        query.append(",").append(rowIdAttribute.translateExpression(tableAlias));
-                    }
-                    return;
-                }
-            } catch (DBException e) {
-                log.warn(e);
-            }
-        }
-        super.appendSelectSource(monitor, query, tableAlias, rowIdAttribute);
-    }
+//    @Override
+//    protected void appendSelectSource(DBRProgressMonitor monitor, StringBuilder query, String tableAlias, DBDPseudoAttribute rowIdAttribute) {
+//        if (tableType != null && tableType.getName().equals(XuguConstants.TYPE_NAME_XML)) {
+//            try {
+//                XuguTableColumn xmlColumn = getXMLColumn(monitor);
+//                if (xmlColumn != null) {
+//                    query.append("XMLType(").append(tableAlias).append(".").append(xmlColumn.getName()).append(".getClobval()) as ").append(xmlColumn.getName());
+//                    if (rowIdAttribute != null) {
+//                        query.append(",").append(rowIdAttribute.translateExpression(tableAlias));
+//                    }
+//                    return;
+//                }
+//            } catch (DBException e) {
+//                log.warn(e);
+//            }
+//        }
+//        super.appendSelectSource(monitor, query, tableAlias, rowIdAttribute);
+//    }
 
     @Override
     public String getObjectDefinitionText(DBRProgressMonitor monitor, Map<String, Object> options) throws DBException {
