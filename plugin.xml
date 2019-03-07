@@ -32,181 +32,199 @@
                   icon="icons/xugu_icon.png"
                   label="Xugu data source"
                   path="xugu">
-                  <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguUser" label="%tree.users.node.name" icon="#folder_user" description="Users">
-                    	<items label="%tree.user.node.name" path="user" property="users" icon="#user"/>
-                	</folder>
-                <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguSchema" label="%tree.schemas.node.name" icon="#folder_schema" description="Database schemas">
-                    <items label="%tree.schema.node.name" path="schema" property="schemas" icon="#schema">
-                        <icon if="object.system" icon="#schema_system"/>
-                      
-                      <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguTable" label="%tree.tables.node.name" icon="#folder_table" description="Tables">
-                            <items label="%tree.table.node.name" path="table" property="tables" icon="#table">
-                                <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguTableColumn" label="%tree.columns.node.name" icon="#columns" description="Table columns">
-                                    <items label="%tree.column.node.name" path="column" property="attributes" icon="#column">
-                                    </items>
-                                </folder>
-                                <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguTableConstraint" label="%tree.constraints.node.name" icon="#constraints" description="Table constraints">
-                                    <items label="%tree.constraint.node.name" path="constraint" property="constraints" icon="#unique-key">
-                                        <items label="%tree.constraint_columns.node.name" path="column" property="attributeReferences" navigable="false" inline="true">
-                                        </items>
-                                    </items>
-                                </folder>
-                                <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguTableForeignKey" label="%tree.foreign_keys.node.name" icon="#keys" description="Table keys">
-                                    <items label="%tree.foreign_key.node.name" path="association" property="associations" icon="#foreign-key">
-                                        <items label="%tree.foreign_key_columns.node.name" itemLabel="%tree.column.node.name" path="column" property="attributeReferences" navigable="false" inline="true">
-                                        </items>
-                                    </items>
-                                </folder>                            
-                                <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguTableTrigger" label="%tree.triggers.node.name" icon="#triggers" description="Triggers">
-                                    <items label="%tree.trigger.node.name" path="trigger" property="triggers" icon="#trigger">
-                                        <items label="%tree.columns.node.name" itemLabel="%tree.column.node.name" path="column" property="columns" navigable="false" inline="false">
-                                        </items>
-                                    </items>
-                                </folder>
-                                <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguTableIndex" label="%tree.indexes.node.name" icon="#indexes" description="Table indexes">
-                                    <items label="%tree.index.node.name" path="index" property="indexes" icon="#index">
-                                        <items label="%tree.index_columns.node.name" itemLabel="%tree.column.node.name" path="column" property="attributeReferences" navigable="false" inline="true">
-                                        </items>
-                                    </items>
-                                </folder>                                                 
-                     
-                        <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguView" label="%tree.views.node.name" icon="#folder_view" description="Views">
-                            <items label="%tree.view.node.name" path="view" property="views" icon="#view">
-                                <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguTableColumn" label="%tree.columns.node.name" icon="#columns" description="View columns">
-                                    <items label="%tree.columns.node.name" itemLabel="%tree.column.node.name" path="column" property="attributes" icon="#column">
-                                    </items>
-                                </folder>                             
-                                <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguTableTrigger" label="%tree.triggers.node.name" icon="#triggers" description="Triggers">
-                                    <items label="%tree.trigger.node.name" path="trigger" property="triggers" icon="#trigger">
-                                        <items label="%tree.columns.node.name" itemLabel="%tree.column.node.name" path="column" property="columns" navigable="false" inline="false">
-                                        </items>
-                                    </items>
-                                </folder>                               
-                            </items>
-                        </folder>
-                     
-                        <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguSequence" label="%tree.sequences.node.name" icon="#sequences" description="Sequences">
-                            <items label="%tree.sequence.node.name" path="sequence" property="sequences" icon="#sequence">
-                            </items>
-                        </folder>
-                                            
-                        <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguPackage" label="%tree.packages.node.name" icon="#packages" description="Packages">
-                            <items label="%tree.package.node.name" path="package" property="packages" icon="#package">
-                                <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguTableColumn" label="%tree.columns.node.name" icon="#packages_head" description="Packages head">
-                                    <items label="%tree.columns.node.name" itemLabel="%tree.column.node.name" path="head" property="attributes" icon="#head">
-                                    </items>
-                                </folder>  
-                                <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguTableColumn" label="%tree.columns.node.name" icon="#packages_body" description="Packages body">
-                                    <items label="%tree.columns.node.name" itemLabel="%tree.column.node.name" path="body" property="attributes" icon="#body">
-                                    </items>
-                                </folder>  
-                            </items>
-                        </folder>
-                        <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguProcedureStandalone" label="%tree.procedures.node.name" icon="#procedures" description="Procedures">
-                            <items label="%tree.procedure.node.name" itemLabel="%tree.procedure.node.name" path="procedure" property="procedures" icon="#procedure" id="Procedure">
-                                 <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguProcedureStandalone" label="%tree.procedures.node.name" icon="#procedures" description="Procedures">
-				                            <items label="%tree.procedure.node.name" itemLabel="%tree.procedure.node.name" path="procedure" property="procedures" icon="#procedure" id="Procedure">
-				                                <items label="%tree.arguments.node.name" itemLabel="%tree.argument.node.name" path="argument" property="parameters" icon="#argument" navigable="false" inline="false">
-				                                    <items ref="ProcedureArgumentAttributes"/>
-				                                </items>
-				                            </items>
-				                        </folder>
-				                        <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguProcedureStandalone" label="%tree.procedures.node.name" icon="#functions" description="Functions">
-				                            <items label="%tree.functions.node.name" itemLabel="%tree.function.node.name" path="function" property="function" icon="#function" id="Function">
-				                                <items label="%tree.arguments.node.name" itemLabel="%tree.argument.node.name" path="argument" property="parameters" icon="#argument" navigable="false" inline="false">
-				                                    <items ref="ProcedureArgumentAttributes"/>
-				                                </items>
-				                            </items>
-				                        </folder>
-                            </items>
-                        </folder>
-				                       
-                        <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguSynonym" label="%tree.synonyms.node.name" icon="#synonyms" description="Synonyms">
-                            <items label="%tree.synonym.node.name" path="synonym" property="synonyms" icon="#synonym"/>
-                        </folder>
-                        <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguSchemaTrigger" label="%tree.schema.triggers.node.name" icon="#triggers" description="triggers">
-                            <items label="%tree.trigger.node.name" path="trigger" property="triggers" icon="#trigger">
-                            </items>
-                        </folder>
-                      
-                        <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguDBLink" label="%tree.database_links.node.name" icon="#folder_link" description="Database Links (DBLinks)">
-                            <items label="%tree.database_links.node.name" path="databaseLink" property="databaseLinks" icon="#link"/>
-                        </folder>
-                        <!--folder type="org.jkiss.dbeaver.ext.xugu.model.XuguJavaClass" label="Java" icon="#java" description="Java Classes">
-                            <items label="Java Class" path="class" property="javaClasses" icon="#javaClass"/>
-                        </folder-->
-                       
-                        <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguRecycledObject" label="%tree.recycle_bin.node.name" icon="#recycle_bin" description="Recycle Bin" visibleIf="object.dataSource.adminVisible &amp;&amp; object.dataSource.isAtLeastV10()">
-                            <items label="%tree.recycled_object.node.name" path="object" property="recycledObjects" icon="#recycle_bin"/>
-                        </folder>
-                    </items>
-                </folder>
-		       <folder type="org.jkiss.dbeaver.model.struct.DBSObject" label="%tree.global_metadata.node.name" icon="#logical" description="Global metadata objects">
-                    <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguDataType" label="%tree.types.node.name" icon="#data_types" description="Types">
-                        <items label="%tree.data_type.node.name" path="type" property="localDataTypes" icon="#data_type"/>
-                    </folder>
-                    <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguSynonym" label="%tree.public_synonyms.node.name" icon="#synonyms" description="Public synonyms">
-                        <items label="%tree.synonym.node.name" path="synonym" property="publicSynonyms" icon="#synonym"/>
-                    </folder>
-                    <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguDBLink" label="%tree.public_database_links.node.name" icon="#links" description="Public database links">
-                        <items label="%tree.database_link.node.name" path="databaseLink" property="publicDatabaseLinks" icon="#link"/>
-                    </folder>
-                    <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguRecycledObject" label="%tree.user_recycle_bin.node.name" icon="#recycle_bin" description="Current user's recycle bin">
-                        <items label="%tree.recycled_object.node.name" path="object" property="userRecycledObjects" icon="#recycle_bin"/>
-                    </folder>
-                </folder>
-                <folder type="org.jkiss.dbeaver.model.struct.DBSObject" label="%tree.storage.node.name" icon="#storage" description="Storage management">
-                    <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguTablespace" label="%tree.tablespaces.node.name" icon="#tablespaces" description="Tablespaces">
-                        <items label="%tree.tablespace.node.name" path="tablespace" property="tablespaces" icon="#tablespace">
-                            <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguDataFile" label="%tree.files.node.name" icon="#files" description="Data Files">
-                                <items label="%tree.file.node.name" path="file" property="files" icon="#file"/>
-                            </folder>
-                            <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguSegment" label="%tree.objects.node.name" icon="#segments" description="Objects (segments)">
-                                <items label="%tree.segment.node.name" path="segment" property="segments" icon="#segment"/>
-                            </folder>
-                        </items>
-                    </folder>
-                </folder>
-                <folder type="org.jkiss.dbeaver.model.struct.DBSObject" label="%tree.security.node.name" icon="#security" description="Security management">
+                    <!--用户-->
                     <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguUser" label="%tree.users.node.name" icon="#folder_user" description="Users">
-                        <items label="%tree.user.node.name" path="users" property="users" icon="#user">
-                            <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguPrivRole" label="%tree.roles.node.name" icon="#folder_role" description="User roles" navigable="false">
-                                <items label="%tree.role.node.name" path="roles" property="rolePrivs" icon="#user_group">
-                                </items>
-                            </folder>
-                            <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguPrivSystem" label="%tree.system_privileges.node.name" icon="#permissions" description="System Privileges" navigable="false">
-                                <items label="%tree.privilege.node.name" path="sysPrivs" property="systemPrivs" icon="#privilege">
-                                </items>
-                            </folder>
-                            <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguPrivObject" label="%tree.objects.node.name" icon="#permissions" description="Objects" navigable="false">
-                                <items label="%tree.privilege.node.name" path="objectPriv" property="objectPrivs" icon="#privilege">
-                                </items>
-                            </folder>
-                        </items>
+                    	<items label="%tree.user.node.name" path="user" property="users" icon="#user"/>
                     </folder>
-                    <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguRole" label="%tree.roles.node.name" icon="#folder_role" description="Roles">
-                        <items label="%tree.role.node.name" path="roles" property="roles" icon="#user_group">
-                            <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguPrivUser" label="%tree.users.node.name" icon="#folder_user" description="Users" navigable="false">
-                                <items label="%tree.user.node.name" path="userPrivs" property="userPrivs" icon="#user">
-                                </items>
-                            </folder>
-                            <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguPrivRole" label="%tree.roles.node.name" icon="#folder_role" description="Roles" navigable="false">
-                                <items label="%tree.role.node.name" path="roles" property="rolePrivs" icon="#user_group">
-                                </items>
-                            </folder>
-                            <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguPrivSystem" label="%tree.system_privileges.node.name" icon="#permissions" description="System Privileges" navigable="false">
-                                <items label="%tree.privilege.node.name" path="sysPrivs" property="systemPrivs" icon="#privilege">
-                                </items>
-                            </folder>
-                            <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguPrivObject" label="%tree.objects.node.name" icon="#permissions" description="Objects" navigable="false">
-                                <items label="%tree.privilege.node.name" path="objectPriv" property="objectPrivs" icon="#privilege">
-                                </items>
-                            </folder>
-                        </items>
-                    </folder>                  
-                </folder>     
-                       </items>
-                        </folder>         
+                    <!--模式-->
+                    <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguSchema" label="%tree.schemas.node.name" icon="#folder_schema" description="Database schemas">
+                  		<items label="%tree.schema.node.name" path="schema" property="schemas" icon="#schema">
+                  			<icon if="object.system" icon="#schema_system"/>
+                  			<!--表-->
+                  			<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguTable" label="%tree.tables.node.name" icon="#folder_table" description="Tables">
+                      			<items label="%tree.table.node.name" path="table" property="tables" icon="#table">
+                            		<!--列-->
+                            		<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguTableColumn" label="%tree.columns.node.name" icon="#columns" description="Table columns">
+                                    	<items label="%tree.column.node.name" path="column" property="attributes" icon="#column">
+                                    	</items>
+                                	</folder>
+                                	<!--约束-->
+                                	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguTableConstraint" label="%tree.constraints.node.name" icon="#constraints" description="Table constraints">
+                                    	<items label="%tree.constraint.node.name" path="constraint" property="constraints" icon="#unique-key">
+                                        	<items label="%tree.constraint_columns.node.name" path="column" property="attributeReferences" navigable="false" inline="true">
+                                        	</items>
+                                    	</items>
+                                	</folder>
+                                	<!--外键-->
+                                	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguTableForeignKey" label="%tree.foreign_keys.node.name" icon="#keys" description="Table keys">
+                                    	<items label="%tree.foreign_key.node.name" path="association" property="associations" icon="#foreign-key">
+                                        	<items label="%tree.foreign_key_columns.node.name" itemLabel="%tree.column.node.name" path="column" property="attributeReferences" navigable="false" inline="true">
+                                        	</items>
+                                    	</items>
+                                	</folder>
+                                	<!--触发器-->                            
+                                	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguTableTrigger" label="%tree.triggers.node.name" icon="#triggers" description="Triggers">
+                                    	<items label="%tree.trigger.node.name" path="trigger" property="triggers" icon="#trigger">
+                                        	<items label="%tree.columns.node.name" itemLabel="%tree.column.node.name" path="column" property="columns" navigable="false" inline="false">
+                                        	</items>
+                                    	</items>
+                                	</folder>
+                                	<!--索引-->
+                                	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguTableIndex" label="%tree.indexes.node.name" icon="#indexes" description="Table indexes">
+                                    	<items label="%tree.index.node.name" path="index" property="indexes" icon="#index">
+                                        	<items label="%tree.index_columns.node.name" itemLabel="%tree.column.node.name" path="column" property="attributeReferences" navigable="false" inline="true">
+                                        	</items>
+                                    	</items>
+                                	</folder>
+                        		</items>
+                        	</folder>
+                        	<!--视图-->                                                 
+                        	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguView" label="%tree.views.node.name" icon="#folder_view" description="Views">
+                            	<items label="%tree.view.node.name" path="view" property="views" icon="#view">
+                                	<!--列-->
+                                	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguTableColumn" label="%tree.columns.node.name" icon="#columns" description="View columns">
+                                    	<items label="%tree.columns.node.name" itemLabel="%tree.column.node.name" path="column" property="attributes" icon="#column">
+                                    	</items>
+                                	</folder>
+                                	<!--触发器-->                             
+                                	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguTableTrigger" label="%tree.triggers.node.name" icon="#triggers" description="Triggers">
+                                    	<items label="%tree.trigger.node.name" path="trigger" property="triggers" icon="#trigger">
+                                        	<items label="%tree.columns.node.name" itemLabel="%tree.column.node.name" path="column" property="columns" navigable="false" inline="false">
+                                        	</items>
+                                    	</items>
+                                	</folder>                               
+                            	</items>
+                        	</folder>
+                        	<!--序列-->     
+                			<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguSequence" label="%tree.sequences.node.name" icon="#sequences" description="Sequences">
+                    			<items label="%tree.sequence.node.name" path="sequence" property="sequences" icon="#sequence">
+                        		</items>
+                    		</folder>  
+                        	<!--包-->                    
+                        	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguPackage" label="%tree.packages.node.name" icon="#packages" description="Packages">
+                            	<items label="%tree.package.node.name" path="package" property="packages" icon="#package">
+                                	<!--列-->
+                                	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguTableColumn" label="%tree.columns.node.name" icon="#packages_head" description="Packages head">
+                                    	<items label="%tree.columns.node.name" itemLabel="%tree.column.node.name" path="head" property="attributes" icon="#head">
+                                    	</items>
+                                	</folder>
+                                	<!--列-->  
+                                	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguTableColumn" label="%tree.columns.node.name" icon="#packages_body" description="Packages body">
+                                    	<items label="%tree.columns.node.name" itemLabel="%tree.column.node.name" path="body" property="attributes" icon="#body">
+                                    	</items>
+                                	</folder>  
+                            	</items>
+                        	</folder>
+                        	<!--存储过程-->
+                        	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguProcedureStandalone" label="%tree.procedures.node.name" icon="#procedures" description="Procedures">
+                            	<items label="%tree.procedure.node.name" itemLabel="%tree.procedure.node.name" path="procedure" property="procedures" icon="#procedure" id="Procedure">
+                                	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguProcedureStandalone" label="%tree.procedures.node.name" icon="#procedures" description="Procedures">
+				                 		<items label="%tree.procedure.node.name" itemLabel="%tree.procedure.node.name" path="procedure" property="procedures" icon="#procedure" id="Procedure">
+				                        	<items label="%tree.arguments.node.name" itemLabel="%tree.argument.node.name" path="argument" property="parameters" icon="#argument" navigable="false" inline="false">
+				                            	<items ref="ProcedureArgumentAttributes"/>
+				                            </items>
+				                        </items>
+				                 	</folder>
+				               		<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguProcedureStandalone" label="%tree.procedures.node.name" icon="#functions" description="Functions">
+				                 		<items label="%tree.functions.node.name" itemLabel="%tree.function.node.name" path="function" property="function" icon="#function" id="Function">
+				                        	<items label="%tree.arguments.node.name" itemLabel="%tree.argument.node.name" path="argument" property="parameters" icon="#argument" navigable="false" inline="false">
+				                            	<items ref="ProcedureArgumentAttributes"/>
+				                            </items>
+				                        </items>
+				                 	</folder>
+                            	</items>
+                        	</folder>
+				        	<!--同义词-->               
+                        	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguSynonym" label="%tree.synonyms.node.name" icon="#synonyms" description="Synonyms">
+                            	<items label="%tree.synonym.node.name" path="synonym" property="synonyms" icon="#synonym"/>
+                        	</folder>
+                        	<!--触发器-->
+                        	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguSchemaTrigger" label="%tree.schema.triggers.node.name" icon="#triggers" description="triggers">
+                            	<items label="%tree.trigger.node.name" path="trigger" property="triggers" icon="#trigger">
+                            	</items>
+                        	</folder>
+                        	<!--连接-->
+                        	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguDBLink" label="%tree.database_links.node.name" icon="#folder_link" description="Database Links (DBLinks)">
+                            	<items label="%tree.database_links.node.name" path="databaseLink" property="databaseLinks" icon="#link"/>
+                        	</folder>
+                        	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguRecycledObject" label="%tree.recycle_bin.node.name" icon="#recycle_bin" description="Recycle Bin" visibleIf="object.dataSource.adminVisible &amp;&amp; object.dataSource.isAtLeastV10()">
+                            	<items label="%tree.recycled_object.node.name" path="object" property="recycledObjects" icon="#recycle_bin"/>
+                        	</folder>
+                    	</items>
+                    </folder>
+                    <!--全局元信息-->
+		       		<folder type="org.jkiss.dbeaver.model.struct.DBSObject" label="%tree.global_metadata.node.name" icon="#logical" description="Global metadata objects">
+                    	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguDataType" label="%tree.types.node.name" icon="#data_types" description="Types">
+                        	<items label="%tree.data_type.node.name" path="type" property="localDataTypes" icon="#data_type"/>
+                    	</folder>
+                    	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguSynonym" label="%tree.public_synonyms.node.name" icon="#synonyms" description="Public synonyms">
+                        	<items label="%tree.synonym.node.name" path="synonym" property="publicSynonyms" icon="#synonym"/>
+                    	</folder>
+                    	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguDBLink" label="%tree.public_database_links.node.name" icon="#links" description="Public database links">
+                        	<items label="%tree.database_link.node.name" path="databaseLink" property="publicDatabaseLinks" icon="#link"/>
+                    	</folder>
+                    	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguRecycledObject" label="%tree.user_recycle_bin.node.name" icon="#recycle_bin" description="Current user's recycle bin">
+                        	<items label="%tree.recycled_object.node.name" path="object" property="userRecycledObjects" icon="#recycle_bin"/>
+                    	</folder>
+                	</folder>
+                	<!--存储管理-->
+                	<folder type="org.jkiss.dbeaver.model.struct.DBSObject" label="%tree.storage.node.name" icon="#storage" description="Storage management">
+                    	<!--表空间-->
+                    	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguTablespace" label="%tree.tablespaces.node.name" icon="#tablespaces" description="Tablespaces">
+                        	<items label="%tree.tablespace.node.name" path="tablespace" property="tablespaces" icon="#tablespace">
+                            	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguDataFile" label="%tree.files.node.name" icon="#files" description="Data Files">
+                                	<items label="%tree.file.node.name" path="file" property="files" icon="#file"/>
+                            	</folder>
+                            	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguSegment" label="%tree.objects.node.name" icon="#segments" description="Objects (segments)">
+                                	<items label="%tree.segment.node.name" path="segment" property="segments" icon="#segment"/>
+                            	</folder>
+                        	</items>
+                    	</folder>
+                	</folder>
+                	<!--安全管理-->
+                	<folder type="org.jkiss.dbeaver.model.struct.DBSObject" label="%tree.security.node.name" icon="#security" description="Security management">
+                    	<!--用户-->
+                    	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguUser" label="%tree.users.node.name" icon="#folder_user" description="Users">
+                        	<items label="%tree.user.node.name" path="users" property="users" icon="#user">
+                            	<!--用户角色-->
+                            	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguPrivRole" label="%tree.roles.node.name" icon="#folder_role" description="User roles" navigable="false">
+                                	<items label="%tree.role.node.name" path="roles" property="rolePrivs" icon="#user_group">
+                                	</items>
+                            	</folder>
+                            	<!--权限-->
+                            	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguPrivSystem" label="%tree.system_privileges.node.name" icon="#permissions" description="System Privileges" navigable="false">
+                                	<items label="%tree.privilege.node.name" path="sysPrivs" property="systemPrivs" icon="#privilege">
+                                	</items>
+                            	</folder>
+                            	<!--权限-->
+                            	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguPrivObject" label="%tree.objects.node.name" icon="#permissions" description="Objects" navigable="false">
+                                	<items label="%tree.privilege.node.name" path="objectPriv" property="objectPrivs" icon="#privilege">
+                                	</items>
+                            	</folder>
+                        	</items>
+                    	</folder>
+                    	<!--角色-->
+                    	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguRole" label="%tree.roles.node.name" icon="#folder_role" description="Roles">
+                        	<items label="%tree.role.node.name" path="roles" property="roles" icon="#user_group">
+                            	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguPrivUser" label="%tree.users.node.name" icon="#folder_user" description="Users" navigable="false">
+                                	<items label="%tree.user.node.name" path="userPrivs" property="userPrivs" icon="#user">
+                                	</items>
+                            	</folder>
+                            	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguPrivRole" label="%tree.roles.node.name" icon="#folder_role" description="Roles" navigable="false">
+                                	<items label="%tree.role.node.name" path="roles" property="rolePrivs" icon="#user_group">
+                                	</items>
+                            	</folder>
+                            	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguPrivSystem" label="%tree.system_privileges.node.name" icon="#permissions" description="System Privileges" navigable="false">
+                                	<items label="%tree.privilege.node.name" path="sysPrivs" property="systemPrivs" icon="#privilege">
+                                	</items>
+                            	</folder>
+                            	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguPrivObject" label="%tree.objects.node.name" icon="#permissions" description="Objects" navigable="false">
+                                	<items label="%tree.privilege.node.name" path="objectPriv" property="objectPrivs" icon="#privilege">
+                                	</items>
+                            	</folder>
+                        	</items>
+                    	</folder>                  
+                	</folder>    
             </tree>
 
             <drivers managable="true">

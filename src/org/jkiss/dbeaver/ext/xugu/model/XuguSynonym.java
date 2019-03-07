@@ -25,6 +25,7 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSAlias;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 
+import java.sql.Date;
 import java.sql.ResultSet;
 
 /**
@@ -32,24 +33,37 @@ import java.sql.ResultSet;
  */
 public class XuguSynonym extends XuguSchemaObject implements DBSAlias {
 
-    private String objectOwner;
-    private String objectTypeName;
+	private int objectDBID;
+    private int objectSchemaID;
+    private String objectSchemaName;
+    private int objectUserID;
+    //private String objectTypeName;
     private String objectName;
-    private String dbLink;
+    private int targetSchemaID;
+    private String targetName;
+    private boolean is_pub;
+    private boolean valid;
+    private boolean deleted;
+    private Date createTime;
+//    private String dbLink;
 
     public XuguSynonym(XuguSchema schema, ResultSet dbResult)
     {
-        super(schema, JDBCUtils.safeGetString(dbResult, "SYNONYM_NAME"), true);
-        this.objectTypeName = JDBCUtils.safeGetString(dbResult, "OBJECT_TYPE");
-        this.objectOwner = JDBCUtils.safeGetString(dbResult, "TABLE_OWNER");
-        this.objectName = JDBCUtils.safeGetString(dbResult, "TABLE_NAME");
-        this.dbLink = JDBCUtils.safeGetString(dbResult, "DB_LINK");
+        super(schema, JDBCUtils.safeGetString(dbResult, "SYNO_NAME"), true);
+        //this.objectTypeName = JDBCUtils.safeGetString(dbResult, "OBJECT_TYPE");
+        this.objectDBID = JDBCUtils.safeGetInt(dbResult, "DB_ID");
+        this.objectSchemaID = JDBCUtils.safeGetInt(dbResult, "SCHEMA_ID");
+        this.objectUserID = JDBCUtils.safeGetInt(dbResult, "USER_ID");
+        this.objectName = JDBCUtils.safeGetString(dbResult, "SYNO_NAME");
+        this.targetSchemaID = JDBCUtils.safeGetInt(dbResult, "TARG_SCHE_ID");
+        this.targetName = JDBCUtils.safeGetString(dbResult, "TARG_NAME");
+        this.is_pub = JDBCUtils.safeGetBoolean(dbResult, "IS_PUBLIC");
+        this.valid = JDBCUtils.safeGetBoolean(dbResult, "VALID");
+        this.deleted = JDBCUtils.safeGetBoolean(dbResult, "DELETED");
+        this.createTime = JDBCUtils.safeGetDate(dbResult, "CREATE_TIME");
+//        this.dbLink = JDBCUtils.safeGetString(dbResult, "DB_LINK");
     }
 
-    public XuguObjectType getObjectType()
-    {
-        return XuguObjectType.getByType(objectTypeName);
-    }
 
     @NotNull
     @Override
@@ -59,39 +73,19 @@ public class XuguSynonym extends XuguSchemaObject implements DBSAlias {
         return super.getName();
     }
 
-    @Property(viewable = true, order = 2)
-    public String getObjectTypeName()
-    {
-        return objectTypeName;
-    }
-
     @Property(viewable = true, order = 3)
     public Object getObjectOwner()
     {
-        final XuguSchema schema = getDataSource().schemaCache.getCachedObject(objectOwner);
-        return schema == null ? objectOwner : schema;
+        final XuguSchema schema = getDataSource().schemaCache.getCachedObject(objectSchemaName);
+        return schema == null ? objectSchemaName : schema;
     }
 
-    @Property(viewable = true, linkPossible = true, order = 4)
-    public Object getObject(DBRProgressMonitor monitor) throws DBException
-    {
-        if (objectTypeName == null) {
-            return null;
-        }
-        return XuguObjectType.resolveObject(
-            monitor,
-            getDataSource(),
-            dbLink,
-            objectTypeName,
-            objectOwner,
-            objectName);
-    }
 
-    @Property(viewable = true, order = 5)
-    public Object getDbLink(DBRProgressMonitor monitor) throws DBException
-    {
-        return XuguDBLink.resolveObject(monitor, getSchema(), dbLink);
-    }
+//    @Property(viewable = true, order = 5)
+//    public Object getDbLink(DBRProgressMonitor monitor) throws DBException
+//    {
+//        return XuguDBLink.resolveObject(monitor, getSchema(), dbLink);
+//    }
 
     @Override
     public DBSObject getTargetObject(DBRProgressMonitor monitor) throws DBException {
@@ -101,4 +95,14 @@ public class XuguSynonym extends XuguSchemaObject implements DBSAlias {
         }
         return null;
     }
+
+	public Object getObject(DBRProgressMonitor monitor) throws DBException {
+        return XuguObjectType.resolveObject(
+            monitor,
+            getDataSource(),
+            null,
+            "SYNONYM",
+            objectSchemaName,
+            objectName);
+	}
 }

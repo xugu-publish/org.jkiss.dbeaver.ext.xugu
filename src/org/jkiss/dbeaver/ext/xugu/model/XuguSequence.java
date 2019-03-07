@@ -23,6 +23,7 @@ import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.struct.rdb.DBSSequence;
 
 import java.math.BigDecimal;
+import java.sql.Date;
 import java.sql.ResultSet;
 
 /**
@@ -30,19 +31,30 @@ import java.sql.ResultSet;
  */
 public class XuguSequence extends XuguSchemaObject implements DBSSequence {
 
-    private BigDecimal minValue;
-    private BigDecimal maxValue;
-    private long incrementBy;
+    
     private long cacheSize;
     private BigDecimal lastValue;
+    
+    private int seq_id;
+    private String seq_name;
     private boolean flagCycle;
     private boolean flagOrder;
-
+    private int cacheVal;
+    private BigDecimal curVal;
+    private BigDecimal minValue;
+    private BigDecimal maxValue;
+    private BigDecimal incrementBy;
+    private Date createTime;
+    private boolean is_sys;
+    private boolean valid;
+    private boolean deleted;
+    private String comments;
+    
     public XuguSequence(XuguSchema schema, String name) {
         super(schema, name, false);
         this.minValue = null;
         this.maxValue = null;
-        this.incrementBy = 0;
+        this.incrementBy = new BigDecimal(0);
         this.cacheSize = 0;
         this.lastValue = new BigDecimal(0);
         this.flagCycle = false;
@@ -51,14 +63,22 @@ public class XuguSequence extends XuguSchemaObject implements DBSSequence {
 
     public XuguSequence(XuguSchema schema, ResultSet dbResult)
     {
-        super(schema, JDBCUtils.safeGetString(dbResult, "SEQUENCE_NAME"), true);
-        this.minValue = JDBCUtils.safeGetBigDecimal(dbResult, "MIN_VALUE");
-        this.maxValue = JDBCUtils.safeGetBigDecimal(dbResult, "MAX_VALUE");
-        this.incrementBy = JDBCUtils.safeGetLong(dbResult, "INCREMENT_BY");
-        this.cacheSize = JDBCUtils.safeGetLong(dbResult, "CACHE_SIZE");
-        this.lastValue = JDBCUtils.safeGetBigDecimal(dbResult, "LAST_NUMBER");
-        this.flagCycle = JDBCUtils.safeGetBoolean(dbResult, "CYCLE_FLAG", "Y");
-        this.flagOrder = JDBCUtils.safeGetBoolean(dbResult, "ORDER_FLAG", "Y");
+        super(schema, JDBCUtils.safeGetString(dbResult, "SEQ_NAME"), true);
+        this.minValue = JDBCUtils.safeGetBigDecimal(dbResult, "MIN_VAL");
+        this.maxValue = JDBCUtils.safeGetBigDecimal(dbResult, "MAX_VAL");
+        this.incrementBy = JDBCUtils.safeGetBigDecimal(dbResult, "STEP_VAL");
+        
+        this.flagCycle = JDBCUtils.safeGetBoolean(dbResult, "IS_CYCLE");
+        this.flagOrder = JDBCUtils.safeGetBoolean(dbResult, "IS_ORDER");
+        this.seq_id = JDBCUtils.safeGetInt(dbResult, "SEQ_ID");
+        this.seq_name = JDBCUtils.safeGetString(dbResult, "SEQ_NAME");
+        this.cacheVal = JDBCUtils.safeGetInt(dbResult, "CACHE_VAL");
+        this.curVal = JDBCUtils.safeGetBigDecimal(dbResult, "CURR_VAL");
+        this.createTime = JDBCUtils.safeGetDate(dbResult, "CREATE_TIME");
+        this.is_sys = JDBCUtils.safeGetBoolean(dbResult, "IS_SYS");
+        this.valid = JDBCUtils.safeGetBoolean(dbResult, "VALID");
+        this.deleted = JDBCUtils.safeGetBoolean(dbResult, "DELETED");
+        this.comments = JDBCUtils.safeGetString(dbResult, "COMMENTS");
     }
 
     @NotNull
@@ -70,13 +90,13 @@ public class XuguSequence extends XuguSchemaObject implements DBSSequence {
     }
 
     @Property(viewable = true, editable = true, updatable = true, order = 2)
-    public BigDecimal getLastValue()
+    public BigDecimal getCurValue()
     {
-        return lastValue;
+        return curVal;
     }
 
-    public void setLastValue(BigDecimal lastValue) {
-        this.lastValue = lastValue;
+    public void setCurValue(BigDecimal curVal) {
+        this.curVal = curVal;
     }
 
     @Property(viewable = true, editable = true, updatable = true, order = 3)
@@ -100,23 +120,23 @@ public class XuguSequence extends XuguSchemaObject implements DBSSequence {
     }
 
     @Property(viewable = true, editable = true, updatable = true, order = 5)
-    public Long getIncrementBy()
+    public BigDecimal getIncrementBy()
     {
         return incrementBy;
     }
 
-    public void setIncrementBy(Long incrementBy) {
+    public void setIncrementBy(BigDecimal incrementBy) {
         this.incrementBy = incrementBy;
     }
 
     @Property(viewable = true, editable = true, updatable = true, order = 6)
-    public long getCacheSize()
+    public int getCacheValue()
     {
-        return cacheSize;
+        return cacheVal;
     }
 
-    public void setCacheSize(long cacheSize) {
-        this.cacheSize = cacheSize;
+    public void setCacheValue(int cacheVal) {
+        this.cacheVal = cacheVal;
     }
 
     @Property(viewable = true, editable = true, updatable = true, order = 7)
@@ -138,4 +158,10 @@ public class XuguSequence extends XuguSchemaObject implements DBSSequence {
     public void setOrder(boolean flagOrder) {
         this.flagOrder = flagOrder;
     }
+
+	@Override
+	public Number getLastValue() {
+		// TODO Auto-generated method stub
+		return getCurValue();
+	}
 }

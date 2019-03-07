@@ -60,7 +60,7 @@ public class XuguSequenceManager extends SQLObjectEditor<XuguSequence, XuguSchem
                 }
 
                 final XuguSequence sequence = new XuguSequence(schema, page.getEntityName());
-                sequence.setIncrementBy(1L);
+                sequence.setIncrementBy(new BigDecimal(1));
                 sequence.setMinValue(new BigDecimal(0));
                 sequence.setCycle(false);
                 return sequence;
@@ -125,8 +125,8 @@ public class XuguSequenceManager extends SQLObjectEditor<XuguSequence, XuguSchem
         } else {
             sb.append("NOCYCLE ");
         }
-        if (sequence.getCacheSize() > 0) {
-            sb.append("CACHE ").append(sequence.getCacheSize()).append(" ");
+        if (sequence.getCacheValue() > 0) {
+            sb.append("CACHE ").append(sequence.getCacheValue()).append(" ");
         } else {
             sb.append("NOCACHE ");
         }

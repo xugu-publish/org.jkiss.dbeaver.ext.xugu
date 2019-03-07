@@ -200,18 +200,20 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         throws DBException
     {
         XuguDataType type = dataTypeCache.getObject(monitor, this, name);
-        if (type == null) {
-            final XuguSynonym synonym = synonymCache.getObject(monitor, this, name);
-            if (synonym != null && synonym.getObjectType() == XuguObjectType.TYPE) {
-                Object object = synonym.getObject(monitor);
-                if (object instanceof XuguDataType) {
-                    return (XuguDataType)object;
-                }
-            }
-            return null;
-        } else {
-            return type;
-        }
+        //不对同义词类型进行检查
+//        if (type == null) {
+//            final XuguSynonym synonym = synonymCache.getObject(monitor, this, name);
+//            if (synonym != null && synonym.getObjectType() == XuguObjectType.TYPE) {
+//                Object object = synonym.getObject(monitor);
+//                if (object instanceof XuguDataType) {
+//                    return (XuguDataType)object;
+//                }
+//            }
+//            return null;
+//        } else {
+//            return type;
+//        }
+        return type;
     }
 
 //    @Association
@@ -800,7 +802,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         	StringBuilder sql = new StringBuilder();
         	sql.append("SELECT * FROM ");
         	sql.append(owner.roleFlag);
-        	sql.append("_SEQUENCES ORDER BY SEQUENCE_NAME");
+        	sql.append("_SEQUENCES ORDER BY SEQ_NAME");
             final JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
             return dbStat;
         }

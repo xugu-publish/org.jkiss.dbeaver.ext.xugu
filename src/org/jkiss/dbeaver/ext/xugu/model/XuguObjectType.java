@@ -239,11 +239,11 @@ public enum XuguObjectType implements DBSObjectType {
         }
         XuguObjectType objectType = XuguObjectType.getByType(objectTypeName);
         if (objectType == null) {
-            log.debug("Unrecognized Oracle object type: " + objectTypeName);
+            log.debug("Unrecognized Xugu object type: " + objectTypeName);
             return objectName;
         }
         if (!objectType.isBrowsable()) {
-            log.debug("Unsupported Oracle object type: " + objectTypeName);
+            log.debug("Unsupported Xugu object type: " + objectTypeName);
             return objectName;
         }
         final XuguSchema schema = dataSource.getSchema(monitor, objectOwner);
