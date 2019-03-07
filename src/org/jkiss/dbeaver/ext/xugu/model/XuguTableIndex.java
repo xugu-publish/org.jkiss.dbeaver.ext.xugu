@@ -41,8 +41,6 @@ import java.util.List;
 //public class XuguTableIndex extends JDBCTableIndex<XuguSchema, XuguTablePhysical> implements DBSObjectLazy
 public class XuguTableIndex extends JDBCTableIndex<XuguSchema, XuguTablePhysical>
 {
-
-//    private Object tablespace;
     private boolean nonUnique;
     private List<XuguTableIndexColumn> columns;
 

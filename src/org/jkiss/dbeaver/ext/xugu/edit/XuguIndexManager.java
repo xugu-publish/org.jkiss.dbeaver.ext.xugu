@@ -23,10 +23,15 @@ import org.jkiss.dbeaver.ext.xugu.model.XuguTableColumn;
 import org.jkiss.dbeaver.ext.xugu.model.XuguTableIndex;
 import org.jkiss.dbeaver.ext.xugu.model.XuguTableIndexColumn;
 import org.jkiss.dbeaver.ext.xugu.model.XuguTablePhysical;
+import org.jkiss.dbeaver.model.DBPEvaluationContext;
+import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.edit.DBECommandContext;
+import org.jkiss.dbeaver.model.edit.DBEPersistAction;
 import org.jkiss.dbeaver.model.impl.DBObjectNameCaseTransformer;
 import org.jkiss.dbeaver.model.impl.DBSObjectCache;
+import org.jkiss.dbeaver.model.impl.edit.SQLDatabasePersistAction;
 import org.jkiss.dbeaver.model.impl.sql.edit.struct.SQLIndexManager;
+import org.jkiss.dbeaver.model.messages.ModelMessages;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSEntityAttribute;
 import org.jkiss.dbeaver.model.struct.DBSObject;
@@ -36,6 +41,8 @@ import org.jkiss.dbeaver.ui.editors.object.struct.EditIndexPage;
 import org.jkiss.utils.CommonUtils;
 
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Oracle index manager
@@ -89,11 +96,29 @@ public class XuguIndexManager extends SQLIndexManager<XuguTableIndex, XuguTableP
             }
         }.execute();
     }
+    
+    @Override
+    protected void addObjectDeleteActions(List<DBEPersistAction> actions, ObjectDeleteCommand command, Map<String, Object> options)
+    {
+        actions.add(
+            new SQLDatabasePersistAction(
+                ModelMessages.model_jdbc_drop_index,
+                getDropIndexPattern(command.getObject())
+                    .replace(PATTERN_ITEM_TABLE, command.getObject().getTable().getFullyQualifiedName(DBPEvaluationContext.DDL))
+                    .replace(PATTERN_ITEM_INDEX, command.getObject().getName())
+                    .replace(PATTERN_ITEM_INDEX_SHORT, DBUtils.getQuotedIdentifier(command.getObject())))
+        );
+        String t = getDropIndexPattern(command.getObject())
+                .replace(PATTERN_ITEM_TABLE, command.getObject().getTable().getFullyQualifiedName(DBPEvaluationContext.DDL))
+                .replace(PATTERN_ITEM_INDEX, command.getObject().getName())
+                .replace(PATTERN_ITEM_INDEX_SHORT, DBUtils.getQuotedIdentifier(command.getObject()));
+        System.out.println("DDDrop index "+t);
+    }
 
     @Override
     protected String getDropIndexPattern(XuguTableIndex index)
     {
-        return "DROP INDEX " + PATTERN_ITEM_INDEX; //$NON-NLS-1$ //$NON-NLS-2$
+        return "DROP INDEX " + PATTERN_ITEM_TABLE + "." + PATTERN_ITEM_INDEX; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
 }
