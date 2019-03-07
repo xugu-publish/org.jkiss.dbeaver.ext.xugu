@@ -69,9 +69,10 @@ public class XuguTableForeignKey extends XuguTableConstraintBase implements DBST
             JDBCUtils.safeGetBoolean(dbResult, "ENABLE") && JDBCUtils.safeGetBoolean(dbResult, "VALID")?XuguObjectStatus.ENABLED:XuguObjectStatus.DISABLED,
             true);
 
-        String refName = JDBCUtils.safeGetString(dbResult, "CONS_NAME");
+        String refName = JDBCUtils.safeGetString(dbResult, "REF_NAME");
         String refOwnerName = JDBCUtils.safeGetString(dbResult, "SCHEMA_NAME");
         String refTableName = JDBCUtils.safeGetString(dbResult, "REF_TABLE_NAME");
+        System.out.println("True foreign info "+refOwnerName+" "+refTableName+" "+refName);
         XuguTableBase refTable = XuguTableBase.findTable(
             monitor,
             table.getDataSource(),
@@ -87,8 +88,8 @@ public class XuguTableForeignKey extends XuguTableConstraintBase implements DBST
             }
         }
 
-        String deleteRuleName = JDBCUtils.safeGetString(dbResult, "DELETE_RULE");
-        this.deleteRule = "CASCADE".equals(deleteRuleName) ? DBSForeignKeyModifyRule.CASCADE : DBSForeignKeyModifyRule.NO_ACTION;
+        //String deleteRuleName = JDBCUtils.safeGetString(dbResult, "DELETE_RULE");
+        //this.deleteRule = "CASCADE".equals(deleteRuleName) ? DBSForeignKeyModifyRule.CASCADE : DBSForeignKeyModifyRule.NO_ACTION;
     }
 
     @Property(viewable = true, order = 3)

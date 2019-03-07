@@ -262,7 +262,8 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
     public XuguTableConstraint getConstraint(DBRProgressMonitor monitor, String ukName)
         throws DBException
     {
-        return getContainer().constraintCache.getObject(monitor, getContainer(), this, ukName);
+        System.out.println("UUUk name "+ukName);
+    	return getContainer().constraintCache.getObject(monitor, getContainer(), this, ukName);
     }
 
     public DBSTableForeignKey getForeignKey(DBRProgressMonitor monitor, String ukName) throws DBException

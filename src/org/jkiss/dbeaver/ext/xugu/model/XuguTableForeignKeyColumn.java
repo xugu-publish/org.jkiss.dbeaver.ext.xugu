@@ -43,8 +43,9 @@ public class XuguTableForeignKeyColumn extends XuguTableConstraintColumn impleme
         XuguTableConstraint referencedConstraint = ((XuguTableForeignKey) getParentObject()).getReferencedConstraint();
         if (referencedConstraint != null) {
             List<XuguTableConstraintColumn> ar = referencedConstraint.getAttributeReferences(new VoidProgressMonitor());
+            //修改了列下标位置计算方式
             if (ar != null) {
-                return ar.get(getOrdinalPosition() - 1).getAttribute();
+                return ar.get(getOrdinalPosition()).getAttribute();
             }
         }
         return null;

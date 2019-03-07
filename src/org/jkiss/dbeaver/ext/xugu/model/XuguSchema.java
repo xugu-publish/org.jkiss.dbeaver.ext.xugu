@@ -407,7 +407,13 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
     private static XuguTableColumn getTableColumn(JDBCSession session, XuguTableBase parent, ResultSet dbResult) throws DBException
     {
         String columnName = JDBCUtils.safeGetStringTrimmed(dbResult, "COL_NAME");
-        //将keys字段中的引号去掉（是否可支持多列？）
+        
+        return getTableColumn(session, parent, columnName);
+    }
+    
+    private static XuguTableColumn getTableColumn(JDBCSession session, XuguTableBase parent, String columnName) throws DBException
+    {
+    	//将keys字段中的引号去掉（是否可支持多列？）
         columnName = columnName.replaceAll("\"", "");
         //que 获取到的列为空？
         XuguTableColumn tableColumn = columnName == null ? null : parent.getAttribute(session.getProgressMonitor(), columnName);
@@ -546,12 +552,33 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
             XuguTableBase parent, XuguTableConstraint object, JDBCResultSet dbResult)
             throws SQLException, DBException
         {
-            final XuguTableColumn tableColumn = getTableColumn(session, parent, dbResult);
-            //xfc COL_NO无法从结果集直接获取 选择从column中调用get方法
-            return tableColumn == null ? null : new XuguTableConstraintColumn[] { new XuguTableConstraintColumn(
-                object,
-                tableColumn,
-                tableColumn.getOrdinalPosition()) };
+            //处理多列的情况
+            String colName = JDBCUtils.safeGetStringTrimmed(dbResult, "COL_NAME");
+            if(colName.indexOf(",")!=-1) {
+            	if(colName.indexOf("(")!=-1) {
+            		colName = colName.substring(colName.indexOf("(")+1, colName.indexOf(")"));
+            	}
+            	System.out.println("CCCCCCCCoLLLLLL "+colName);
+            	String[] colNames = colName.split(",");
+            	XuguTableConstraintColumn[] con_cols = new XuguTableConstraintColumn[colNames.length];
+            	for(int i=0; i<colNames.length; i++) {
+            		System.out.println("SSingle col "+colNames[i]);
+            		XuguTableColumn tableColumn = getTableColumn(session, parent, colNames[i]);
+            		con_cols[i] = new XuguTableConstraintColumn(
+                            object,
+                            tableColumn,
+                            tableColumn.getOrdinalPosition());
+            	}
+            	return con_cols;
+            }else {
+            	final XuguTableColumn tableColumn = getTableColumn(session, parent, dbResult);
+            	//xfc COL_NO无法从结果集直接获取 选择从column中调用get方法
+                return tableColumn == null ? null : new XuguTableConstraintColumn[] { new XuguTableConstraintColumn(
+                    object,
+                    tableColumn,
+                    tableColumn.getOrdinalPosition()) };
+            }
+            
         }
 
         @Override
@@ -586,9 +613,11 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         {
         	//xfc 修改了获取外键信息的sql
             StringBuilder sql = new StringBuilder(500);
-            sql.append("SELECT *, DEFINE AS COL_NAME FROM ");
+            sql.append("SELECT *, f.DEFINE AS COL_NAME,"
+            		+ " t2.TABLE_NAME AS REF_TABLE_NAME,"
+            		+ " f2.CONS_NAME AS REF_NAME FROM ");
         	sql.append(owner.roleFlag);
-        	sql.append("_CONSTRAINTS INNER JOIN (SELECT s.SCHEMA_NAME, t.TABLE_ID FROM ");
+        	sql.append("_CONSTRAINTS f INNER JOIN (SELECT s.SCHEMA_NAME, t.TABLE_ID FROM ");
             sql.append(owner.roleFlag);
             sql.append("_SCHEMAS s INNER JOIN ");
             sql.append(owner.roleFlag);
@@ -598,7 +627,12 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
                 sql.append(forTable.getName());
                 sql.append("'");
             }
-            sql.append(") USING(TABLE_ID) WHERE CONS_TYPE='F'");
+            sql.append(") USING(TABLE_ID) JOIN ");
+            sql.append(owner.roleFlag);
+            sql.append("_TABLES t2 ON f.REF_TABLE_ID=t2.TABLE_ID JOIN ");
+            sql.append(owner.roleFlag);
+            sql.append("_CONSTRAINTS f2 ON f.REF_TABLE_ID=f2.TABLE_ID ");
+            sql.append("WHERE CONS_TYPE='F'");
             System.out.println("GGGet FFFFkey "+sql.toString());
             JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
 
@@ -620,11 +654,29 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
             XuguTable parent, XuguTableForeignKey object, JDBCResultSet dbResult)
             throws SQLException, DBException
         {
-            XuguTableColumn column = getTableColumn(session, parent, dbResult);
-            return column == null ? null : new XuguTableForeignKeyColumn[] { new XuguTableForeignKeyColumn(
-                object,
-                column,
-                JDBCUtils.safeGetInt(dbResult, "POSITION")) };
+        	//处理多列的情况
+            String colName = JDBCUtils.safeGetStringTrimmed(dbResult, "COL_NAME");
+            if(colName.indexOf("(")!=-1) {
+            	colName = colName.substring(colName.indexOf("(")+1, colName.indexOf(")"));
+            	System.out.println("CCCCCCCCoLLLLLL2 "+colName);
+            	String[] colNames = colName.split(",");
+            	XuguTableForeignKeyColumn[] con_cols = new XuguTableForeignKeyColumn[colNames.length];
+            	for(int i=0; i<colNames.length; i++) {
+            		System.out.println("SSingle col "+colNames[i]);
+            		XuguTableColumn tableColumn = getTableColumn(session, parent, colNames[i]);
+            		con_cols[i] = new XuguTableForeignKeyColumn(
+                            object,
+                            tableColumn,
+                            tableColumn.getOrdinalPosition());
+            	}
+            	return con_cols;
+            }else {
+	            XuguTableColumn column = getTableColumn(session, parent, dbResult);
+	            return column == null ? null : new XuguTableForeignKeyColumn[] { new XuguTableForeignKeyColumn(
+	                object,
+	                column,
+	                JDBCUtils.safeGetInt(dbResult, "POSITION")) };
+            }
         }
 
         @Override
