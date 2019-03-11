@@ -51,14 +51,16 @@ public class XuguProcedureStandalone extends XuguProcedureBase<XuguSchema> imple
         super(
             schema,
             JDBCUtils.safeGetString(dbResult, "PROC_NAME"),
-            JDBCUtils.safeGetLong(dbResult, "OBJECT_ID"),
-            DBSProcedureType.valueOf(JDBCUtils.safeGetString(dbResult, "OBJECT_TYPE")));
-        this.valid = "VALID".equals(JDBCUtils.safeGetString(dbResult, "STATUS"));
+            JDBCUtils.safeGetLong(dbResult, "PROC_ID"),
+            DBSProcedureType.valueOf(JDBCUtils.safeGetString(dbResult, "RET_TYPE")==null?"PROCEDURE":"FUNCTION"));
+        System.out.println(JDBCUtils.safeGetString(dbResult, "PROC_NAME"));
+        this.valid = JDBCUtils.safeGetBoolean(dbResult, "VALID");
+        this.sourceDeclaration = JDBCUtils.safeGetString(dbResult, "DEFINE");
     }
 
-    public XuguProcedureStandalone(XuguSchema oracleSchema, String name, DBSProcedureType procedureType)
+    public XuguProcedureStandalone(XuguSchema xuguSchema, String name, DBSProcedureType procedureType)
     {
-        super(oracleSchema, name, 0l, procedureType);
+        super(xuguSchema, name, 0l, procedureType);
         sourceDeclaration =
             procedureType.name() + " " + name + GeneralUtils.getDefaultLineSeparator() +
             "IS" + GeneralUtils.getDefaultLineSeparator() +
@@ -77,7 +79,7 @@ public class XuguProcedureStandalone extends XuguProcedureBase<XuguSchema> imple
     {
         return getParentObject();
     }
-
+    
     @Override
     public XuguSourceType getSourceType()
     {
@@ -145,6 +147,7 @@ public class XuguProcedureStandalone extends XuguProcedureBase<XuguSchema> imple
 
     @Override
     public DBSObject refreshObject(@NotNull DBRProgressMonitor monitor) throws DBException {
-        return getSchema().proceduresCache.refreshObject(monitor, getSchema(), this);
+    	getSchema().proceduresCache.clearCache();
+    	return getSchema().proceduresCache.refreshObject(monitor, getSchema(), this);
     }
 }

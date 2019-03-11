@@ -67,7 +67,7 @@ public class XuguProcedureManager extends SQLObjectEditor<XuguProcedureStandalon
     @Override
     protected void addObjectCreateActions(DBRProgressMonitor monitor, List<DBEPersistAction> actions, ObjectCreateCommand objectCreateCommand, Map<String, Object> options)
     {
-        createOrReplaceProcedureQuery(actions, objectCreateCommand.getObject());
+        createOrReplaceProcedureQuery(actions, objectCreateCommand.getObject()); 
     }
 
     @Override
@@ -98,6 +98,9 @@ public class XuguProcedureManager extends SQLObjectEditor<XuguProcedureStandalon
         if (source == null) {
             return;
         }
+        //强制增加CREATE OR REPLACE关键字
+        int index = procedure.getProcedureType().toString().equals("PROCEDURE")?source.indexOf("PROCEDURE"):source.indexOf("FUNCTION");
+        source = "CREATE OR REPLACE "+source.substring(index);
         actionList.add(new XuguObjectValidateAction(procedure, XuguObjectType.PROCEDURE, "Create procedure", source)); //$NON-NLS-2$
         XuguUtils.addSchemaChangeActions(actionList, procedure);
     }

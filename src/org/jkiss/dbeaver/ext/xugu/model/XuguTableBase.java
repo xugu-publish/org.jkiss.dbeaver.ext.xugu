@@ -233,7 +233,6 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
     public DBSObject refreshObject(@NotNull DBRProgressMonitor monitor) throws DBException
     {
         getContainer().constraintCache.clearObjectCache(this);
-        System.out.println("right owner? right this?"+getContainer().getName()+" "+this.getName());
         return getContainer().tableCache.refreshObject(monitor, getContainer(), this);
     }
 

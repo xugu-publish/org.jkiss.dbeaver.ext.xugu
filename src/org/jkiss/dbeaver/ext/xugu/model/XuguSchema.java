@@ -848,6 +848,11 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         	sql.append(owner.roleFlag);
         	sql.append("_PROCEDURES WHERE SCHEMA_ID=");
         	sql.append(owner.id);
+        	//当有检索条件时 只查询指定表 用于新建表之后的刷新工作
+        	if(object!=null) {
+        		sql.append(" AND PROC_ID = ");
+        		sql.append(object.getObjectId());
+        	}
         	JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
             return dbStat;
         }

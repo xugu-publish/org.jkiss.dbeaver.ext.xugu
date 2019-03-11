@@ -117,22 +117,16 @@
                         	</folder>
                         	<!--存储过程-->
                         	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguProcedureStandalone" label="%tree.procedures.node.name" icon="#procedures" description="Procedures">
-                            	<items label="%tree.procedure.node.name" itemLabel="%tree.procedure.node.name" path="procedure" property="procedures" icon="#procedure" id="Procedure">
-                                	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguProcedureStandalone" label="%tree.procedures.node.name" icon="#procedures" description="Procedures">
-				                 		<items label="%tree.procedure.node.name" itemLabel="%tree.procedure.node.name" path="procedure" property="procedures" icon="#procedure" id="Procedure">
-				                        	<items label="%tree.arguments.node.name" itemLabel="%tree.argument.node.name" path="argument" property="parameters" icon="#argument" navigable="false" inline="false">
-				                            	<items ref="ProcedureArgumentAttributes"/>
-				                            </items>
-				                        </items>
-				                 	</folder>
-				               		<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguProcedureStandalone" label="%tree.procedures.node.name" icon="#functions" description="Functions">
-				                 		<items label="%tree.functions.node.name" itemLabel="%tree.function.node.name" path="function" property="function" icon="#function" id="Function">
-				                        	<items label="%tree.arguments.node.name" itemLabel="%tree.argument.node.name" path="argument" property="parameters" icon="#argument" navigable="false" inline="false">
-				                            	<items ref="ProcedureArgumentAttributes"/>
-				                            </items>
-				                        </items>
-				                 	</folder>
-                            	</items>
+                            	<items label="%tree.procedures.node.name" itemLabel="%tree.procedure.node.name" path="procedure" property="procedures" icon="#procedure" id="Procedure">
+                                	<items label="%tree.arguments.node.name" itemLabel="%tree.argument.node.name" path="argument" property="parameters" icon="#argument" navigable="false" inline="false">
+				                    	<items ref="ProcedureArgumentAttributes"/>
+				                    </items>
+				                </items>
+                            	<items label="%tree.functions.node.name" itemLabel="%tree.function.node.name" path="function" property="function" icon="#function" id="Function">
+				                	<items label="%tree.arguments.node.name" itemLabel="%tree.argument.node.name" path="argument" property="parameters" icon="#argument" navigable="false" inline="false">
+				                		<items ref="ProcedureArgumentAttributes"/>
+				                	</items>
+				                </items>
                         	</folder>
 				        	<!--同义词-->               
                         	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguSynonym" label="%tree.synonyms.node.name" icon="#synonyms" description="Synonyms">

@@ -44,7 +44,7 @@ public class XuguObjectValidateAction extends XuguObjectPersistAction {
             return;
         }
         DBCCompileLog log = new DBCCompileLogBase();
-        XuguTaskHandler.logObjectErrors((JDBCSession) session, log, object, getObjectType());
+//        XuguTaskHandler.logObjectErrors((JDBCSession) session, log, object, getObjectType());
         if (!log.getErrorStack().isEmpty()) {
             StringBuilder message = new StringBuilder();
             message.append("Error during ").append(getObjectType().getTypeName()).append(" '").append(object.getName()).append("' validation:");

@@ -32,6 +32,7 @@ import org.jkiss.dbeaver.model.struct.rdb.DBSProcedure;
 import org.jkiss.dbeaver.model.struct.rdb.DBSProcedureType;
 import org.jkiss.utils.IntKeyMap;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Iterator;
@@ -84,24 +85,27 @@ public abstract class XuguProcedureBase<PARENT extends DBSObjectContainer> exten
         @Override
         protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguProcedureBase procedure) throws SQLException
         {
-            JDBCPreparedStatement dbStat = session.prepareStatement(
-                "SELECT * FROM SYS.ALL_ARGUMENTS " +
-                "WHERE " +
-                (procedure.getObjectId() <= 0  ? "OWNER=? AND OBJECT_NAME=? AND PACKAGE_NAME=? " : "OBJECT_ID=? ") +
-                (procedure.getOverloadNumber() != null ? "AND OVERLOAD=? " : "AND OVERLOAD IS NULL ") +
-                "\nORDER BY SEQUENCE");
-            int paramNum = 1;
-            if (procedure.getObjectId() <= 0) {
-                dbStat.setString(paramNum++, procedure.getSchema().getName());
-                dbStat.setString(paramNum++, procedure.getName());
-                dbStat.setString(paramNum++, procedure.getContainer().getName());
-            } else {
-                dbStat.setLong(paramNum++, procedure.getObjectId());
-            }
-            if (procedure.getOverloadNumber() != null) {
-                dbStat.setInt(paramNum, procedure.getOverloadNumber());
-            }
-            return dbStat;
+        	System.out.println("Select all arguments");
+        	JDBCPreparedStatement dbStat = session.prepareStatement(
+                    "SELECT DEFINE FROM ALL_PROCEDURES " +
+                    "WHERE PROC_ID=" + procedure.getObjectId());
+//        	ResultSet res = dbStat.executeQuery();
+//        	if(res!=null) {
+//        		
+//        	}
+        	return dbStat;
+//            int paramNum = 1;
+//            if (procedure.getObjectId() <= 0) {
+//                dbStat.setString(paramNum++, procedure.getSchema().getName());
+//                dbStat.setString(paramNum++, procedure.getName());
+//                dbStat.setString(paramNum++, procedure.getContainer().getName());
+//            } else {
+//                dbStat.setLong(paramNum++, procedure.getObjectId());
+//            }
+//            if (procedure.getOverloadNumber() != null) {
+//                dbStat.setInt(paramNum, procedure.getOverloadNumber());
+//            }
+//            return dbStat;
         }
 
         @Override
