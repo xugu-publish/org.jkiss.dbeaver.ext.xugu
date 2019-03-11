@@ -59,7 +59,7 @@ public class XuguSynonym extends XuguSchemaObject implements DBSAlias {
         this.targetName = JDBCUtils.safeGetString(dbResult, "TARG_NAME");
         this.is_pub = JDBCUtils.safeGetBoolean(dbResult, "IS_PUBLIC");
         this.valid = JDBCUtils.safeGetBoolean(dbResult, "VALID");
-        this.deleted = JDBCUtils.safeGetBoolean(dbResult, "DELETED");
+//        this.deleted = JDBCUtils.safeGetBoolean(dbResult, "DELETED");
         this.createTime = JDBCUtils.safeGetDate(dbResult, "CREATE_TIME");
 //        this.dbLink = JDBCUtils.safeGetString(dbResult, "DB_LINK");
     }
@@ -94,6 +94,14 @@ public class XuguSynonym extends XuguSchemaObject implements DBSAlias {
             return (DBSObject) object;
         }
         return null;
+    }
+    
+    public void setName(String name) {
+    	objectName = name;
+    }
+    
+    public void setTargetName(String name) {
+    	targetName = name;
     }
 
 	public Object getObject(DBRProgressMonitor monitor) throws DBException {
