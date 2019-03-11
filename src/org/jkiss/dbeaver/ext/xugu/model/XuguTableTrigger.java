@@ -39,6 +39,7 @@ public class XuguTableTrigger extends XuguTrigger<XuguTableBase>
     public XuguTableTrigger(XuguTableBase table, String name)
     {
         super(table, name);
+        this.ownerSchema = table.getSchema();
     }
 
     public XuguTableTrigger(
@@ -46,16 +47,7 @@ public class XuguTableTrigger extends XuguTrigger<XuguTableBase>
         ResultSet dbResult)
     {
         super(table, dbResult);
-        String ownerName = JDBCUtils.safeGetStringTrimmed(dbResult, "OWNER");
-        if (ownerName != null) {
-            this.ownerSchema = table.getDataSource().schemaCache.getCachedObject(ownerName);
-            if (this.ownerSchema == null) {
-                log.warn("Trigger owner schema '" + ownerName + "' not found");
-            }
-        }
-        if (this.ownerSchema == null) {
-            this.ownerSchema = table.getSchema();
-        }
+        this.ownerSchema = table.getSchema();
     }
 
     @Override
@@ -75,5 +67,11 @@ public class XuguTableTrigger extends XuguTrigger<XuguTableBase>
     {
         return parent.triggerCache.getChildren(monitor, parent, this);
     }
+
+	@Override
+	public void setObjectDefinitionText(String source) {
+		// TODO Auto-generated method stub
+		super.setObjectDefinitionText(source);
+	}
 
 }

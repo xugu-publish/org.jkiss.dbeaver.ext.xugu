@@ -23,6 +23,5 @@ package org.jkiss.dbeaver.ext.xugu.model;
 public enum XuguObjectStatus {
     ENABLED,
     DISABLED,
-    ERROR;
-
+    ERROR
 }

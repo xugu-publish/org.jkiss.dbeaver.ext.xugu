@@ -223,7 +223,7 @@ public class XuguUtils {
         }
         try (final JDBCSession session = DBUtils.openMetaSession(monitor, sourceOwner, "Load source code for " + sourceType + " '" + sourceObject.getName() + "'")) {
             try (JDBCPreparedStatement dbStat = session.prepareStatement(
-                "SELECT TEXT FROM " + XuguConstants.SCHEMA_SYS + "." + sysViewName + " " +
+                "SELECT TEXT FROM ALL_OBJECTS " +
                     "WHERE TYPE=? AND OWNER=? AND NAME=? " +
                     "ORDER BY LINE")) {
                 dbStat.setString(1, body ? sourceType + " BODY" : sourceType);
@@ -329,7 +329,8 @@ public class XuguUtils {
         try (JDBCSession session = DBUtils.openMetaSession(monitor, object, "Refresh state of " + objectType.getTypeName() + " '" + object.getName() + "'")) {
             try (JDBCPreparedStatement dbStat = session.prepareStatement(
                 "SELECT * FROM ALL_OBJECTS WHERE OBJ_TYPE=? AND SCHEMA_ID=? AND OBJ_NAME=?")) {
-                dbStat.setInt(1, Integer.parseInt(objectType.getTypeName()));
+                //在xugu数据库中 obj_type字段为int类型
+            	dbStat.setInt(1, Integer.parseInt(objectType.getTypeName()));
                 dbStat.setLong(2, object.getSchema().getId());
                 dbStat.setString(3, DBObjectNameCaseTransformer.transformObjectName(object, object.getName()));
                 try (JDBCResultSet dbResult = dbStat.executeQuery()) {

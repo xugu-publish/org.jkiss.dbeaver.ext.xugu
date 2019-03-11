@@ -37,7 +37,6 @@ public class XuguTriggerColumn extends AbstractTriggerColumn
     private XuguTrigger trigger;
     private String name;
     private XuguTableColumn tableColumn;
-    private boolean columnList;
 
     public XuguTriggerColumn(
         DBRProgressMonitor monitor,
@@ -47,15 +46,14 @@ public class XuguTriggerColumn extends AbstractTriggerColumn
     {
         this.trigger = trigger;
         this.tableColumn = tableColumn;
-        this.name = JDBCUtils.safeGetString(dbResult, "COLUMN_NAME");
-        this.columnList = JDBCUtils.safeGetBoolean(dbResult, "COLUMN_LIST", "YES");
+        this.name = JDBCUtils.safeGetString(dbResult, "COL_NAME");
+        //不存在col_list列 是否等价于define？
     }
 
     XuguTriggerColumn(XuguTrigger trigger, XuguTriggerColumn source)
     {
         this.trigger = trigger;
         this.tableColumn = source.tableColumn;
-        this.columnList = source.columnList;
     }
 
     @Override

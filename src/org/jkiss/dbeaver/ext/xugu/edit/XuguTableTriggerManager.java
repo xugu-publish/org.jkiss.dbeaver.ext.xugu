@@ -56,8 +56,10 @@ public class XuguTableTriggerManager extends SQLTriggerManager<XuguTableTrigger,
             protected XuguTableTrigger runTask() {
                 EntityEditPage editPage = new EntityEditPage(parent.getDataSource(), DBSEntityType.TRIGGER);
                 if (!editPage.edit()) {
+                	System.out.println("can not edit?");
                     return null;
                 }
+                System.out.println("can edit?");
                 XuguTableTrigger newTrigger = new XuguTableTrigger(parent, editPage.getEntityName());
                 newTrigger.setObjectDefinitionText("TRIGGER " + editPage.getEntityName() + "\n" + //$NON-NLS-1$ //$NON-NLS-2$
                     "BEGIN\n" + //$NON-NLS-1$

@@ -50,7 +50,7 @@ public class XuguProcedureStandalone extends XuguProcedureBase<XuguSchema> imple
     {
         super(
             schema,
-            JDBCUtils.safeGetString(dbResult, "OBJECT_NAME"),
+            JDBCUtils.safeGetString(dbResult, "PROC_NAME"),
             JDBCUtils.safeGetLong(dbResult, "OBJECT_ID"),
             DBSProcedureType.valueOf(JDBCUtils.safeGetString(dbResult, "OBJECT_TYPE")));
         this.valid = "VALID".equals(JDBCUtils.safeGetString(dbResult, "STATUS"));

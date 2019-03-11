@@ -48,4 +48,10 @@ public class XuguSchemaTrigger extends XuguTrigger<XuguSchema>
         return parent;
     }
 
+	@Override
+	public void setObjectDefinitionText(String source) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

@@ -329,11 +329,11 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
         protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguTableBase owner) throws SQLException
         {
             JDBCPreparedStatement dbStat = session.prepareStatement(
-                "SELECT *\n" +
-                    "FROM " + XuguUtils.getAdminAllViewPrefix(session.getProgressMonitor(), owner.getDataSource(), "TRIGGERS") + 
+                "SELECT *, tr.OBJ_ID AS TABLE_ID\n" +
+                    "FROM " + XuguUtils.getAdminAllViewPrefix(session.getProgressMonitor(), owner.getDataSource(), "TRIGGERS tr") + 
                     " WHERE SCHEMA_ID=(SELECT SCHEMA_ID FROM ALL_SCHEMAS WHERE SCHEMA_NAME=?) AND "
                     + "TABLE_ID=(SELECT TABLE_ID FROM ALL_TABLES WHERE TABLE_NAME=?)\n" +
-                    "ORDER BY TRIGGER_NAME");
+                    "ORDER BY TRIG_NAME");
             dbStat.setString(1, owner.getSchema().getName());
             dbStat.setString(2, owner.getName());
             return dbStat;
@@ -348,37 +348,54 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
         @Override
         protected JDBCStatement prepareChildrenStatement(@NotNull JDBCSession session, @NotNull XuguTableBase owner, @Nullable XuguTableTrigger forObject) throws SQLException
         {
-//            JDBCPreparedStatement dbStat = session.prepareStatement(
-//                "SELECT * FROM ALL_TRIGGER_COLS WHERE TABLE_OWNER=? AND TABLE_NAME=?" +
-//                    (forObject == null ? "" : " AND TRIGGER_NAME=?") +
-//                    "\nORDER BY TRIGGER_NAME");
-//            dbStat.setString(1, owner.getContainer().getName());
-//            dbStat.setString(2, owner.getName());
-//            if (forObject != null) {
-//                dbStat.setString(3, forObject.getName());
-//            }
-            //do nothing
-            JDBCPreparedStatement dbStat = session.prepareStatement(
-                    "");
+            //通过获取description中的字段名来查询触发器的列信息
+        	String cols = forObject.getDescription();
+        	int i1 = cols.indexOf(" OF ");
+        	int i2 = cols.indexOf(" ON ");
+        	StringBuilder sql = new StringBuilder();
+        	sql.append("SELECT * FROM ALL_COLUMNS WHERE ");
+    		sql.append("TABLE_ID=(SELECT TABLE_ID FROM ALL_TABLES WHERE TABLE_NAME='");
+    		sql.append(owner.getName());
+    		sql.append("' AND SCHEMA_ID='");
+    		sql.append(owner.getSchema().getId());
+    		sql.append("')");
+        	//指定了特殊字段则仅查询指定字段，若没有则直接查该表的所有列
+        	if(i1!=-1) {
+        		cols = cols.substring(i1+4, i2);
+        		String[] col = cols.split(",");
+        		
+        		sql.append(" AND COL_NAME IN(");
+        		for(int i=0; i<col.length; i++) {
+        			sql.append("'");
+        			sql.append(col[i]);
+        			sql.append("'");
+        			if(i!=col.length-1) {
+        				sql.append(",");
+        			}
+        		}
+        		sql.append(")");
+        	}
+        	System.out.println("find trigger columns "+sql.toString());
+            JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
             return dbStat;
         }
 
         @Override
         protected XuguTriggerColumn fetchChild(@NotNull JDBCSession session, @NotNull XuguTableBase owner, @NotNull XuguTableTrigger parent, @NotNull JDBCResultSet dbResult) throws SQLException, DBException
         {
-//            XuguTableBase refTable = XuguTableBase.findTable(
-//                session.getProgressMonitor(),
-//                owner.getDataSource(),
-//                JDBCUtils.safeGetString(dbResult, "TABLE_OWNER"),
-//                JDBCUtils.safeGetString(dbResult, "TABLE_NAME"));
-//            if (refTable != null) {
-//                final String columnName = JDBCUtils.safeGetString(dbResult, "COLUMN_NAME");
-//                XuguTableColumn tableColumn = refTable.getAttribute(session.getProgressMonitor(), columnName);
-//                if (tableColumn == null) {
-//                    log.debug("Column '" + columnName + "' not found in table '" + refTable.getFullyQualifiedName(DBPEvaluationContext.DDL) + "' for trigger '" + parent.getName() + "'");
-//                }
-//                return new XuguTriggerColumn(session.getProgressMonitor(), parent, tableColumn, dbResult);
-//            }
+            XuguTableBase refTable = XuguTableBase.findTable(
+                session.getProgressMonitor(),
+                owner.getDataSource(),
+                owner.getSchema().getName(),
+                owner.getName());
+            if (refTable != null) {
+                final String columnName = JDBCUtils.safeGetString(dbResult, "COL_NAME");
+                XuguTableColumn tableColumn = refTable.getAttribute(session.getProgressMonitor(), columnName);
+                if (tableColumn == null) {
+                    log.debug("Column '" + columnName + "' not found in table '" + refTable.getFullyQualifiedName(DBPEvaluationContext.DDL) + "' for trigger '" + parent.getName() + "'");
+                }
+                return new XuguTriggerColumn(session.getProgressMonitor(), parent, tableColumn, dbResult);
+            }
         	// do nothing
             return null;
         }

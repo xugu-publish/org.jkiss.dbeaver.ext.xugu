@@ -84,7 +84,8 @@ public enum XuguObjectType implements DBSObjectType {
             return schema.packageCache.getObject(monitor, schema, objectName);
         }
     }),
-	PROCEDURE("PROCEDURE", DBIcon.TREE_PROCEDURE, XuguProcedureStandalone.class, new ObjectFinder() {
+	//procedure的obj_type为7
+	PROCEDURE("7", DBIcon.TREE_PROCEDURE, XuguProcedureStandalone.class, new ObjectFinder() {
         @Override
         public XuguProcedureStandalone findObject(DBRProgressMonitor monitor, XuguSchema schema, String objectName) throws DBException
         {
@@ -102,6 +103,7 @@ public enum XuguObjectType implements DBSObjectType {
 	RULE("RULE", null, DBSObject.class, null),
 	RULE_SET("RULE SET", null, DBSObject.class, null),
 	SCHEDULE("SCHEDULE", null, DBSObject.class, null),
+	//sequence的obj_type为8
 	SEQUENCE("SEQUENCE", DBIcon.TREE_SEQUENCE, XuguSequence.class, new ObjectFinder() {
         @Override
         public XuguSequence findObject(DBRProgressMonitor monitor, XuguSchema schema, String objectName) throws DBException
@@ -116,6 +118,7 @@ public enum XuguObjectType implements DBSObjectType {
             return schema.synonymCache.getObject(monitor, schema, objectName);
         }
     }),
+	//table的OBJ_TYPE为5
 	TABLE("5", DBIcon.TREE_TABLE, XuguTable.class, new ObjectFinder() {
         @Override
         public XuguTableBase findObject(DBRProgressMonitor monitor, XuguSchema schema, String objectName) throws DBException
@@ -124,7 +127,8 @@ public enum XuguObjectType implements DBSObjectType {
         }
     }),
 	TABLE_PARTITION("TABLE PARTITION", null, DBSObject.class, null),
-	TRIGGER("TRIGGER", DBIcon.TREE_TRIGGER, XuguTrigger.class, new ObjectFinder() {
+	//trigger的OBJ_TYPE为11
+	TRIGGER("11", DBIcon.TREE_TRIGGER, XuguTrigger.class, new ObjectFinder() {
         @Override
         public XuguTrigger findObject(DBRProgressMonitor monitor, XuguSchema schema, String objectName) throws DBException
         {

@@ -43,10 +43,7 @@ import java.util.Map;
 public abstract class XuguTrigger<PARENT extends DBSObject> extends XuguObject<PARENT> implements DBSTrigger, DBPQualifiedObject, XuguSourceObject
 {
     public enum BaseObjectType {
-        TABLE,
-        VIEW,
-        SCHEMA,
-        DATABASE
+        TABLE
     }
 
     public enum ActionType implements DBPNamedObject {
@@ -69,15 +66,19 @@ public abstract class XuguTrigger<PARENT extends DBSObject> extends XuguObject<P
     }
 
     private BaseObjectType objectType;
-    private String triggerType;
-    private String triggeringEvent;
-    private String columnName;
-    private String refNames;
-    private String whenClause;
+    private int triggerType;
+    private int triggeringEvent;
+//    private String columnName;
+    private int obj_id;
+    
+//    private String refNames;
+//    private String whenClause;
     private XuguObjectStatus status;
-    private String description;
-    private ActionType actionType;
-    private String sourceDeclaration;
+    private boolean valid;
+    private boolean deleted;
+    private String define;
+//    private ActionType actionType;
+//    private String sourceDeclaration;
 
     public XuguTrigger(PARENT parent, String name)
     {
@@ -88,16 +89,22 @@ public abstract class XuguTrigger<PARENT extends DBSObject> extends XuguObject<P
         PARENT parent,
         ResultSet dbResult)
     {
-        super(parent, JDBCUtils.safeGetString(dbResult, "TRIGGER_NAME"), true);
-        this.objectType = CommonUtils.valueOf(BaseObjectType.class, JDBCUtils.safeGetStringTrimmed(dbResult, "BASE_OBJECT_TYPE"));
-        this.triggerType = JDBCUtils.safeGetString(dbResult, "TRIGGER_TYPE");
-        this.triggeringEvent = JDBCUtils.safeGetString(dbResult, "TRIGGERING_EVENT");
-        this.columnName = JDBCUtils.safeGetString(dbResult, "COLUMN_NAME");
-        this.refNames = JDBCUtils.safeGetString(dbResult, "REFERENCING_NAMES");
-        this.whenClause = JDBCUtils.safeGetString(dbResult, "WHEN_CLAUSE");
-        this.status = CommonUtils.valueOf(XuguObjectStatus.class, JDBCUtils.safeGetStringTrimmed(dbResult, "STATUS"));
-        this.description = JDBCUtils.safeGetString(dbResult, "DESCRIPTION");
-        this.actionType = "CALL".equals(JDBCUtils.safeGetString(dbResult, "ACTION_TYPE")) ? ActionType.CALL : ActionType.PLSQL;
+        super(parent, JDBCUtils.safeGetString(dbResult, "TRIG_NAME"), true);
+        //只有一种类型触发器
+        this.objectType = BaseObjectType.TABLE;
+        this.triggerType = JDBCUtils.safeGetInt(dbResult, "TRIG_TYPE");
+        this.triggeringEvent = JDBCUtils.safeGetInt(dbResult, "TRIG_EVENT");
+        //根据obj_id获取？是否代表列id？
+        this.obj_id = JDBCUtils.safeGetInt(dbResult, "TABLE_ID");
+//        this.columnName = JDBCUtils.safeGetString(dbResult, "COL_NAME");
+//        this.refNames = JDBCUtils.safeGetString(dbResult, "REFERENCING_NAMES");
+//        this.whenClause = JDBCUtils.safeGetString(dbResult, "WHEN_CLAUSE");
+        this.status = JDBCUtils.safeGetBoolean(dbResult, "ENABLE")?XuguObjectStatus.ENABLED:XuguObjectStatus.DISABLED;
+        this.valid = JDBCUtils.safeGetBoolean(dbResult, "VALID");
+//        this.deleted = JDBCUtils.safeGetBoolean(dbResult, "DELETED");
+        this.define = JDBCUtils.safeGetString(dbResult, "DEFINE");
+//        this.description = JDBCUtils.safeGetString(dbResult, "DESCRIPTION");
+//        this.actionType = "CALL".equals(JDBCUtils.safeGetString(dbResult, "ACTION_TYPE")) ? ActionType.CALL : ActionType.PLSQL;
     }
 
     @NotNull
@@ -115,54 +122,54 @@ public abstract class XuguTrigger<PARENT extends DBSObject> extends XuguObject<P
     }
 
     @Property(viewable = true, order = 5)
-    public String getTriggerType()
+    public int getTriggerType()
     {
         return triggerType;
     }
 
     @Property(viewable = true, order = 6)
-    public String getTriggeringEvent()
+    public int getTriggeringEvent()
     {
         return triggeringEvent;
     }
 
-    @Property(viewable = true, order = 7)
-    public String getColumnName()
-    {
-        return columnName;
-    }
+//    @Property(viewable = true, order = 7)
+//    public String getColumnName()
+//    {
+//        return columnName;
+//    }
 
-    @Property(order = 8)
-    public String getRefNames()
-    {
-        return refNames;
-    }
-
-    @Property(order = 9)
-    public String getWhenClause()
-    {
-        return whenClause;
-    }
-
-    @Property(viewable = true, order = 10)
-    public XuguObjectStatus getStatus()
-    {
-        return status;
-    }
+//    @Property(order = 8)
+//    public String getRefNames()
+//    {
+//        return refNames;
+//    }
+//
+//    @Property(order = 9)
+//    public String getWhenClause()
+//    {
+//        return whenClause;
+//    }
+//
+//    @Property(viewable = true, order = 10)
+//    public XuguObjectStatus getStatus()
+//    {
+//        return status;
+//    }
 
     @Nullable
     @Override
     @Property(multiline = true, order = 11)
     public String getDescription()
     {
-        return description;
+        return define;
     }
 
-    @Property(viewable = true, order = 12)
-    public ActionType getActionType()
-    {
-        return actionType;
-    }
+//    @Property(viewable = true, order = 12)
+//    public ActionType getActionType()
+//    {
+//        return actionType;
+//    }
 
     @Override
     public XuguSourceType getSourceType()
@@ -174,28 +181,28 @@ public abstract class XuguTrigger<PARENT extends DBSObject> extends XuguObject<P
     @Property(hidden = true, editable = true, updatable = true, order = -1)
     public String getObjectDefinitionText(DBRProgressMonitor monitor, Map<String, Object> options) throws DBException
     {
-        if (sourceDeclaration == null && monitor != null) {
-            sourceDeclaration = XuguUtils.getSource(monitor, this, false, false);
-        }
-        return sourceDeclaration;
+//        if (define == null && monitor != null) {
+//            define = XuguUtils.getSource(monitor, this, false, false);
+//        }
+        return this.define;
     }
 
     public void setObjectDefinitionText(String source)
     {
-        this.sourceDeclaration = source;
+        this.define = source;
     }
 
     @NotNull
     @Override
     public DBSObjectState getObjectState()
     {
-        return status != XuguObjectStatus.ERROR ? DBSObjectState.NORMAL : DBSObjectState.INVALID;
+        return valid? DBSObjectState.NORMAL: DBSObjectState.INVALID;
     }
 
     @Override
     public void refreshObjectState(@NotNull DBRProgressMonitor monitor) throws DBCException
     {
-        this.status = (XuguUtils.getObjectStatus(monitor, this, XuguObjectType.TRIGGER) ? XuguObjectStatus.ENABLED : XuguObjectStatus.ERROR);
+        this.status = (XuguUtils.getObjectStatus(monitor, this, XuguObjectType.TRIGGER) ? XuguObjectStatus.ENABLED : XuguObjectStatus.DISABLED);
     }
 
     @Override
