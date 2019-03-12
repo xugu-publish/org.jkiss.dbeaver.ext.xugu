@@ -99,9 +99,9 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
         super(schema, name, persisted);
     }
 
-    protected XuguTableBase(XuguSchema oracleSchema, ResultSet dbResult)
+    protected XuguTableBase(XuguSchema xuguSchema, ResultSet dbResult)
     {
-        super(oracleSchema, true);
+        super(xuguSchema, true);
         setName(JDBCUtils.safeGetString(dbResult, "TABLE_NAME"));
         this.id = JDBCUtils.safeGetInt(dbResult, "TABLE_ID");
         this.valid = JDBCUtils.safeGetBoolean(dbResult, "VALID");

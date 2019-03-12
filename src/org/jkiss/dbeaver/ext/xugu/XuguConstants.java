@@ -37,12 +37,6 @@ public class XuguConstants {
     public static final int DEFAULT_PORT = 3306;
     public static final String DEFAULT_HOST = "localhost";
 
-    public static final String DRIVER_ID_MYSQL = "mysql5";
-    public static final String DRIVER_ID_MYSQL8 = "mysql8";
-    public static final String DRIVER_ID_MARIA_DB = "mariaDB";
-    public static final String DRIVER_CLASS_MARIA_DB = "org.mariadb.jdbc.Driver";
-
-    public static final String HANDLER_SSL = "mysql_ssl";
 
     public static final String PROP_SERVER_TIMEZONE = DBConstants.INTERNAL_PROP_PREFIX + "serverTimezone@";
 

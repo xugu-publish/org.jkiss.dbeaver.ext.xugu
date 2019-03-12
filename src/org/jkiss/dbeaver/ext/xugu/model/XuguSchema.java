@@ -572,7 +572,17 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
                             tableColumn.getOrdinalPosition());
             	}
             	return con_cols;
-            }else {
+            }
+            //处理单列但是带括号情况
+            else if(colName.indexOf("(")!=-1) {
+            	String realColName = colName.substring(colName.indexOf("(")+1, colName.indexOf(")"));
+            	XuguTableColumn tableColumn = getTableColumn(session, parent, realColName);
+            	return tableColumn == null ? null : new XuguTableConstraintColumn[] { new XuguTableConstraintColumn(
+                        object,
+                        tableColumn,
+                        tableColumn.getOrdinalPosition()) };
+            }
+            else {
             	final XuguTableColumn tableColumn = getTableColumn(session, parent, dbResult);
             	//xfc COL_NO无法从结果集直接获取 选择从column中调用get方法
                 return tableColumn == null ? null : new XuguTableConstraintColumn[] { new XuguTableConstraintColumn(

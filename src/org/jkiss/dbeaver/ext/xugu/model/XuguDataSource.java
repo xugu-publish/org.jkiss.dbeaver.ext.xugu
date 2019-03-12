@@ -223,37 +223,6 @@ public class XuguDataSource extends JDBCDataSource
             DBPConnectionConfiguration connectionInfo = getContainer().getConnectionConfiguration();
 
             try (JDBCSession session = context.openSession(monitor, DBCExecutionPurpose.META, "Set connection parameters")) {
-                // Set session settings
-                String sessionLanguage = connectionInfo.getProviderProperty(XuguConstants.PROP_SESSION_LANGUAGE);
-                if (sessionLanguage != null) {
-                    try {
-                        JDBCUtils.executeSQL(
-                            session,
-                            "ALTER SESSION SET NLS_LANGUAGE='" + sessionLanguage + "'");
-                    } catch (SQLException e) {
-                        log.warn("Can't set session language", e);
-                    }
-                }
-                String sessionTerritory = connectionInfo.getProviderProperty(XuguConstants.PROP_SESSION_TERRITORY);
-                if (sessionTerritory != null) {
-                    try {
-                        JDBCUtils.executeSQL(
-                            session,
-                            "ALTER SESSION SET NLS_TERRITORY='" + sessionTerritory + "'");
-                    } catch (SQLException e) {
-                        log.warn("Can't set session territory", e);
-                    }
-                }
-                String nlsDateFormat = connectionInfo.getProviderProperty(XuguConstants.PROP_SESSION_NLS_DATE_FORMAT);
-                if (nlsDateFormat != null) {
-                    try {
-                        JDBCUtils.executeSQL(
-                            session,
-                            "ALTER SESSION SET NLS_DATE_FORMAT='" + nlsDateFormat + "'");
-                    } catch (SQLException e) {
-                        log.warn("Can't set session NLS date format", e);
-                    }
-                }
              // Read charsets and collations
                 {
                     charsets = new ArrayList<>();
@@ -297,10 +266,10 @@ public class XuguDataSource extends JDBCDataSource
     @Override
     protected Map<String, String> getInternalConnectionProperties(DBRProgressMonitor monitor, DBPDriver driver, String purpose, DBPConnectionConfiguration connectionInfo) throws DBCException {
         Map<String, String> connectionsProps = new HashMap<>();
-        if (!getContainer().getPreferenceStore().getBoolean(ModelPreferences.META_CLIENT_NAME_DISABLE)) {
-            // Program name
-            connectionsProps.put("v$session.program", CommonUtils.truncateString(DBUtils.getClientApplicationName(getContainer(), purpose), 48));
-        }
+//        if (!getContainer().getPreferenceStore().getBoolean(ModelPreferences.META_CLIENT_NAME_DISABLE)) {
+//            // Program name
+//            connectionsProps.put("v$session.program", CommonUtils.truncateString(DBUtils.getClientApplicationName(getContainer(), purpose), 48));
+//        }
         if (CommonUtils.toBoolean(connectionInfo.getProviderProperty(XuguConstants.OS_AUTH_PROP))) {
             connectionsProps.put("v$session.osuser", System.getProperty(StandardConstants.ENV_USER_NAME));
         }
@@ -826,26 +795,7 @@ public class XuguDataSource extends JDBCDataSource
 
         @Override
         public void readServerOutput(@NotNull DBRProgressMonitor monitor, @NotNull DBCExecutionContext context, @Nullable SQLQueryResult queryResult, @Nullable DBCStatement statement, @NotNull PrintWriter output) throws DBCException {
-            try (JDBCSession session = (JDBCSession) context.openSession(monitor, DBCExecutionPurpose.UTIL, "Read DBMS output")) {
-                try (CallableStatement getLineProc = session.getOriginal().prepareCall("{CALL DBMS_OUTPUT.GET_LINE(?, ?)}")) {
-                    getLineProc.registerOutParameter(1, java.sql.Types.VARCHAR);
-                    getLineProc.registerOutParameter(2, java.sql.Types.INTEGER);
-                    int status = 0;
-                    while (status == 0) {
-                        getLineProc.execute();
-                        status = getLineProc.getInt(2);
-                        if (status == 0) {
-                            String str = getLineProc.getString(1);
-                            if (str != null) {
-                                output.write(str);
-                            }
-                            output.write('\n');
-                        }
-                    }
-                } catch (SQLException e) {
-                    throw new DBCException(e, XuguDataSource.this);
-                }
-            }
+        	//do nothing
         }
     }
 

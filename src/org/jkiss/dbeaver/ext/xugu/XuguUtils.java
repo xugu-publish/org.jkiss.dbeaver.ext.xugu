@@ -142,9 +142,4 @@ public class XuguUtils {
         }
     }
 
-    public static boolean isMariaDB(DBPDriver driver) {
-        return XuguConstants.DRIVER_CLASS_MARIA_DB.equals(
-                driver.getDriverClassName());
-    }
-
 }
