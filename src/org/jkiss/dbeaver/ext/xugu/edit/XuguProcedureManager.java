@@ -33,6 +33,8 @@ import org.jkiss.dbeaver.ui.editors.object.struct.CreateProcedurePage;
 
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * OracleProcedureManager
@@ -99,9 +101,14 @@ public class XuguProcedureManager extends SQLObjectEditor<XuguProcedureStandalon
             return;
         }
         //强制增加CREATE OR REPLACE关键字
-        source = source.toUpperCase();
-        int index = procedure.getProcedureType().toString().equals("PROCEDURE")?source.indexOf("PROCEDURE"):source.indexOf("FUNCTION");
-        source = "CREATE OR REPLACE "+source.substring(index);
+        String keyWord = procedure.getProcedureType().toString().equals("PROCEDURE")?"PROCEDURE":"FUNCTION";
+    	Pattern p = Pattern.compile("("+keyWord+")", Pattern.CASE_INSENSITIVE);
+        Matcher m = p.matcher(source);
+        if(m.find()) {
+        	keyWord = m.group(0);
+        }
+        int index = source.indexOf(keyWord);
+        source = "CREATE OR REPLACE " + keyWord.toUpperCase() + source.substring(index+keyWord.length());
         actionList.add(new XuguObjectValidateAction(procedure, XuguObjectType.PROCEDURE, "Create procedure", source)); //$NON-NLS-2$
         XuguUtils.addSchemaChangeActions(actionList, procedure);
     }
