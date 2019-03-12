@@ -99,6 +99,7 @@ public class XuguProcedureManager extends SQLObjectEditor<XuguProcedureStandalon
             return;
         }
         //强制增加CREATE OR REPLACE关键字
+        source = source.toUpperCase();
         int index = procedure.getProcedureType().toString().equals("PROCEDURE")?source.indexOf("PROCEDURE"):source.indexOf("FUNCTION");
         source = "CREATE OR REPLACE "+source.substring(index);
         actionList.add(new XuguObjectValidateAction(procedure, XuguObjectType.PROCEDURE, "Create procedure", source)); //$NON-NLS-2$
