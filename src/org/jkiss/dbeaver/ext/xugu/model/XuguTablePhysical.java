@@ -208,8 +208,7 @@ public abstract class XuguTablePhysical extends XuguTableBase implements DBSObje
                 "SELECT * FROM ALL_PARTIS " +
                 "WHERE TABLE_ID=(SELECT TABLE_ID FROM ALL_TABLES WHERE TABLE_NAME=?) " +
                 "ORDER BY PARTI_NO");
-            dbStat.setString(1, table.getContainer().getName());
-            dbStat.setString(2, table.getName());
+            dbStat.setString(1, table.getName());
             return dbStat;
         }
 
@@ -222,16 +221,13 @@ public abstract class XuguTablePhysical extends XuguTableBase implements DBSObje
         @Override
         protected JDBCStatement prepareChildrenStatement(@NotNull JDBCSession session, @NotNull XuguTablePhysical table, @Nullable XuguTablePartition forObject) throws SQLException
         {
-            final JDBCPreparedStatement dbStat = session.prepareStatement(
-                "SELECT * FROM ALL_SUBPARTIS " +
-                "WHERE TABLE_ID=(SELECT TABLE_ID FROM ALL_TABLES WHERE TABLE_NAME=?) " +
-                (forObject == null ? "" : "AND PARTITION_NAME=?") +
-                "ORDER BY SUBPARTI_NO");
-            dbStat.setString(1, table.getContainer().getName());
-            dbStat.setString(2, table.getName());
-            if (forObject != null) {
-                dbStat.setString(2, forObject.getName());
-            }
+        	String sql = "SELECT * FROM ALL_SUBPARTIS " +
+                    "WHERE TABLE_ID=(SELECT TABLE_ID FROM ALL_TABLES WHERE TABLE_NAME='"+ table.getName() +"') ";
+        	if(forObject != null) {
+        		sql += "AND PARTITION_NAME='" + forObject.getName() + "'";
+        	}
+        	sql += "ORDER BY SUBPARTI_NO";
+            final JDBCPreparedStatement dbStat = session.prepareStatement(sql);
             return dbStat;
         }
 

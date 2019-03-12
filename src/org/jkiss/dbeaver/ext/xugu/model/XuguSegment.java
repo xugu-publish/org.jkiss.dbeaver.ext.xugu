@@ -66,7 +66,7 @@ public class XuguSegment<PARENT extends DBSObject> extends XuguObject<PARENT> {
         if (parent instanceof XuguTablespace) {
             return parent;
         } else if (parent instanceof XuguPartitionBase) {
-            return ((XuguPartitionBase) parent).getTablespace(monitor);
+            return null;
         } else {
             return null;
         }
