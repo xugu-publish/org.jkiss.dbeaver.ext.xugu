@@ -72,7 +72,7 @@ public abstract class XuguPartitionBase<PARENT extends DBSObject> extends XuguOb
             this.subpartitionType = CommonUtils.valueOf(PartitionType.class, JDBCUtils.safeGetStringTrimmed(dbResult, "SUBPARTITIONING_TYPE"));
             this.partitionTablespace = JDBCUtils.safeGetStringTrimmed(dbResult, "DEF_TABLESPACE_NAME");
             if (dataSource.isAdmin()) {
-                this.partitionTablespace = dataSource.tablespaceCache.getObject(monitor, dataSource, (String) partitionTablespace);
+                this.partitionTablespace = dataSource.getTablespaceCache().getObject(monitor, dataSource, (String) partitionTablespace);
             }
         }
     }

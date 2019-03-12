@@ -19,8 +19,12 @@ package org.jkiss.dbeaver.ext.xugu.model;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.ext.xugu.model.source.XuguSourceObject;
 import org.jkiss.dbeaver.model.DBPRefreshableObject;
+import org.jkiss.dbeaver.model.DBPScriptObjectExt;
 import org.jkiss.dbeaver.model.DBUtils;
+import org.jkiss.dbeaver.model.edit.DBEPersistAction;
+import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.exec.jdbc.JDBCPreparedStatement;
 import org.jkiss.dbeaver.model.exec.jdbc.JDBCResultSet;
 import org.jkiss.dbeaver.model.exec.jdbc.JDBCSession;
@@ -33,17 +37,20 @@ import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.DBSObjectLazy;
+import org.jkiss.dbeaver.model.struct.DBSObjectState;
 import org.jkiss.utils.CommonUtils;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * Oracle tablespace
  */
 //public class XuguTablespace extends XuguGlobalObject implements DBPRefreshableObject
 public class XuguTablespace extends XuguGlobalObject
+	implements DBPScriptObjectExt, XuguSourceObject
 {
 
     public enum Status {
@@ -118,6 +125,11 @@ public class XuguTablespace extends XuguGlobalObject
     private String space_Type;
     private boolean media_Error;
     
+    public XuguTablespace(XuguDataSource dataSource, String tsName) throws SQLException
+    {
+    	super(dataSource, true);
+    	this.name = tsName;
+    }
     protected XuguTablespace(XuguDataSource dataSource, ResultSet dbResult) throws SQLException
     {
         super(dataSource, true);
@@ -395,7 +407,7 @@ public class XuguTablespace extends XuguGlobalObject
         if (!dataSource.isAdmin()) {
             return referrer.getLazyReference(propertyId);
         } else {
-            return XuguUtils.resolveLazyReference(monitor, dataSource, dataSource.tablespaceCache, referrer, propertyId);
+            return XuguUtils.resolveLazyReference(monitor, dataSource, dataSource.getTablespaceCache(), referrer, propertyId);
         }
     }
 
@@ -406,9 +418,60 @@ public class XuguTablespace extends XuguGlobalObject
             return
                 object.getLazyReference(propertyId) instanceof XuguTablespace ||
                 object.getLazyReference(propertyId) == null ||
-                object.getDataSource().tablespaceCache.isFullyCached() ||
+                object.getDataSource().getTablespaceCache().isFullyCached() ||
                 !object.getDataSource().isAdmin();
         }
     }
+    
+    @Override
+    @Property(hidden = true, editable = true, updatable = true, order = -1)
+    public String getObjectDefinitionText(DBRProgressMonitor monitor, Map<String, Object> options) throws DBCException
+    {
+    	String sourceDeclaration = "";
+        if ( monitor != null) {
+            sourceDeclaration = XuguUtils.getSource(monitor, this, false, true);
+        }
+        return sourceDeclaration;
+    }
+	@Override
+	public String getExtendedDefinitionText(DBRProgressMonitor monitor) throws DBException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public XuguSchema getSchema() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public DBSObjectState getObjectState() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public void refreshObjectState(DBRProgressMonitor monitor) throws DBCException {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void setName(String name) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void setObjectDefinitionText(String source) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public XuguSourceType getSourceType() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public DBEPersistAction[] getCompileActions() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }

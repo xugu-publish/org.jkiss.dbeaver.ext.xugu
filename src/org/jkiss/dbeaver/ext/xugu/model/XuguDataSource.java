@@ -72,7 +72,7 @@ public class XuguDataSource extends JDBCDataSource
     final public SchemaCache schemaCache = new SchemaCache();
     final DataTypeCache dataTypeCache = new DataTypeCache();
     
-    final TablespaceCache tablespaceCache = new TablespaceCache();
+    private final TablespaceCache tablespaceCache = new TablespaceCache();
     final UserCache userCache = new UserCache();
     final ProfileCache profileCache = new ProfileCache();
     final RoleCache roleCache = new RoleCache();
@@ -338,7 +338,7 @@ public class XuguDataSource extends JDBCDataSource
 
     @Association
     public Collection<XuguTablespace> getTablespaces(DBRProgressMonitor monitor) throws DBException {
-        return tablespaceCache.getAllObjects(monitor, this);
+        return getTablespaceCache().getAllObjects(monitor, this);
     }
 
     @Association
@@ -996,5 +996,9 @@ public class XuguDataSource extends JDBCDataSource
         }
         return null;
     }
+
+	public TablespaceCache getTablespaceCache() {
+		return tablespaceCache;
+	}
     
 }

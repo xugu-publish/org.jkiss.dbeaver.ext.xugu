@@ -42,7 +42,7 @@ import java.util.Map;
 import javax.swing.text.Utilities;
 
 /**
- * OraclePackageManager
+ * XuguPackageManager
  */
 public class XuguPackageManager extends SQLObjectEditor<XuguPackage, XuguSchema> {
 

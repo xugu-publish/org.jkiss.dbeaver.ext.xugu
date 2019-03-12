@@ -308,6 +308,7 @@
         <manager class="org.jkiss.dbeaver.ext.xugu.edit.XuguPackageManager" objectType="org.jkiss.dbeaver.ext.xugu.model.XuguPackage"/>
         <manager class="org.jkiss.dbeaver.ext.xugu.edit.XuguTableTriggerManager" objectType="org.jkiss.dbeaver.ext.xugu.model.XuguTableTrigger"/>
         <manager class="org.jkiss.dbeaver.ext.xugu.edit.XuguSequenceManager" objectType="org.jkiss.dbeaver.ext.xugu.model.XuguSequence"/>
+    	<!--<manager class="org.jkiss.dbeaver.ext.xugu.edit.XuguTablespaceManager" objectType="org.jkiss.dbeaver.ext.xugu.model.XuguTablespace"/>-->
     </extension>
     
     <extension point="org.jkiss.dbeaver.databaseEditor">
@@ -320,6 +321,7 @@
             <objectType name="org.jkiss.dbeaver.ext.xugu.model.XuguPackage"/>
             <objectType name="org.jkiss.dbeaver.ext.xugu.model.XuguDataType" if="!object.predefined"/>
             <objectType name="org.jkiss.dbeaver.ext.xugu.model.XuguTrigger"/>
+            <!--<objectType name="org.jkiss.dbeaver.ext.xugu.model.XuguTablespace"/>-->
         </editor>
         <editor id="source.definition" class="org.jkiss.dbeaver.ext.xugu.editors.XuguSourceDefinitionEditor"
             label="%editor.package.body.name" description="%editor.package.body.description" icon="#sql_text" position="additions_middle"
