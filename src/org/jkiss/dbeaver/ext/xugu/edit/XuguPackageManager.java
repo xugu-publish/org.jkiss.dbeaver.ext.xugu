@@ -39,6 +39,8 @@ import org.jkiss.utils.CommonUtils;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.text.Utilities;
+
 /**
  * OraclePackageManager
  */
@@ -62,20 +64,20 @@ public class XuguPackageManager extends SQLObjectEditor<XuguPackage, XuguSchema>
                     return null;
                 }
                 String packName = editPage.getEntityName();
-                XuguPackage oraclePackage = new XuguPackage(
+                XuguPackage xuguPackage = new XuguPackage(
                     parent,
                     packName);
-                oraclePackage.setObjectDefinitionText(
+                xuguPackage.setObjectDefinitionText(
                     "CREATE OR REPLACE PACKAGE " + packName + "\n" +
                     "AS\n" +
                     "-- Package header\n" +
                     "END " + packName +";");
-                oraclePackage.setExtendedDefinitionText(
+                xuguPackage.setExtendedDefinitionText(
                     "CREATE OR REPLACE PACKAGE BODY " + packName + "\n" +
                         "AS\n" +
                         "-- Package body\n" +
                         "END " + packName +";");
-                return oraclePackage;
+                return xuguPackage;
             }
         }.execute();
     }
@@ -110,8 +112,15 @@ public class XuguPackageManager extends SQLObjectEditor<XuguPackage, XuguSchema>
 
     private void createOrReplaceProcedureQuery(List<DBEPersistAction> actionList, XuguPackage pack)
     {
+    	
         try {
             String header = pack.getObjectDefinitionText(new VoidProgressMonitor(), DBPScriptObject.EMPTY_OPTIONS);
+            //对header进行预处理
+            header = header.toUpperCase();
+            String str1 = header.substring(header.indexOf("CREATE")+6, header.indexOf("PACKAGE"));
+            if(str1.indexOf("OR")==-1) {
+            	header = "CREATE OR REPLACE "+header.substring(header.indexOf("PACKAGE"));
+            }
             if (!CommonUtils.isEmpty(header)) {
                 actionList.add(
                     new XuguObjectValidateAction(
@@ -120,6 +129,12 @@ public class XuguPackageManager extends SQLObjectEditor<XuguPackage, XuguSchema>
                         header)); //$NON-NLS-1$
             }
             String body = pack.getExtendedDefinitionText(new VoidProgressMonitor());
+            //对body进行预处理
+            body = body.toUpperCase();
+            String str2 = body.substring(body.indexOf("CREATE")+6, body.indexOf("PACKAGE"));
+            if(str2.indexOf("OR")==-1) {
+            	body = "CREATE OR REPLACE "+body.substring(body.indexOf("PACKAGE"));
+            }
             if (!CommonUtils.isEmpty(body)) {
                 actionList.add(
                     new XuguObjectValidateAction(

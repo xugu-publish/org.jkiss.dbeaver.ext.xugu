@@ -70,14 +70,16 @@ public enum XuguObjectType implements DBSObjectType {
 	LOB("CONTENT", null, DBSObject.class, null),
 	MATERIALIZED_VIEW("MATERIALIZED VIEW", null, DBSObject.class, null),
 	OPERATOR("OPERATOR", null, DBSObject.class, null),
-	PACKAGE("PACKAGE", DBIcon.TREE_PACKAGE, XuguPackage.class, new ObjectFinder() {
+	//package的obj_type为
+	PACKAGE("18", DBIcon.TREE_PACKAGE, XuguPackage.class, new ObjectFinder() {
         @Override
         public XuguPackage findObject(DBRProgressMonitor monitor, XuguSchema schema, String objectName) throws DBException
         {
             return schema.packageCache.getObject(monitor, schema, objectName);
         }
     }),
-	PACKAGE_BODY("PACKAGE BODY", DBIcon.TREE_PACKAGE, XuguPackage.class, new ObjectFinder() {
+	//package body当作package处理
+	PACKAGE_BODY("18", DBIcon.TREE_PACKAGE, XuguPackage.class, new ObjectFinder() {
         @Override
         public XuguPackage findObject(DBRProgressMonitor monitor, XuguSchema schema, String objectName) throws DBException
         {

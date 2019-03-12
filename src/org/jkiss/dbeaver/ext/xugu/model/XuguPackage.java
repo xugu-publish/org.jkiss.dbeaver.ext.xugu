@@ -54,13 +54,23 @@ public class XuguPackage extends XuguSchemaObject
     private boolean valid;
     private String sourceDeclaration;
     private String sourceDefinition;
+    private String spec;
+    private String body;
 
     public XuguPackage(
         XuguSchema schema,
         ResultSet dbResult)
     {
-        super(schema, JDBCUtils.safeGetString(dbResult, "OBJECT_NAME"), true);
-        this.valid = "VALID".equals(JDBCUtils.safeGetString(dbResult, "STATUS"));
+        super(schema, JDBCUtils.safeGetString(dbResult, "PACK_NAME"), true);
+        this.valid = JDBCUtils.safeGetBoolean(dbResult, "VALID");
+        this.sourceDeclaration = JDBCUtils.safeGetString(dbResult, "SPEC");
+        this.sourceDefinition = JDBCUtils.safeGetString(dbResult, "BODY");
+        if(this.sourceDeclaration == null) {
+        	this.sourceDeclaration = "--Null Package header";
+        }
+        if(this.sourceDefinition == null) {
+        	this.sourceDefinition = "-- Null Package header";
+        }
     }
 
     public XuguPackage(XuguSchema schema, String name)
