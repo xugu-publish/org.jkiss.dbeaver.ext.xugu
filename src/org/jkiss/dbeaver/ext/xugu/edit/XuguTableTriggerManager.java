@@ -35,6 +35,8 @@ import org.jkiss.dbeaver.ui.editors.object.struct.EntityEditPage;
 
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * OracleTableTriggerManager
@@ -80,15 +82,22 @@ public class XuguTableTriggerManager extends SQLTriggerManager<XuguTableTrigger,
     protected void createOrReplaceTriggerQuery(List<DBEPersistAction> actions, XuguTableTrigger trigger)
     {
         String source = XuguUtils.normalizeSourceName(trigger, false);
-        if (source == null) {
+        if (source == null || source.equals("")) {
             return;
         }
-        //强制增加CREATE OR REPLACE关键字
-        source = source.toUpperCase();
-        int index = source.indexOf("TRIGGER");
-        source = "CREATE OR REPLACE "+source.substring(index);
-        actions.add(new SQLDatabasePersistAction("Create trigger", source, true)); //$NON-NLS-2$
-        XuguUtils.addSchemaChangeActions(actions, trigger);
+        else{
+        	//强制增加CREATE OR REPLACE关键字
+        	Pattern p = Pattern.compile("(TRIGGER)", Pattern.CASE_INSENSITIVE);
+            Matcher m = p.matcher(source);
+            String keyWord = "TRIGGER";
+            if(m.find()) {
+            	keyWord = m.group(0);
+            }
+            int index = source.indexOf(keyWord);
+            source = "CREATE OR REPLACE TRIGGER "+source.substring(index+8);
+            actions.add(new SQLDatabasePersistAction("Create trigger", source, true)); //$NON-NLS-2$
+            XuguUtils.addSchemaChangeActions(actions, trigger);
+        }
     }
 
 }

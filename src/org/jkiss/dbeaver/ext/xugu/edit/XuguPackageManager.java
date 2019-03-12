@@ -38,6 +38,8 @@ import org.jkiss.utils.CommonUtils;
 
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.text.Utilities;
 
@@ -116,10 +118,21 @@ public class XuguPackageManager extends SQLObjectEditor<XuguPackage, XuguSchema>
         try {
             String header = pack.getObjectDefinitionText(new VoidProgressMonitor(), DBPScriptObject.EMPTY_OPTIONS);
             //对header进行预处理
-            header = header.toUpperCase();
-            String str1 = header.substring(header.indexOf("CREATE")+6, header.indexOf("PACKAGE"));
-            if(str1.indexOf("OR")==-1) {
-            	header = "CREATE OR REPLACE "+header.substring(header.indexOf("PACKAGE"));
+        	//强制增加CREATE OR REPLACE关键字
+        	Pattern p1 = Pattern.compile("(OR)", Pattern.CASE_INSENSITIVE);
+            Matcher m1 = p1.matcher(header);
+            String keyWord1 = "OR";
+            Pattern p2 = Pattern.compile("(PACKAGE)", Pattern.CASE_INSENSITIVE);
+            Matcher m2 = p2.matcher(header);
+            String keyWord2 = "PACKAGE";
+            if(m1.find()) {
+            	keyWord1 = m1.group(0);
+            }
+            if(m2.find()) {
+            	keyWord2 = m2.group(0);
+            }
+            if(header.indexOf(keyWord1)==-1) {
+            	header = "CREATE OR REPLACE PACKAGE "+header.substring(header.indexOf(keyWord2)+8);
             }
             if (!CommonUtils.isEmpty(header)) {
                 actionList.add(
@@ -130,10 +143,19 @@ public class XuguPackageManager extends SQLObjectEditor<XuguPackage, XuguSchema>
             }
             String body = pack.getExtendedDefinitionText(new VoidProgressMonitor());
             //对body进行预处理
-            body = body.toUpperCase();
-            String str2 = body.substring(body.indexOf("CREATE")+6, body.indexOf("PACKAGE"));
-            if(str2.indexOf("OR")==-1) {
-            	body = "CREATE OR REPLACE "+body.substring(body.indexOf("PACKAGE"));
+            //强制增加CREATE OR REPLACE关键字
+        	Pattern p3 = Pattern.compile("(OR)", Pattern.CASE_INSENSITIVE);
+            Matcher m3 = p3.matcher(body);
+            Pattern p4 = Pattern.compile("(PACKAGE)", Pattern.CASE_INSENSITIVE);
+            Matcher m4 = p4.matcher(body);
+            if(m3.find()) {
+            	keyWord1 = m3.group(0);
+            }
+            if(m4.find()) {
+            	keyWord2 = m4.group(0);
+            }
+            if(body.indexOf(keyWord1)==-1) {
+            	body = "CREATE OR REPLACE PACKAGE "+body.substring(body.indexOf(keyWord2)+8);
             }
             if (!CommonUtils.isEmpty(body)) {
                 actionList.add(
