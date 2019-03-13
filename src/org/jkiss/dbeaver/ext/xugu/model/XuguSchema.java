@@ -270,6 +270,12 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         return synonymCache.getAllObjects(monitor, this);
     }
 
+    public XuguSynonym getSynonym(DBRProgressMonitor monitor, String name)
+        throws DBException
+    {
+        return synonymCache.getObject(monitor, this, name, XuguSynonym.class);
+    }
+
     @Association
     public Collection<XuguSchemaTrigger> getTriggers(DBRProgressMonitor monitor)
         throws DBException

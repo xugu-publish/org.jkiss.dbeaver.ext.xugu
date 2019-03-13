@@ -49,21 +49,22 @@ public class XuguSynonym extends XuguSchemaObject implements DBSAlias {
 
     public XuguSynonym(XuguSchema schema, ResultSet dbResult)
     {
-        super(schema, JDBCUtils.safeGetString(dbResult, "SYNO_NAME"), true);
+        super(schema, dbResult!=null?JDBCUtils.safeGetString(dbResult, "SYNO_NAME"):"NEW_SYNO", true);
         //this.objectTypeName = JDBCUtils.safeGetString(dbResult, "OBJECT_TYPE");
-        this.objectDBID = JDBCUtils.safeGetInt(dbResult, "DB_ID");
-        this.objectSchemaID = JDBCUtils.safeGetInt(dbResult, "SCHEMA_ID");
-        this.objectUserID = JDBCUtils.safeGetInt(dbResult, "USER_ID");
-        this.objectName = JDBCUtils.safeGetString(dbResult, "SYNO_NAME");
-        this.targetSchemaID = JDBCUtils.safeGetInt(dbResult, "TARG_SCHE_ID");
-        this.targetName = JDBCUtils.safeGetString(dbResult, "TARG_NAME");
-        this.is_pub = JDBCUtils.safeGetBoolean(dbResult, "IS_PUBLIC");
-        this.valid = JDBCUtils.safeGetBoolean(dbResult, "VALID");
-//        this.deleted = JDBCUtils.safeGetBoolean(dbResult, "DELETED");
-        this.createTime = JDBCUtils.safeGetDate(dbResult, "CREATE_TIME");
-//        this.dbLink = JDBCUtils.safeGetString(dbResult, "DB_LINK");
+        if(dbResult!=null) {
+        	this.objectDBID = JDBCUtils.safeGetInt(dbResult, "DB_ID");
+            this.objectSchemaID = JDBCUtils.safeGetInt(dbResult, "SCHEMA_ID");
+            this.objectUserID = JDBCUtils.safeGetInt(dbResult, "USER_ID");
+            this.objectName = JDBCUtils.safeGetString(dbResult, "SYNO_NAME");
+            this.targetSchemaID = JDBCUtils.safeGetInt(dbResult, "TARG_SCHE_ID");
+            this.targetName = JDBCUtils.safeGetString(dbResult, "TARG_NAME");
+            this.is_pub = JDBCUtils.safeGetBoolean(dbResult, "IS_PUBLIC");
+            this.valid = JDBCUtils.safeGetBoolean(dbResult, "VALID");
+//            this.deleted = JDBCUtils.safeGetBoolean(dbResult, "DELETED");
+            this.createTime = JDBCUtils.safeGetDate(dbResult, "CREATE_TIME");
+//            this.dbLink = JDBCUtils.safeGetString(dbResult, "DB_LINK");
+        }
     }
-
 
     @NotNull
     @Override
@@ -71,6 +72,10 @@ public class XuguSynonym extends XuguSchemaObject implements DBSAlias {
     public String getName()
     {
         return super.getName();
+    }
+    
+    public String getTargetName() {
+    	return targetName;
     }
 
     @Property(viewable = true, order = 3)

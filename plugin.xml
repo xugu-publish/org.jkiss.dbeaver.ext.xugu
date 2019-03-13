@@ -322,6 +322,7 @@
         <manager class="org.jkiss.dbeaver.ext.xugu.edit.XuguPackageManager" objectType="org.jkiss.dbeaver.ext.xugu.model.XuguPackage"/>
         <manager class="org.jkiss.dbeaver.ext.xugu.edit.XuguTableTriggerManager" objectType="org.jkiss.dbeaver.ext.xugu.model.XuguTableTrigger"/>
         <manager class="org.jkiss.dbeaver.ext.xugu.edit.XuguSequenceManager" objectType="org.jkiss.dbeaver.ext.xugu.model.XuguSequence"/>
+    	<manager class="org.jkiss.dbeaver.ext.xugu.edit.XuguSynonymManager" objectType="org.jkiss.dbeaver.ext.xugu.model.XuguSynonym"/>
     	<!--<manager class="org.jkiss.dbeaver.ext.xugu.edit.XuguTablespaceManager" objectType="org.jkiss.dbeaver.ext.xugu.model.XuguTablespace"/>-->
     </extension>
     
