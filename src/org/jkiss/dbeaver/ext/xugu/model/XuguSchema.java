@@ -75,6 +75,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
     private String name;
     private String roleFlag;
     //private Date createTime;
+    private XuguDatabase parent;
     private transient XuguUser user;
 
     public XuguSchema(XuguDataSource dataSource, long id, String name)
@@ -85,6 +86,18 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         this.roleFlag = dataSource.getRoleFlag();
     }
 
+    public XuguSchema(@NotNull XuguDataSource dataSource, XuguDatabase parent, ResultSet dbResult) {
+    	super(dataSource, true);
+    	this.id = JDBCUtils.safeGetLong(dbResult, "SCHEMA_ID");
+        this.name = JDBCUtils.safeGetString(dbResult, "SCHEMA_NAME");
+        this.roleFlag = dataSource.getRoleFlag();
+        this.parent = parent;
+        if (CommonUtils.isEmpty(this.name)) {
+            log.warn("Empty schema name fetched");
+            this.name = "? " + super.hashCode();
+        }
+    }
+    
     public XuguSchema(@NotNull XuguDataSource dataSource, @NotNull ResultSet dbResult)
     {
         super(dataSource, true);
@@ -97,6 +110,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         }
         //this.createTime = JDBCUtils.safeGetTimestamp(dbResult, "CREATED");
     }
+    
 
     public boolean isPublic()
     {

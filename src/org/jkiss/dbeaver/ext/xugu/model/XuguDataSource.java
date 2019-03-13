@@ -43,6 +43,7 @@ import org.jkiss.dbeaver.model.exec.plan.DBCQueryPlanner;
 import org.jkiss.dbeaver.model.impl.jdbc.*;
 import org.jkiss.dbeaver.model.impl.jdbc.cache.JDBCObjectCache;
 import org.jkiss.dbeaver.model.impl.jdbc.cache.JDBCStructCache;
+import org.jkiss.dbeaver.model.impl.jdbc.cache.JDBCStructLookupCache;
 import org.jkiss.dbeaver.model.meta.Association;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.sql.SQLConstants;
@@ -70,6 +71,7 @@ public class XuguDataSource extends JDBCDataSource
     private static final Log log = Log.getLog(XuguDataSource.class);
 
     final public SchemaCache schemaCache = new SchemaCache();
+    final public DatabaseCache databaseCache = new DatabaseCache();
     final DataTypeCache dataTypeCache = new DataTypeCache();
     
     private final TablespaceCache tablespaceCache = new TablespaceCache();
@@ -291,12 +293,23 @@ public class XuguDataSource extends JDBCDataSource
     public String getRoleFlag() {
     	return this.roleFlag;
     }
+
+    @Association
+    public Collection<XuguDatabase> getDatabases(DBRProgressMonitor monitor) throws DBException {
+        return databaseCache.getAllObjects(monitor, this);
+    }
+    
+    @Association
+    public XuguDatabase getDatabase(DBRProgressMonitor monitor, String name) throws DBException {
+        return databaseCache.getObject(monitor, this, name);
+    }
     
     @Association
     public Collection<XuguSchema> getSchemas(DBRProgressMonitor monitor) throws DBException {
         return schemaCache.getAllObjects(monitor, this);
     }
 
+    @Association
     public XuguSchema getSchema(DBRProgressMonitor monitor, String name) throws DBException {
         if (publicSchema != null && publicSchema.getName().equals(name)) {
         	System.out.println("inhere 2");
@@ -395,10 +408,10 @@ public class XuguDataSource extends JDBCDataSource
         {
             try (JDBCSession session = DBUtils.openMetaSession(monitor, this, "Load data source meta info")) {
                 // Get active schema
-                this.activeSchemaName = XuguUtils.getCurrentSchema(session, this.userRole);
-                if (this.activeSchemaName != null) {
-                    if (this.activeSchemaName.isEmpty()) {
-                        this.activeSchemaName = null;
+                this.setActiveSchemaName(XuguUtils.getCurrentSchema(session, this.userRole));
+                if (this.getActiveSchemaName() != null) {
+                    if (this.getActiveSchemaName().isEmpty()) {
+                        this.setActiveSchemaName(null);
                     }
                 }
 
@@ -424,7 +437,12 @@ public class XuguDataSource extends JDBCDataSource
         }
     }
 
-    @Override
+    private void setActiveSchemaName(String currentSchema) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
     public DBSObject refreshObject(@NotNull DBRProgressMonitor monitor)
         throws DBException {
         super.refreshObject(monitor);
@@ -435,7 +453,7 @@ public class XuguDataSource extends JDBCDataSource
         this.userCache.clearCache();
         this.profileCache.clearCache();
         this.roleCache.clearCache();
-        this.activeSchemaName = null;
+        this.setActiveSchemaName(null);
 
         this.initialize(monitor);
 
@@ -474,7 +492,7 @@ public class XuguDataSource extends JDBCDataSource
     @Nullable
     @Override
     public XuguSchema getDefaultObject() {
-        return activeSchemaName == null ? null : schemaCache.getCachedObject(activeSchemaName);
+        return getActiveSchemaName() == null ? null : schemaCache.getCachedObject(getActiveSchemaName());
     }
 
     @Override
@@ -487,13 +505,13 @@ public class XuguDataSource extends JDBCDataSource
         for (JDBCExecutionContext context : getDefaultInstance().getAllContexts()) {
             setCurrentSchema(monitor, context, (XuguSchema) object);
         }
-        activeSchemaName = object.getName();
+        setActiveSchemaName(object.getName());
 
         // Send notifications
         if (oldSelectedEntity != null) {
             DBUtils.fireObjectSelect(oldSelectedEntity, false);
         }
-        if (this.activeSchemaName != null) {
+        if (this.getActiveSchemaName() != null) {
             DBUtils.fireObjectSelect(object, true);
         }
     }
@@ -502,7 +520,7 @@ public class XuguDataSource extends JDBCDataSource
     public boolean refreshDefaultObject(@NotNull DBCSession session) throws DBException {
         try {
             final String currentSchema = XuguUtils.getCurrentSchema((JDBCSession) session, this.userRole);
-            if (currentSchema != null && !CommonUtils.equalObjects(currentSchema, activeSchemaName)) {
+            if (currentSchema != null && !CommonUtils.equalObjects(currentSchema, getActiveSchemaName())) {
                 final XuguSchema newSchema = schemaCache.getCachedObject(currentSchema);
                 if (newSchema != null) {
                     setDefaultObject(session.getProgressMonitor(), newSchema);
@@ -799,6 +817,50 @@ public class XuguDataSource extends JDBCDataSource
         }
     }
 
+    static class DatabaseCache extends JDBCStructLookupCache<XuguDataSource, XuguDatabase, XuguSchema> {
+        
+        public DatabaseCache() {
+			super("DATABASE_NAME");
+		}
+        
+        @Override
+		public JDBCStatement prepareLookupStatement(JDBCSession session, XuguDataSource owner, XuguDatabase object,
+				String objectName) throws SQLException {
+			return session.prepareStatement(
+	                "SELECT * FROM "+owner.roleFlag+"_DATABASES");
+		}
+        
+        @Override
+        protected XuguDatabase fetchObject(@NotNull JDBCSession session, @NotNull XuguDataSource owner, @NotNull JDBCResultSet resultSet) throws SQLException, DBException {
+            return new XuguDatabase(owner, resultSet);
+        }
+
+		@Override
+		protected JDBCStatement prepareChildrenStatement(JDBCSession session, XuguDataSource owner,
+				XuguDatabase forDB) throws SQLException {
+			//xfc 修改了获取列信息的sql
+            StringBuilder sql = new StringBuilder(500);
+            sql.append("SELECT * FROM ");
+        	sql.append(owner.roleFlag);
+        	sql.append("_SCHEMAS");
+        	if (forDB != null) {
+                sql.append(" where DB_ID=(SELECT DB_ID FROM ");
+                sql.append(owner.roleFlag);
+                sql.append("_DATABASES WHERE DB_NAME='");
+                sql.append(forDB.getName());
+                sql.append("')");
+            }
+        	JDBCStatement dbStat = session.prepareStatement(sql.toString());
+			return dbStat;
+		}
+
+		@Override
+		protected XuguSchema fetchChild(JDBCSession session, XuguDataSource owner, XuguDatabase db,
+				JDBCResultSet dbResult) throws SQLException, DBException {
+			return new XuguSchema(owner, db, dbResult);
+		}
+    }
+    
     static class SchemaCache extends JDBCObjectCache<XuguDataSource, XuguSchema> {
         SchemaCache() {
             setListOrderComparator(DBUtils.<XuguSchema>nameComparator());
@@ -810,13 +872,10 @@ public class XuguDataSource extends JDBCDataSource
 
             //过滤条件
             DBSObjectFilter schemaFilters = owner.getContainer().getObjectFilter(XuguSchema.class, null, false);
-            
-            if (!CommonUtils.isEmpty(owner.activeSchemaName)) {
-            	//xfc 根据owner的用户角色选取不同的语句来查询schema
-            	schemasQuery.append("SELECT * FROM ");
-            	schemasQuery.append(owner.roleFlag);
-            	schemasQuery.append("_SCHEMAS");
-            }
+        	//xfc 根据owner的用户角色选取不同的语句来查询schema
+        	schemasQuery.append("SELECT * FROM ");
+        	schemasQuery.append(owner.roleFlag);
+        	schemasQuery.append("_SCHEMAS");
             System.out.println("QQQQQQ "+schemasQuery.toString());
             JDBCPreparedStatement dbStat = session.prepareStatement(schemasQuery.toString());
             if (schemaFilters != null) {
@@ -836,12 +895,13 @@ public class XuguDataSource extends JDBCDataSource
         protected void invalidateObjects(DBRProgressMonitor monitor, XuguDataSource owner, Iterator<XuguSchema> objectIter) {
             setListOrderComparator(DBUtils.<XuguSchema>nameComparator());
             // Add predefined types
-            if (!CommonUtils.isEmpty(owner.activeSchemaName) && getCachedObject(owner.activeSchemaName) == null) {
+            if (!CommonUtils.isEmpty(owner.getActiveSchemaName()) && getCachedObject(owner.getActiveSchemaName()) == null) {
                 cacheObject(
-                    new XuguSchema(owner, 100, owner.activeSchemaName));
+                    new XuguSchema(owner, 100, owner.getActiveSchemaName()));
             }
         }
     }
+    
     
     static class DataTypeCache extends JDBCObjectCache<XuguDataSource, XuguDataType> {
         @Override
@@ -949,6 +1009,10 @@ public class XuguDataSource extends JDBCDataSource
 
 	public TablespaceCache getTablespaceCache() {
 		return tablespaceCache;
+	}
+
+	public String getActiveSchemaName() {
+		return activeSchemaName;
 	}
     
 }
