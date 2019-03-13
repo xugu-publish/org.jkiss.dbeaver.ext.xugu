@@ -124,6 +124,7 @@ public class XuguTablespace extends XuguGlobalObject
     private int dataFile_Num;
     private String space_Type;
     private boolean media_Error;
+    private String filePath;
     
     public XuguTablespace(XuguDataSource dataSource, String tsName) throws SQLException
     {
@@ -197,191 +198,6 @@ public class XuguTablespace extends XuguGlobalObject
     {
         return media_Error;
     }
-    
-//    @Property(viewable = true, order = 4)
-//    public Long getAvailableSize(DBRProgressMonitor monitor) throws DBException {
-//        if (availableSize == null) {
-//            loadSizes(monitor);
-//        }
-//        return availableSize;
-//    }
-//
-//    @Property(viewable = true, order = 5)
-//    public Long getUsedSize(DBRProgressMonitor monitor) throws DBException {
-//        if (usedSize == null) {
-//            loadSizes(monitor);
-//        }
-//        return usedSize;
-//    }
-//
-//    @Property(viewable = true, editable = true, order = 22)
-//    public long getBlockSize()
-//    {
-//        return blockSize;
-//    }
-//
-//    @Property(editable = true, order = 23)
-//    public long getInitialExtent()
-//    {
-//        return initialExtent;
-//    }
-//
-//    @Property(editable = true, order = 24)
-//    public long getNextExtent()
-//    {
-//        return nextExtent;
-//    }
-//
-//    @Property(editable = true, order = 25)
-//    public long getMinExtents()
-//    {
-//        return minExtents;
-//    }
-//
-//    @Property(editable = true, order = 26)
-//    public long getMaxExtents()
-//    {
-//        return maxExtents;
-//    }
-//
-//    @Property(editable = true, order = 27)
-//    public long getPctIncrease()
-//    {
-//        return pctIncrease;
-//    }
-//
-//    @Property(editable = true, order = 28)
-//    public long getMinExtLen()
-//    {
-//        return minExtLen;
-//    }
-//
-//    @Property(viewable = true, editable = true, order = 29)
-//    public Status getStatus()
-//    {
-//        return status;
-//    }
-//
-//    @Property(editable = true, order = 30)
-//    public Contents getContents()
-//    {
-//        return contents;
-//    }
-//
-//    @Property(editable = true, order = 31)
-//    public Logging isLogging()
-//    {
-//        return logging;
-//    }
-//
-//    @Property(editable = true, order = 32)
-//    public boolean isForceLogging()
-//    {
-//        return forceLogging;
-//    }
-//
-//    @Property(editable = true, order = 33)
-//    public ExtentManagement getExtentManagement()
-//    {
-//        return extentManagement;
-//    }
-//
-//    @Property(editable = true, order = 34)
-//    public AllocationType getAllocationType()
-//    {
-//        return allocationType;
-//    }
-//
-//    @Property(editable = true, order = 35)
-//    public boolean isPluggedIn()
-//    {
-//        return pluggedIn;
-//    }
-//
-//    @Property(editable = true, order = 36)
-//    public SegmentSpaceManagement getSegmentSpaceManagement()
-//    {
-//        return segmentSpaceManagement;
-//    }
-//
-//    @Property(editable = true, order = 37)
-//    public boolean isDefTableCompression()
-//    {
-//        return defTableCompression;
-//    }
-//
-//    @Property(editable = true, order = 38)
-//    public Retention getRetention()
-//    {
-//        return retention;
-//    }
-//
-//    @Property(editable = true, order = 39)
-//    public boolean isBigFile()
-//    {
-//        return bigFile;
-//    }
-//
-//    @Association
-//    public Collection<XuguDataFile> getFiles(DBRProgressMonitor monitor) throws DBException
-//    {
-//        return fileCache.getAllObjects(monitor, this);
-//    }
-//
-//    public XuguDataFile getFile(DBRProgressMonitor monitor, long relativeFileNo) throws DBException
-//    {
-//        for (XuguDataFile file : fileCache.getAllObjects(monitor, this)) {
-//            if (file.getRelativeNo() == relativeFileNo) {
-//                return file;
-//            }
-//        }
-//        return null;
-//    }
-//
-//    @Association
-//    public Collection<XuguSegment<XuguTablespace>> getSegments(DBRProgressMonitor monitor) throws DBException
-//    {
-//        return segmentCache.getAllObjects(monitor, this);
-//    }
-//
-//    @Override
-//    public DBSObject refreshObject(@NotNull DBRProgressMonitor monitor) throws DBException
-//    {
-//        fileCache.clearCache();
-//        segmentCache.clearCache();
-//        return this;
-//    }
-//
-//    private void loadSizes(DBRProgressMonitor monitor) throws DBException {
-//        try (final JDBCSession session = DBUtils.openMetaSession(monitor, this, "Load tablespace '" + getName() + "' statistics")) {
-//            availableSize = CommonUtils.toLong(JDBCUtils.queryObject(session,
-//                "SELECT SUM(F.BYTES) AVAILABLE_SPACE FROM SYS.DBA_DATA_FILES F WHERE F.TABLESPACE_NAME=?", getName()));
-//            usedSize = CommonUtils.toLong(JDBCUtils.queryObject(session,
-//                "SELECT SUM(S.BYTES) USED_SPACE FROM SYS.DBA_SEGMENTS S WHERE S.TABLESPACE_NAME=?", getName()));
-//        } catch (SQLException e) {
-//            throw new DBException("Can't read tablespace statistics", e, getDataSource());
-//        }
-//    }
-
-
-//    static class FileCache extends JDBCObjectCache<XuguTablespace, XuguDataFile> {
-//        @Override
-//        protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguTablespace owner) throws SQLException
-//        {
-//            final JDBCPreparedStatement dbStat = session.prepareStatement(
-//                "SELECT * FROM SYS.DBA_" +
-//                    (owner.getContents() == Contents.TEMPORARY ? "TEMP" : "DATA") +
-//                    "_FILES WHERE TABLESPACE_NAME=? ORDER BY FILE_NAME");
-//            dbStat.setString(1, owner.getName());
-//            return dbStat;
-//        }
-//
-//        @Override
-//        protected XuguDataFile fetchObject(@NotNull JDBCSession session, @NotNull XuguTablespace owner, @NotNull JDBCResultSet resultSet) throws SQLException, DBException
-//        {
-//            return new XuguDataFile(owner, resultSet, owner.getContents() == Contents.TEMPORARY);
-//        }
-//    }
 
     static class SegmentCache extends JDBCObjectCache<XuguTablespace, XuguSegment<XuguTablespace>> {
         @Override
@@ -456,7 +272,7 @@ public class XuguTablespace extends XuguGlobalObject
 	@Override
 	public void setName(String name) {
 		// TODO Auto-generated method stub
-		
+		this.name = name;
 	}
 	@Override
 	public void setObjectDefinitionText(String source) {
@@ -472,6 +288,19 @@ public class XuguTablespace extends XuguGlobalObject
 	public DBEPersistAction[] getCompileActions() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	public String getFilePath() {
+		return filePath;
+	}
+	
+	public void setFilePath(String path) {
+		// TODO Auto-generated method stub
+		filePath = path;
+	}
+	
+	public void setNodeID(int id) {
+		this.nodeID = id;
 	}
 
 }
