@@ -54,7 +54,7 @@ import java.util.Map;
 /**
  * OracleSchemaManager
  */
-public class XuguSchemaManager extends SQLObjectEditor<XuguSchema, XuguDatabase> implements DBEObjectRenamer<XuguSchema> {
+public class XuguSchemaManager extends SQLObjectEditor<XuguSchema, XuguDataSource> implements DBEObjectRenamer<XuguSchema> {
 
     @Override
     public long getMakerOptions(DBPDataSource dataSource)
@@ -70,16 +70,16 @@ public class XuguSchemaManager extends SQLObjectEditor<XuguSchema, XuguDatabase>
     }
 
     @Override
-    protected XuguSchema createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final XuguDatabase parent, Object copyFrom)
+    protected XuguSchema createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final XuguDataSource parent, Object copyFrom)
     {
         return new UITask<XuguSchema>() {
             @Override
             protected XuguSchema runTask() {
-                NewUserDialog dialog = new NewUserDialog(UIUtils.getActiveWorkbenchShell(), parent.getDataSource());
+                NewUserDialog dialog = new NewUserDialog(UIUtils.getActiveWorkbenchShell(), parent);
                 if (dialog.open() != IDialogConstants.OK_ID) {
                     return null;
                 }
-                XuguSchema newSchema = new XuguSchema(parent.getDataSource(), -1, dialog.getSchema().getName());
+                XuguSchema newSchema = new XuguSchema(parent, -1, dialog.getSchema().getName());
                 newSchema.setUser(dialog.getUser());
                 return newSchema;
             }

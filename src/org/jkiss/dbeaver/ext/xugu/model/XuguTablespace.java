@@ -50,7 +50,6 @@ import java.util.Map;
  */
 //public class XuguTablespace extends XuguGlobalObject implements DBPRefreshableObject
 public class XuguTablespace extends XuguGlobalObject
-	implements DBPScriptObjectExt, XuguSourceObject
 {
 
     public enum Status {
@@ -239,56 +238,22 @@ public class XuguTablespace extends XuguGlobalObject
         }
     }
     
-    @Override
-    @Property(hidden = true, editable = true, updatable = true, order = -1)
-    public String getObjectDefinitionText(DBRProgressMonitor monitor, Map<String, Object> options) throws DBCException
-    {
-    	String sourceDeclaration = "";
-        if ( monitor != null) {
-            sourceDeclaration = XuguUtils.getSource(monitor, this, false, true);
-        }
-        return sourceDeclaration;
-    }
-	@Override
-	public String getExtendedDefinitionText(DBRProgressMonitor monitor) throws DBException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	@Override
-	public XuguSchema getSchema() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	@Override
-	public DBSObjectState getObjectState() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	@Override
-	public void refreshObjectState(DBRProgressMonitor monitor) throws DBCException {
-		// TODO Auto-generated method stub
-		
-	}
-	@Override
+
 	public void setName(String name) {
 		// TODO Auto-generated method stub
 		this.name = name;
 	}
-	@Override
-	public void setObjectDefinitionText(String source) {
-		// TODO Auto-generated method stub
-		
-	}
-	@Override
-	public XuguSourceType getSourceType() {
-		// TODO Auto-generated method stub
-		return XuguSourceType.TABLESPACE;
-	}
-	@Override
-	public DBEPersistAction[] getCompileActions() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+
+//	@Override
+//	public XuguSourceType getSourceType() {
+//		// TODO Auto-generated method stub
+//		return XuguSourceType.TABLESPACE;
+//	}
+//	@Override
+//	public DBEPersistAction[] getCompileActions() {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
 	
 	public String getFilePath() {
 		return filePath;
