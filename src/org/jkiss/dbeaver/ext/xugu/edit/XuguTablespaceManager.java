@@ -88,6 +88,7 @@ public class XuguTablespaceManager extends SQLObjectEditor<XuguTablespace, XuguD
             new SQLDatabasePersistAction("Drop Tablespace",
                 "DROP TABLESPACE " + DBUtils.getQuotedIdentifier(command.getObject())) //$NON-NLS-2$
         );
+        System.out.println("do drop?" + "DROP TABLESPACE " + DBUtils.getQuotedIdentifier(command.getObject()));
     }
     
     @Override

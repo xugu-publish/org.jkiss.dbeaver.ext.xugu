@@ -282,7 +282,7 @@ public class XuguTablespace extends XuguGlobalObject
 	@Override
 	public XuguSourceType getSourceType() {
 		// TODO Auto-generated method stub
-		return null;
+		return XuguSourceType.TABLESPACE;
 	}
 	@Override
 	public DBEPersistAction[] getCompileActions() {

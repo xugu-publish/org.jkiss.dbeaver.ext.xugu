@@ -21,6 +21,7 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -29,6 +30,7 @@ import org.eclipse.swt.widgets.Text;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.ext.xugu.model.XuguDataSource;
+import org.jkiss.dbeaver.ext.xugu.model.XuguDatabase;
 import org.jkiss.dbeaver.ext.xugu.model.XuguSchema;
 import org.jkiss.dbeaver.ext.xugu.model.XuguUser;
 import org.jkiss.dbeaver.model.DBPDataSource;
@@ -52,7 +54,7 @@ import java.util.Map;
 /**
  * OracleSchemaManager
  */
-public class XuguSchemaManager extends SQLObjectEditor<XuguSchema, XuguDataSource> implements DBEObjectRenamer<XuguSchema> {
+public class XuguSchemaManager extends SQLObjectEditor<XuguSchema, XuguDatabase> implements DBEObjectRenamer<XuguSchema> {
 
     @Override
     public long getMakerOptions(DBPDataSource dataSource)
@@ -68,16 +70,16 @@ public class XuguSchemaManager extends SQLObjectEditor<XuguSchema, XuguDataSourc
     }
 
     @Override
-    protected XuguSchema createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final XuguDataSource parent, Object copyFrom)
+    protected XuguSchema createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final XuguDatabase parent, Object copyFrom)
     {
         return new UITask<XuguSchema>() {
             @Override
             protected XuguSchema runTask() {
-                NewUserDialog dialog = new NewUserDialog(UIUtils.getActiveWorkbenchShell(), parent);
+                NewUserDialog dialog = new NewUserDialog(UIUtils.getActiveWorkbenchShell(), parent.getDataSource());
                 if (dialog.open() != IDialogConstants.OK_ID) {
                     return null;
                 }
-                XuguSchema newSchema = new XuguSchema(parent, -1, dialog.getSchema().getName());
+                XuguSchema newSchema = new XuguSchema(parent.getDataSource(), -1, dialog.getSchema().getName());
                 newSchema.setUser(dialog.getUser());
                 return newSchema;
             }
@@ -141,6 +143,11 @@ public class XuguSchemaManager extends SQLObjectEditor<XuguSchema, XuguDataSourc
             return true;
         }
 
+        @Override
+        protected Point getInitialSize() {
+        	return new Point(300,200);
+        }
+        
         @Override
         protected Control createDialogArea(Composite parent)
         {

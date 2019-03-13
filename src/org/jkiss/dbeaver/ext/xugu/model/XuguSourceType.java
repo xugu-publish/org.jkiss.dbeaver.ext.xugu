@@ -27,6 +27,7 @@ public enum XuguSourceType {
     FUNCTION(false),
     PACKAGE(false),
     TRIGGER(false),
+    TABLESPACE(false),
     VIEW(true),
     MATERIALIZED_VIEW(true);
 
