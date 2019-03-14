@@ -164,7 +164,7 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
             try (JDBCSession session = DBUtils.openMetaSession(monitor, this, "Load table comments")) {
                 comment = JDBCUtils.queryString(
                     session,
-                    "SELECT COMMENTS FROM ALL_TABLES WHERE TABLE_NAME=? AND TABLE_TYPE=?",
+                    "SELECT COMMENTS FROM "+this.getDataSource().getRoleFlag()+"_TABLES WHERE TABLE_NAME=? AND TABLE_TYPE=?",
                     getName(),
                     tableType);
                 if (comment == null) {
@@ -181,7 +181,7 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
     void loadColumnComments(DBRProgressMonitor monitor) {
         try {
             try (JDBCSession session = DBUtils.openMetaSession(monitor, this, "Load table column comments")) {
-                try (JDBCPreparedStatement stat = session.prepareStatement("SELECT COL_NAME,COMMENTS FROM ALL_COLUMNS cc WHERE cc.TABLE_ID=(SELECT TABLE_ID FROM ALL_TABLES WHERE TABLE_NAME=?)")) {
+                try (JDBCPreparedStatement stat = session.prepareStatement("SELECT COL_NAME,COMMENTS FROM "+this.getDataSource().getRoleFlag()+"_COLUMNS cc WHERE cc.TABLE_ID=(SELECT TABLE_ID FROM "+this.getDataSource().getRoleFlag()+"_TABLES WHERE TABLE_NAME=?)")) {
                     stat.setString(1, getName());
                     try (JDBCResultSet resultSet = stat.executeQuery()) {
                         while (resultSet.next()) {
@@ -329,9 +329,9 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
         {
             JDBCPreparedStatement dbStat = session.prepareStatement(
                 "SELECT *, tr.OBJ_ID AS TABLE_ID\n" +
-                    "FROM " + XuguUtils.getAdminAllViewPrefix(session.getProgressMonitor(), owner.getDataSource(), "TRIGGERS tr") + 
-                    " WHERE SCHEMA_ID=(SELECT SCHEMA_ID FROM ALL_SCHEMAS WHERE SCHEMA_NAME=?) AND "
-                    + "TABLE_ID=(SELECT TABLE_ID FROM ALL_TABLES WHERE TABLE_NAME=?)\n" +
+                    "FROM " + owner.getDataSource().getRoleFlag()+"_TRIGGERS tr" + 
+                    " WHERE SCHEMA_ID=(SELECT SCHEMA_ID FROM "+owner.getDataSource().getRoleFlag()+"_SCHEMAS WHERE SCHEMA_NAME=?) AND "
+                    + "TABLE_ID=(SELECT TABLE_ID FROM "+owner.getDataSource().getRoleFlag()+"_TABLES WHERE TABLE_NAME=?)\n" +
                     "ORDER BY TRIG_NAME");
             dbStat.setString(1, owner.getSchema().getName());
             dbStat.setString(2, owner.getName());
@@ -352,8 +352,8 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
         	int i1 = cols.indexOf(" OF ");
         	int i2 = cols.indexOf(" ON ");
         	StringBuilder sql = new StringBuilder();
-        	sql.append("SELECT * FROM ALL_COLUMNS WHERE ");
-    		sql.append("TABLE_ID=(SELECT TABLE_ID FROM ALL_TABLES WHERE TABLE_NAME='");
+        	sql.append("SELECT * FROM "+ owner.getDataSource().getRoleFlag() +"_COLUMNS WHERE ");
+    		sql.append("TABLE_ID=(SELECT TABLE_ID FROM " + owner.getDataSource().getRoleFlag() + "_TABLES WHERE TABLE_NAME='");
     		sql.append(owner.getName());
     		sql.append("' AND SCHEMA_ID='");
     		sql.append(owner.getSchema().getId());
@@ -362,7 +362,6 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
         	if(i1!=-1) {
         		cols = cols.substring(i1+4, i2);
         		String[] col = cols.split(",");
-        		
         		sql.append(" AND COL_NAME IN(");
         		for(int i=0; i<col.length; i++) {
         			sql.append("'");
