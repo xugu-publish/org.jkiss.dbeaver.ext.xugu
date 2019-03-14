@@ -48,8 +48,8 @@ import java.util.Map;
 /**
  * Xugu tablespace
  */
-//public class XuguTablespace extends XuguGlobalObject implements DBPRefreshableObject
-public class XuguTablespace extends XuguGlobalObject
+public class XuguTablespace extends XuguGlobalObject implements DBPRefreshableObject
+//public class XuguTablespace extends XuguGlobalObject
 {
 
     public enum Status {
@@ -92,30 +92,7 @@ public class XuguTablespace extends XuguGlobalObject
 
     private String name;
     private XuguDataFile file;
-    
-//    private long blockSize;
-//    private long initialExtent;
-//    private long nextExtent;
-//    private long minExtents;
-//    private long maxExtents;
-//    private long pctIncrease;
-//    private long minExtLen;
-//    private Status status;
-//    private Contents contents;
-//    private Logging logging;
-//    private boolean forceLogging;
-//    private ExtentManagement extentManagement;
-//    private AllocationType allocationType;
-//    private boolean pluggedIn;
-//    private SegmentSpaceManagement segmentSpaceManagement;
-//    private boolean defTableCompression;
-//    private Retention retention;
-//    private boolean bigFile;
-//    private volatile Long availableSize;
-//    private volatile Long usedSize;
-//
     final FileCache fileCache = new FileCache();
-//    final SegmentCache segmentCache = new SegmentCache();
 
     private int nodeID;
     private long space_ID;
@@ -129,6 +106,7 @@ public class XuguTablespace extends XuguGlobalObject
     	super(dataSource, true);
     	this.name = tsName;
     }
+    
     protected XuguTablespace(XuguDataSource dataSource, ResultSet dbResult) throws SQLException
     {
         super(dataSource, true);
@@ -139,24 +117,6 @@ public class XuguTablespace extends XuguGlobalObject
         this.dataFile_Num = JDBCUtils.safeGetInt(dbResult, "DATAFILE_NUM");
         this.space_Type = JDBCUtils.safeGetString(dbResult, "SPACE_TYPE");
         this.media_Error = JDBCUtils.safeGetBoolean(dbResult, "MEDIA_ERROR");
-//        this.blockSize = JDBCUtils.safeGetLong(dbResult, "BLOCK_SIZE");
-//        this.initialExtent = JDBCUtils.safeGetLong(dbResult, "INITIAL_EXTENT");
-//        this.nextExtent = JDBCUtils.safeGetLong(dbResult, "NEXT_EXTENT");
-//        this.minExtents = JDBCUtils.safeGetLong(dbResult, "MIN_EXTENTS");
-//        this.maxExtents = JDBCUtils.safeGetLong(dbResult, "MAX_EXTENTS");
-//        this.pctIncrease = JDBCUtils.safeGetLong(dbResult, "PCT_INCREASE");
-//        this.minExtLen = JDBCUtils.safeGetLong(dbResult, "MIN_EXTLEN");
-//        this.status = CommonUtils.valueOf(Status.class, JDBCUtils.safeGetString(dbResult, "STATUS"), true);
-//        this.contents = CommonUtils.valueOf(Contents.class, JDBCUtils.safeGetString(dbResult, "CONTENTS"), true);
-//        this.logging = CommonUtils.valueOf(Logging.class, JDBCUtils.safeGetString(dbResult, "LOGGING"), true);
-//        this.forceLogging = JDBCUtils.safeGetBoolean(dbResult, "FORCE_LOGGING", "Y");
-//        this.extentManagement = CommonUtils.valueOf(ExtentManagement.class, JDBCUtils.safeGetString(dbResult, "EXTENT_MANAGEMENT"), true);
-//        this.allocationType = CommonUtils.valueOf(AllocationType.class, JDBCUtils.safeGetString(dbResult, "ALLOCATION_TYPE"), true);
-//        this.pluggedIn = JDBCUtils.safeGetBoolean(dbResult, "PLUGGED_IN", "Y");
-//        this.segmentSpaceManagement = CommonUtils.valueOf(SegmentSpaceManagement.class, JDBCUtils.safeGetString(dbResult, "SEGMENT_SPACE_MANAGEMENT"), true);
-//        this.defTableCompression = "ENABLED".equals(JDBCUtils.safeGetString(dbResult, "DEF_TAB_COMPRESSION"));
-//        this.retention = CommonUtils.valueOf(Retention.class, JDBCUtils.safeGetString(dbResult, "RETENTION"), true);
-//        this.bigFile = JDBCUtils.safeGetBoolean(dbResult, "BIGFILE", "Y");
     }
 
     static class FileCache extends JDBCObjectCache<XuguTablespace, XuguDataFile> {
@@ -296,4 +256,10 @@ public class XuguTablespace extends XuguGlobalObject
     {
         return file;
     }
+
+	@Override
+	public DBSObject refreshObject(DBRProgressMonitor monitor) throws DBException {
+		fileCache.clearCache();
+		return this;
+	}
 }

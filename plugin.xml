@@ -40,8 +40,7 @@
                     <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguDatabase" label="%tree.databases.node.name" icon="#folder_user" description="Databases">
                     	<items label="%tree.database.node.name" path="database" property="databases" icon="#database">
                     	</items>
-                    </folder>
-                    
+                    </folder>                    
                     <!--模式-->
 		            <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguSchema" label="%tree.schemas.node.name" icon="#folder_schema" description="Database schemas">
 		            	<items label="%tree.schema.node.name" path="schema" property="schemas" icon="#schema">
@@ -161,7 +160,20 @@
                         	</folder>  			
 		                </items>
 		            </folder>
-                    
+                    <!--存储管理-->
+        			<!--表空间-->
+                	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguTablespace" label="%tree.tablespaces.node.name" icon="#tablespaces" description="Tablespaces">
+                    	<items label="%tree.tablespace.node.name" path="tablespace" property="tablespaces" icon="#tablespace">
+                        	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguDataFile" label="%tree.files.node.name" icon="#files" description="Data Files">
+                            	<items label="%tree.file.node.name" path="file" property="files" icon="#file"/>
+                        	</folder>
+                        	<!--
+                        	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguSegment" label="%tree.objects.node.name" icon="#segments" description="Objects (segments)">
+                            	<items label="%tree.segment.node.name" path="segment" property="segments" icon="#segment"/>
+                        	</folder>
+                        	-->
+                    	</items>
+                	</folder>
                     <!--全局元信息-->
 		       		<folder type="org.jkiss.dbeaver.model.struct.DBSObject" label="%tree.global_metadata.node.name" icon="#logical" description="Global metadata objects">
                     	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguDataType" label="%tree.types.node.name" icon="#data_types" description="Types">
@@ -176,19 +188,6 @@
                     	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguRecycledObject" label="%tree.user_recycle_bin.node.name" icon="#recycle_bin" description="Current user's recycle bin">
                         	<items label="%tree.recycled_object.node.name" path="object" property="userRecycledObjects" icon="#recycle_bin"/>
                     	</folder>
-                	</folder>
-                	<!--表空间-->
-                	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguTablespace" label="%tree.tablespaces.node.name" icon="#tablespaces" description="Tablespaces">
-                    	<items label="%tree.tablespace.node.name" path="tablespace" property="tablespaces" icon="#tablespace">
-                        	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguDataFile" label="%tree.files.node.name" icon="#files" description="Data Files">
-                            	<items label="%tree.file.node.name" path="file" property="files" icon="#file"/>
-                        	</folder>
-                        	<!--
-                        	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguSegment" label="%tree.objects.node.name" icon="#segments" description="Objects (segments)">
-                            	<items label="%tree.segment.node.name" path="segment" property="segments" icon="#segment"/>
-                        	</folder>
-                        	-->
-                    	</items>
                 	</folder>
                 	<!--安全管理-->
                 	<folder type="org.jkiss.dbeaver.model.struct.DBSObject" label="%tree.security.node.name" icon="#security" description="Security management">

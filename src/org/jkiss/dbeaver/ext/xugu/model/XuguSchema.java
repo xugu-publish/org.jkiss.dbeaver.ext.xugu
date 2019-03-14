@@ -47,7 +47,7 @@ import java.sql.SQLException;
 import java.util.*;
 
 /**
- * OracleSchema
+ * XuguSchema
  */
 public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefreshableObject, DBPSystemObject, DBSProcedureContainer
 {
