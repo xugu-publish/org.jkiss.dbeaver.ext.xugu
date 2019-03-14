@@ -12,6 +12,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.ext.xugu.XuguMessages;
 import org.jkiss.dbeaver.ext.xugu.model.XuguSchema;
 import org.jkiss.dbeaver.ext.xugu.model.XuguSynonym;
 import org.jkiss.dbeaver.model.DBPDataSource;
@@ -110,19 +111,19 @@ public class XuguSynonymManager extends SQLObjectEditor<XuguSynonym, XuguSchema>
         @Override
         protected Control createDialogArea(Composite parent)
         {
-            getShell().setText("Set synonym properties");
+            getShell().setText(XuguMessages.dialog_synonym_create_title);
 
             Control container = super.createDialogArea(parent);
             Composite composite = UIUtils.createPlaceholder((Composite) container, 2, 5);
             composite.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-            nameText = UIUtils.createLabelText(composite, "Synonym Name", null);
+            nameText = UIUtils.createLabelText(composite, XuguMessages.dialog_synonym_name, null);
             nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             
-            tarNameText = UIUtils.createLabelText(composite, "Target Name", null);
+            tarNameText = UIUtils.createLabelText(composite, XuguMessages.dialog_synonym_target, null);
             tarNameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-            UIUtils.createInfoLabel(composite, "Creating a synonym.", GridData.FILL_HORIZONTAL, 2);
+            UIUtils.createInfoLabel(composite, XuguMessages.dialog_synonym_create_info, GridData.FILL_HORIZONTAL, 2);
 
             return parent;
         }

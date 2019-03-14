@@ -28,6 +28,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.ext.xugu.XuguMessages;
 import org.jkiss.dbeaver.ext.xugu.edit.XuguSchemaManager.NewUserDialog;
 import org.jkiss.dbeaver.ext.xugu.model.XuguDataSource;
 import org.jkiss.dbeaver.ext.xugu.model.XuguDatabase;
@@ -126,22 +127,22 @@ public class XuguDatabaseManager extends SQLObjectEditor<XuguDatabase, XuguDataS
 
         @Override
         protected Point getInitialSize() {
-        	return new Point(300, 150);
+        	return new Point(300, 170);
         }
         
         @Override
         protected Control createDialogArea(Composite parent)
         {
-            getShell().setText("Set database properties");
+            getShell().setText(XuguMessages.dialog_database_create_title);
 
             Control container = super.createDialogArea(parent);
             Composite composite = UIUtils.createPlaceholder((Composite) container, 2, 5);
             composite.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-            nameText = UIUtils.createLabelText(composite, "DataBase Name", null);
+            nameText = UIUtils.createLabelText(composite, XuguMessages.dialog_database_name, null);
             nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-            UIUtils.createInfoLabel(composite, "Creating a database.", GridData.FILL_HORIZONTAL, 2);
+            UIUtils.createInfoLabel(composite, XuguMessages.dialog_database_create_info, GridData.FILL_HORIZONTAL, 2);
 
             return parent;
         }

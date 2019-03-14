@@ -48,6 +48,18 @@ public class XuguMessages extends NLS {
 	public static String dialog_connection_role_normal;
 	public static String dialog_connection_auto_detect;
 	public static String dialog_connection_local_client;
+	public static String dialog_database_name;
+	public static String dialog_database_create_title;
+	public static String dialog_database_create_info;
+	public static String dialog_tablespace_create_title;
+	public static String dialog_tablespace_name;
+	public static String dialog_tablespace_nodeID;
+	public static String dialog_tablespace_filePath;
+	public static String dialog_tablespace_create_info;
+	public static String dialog_synonym_create_title;
+	public static String dialog_synonym_name;
+	public static String dialog_synonym_target;
+	public static String dialog_synonym_create_info;
 	public static String edit_catalog_manager_dialog_schema_name;
 	public static String edit_command_change_user_action_create_new_user;
 	public static String edit_command_change_user_action_update_user_record;

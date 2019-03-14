@@ -13,6 +13,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.ext.xugu.XuguMessages;
 import org.jkiss.dbeaver.ext.xugu.edit.XuguSchemaManager.NewUserDialog;
 import org.jkiss.dbeaver.ext.xugu.model.XuguDataSource;
 import org.jkiss.dbeaver.ext.xugu.model.XuguSchema;
@@ -141,22 +142,22 @@ public class XuguTablespaceManager extends SQLObjectEditor<XuguTablespace, XuguD
         @Override
         protected Control createDialogArea(Composite parent)
         {
-            getShell().setText("Set Tablespace properties");
+            getShell().setText(XuguMessages.dialog_tablespace_create_title);
 
             Control container = super.createDialogArea(parent);
             Composite composite = UIUtils.createPlaceholder((Composite) container, 2, 5);
             composite.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-            nameText = UIUtils.createLabelText(composite, "Space Name", null);
+            nameText = UIUtils.createLabelText(composite, XuguMessages.dialog_tablespace_name, null);
             nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             
-            nodeText = UIUtils.createLabelText(composite, "Node ID", null);
+            nodeText = UIUtils.createLabelText(composite, XuguMessages.dialog_tablespace_nodeID, null);
             nodeText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             
-            fileText = UIUtils.createLabelText(composite, "File Path", null);
+            fileText = UIUtils.createLabelText(composite, XuguMessages.dialog_tablespace_filePath, null);
             fileText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-            UIUtils.createInfoLabel(composite, "Creating a Tablespace.", GridData.FILL_HORIZONTAL, 2);
+            UIUtils.createInfoLabel(composite, XuguMessages.dialog_tablespace_create_info, GridData.FILL_HORIZONTAL, 2);
 
             return parent;
         }
