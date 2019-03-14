@@ -37,20 +37,27 @@ public class XuguDataFile extends XuguObject<XuguTablespace> {
         RECOVER,
     }
 
+    private long nodeID;
+    private long spaceID;
+    private String path;
+    private int fileNo;
+    private BigDecimal max_size;
+    private BigDecimal step_size;
+    
     private final XuguTablespace tablespace;
-    private long id;
-    private long relativeNo;
-    private BigDecimal bytes;
-    private BigDecimal blocks;
-    private BigDecimal maxBytes;
-    private BigDecimal maxBlocks;
-    private long incrementBy;
-    private BigDecimal userBytes;
-    private BigDecimal userBlocks;
-
-    private boolean available;
-    private boolean autoExtensible;
-    private OnlineStatus onlineStatus;
+//    private long id;
+//    private long relativeNo;
+//    private BigDecimal bytes;
+//    private BigDecimal blocks;
+//    private BigDecimal maxBytes;
+//    private BigDecimal maxBlocks;
+//    private long incrementBy;
+//    private BigDecimal userBytes;
+//    private BigDecimal userBlocks;
+//
+//    private boolean available;
+//    private boolean autoExtensible;
+//    private OnlineStatus onlineStatus;
 
     private boolean temporary;
 
@@ -58,24 +65,19 @@ public class XuguDataFile extends XuguObject<XuguTablespace> {
     {
         super(
             tablespace,
-            JDBCUtils.safeGetString(dbResult, "FILE_NAME"),
+            JDBCUtils.safeGetString(dbResult, "PATH").substring(JDBCUtils.safeGetString(dbResult, "PATH").lastIndexOf("/")+1),
             true);
         this.tablespace = tablespace;
         this.temporary = temporary;
-        this.id = JDBCUtils.safeGetLong(dbResult, "FILE_ID");
-        this.relativeNo = JDBCUtils.safeGetLong(dbResult, "RELATIVE_FNO");
-        this.bytes = JDBCUtils.safeGetBigDecimal(dbResult, "BYTES");
-        this.blocks = JDBCUtils.safeGetBigDecimal(dbResult, "BLOCKS");
-        this.maxBytes = JDBCUtils.safeGetBigDecimal(dbResult, "MAXBYTES");
-        this.maxBlocks = JDBCUtils.safeGetBigDecimal(dbResult, "MAXBLOCKS");
-        this.incrementBy = JDBCUtils.safeGetLong(dbResult, "INCREMENT_BY");
-        this.userBytes = JDBCUtils.safeGetBigDecimal(dbResult, "USER_BYTES");
-        this.userBlocks = JDBCUtils.safeGetBigDecimal(dbResult, "USER_BLOCKS");
-        this.autoExtensible = JDBCUtils.safeGetBoolean(dbResult, "AUTOEXTENSIBLE", "Y");
-        this.available = "AVAILABLE".equals(JDBCUtils.safeGetStringTrimmed(dbResult, "STATUS"));
-        if (!this.temporary) {
-            this.onlineStatus = CommonUtils.valueOf(OnlineStatus.class, JDBCUtils.safeGetStringTrimmed(dbResult, "ONLINE_STATUS"));
-        }
+        this.nodeID = JDBCUtils.safeGetLong(dbResult, "NODEID");
+        this.spaceID = JDBCUtils.safeGetLong(dbResult, "SPACE_ID");
+        this.path = JDBCUtils.safeGetString(dbResult, "PATH");
+        this.max_size = JDBCUtils.safeGetBigDecimal(dbResult, "MAX_SIZE");
+        this.step_size = JDBCUtils.safeGetBigDecimal(dbResult, "STEP_SIZE");
+        this.fileNo = JDBCUtils.safeGetInt(dbResult, "FILE_NO");
+//        if (!this.temporary) {
+//            this.onlineStatus = CommonUtils.valueOf(OnlineStatus.class, JDBCUtils.safeGetStringTrimmed(dbResult, "ONLINE_STATUS"));
+//        }
     }
 
     public XuguTablespace getTablespace()
@@ -92,75 +94,33 @@ public class XuguDataFile extends XuguObject<XuguTablespace> {
     }
 
     @Property(order = 2)
-    public long getId()
+    public long getNodeID()
     {
-        return id;
+        return nodeID;
     }
 
     @Property(order = 3)
-    public long getRelativeNo()
+    public long getSpaceID()
     {
-        return relativeNo;
+        return spaceID;
     }
 
-    @Property(viewable = true, order = 4)
-    public BigDecimal getBytes()
+    @Property(order = 3)
+    public int getFileNo()
     {
-        return bytes;
+        return fileNo;
     }
-
-    @Property(viewable = true, order = 5)
-    public BigDecimal getBlocks()
-    {
-        return blocks;
-    }
-
+    
     @Property(viewable = true, order = 6)
-    public BigDecimal getMaxBytes()
+    public BigDecimal getMaxSize()
     {
-        return maxBytes;
+        return max_size;
     }
 
     @Property(viewable = true, order = 7)
-    public BigDecimal getMaxBlocks()
+    public BigDecimal getStepSize()
     {
-        return maxBlocks;
-    }
-
-    @Property(viewable = true, order = 8)
-    public long getIncrementBy()
-    {
-        return incrementBy;
-    }
-
-    @Property(viewable = true, order = 9)
-    public BigDecimal getUserBytes()
-    {
-        return userBytes;
-    }
-
-    @Property(viewable = true, order = 10)
-    public BigDecimal getUserBlocks()
-    {
-        return userBlocks;
-    }
-
-    @Property(viewable = true, order = 11)
-    public boolean isAvailable()
-    {
-        return available;
-    }
-
-    @Property(viewable = true, order = 12)
-    public boolean isAutoExtensible()
-    {
-        return autoExtensible;
-    }
-
-    @Property(order = 13)
-    public OnlineStatus getOnlineStatus()
-    {
-        return onlineStatus;
+        return step_size;
     }
 
     @Property(order = 14)

@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -59,6 +60,7 @@ public class XuguTablespaceManager extends SQLObjectEditor<XuguTablespace, XuguD
                     return null;
                 }
                 XuguTablespace newTablespace = dialog.getTableSpace();
+//                XuguDataFile newDataFile = new XuguDataFile(newTablespace, null, false);
                 return newTablespace;
             }
         }.execute();
@@ -130,6 +132,11 @@ public class XuguTablespaceManager extends SQLObjectEditor<XuguTablespace, XuguD
         {
             return true;
         }
+        
+        @Override
+        protected Point getInitialSize() {
+        	return new Point(300, 250);
+        }
 
         @Override
         protected Control createDialogArea(Composite parent)
@@ -137,7 +144,7 @@ public class XuguTablespaceManager extends SQLObjectEditor<XuguTablespace, XuguD
             getShell().setText("Set Tablespace properties");
 
             Control container = super.createDialogArea(parent);
-            Composite composite = UIUtils.createPlaceholder((Composite) container, 3, 5);
+            Composite composite = UIUtils.createPlaceholder((Composite) container, 2, 5);
             composite.setLayoutData(new GridData(GridData.FILL_BOTH));
 
             nameText = UIUtils.createLabelText(composite, "Space Name", null);

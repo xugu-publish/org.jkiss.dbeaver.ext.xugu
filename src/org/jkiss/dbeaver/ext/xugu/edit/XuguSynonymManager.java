@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -100,6 +101,11 @@ public class XuguSynonymManager extends SQLObjectEditor<XuguSynonym, XuguSchema>
         {
             return true;
         }
+        
+        @Override
+        protected Point getInitialSize() {
+        	return new Point(300, 200);
+        }
 
         @Override
         protected Control createDialogArea(Composite parent)
@@ -107,7 +113,7 @@ public class XuguSynonymManager extends SQLObjectEditor<XuguSynonym, XuguSchema>
             getShell().setText("Set synonym properties");
 
             Control container = super.createDialogArea(parent);
-            Composite composite = UIUtils.createPlaceholder((Composite) container, 3, 5);
+            Composite composite = UIUtils.createPlaceholder((Composite) container, 2, 5);
             composite.setLayoutData(new GridData(GridData.FILL_BOTH));
 
             nameText = UIUtils.createLabelText(composite, "Synonym Name", null);

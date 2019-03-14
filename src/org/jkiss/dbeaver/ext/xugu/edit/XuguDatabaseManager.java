@@ -19,7 +19,9 @@ package org.jkiss.dbeaver.ext.xugu.edit;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
@@ -123,12 +125,17 @@ public class XuguDatabaseManager extends SQLObjectEditor<XuguDatabase, XuguDataS
         }
 
         @Override
+        protected Point getInitialSize() {
+        	return new Point(300, 150);
+        }
+        
+        @Override
         protected Control createDialogArea(Composite parent)
         {
             getShell().setText("Set database properties");
 
             Control container = super.createDialogArea(parent);
-            Composite composite = UIUtils.createPlaceholder((Composite) container, 3, 5);
+            Composite composite = UIUtils.createPlaceholder((Composite) container, 2, 5);
             composite.setLayoutData(new GridData(GridData.FILL_BOTH));
 
             nameText = UIUtils.createLabelText(composite, "DataBase Name", null);

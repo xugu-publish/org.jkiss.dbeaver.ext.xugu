@@ -46,7 +46,7 @@ import java.util.Collection;
 import java.util.Map;
 
 /**
- * Oracle tablespace
+ * Xugu tablespace
  */
 //public class XuguTablespace extends XuguGlobalObject implements DBPRefreshableObject
 public class XuguTablespace extends XuguGlobalObject
@@ -60,8 +60,7 @@ public class XuguTablespace extends XuguGlobalObject
 
     public enum Contents {
         PERMANENT,
-        TEMPORARY,
-        UNDO
+        TEMPORARY
     }
 
     public enum Logging {
@@ -92,7 +91,7 @@ public class XuguTablespace extends XuguGlobalObject
     }
 
     private String name;
-    
+    private XuguDataFile file;
     
 //    private long blockSize;
 //    private long initialExtent;
@@ -115,7 +114,7 @@ public class XuguTablespace extends XuguGlobalObject
 //    private volatile Long availableSize;
 //    private volatile Long usedSize;
 //
-//    final FileCache fileCache = new FileCache();
+    final FileCache fileCache = new FileCache();
 //    final SegmentCache segmentCache = new SegmentCache();
 
     private int nodeID;
@@ -160,6 +159,23 @@ public class XuguTablespace extends XuguGlobalObject
 //        this.bigFile = JDBCUtils.safeGetBoolean(dbResult, "BIGFILE", "Y");
     }
 
+    static class FileCache extends JDBCObjectCache<XuguTablespace, XuguDataFile> {
+        @Override
+        protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguTablespace owner) throws SQLException
+        {
+            final JDBCPreparedStatement dbStat = session.prepareStatement(
+                "SELECT * FROM " + owner.getDataSource().getRoleFlag() + "_DATAFILES " +
+                    " WHERE SPACE_ID=" + owner.getSpaceID());
+            return dbStat;
+        }
+
+        @Override
+        protected XuguDataFile fetchObject(@NotNull JDBCSession session, @NotNull XuguTablespace owner, @NotNull JDBCResultSet resultSet) throws SQLException, DBException
+        {
+            return new XuguDataFile(owner, resultSet, owner.getSpaceType().equals("TEMP_SPACE"));
+        }
+    }
+    
     @NotNull
     @Override
     @Property(viewable = true, editable = true, order = 3)
@@ -167,8 +183,8 @@ public class XuguTablespace extends XuguGlobalObject
     {
         return name;
     }
-
-    @Property(viewable = true, editable = true, order = 1)
+    
+	@Property(viewable = true, editable = true, order = 1)
     public int getNodeID()
     {
         return nodeID;
@@ -268,4 +284,16 @@ public class XuguTablespace extends XuguGlobalObject
 		this.nodeID = id;
 	}
 
+	@Association
+    public Collection<XuguDataFile> getFiles(DBRProgressMonitor monitor)
+        throws DBException
+    {
+        return fileCache.getAllObjects(monitor, this);
+    }
+	
+	@Property(order = 7)
+    public XuguDataFile getFile()
+    {
+        return file;
+    }
 }

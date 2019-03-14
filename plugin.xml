@@ -183,9 +183,11 @@
                         	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguDataFile" label="%tree.files.node.name" icon="#files" description="Data Files">
                             	<items label="%tree.file.node.name" path="file" property="files" icon="#file"/>
                         	</folder>
+                        	<!--
                         	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguSegment" label="%tree.objects.node.name" icon="#segments" description="Objects (segments)">
                             	<items label="%tree.segment.node.name" path="segment" property="segments" icon="#segment"/>
                         	</folder>
+                        	-->
                     	</items>
                 	</folder>
                 	<!--安全管理-->
