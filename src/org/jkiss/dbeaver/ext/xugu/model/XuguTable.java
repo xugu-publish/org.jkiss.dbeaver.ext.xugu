@@ -16,30 +16,17 @@
  */
 package org.jkiss.dbeaver.ext.xugu.model;
 
-import org.eclipse.swt.widgets.DateTime;
 import org.jkiss.code.NotNull;
-import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.*;
-import org.jkiss.dbeaver.model.data.DBDPseudoAttribute;
-import org.jkiss.dbeaver.model.data.DBDPseudoAttributeContainer;
-import org.jkiss.dbeaver.model.exec.DBCException;
-import org.jkiss.dbeaver.model.exec.jdbc.JDBCPreparedStatement;
-import org.jkiss.dbeaver.model.exec.jdbc.JDBCResultSet;
-import org.jkiss.dbeaver.model.exec.jdbc.JDBCSession;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
 import org.jkiss.dbeaver.model.meta.Association;
-import org.jkiss.dbeaver.model.meta.LazyProperty;
-import org.jkiss.dbeaver.model.meta.Property;
-import org.jkiss.dbeaver.model.meta.PropertyGroup;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSObject;
-import org.jkiss.utils.CommonUtils;
 
 import java.sql.Date;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -97,73 +84,6 @@ public class XuguTable extends XuguTablePhysical implements DBPScriptObject
     private int acl_mask;
     private Date create_time;
     private String comments;
-    
-    
-//    private boolean temporary;
-//    private boolean secondary;
-//    private boolean nested;
-
-    public class AdditionalInfo extends TableAdditionalInfo {
-        private int pctFree;
-        private int pctUsed;
-        private int iniTrans;
-        private int maxTrans;
-        private int initialExtent;
-        private int nextExtent;
-        private int minExtents;
-        private int maxExtents;
-        private int pctIncrease;
-        private int freelists;
-        private int freelistGroups;
-
-        private int blocks;
-        private int emptyBlocks;
-        private int avgSpace;
-        private int chainCount;
-
-        private int avgRowLen;
-        private int avgSpaceFreelistBlocks;
-        private int numFreelistBlocks;
-
-        @Property(category = CAT_STATISTICS, order = 31)
-        public int getPctFree() { return pctFree; }
-        @Property(category = CAT_STATISTICS, order = 32)
-        public int getPctUsed() { return pctUsed; }
-        @Property(category = CAT_STATISTICS, order = 33)
-        public int getIniTrans() { return iniTrans; }
-        @Property(category = CAT_STATISTICS, order = 34)
-        public int getMaxTrans() { return maxTrans; }
-        @Property(category = CAT_STATISTICS, order = 35)
-        public int getInitialExtent() { return initialExtent; }
-        @Property(category = CAT_STATISTICS, order = 36)
-        public int getNextExtent() { return nextExtent; }
-        @Property(category = CAT_STATISTICS, order = 37)
-        public int getMinExtents() { return minExtents; }
-        @Property(category = CAT_STATISTICS, order = 38)
-        public int getMaxExtents() { return maxExtents; }
-        @Property(category = CAT_STATISTICS, order = 39)
-        public int getPctIncrease() { return pctIncrease; }
-        @Property(category = CAT_STATISTICS, order = 40)
-        public int getFreelists() { return freelists; }
-        @Property(category = CAT_STATISTICS, order = 41)
-        public int getFreelistGroups() { return freelistGroups; }
-        @Property(category = CAT_STATISTICS, order = 42)
-        public int getBlocks() { return blocks; }
-        @Property(category = CAT_STATISTICS, order = 43)
-        public int getEmptyBlocks() { return emptyBlocks; }
-        @Property(category = CAT_STATISTICS, order = 44)
-        public int getAvgSpace() { return avgSpace; }
-        @Property(category = CAT_STATISTICS, order = 45)
-        public int getChainCount() { return chainCount; }
-        @Property(category = CAT_STATISTICS, order = 46)
-        public int getAvgRowLen() { return avgRowLen; }
-        @Property(category = CAT_STATISTICS, order = 47)
-        public int getAvgSpaceFreelistBlocks() { return avgSpaceFreelistBlocks; }
-        @Property(category = CAT_STATISTICS, order = 48)
-        public int getNumFreelistBlocks() { return numFreelistBlocks; }
-    }
-
-    private final AdditionalInfo additionalInfo = new AdditionalInfo();
 
     public XuguTable(XuguSchema schema, String name)
     {
@@ -177,14 +97,6 @@ public class XuguTable extends XuguTablePhysical implements DBPScriptObject
     {
         super(schema, dbResult);
         //xfc 修改了模式名获取的方式
-        String typeOwner = schema.getName();
-//        if (!CommonUtils.isEmpty(typeOwner)) {
-//            tableType = XuguDataType.resolveDataType(
-//                monitor,
-//                schema.getDataSource(),
-//                typeOwner,
-//                JDBCUtils.safeGetString(dbResult, "TABLE_TYPE"));
-//        }
         if(dbResult!=null) {
         	this.table_name = JDBCUtils.safeGetString(dbResult, "TABLE_NAME");
         	this.db_id = JDBCUtils.safeGetInt(dbResult, "DB_ID");
@@ -226,24 +138,6 @@ public class XuguTable extends XuguTablePhysical implements DBPScriptObject
     }
 
     @Override
-    public TableAdditionalInfo getAdditionalInfo()
-    {
-        return additionalInfo;
-    }
-
-    @PropertyGroup()
-    @LazyProperty(cacheValidator = AdditionalInfoValidator.class)
-    public AdditionalInfo getAdditionalInfo(DBRProgressMonitor monitor) throws DBException
-    {
-        synchronized (additionalInfo) {
-            if (!additionalInfo.loaded && monitor != null) {
-                loadAdditionalInfo(monitor);
-            }
-            return additionalInfo;
-        }
-    }
-
-    @Override
     protected String getTableTypeName()
     {
         return "TABLE";
@@ -254,66 +148,175 @@ public class XuguTable extends XuguTablePhysical implements DBPScriptObject
     {
         return false;
     }
+    
+    public static Log getLog() {
+		return log;
+	}
 
-//    @Property(viewable = false, order = 5)
-//    public XuguDataType getTableType()
-//    {
-//        return tableType;
-//    }
+	public int getDb_id() {
+		return db_id;
+	}
 
-//    @Property(viewable = false, order = 6)
-//    public String getIotType()
-//    {
-//        return iotType;
-//    }
-//
-//    @Property(viewable = false, order = 7)
-//    public String getIotName()
-//    {
-//        return iotName;
-//    }
-//
-//    @Property(viewable = false, order = 10)
-//    public boolean isTemporary()
-//    {
-//        return temporary;
-//    }
-//
-//    @Property(viewable = false, order = 11)
-//    public boolean isSecondary()
-//    {
-//        return secondary;
-//    }
-//
-//    @Property(viewable = false, order = 12)
-//    public boolean isNested()
-//    {
-//        return nested;
-//    }
+	public int getUser_id() {
+		return user_id;
+	}
+
+	public int getSchema_id() {
+		return schema_id;
+	}
+
+	public int getTable_id() {
+		return table_id;
+	}
+
+	public String getTable_name() {
+		return table_name;
+	}
+
+	public int getTemp_type() {
+		return temp_type;
+	}
+
+	public int getField_num() {
+		return field_num;
+	}
+
+	public int getParti_type() {
+		return parti_type;
+	}
+
+	public int getParti_num() {
+		return parti_num;
+	}
+
+	public String getParti_key() {
+		return parti_key;
+	}
+
+	public int getAuto_parti_type() {
+		return auto_parti_type;
+	}
+
+	public int getAuto_parti_span() {
+		return auto_parti_span;
+	}
+
+	public int getSubparti_type() {
+		return subparti_type;
+	}
+
+	public int getSubparti_num() {
+		return subparti_num;
+	}
+
+	public String getSubparti_key() {
+		return subparti_key;
+	}
+
+	public int getGsto_no() {
+		return gsto_no;
+	}
+
+	public int getCopy_num() {
+		return copy_num;
+	}
+
+	public int getBlock_size() {
+		return block_size;
+	}
+
+	public int getChunk_size() {
+		return chunk_size;
+	}
+
+	public long getRecord_num() {
+		return record_num;
+	}
+
+	public int getPctfree() {
+		return pctfree;
+	}
+
+	public String getFile_type() {
+		return file_type;
+	}
+
+	public String getFile_path() {
+		return file_path;
+	}
+
+	public String getRow_delimiter() {
+		return row_delimiter;
+	}
+
+	public String getCol_delimiter() {
+		return col_delimiter;
+	}
+
+	public String getBad_file() {
+		return bad_file;
+	}
+
+	public String getMissing_val() {
+		return missing_val;
+	}
+
+	public boolean isUse_cache() {
+		return use_cache;
+	}
+
+	public String getOnline() {
+		return online;
+	}
+
+	public boolean isIs_sys() {
+		return is_sys;
+	}
+
+	public boolean isIs_encr() {
+		return is_encr;
+	}
+
+	public boolean isHave_policy() {
+		return have_policy;
+	}
+
+	public boolean isOn_commit_del() {
+		return on_commit_del;
+	}
+
+	public boolean isEna_trans() {
+		return ena_trans;
+	}
+
+	public boolean isEna_logging() {
+		return ena_logging;
+	}
+
+	public boolean isValid() {
+		return valid;
+	}
+
+	public boolean isDeleted() {
+		return deleted;
+	}
+
+	public int getAcl_mask() {
+		return acl_mask;
+	}
+
+	public Date getCreate_time() {
+		return create_time;
+	}
+
+	public String getComments() {
+		return comments;
+	}
 
     @Override
     public XuguTableColumn getAttribute(@NotNull DBRProgressMonitor monitor, @NotNull String attributeName) throws DBException {
-/*
-        // Fake XML attribute handle
-        if (tableType != null && tableType.getName().equals(OracleConstants.TYPE_NAME_XML) && OracleConstants.XML_COLUMN_NAME.equals(attributeName)) {
-            OracleTableColumn col = getXMLColumn(monitor);
-            if (col != null) return col;
-        }
-*/
-
         return super.getAttribute(monitor, attributeName);
     }
-
-    @Nullable
-//    private XuguTableColumn getXMLColumn(DBRProgressMonitor monitor) throws DBException {
-//        for (XuguTableColumn col : CommonUtils.safeCollection(getAttributes(monitor))) {
-//            if (col.getDataType() == tableType) {
-//                return col;
-//            }
-//        }
-//        return null;
-//    }
-
 
     @Override
     public Collection<XuguTableForeignKey> getReferences(@NotNull DBRProgressMonitor monitor)
@@ -347,98 +350,8 @@ public class XuguTable extends XuguTablePhysical implements DBPScriptObject
         return super.refreshObject(monitor);
     }
 
-//    @Override
-//    public DBDPseudoAttribute[] getPseudoAttributes() throws DBException
-//    {
-//        if (CommonUtils.isEmpty(this.iotType) && getDataSource().getContainer().getPreferenceStore().getBoolean(XuguConstants.PREF_SUPPORT_ROWID)) {
-//            // IOT tables have index id instead of ROWID
-//            return new DBDPseudoAttribute[] {
-//                XuguConstants.PSEUDO_ATTR_ROWID
-//            };
-//        } else {
-//            return null;
-//        }
-//    }
-
-//    @Override
-//    protected void appendSelectSource(DBRProgressMonitor monitor, StringBuilder query, String tableAlias, DBDPseudoAttribute rowIdAttribute) {
-//        if (tableType != null && tableType.getName().equals(XuguConstants.TYPE_NAME_XML)) {
-//            try {
-//                XuguTableColumn xmlColumn = getXMLColumn(monitor);
-//                if (xmlColumn != null) {
-//                    query.append("XMLType(").append(tableAlias).append(".").append(xmlColumn.getName()).append(".getClobval()) as ").append(xmlColumn.getName());
-//                    if (rowIdAttribute != null) {
-//                        query.append(",").append(rowIdAttribute.translateExpression(tableAlias));
-//                    }
-//                    return;
-//                }
-//            } catch (DBException e) {
-//                log.warn(e);
-//            }
-//        }
-//        super.appendSelectSource(monitor, query, tableAlias, rowIdAttribute);
-//    }
-
     @Override
     public String getObjectDefinitionText(DBRProgressMonitor monitor, Map<String, Object> options) throws DBException {
         return getDDL(monitor, XuguDDLFormat.getCurrentFormat(getDataSource()), options);
     }
-
-
-//    @Nullable
-//    @Override
-//    public DBPImage getObjectImage() {
-//        if (CommonUtils.isEmpty(iotType)) {
-//            return DBIcon.TREE_TABLE;
-//        } else {
-//            return DBIcon.TREE_TABLE_INDEX;
-//        }
-//    }
-
-    private void loadAdditionalInfo(DBRProgressMonitor monitor) throws DBException
-    {
-//        if (!isPersisted()) {
-//            additionalInfo.loaded = true;
-//            return;
-//        }
-//        try (JDBCSession session = DBUtils.openMetaSession(monitor, this, "Load table status")) {
-//            try (JDBCPreparedStatement dbStat = session.prepareStatement(
-//                "SELECT * FROM SYS.ALL_TABLES WHERE OWNER=? AND TABLE_NAME=?")) {
-//                dbStat.setString(1, getContainer().getName());
-//                dbStat.setString(2, getName());
-//                try (JDBCResultSet dbResult = dbStat.executeQuery()) {
-//                    if (dbResult.next()) {
-//                        additionalInfo.pctFree = JDBCUtils.safeGetInt(dbResult, "PCT_FREE");
-//                        additionalInfo.pctUsed = JDBCUtils.safeGetInt(dbResult, "PCT_USED");
-//                        additionalInfo.iniTrans = JDBCUtils.safeGetInt(dbResult, "INI_TRANS");
-//                        additionalInfo.maxTrans = JDBCUtils.safeGetInt(dbResult, "MAX_TRANS");
-//                        additionalInfo.initialExtent = JDBCUtils.safeGetInt(dbResult, "INITIAL_EXTENT");
-//                        additionalInfo.nextExtent = JDBCUtils.safeGetInt(dbResult, "NEXT_EXTENT");
-//                        additionalInfo.minExtents = JDBCUtils.safeGetInt(dbResult, "MIN_EXTENTS");
-//                        additionalInfo.maxExtents = JDBCUtils.safeGetInt(dbResult, "MAX_EXTENTS");
-//                        additionalInfo.pctIncrease = JDBCUtils.safeGetInt(dbResult, "PCT_INCREASE");
-//                        additionalInfo.freelists = JDBCUtils.safeGetInt(dbResult, "FREELISTS");
-//                        additionalInfo.freelistGroups = JDBCUtils.safeGetInt(dbResult, "FREELIST_GROUPS");
-//
-//                        additionalInfo.blocks = JDBCUtils.safeGetInt(dbResult, "BLOCKS");
-//                        additionalInfo.emptyBlocks = JDBCUtils.safeGetInt(dbResult, "EMPTY_BLOCKS");
-//                        additionalInfo.avgSpace = JDBCUtils.safeGetInt(dbResult, "AVG_SPACE");
-//                        additionalInfo.chainCount = JDBCUtils.safeGetInt(dbResult, "CHAIN_CNT");
-//
-//                        additionalInfo.avgRowLen = JDBCUtils.safeGetInt(dbResult, "AVG_ROW_LEN");
-//                        additionalInfo.avgSpaceFreelistBlocks = JDBCUtils.safeGetInt(dbResult, "AVG_SPACE_FREELIST_BLOCKS");
-//                        additionalInfo.numFreelistBlocks = JDBCUtils.safeGetInt(dbResult, "NUM_FREELIST_BLOCKS");
-//                    } else {
-//                        log.warn("Cannot find table '" + getFullyQualifiedName(DBPEvaluationContext.UI) + "' metadata");
-//                    }
-//                    additionalInfo.loaded = true;
-//                }
-//            }
-//        }
-//        catch (SQLException e) {
-//            throw new DBCException(e, getDataSource());
-//        }
-
-    }
-
 }

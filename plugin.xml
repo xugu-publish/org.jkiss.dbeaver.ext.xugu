@@ -37,7 +37,7 @@
                     	<items label="%tree.user.node.name" path="user" property="users" icon="#user"/>
                     </folder>
                     <!--数据库-->
-                    <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguDatabase" label="%tree.databases.node.name" icon="#folder_user" description="Databases">
+                    <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguDatabase" label="%tree.databases.node.name" icon="#folder_schema" description="Databases">
                     	<items label="%tree.database.node.name" path="database" property="databases" icon="#database">
                     	</items>
                     </folder>                    
@@ -155,6 +155,13 @@
                         	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguDBLink" label="%tree.database_links.node.name" icon="#folder_link" description="Database Links (DBLinks)">
                             	<items label="%tree.database_links.node.name" path="databaseLink" property="databaseLinks" icon="#link"/>
                         	</folder>
+	                        <folder label="%tree.scheduler.node.name" icon="#scheduler_folder" description="Scheduler objects">
+	                            <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguSchedulerJob" label="%tree.scheduler.jobs.node.name" icon="#scheduler_job_folder" description="Scheduler jobs">
+	                                <items label="%tree.scheduler.job.node.name" path="schedulerJob" property="schedulerJobs" icon="icons/scheduled_job.png">
+	                                    <items label="%tree.scheduler.job.arguments.node.name" itemLabel="%tree.scheduler.job.argument.node.name" path="argument" property="arguments" icon="#argument" navigable="false" inline="false"/>
+	                                </items>
+	                            </folder>
+	                        </folder> 
                         	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguRecycledObject" label="%tree.recycle_bin.node.name" icon="#recycle_bin" description="Recycle Bin" visibleIf="object.dataSource.adminVisible &amp;&amp; object.dataSource.isAtLeastV10()">
                             	<items label="%tree.recycled_object.node.name" path="object" property="recycledObjects" icon="#recycle_bin"/>
                         	</folder>  			
@@ -184,7 +191,7 @@
                     	</folder>
                     	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguDBLink" label="%tree.public_database_links.node.name" icon="#links" description="Public database links">
                         	<items label="%tree.database_link.node.name" path="databaseLink" property="publicDatabaseLinks" icon="#link"/>
-                    	</folder>
+                    	</folder>   
                     	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguRecycledObject" label="%tree.user_recycle_bin.node.name" icon="#recycle_bin" description="Current user's recycle bin">
                         	<items label="%tree.recycled_object.node.name" path="object" property="userRecycledObjects" icon="#recycle_bin"/>
                     	</folder>

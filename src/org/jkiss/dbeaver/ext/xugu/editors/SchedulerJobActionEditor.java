@@ -38,8 +38,7 @@ public class SchedulerJobActionEditor extends SQLSourceViewer<XuguSchedulerJob> 
     @Override
     protected String getSourceText(DBRProgressMonitor monitor) throws DBException {
     	XuguSchedulerJob schedulerJob = getSourceObject();
-    	return schedulerJob.getJobAction();
-//        return ((DBPScriptObjectExt)getSourceObject()).getExtendedDefinitionText(monitor);
+    	return schedulerJob.getAction().toString();
     }
 
     @Override

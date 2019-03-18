@@ -43,7 +43,14 @@ public class XuguTableConstraint extends XuguTableConstraintBase {
     private char update_act;
     private char delete_act;
     private boolean is_sys;
-
+    
+    private int dbID;
+    private int tableID;
+    private int refTableID;
+    private char consType;
+    private boolean enable;
+    private boolean valid;
+    
     public XuguTableConstraint(XuguTableBase oracleTable, String name, DBSEntityConstraintType constraintType, String searchCondition, XuguObjectStatus status)
     {
         super(oracleTable, name, constraintType, status, false);
@@ -59,8 +66,19 @@ public class XuguTableConstraint extends XuguTableConstraintBase {
             JDBCUtils.safeGetBoolean(dbResult, "ENABLE") && JDBCUtils.safeGetBoolean(dbResult, "VALID")?XuguObjectStatus.ENABLED:XuguObjectStatus.DISABLED,
             true);
         if(dbResult!=null) {
-        	//this.searchCondition = JDBCUtils.safeGetString(dbResult, "SEARCH_CONDITION");
-            this.cons_name = JDBCUtils.safeGetString(dbResult, "CONS_NAME");
+//        	private int dbID;
+//            private int tableID;
+//            private int refTableID;
+//            private char consType;
+//            private boolean enable;
+//            private boolean valid;
+        	this.dbID = JDBCUtils.safeGetInt(dbResult, "DB_ID");
+        	this.tableID = JDBCUtils.safeGetInt(dbResult, "TABLE_ID");
+        	this.refTableID = JDBCUtils.safeGetInt(dbResult, "REF_TABLE_ID");
+        	this.consType = JDBCUtils.safeGetString(dbResult, "CONS_TYPE").charAt(0);
+        	this.enable = JDBCUtils.safeGetBoolean(dbResult, "ENABLE");
+        	this.valid = JDBCUtils.safeGetBoolean(dbResult, "VALID");
+        	this.cons_name = JDBCUtils.safeGetString(dbResult, "CONS_NAME");
             String s1 = JDBCUtils.safeGetString(dbResult, "MATCH_TYPE");
             if(s1!=null) {
             	this.match_type = s1.charAt(0);

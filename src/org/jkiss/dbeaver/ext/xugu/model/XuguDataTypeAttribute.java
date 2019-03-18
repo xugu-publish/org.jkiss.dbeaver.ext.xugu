@@ -45,11 +45,7 @@ public class XuguDataTypeAttribute extends XuguDataTypeMember implements DBSEnti
         super(dataType, dbResult);
         this.name = JDBCUtils.safeGetString(dbResult, "ATTR_NAME");
         this.number = JDBCUtils.safeGetInt(dbResult, "ATTR_NO");
-        this.attrType = XuguDataType.resolveDataType(
-            monitor,
-            getDataSource(),
-            JDBCUtils.safeGetString(dbResult, "ATTR_TYPE_OWNER"),
-            JDBCUtils.safeGetString(dbResult, "ATTR_TYPE_NAME"));
+        this.attrType = XuguDataType.resolveDataType(JDBCUtils.safeGetString(dbResult, "ATTR_TYPE_NAME"));
         this.attrTypeMod = XuguDataTypeModifier.resolveTypeModifier(JDBCUtils.safeGetString(dbResult, "ATTR_TYPE_MOD"));
         this.length = JDBCUtils.safeGetInteger(dbResult, "LENGTH");
         this.precision = JDBCUtils.safeGetInteger(dbResult, "PRECISION");

@@ -81,13 +81,13 @@ public class XuguDataType extends XuguObject<DBSObject>
     static final Map<Integer, TypeDesc> PREDEFINED_TYPE_IDS = new HashMap<>();
     //修改了数据类型定义
     static  {
-    	PREDEFINED_TYPES.put("INTEGER", new TypeDesc(DBPDataKind.NUMERIC, Types.INTEGER, 63, 127, -84));
-    	PREDEFINED_TYPES.put("BIGINT", new TypeDesc(DBPDataKind.NUMERIC, Types.BIGINT, 63, 127, -84));
-    	PREDEFINED_TYPES.put("FLOAT", new TypeDesc(DBPDataKind.NUMERIC, Types.FLOAT, 63, 127, -84));
-    	PREDEFINED_TYPES.put("DOUBLE", new TypeDesc(DBPDataKind.NUMERIC, Types.DOUBLE, 63, 127, -84));
-    	PREDEFINED_TYPES.put("TINYINT", new TypeDesc(DBPDataKind.NUMERIC, Types.TINYINT, 63, 127, -84));
-    	PREDEFINED_TYPES.put("SMALLINT", new TypeDesc(DBPDataKind.NUMERIC, Types.SMALLINT, 63, 127, -84));
-    	PREDEFINED_TYPES.put("NUMERIC", new TypeDesc(DBPDataKind.NUMERIC, Types.NUMERIC, 63, 127, -84));
+    	PREDEFINED_TYPES.put("INTEGER", new TypeDesc(DBPDataKind.NUMERIC, Types.INTEGER, 10, 0, 0));
+    	PREDEFINED_TYPES.put("BIGINT", new TypeDesc(DBPDataKind.NUMERIC, Types.BIGINT, 19, 0, 0));
+    	PREDEFINED_TYPES.put("FLOAT", new TypeDesc(DBPDataKind.NUMERIC, Types.FLOAT, 38, 0, 6));
+    	PREDEFINED_TYPES.put("DOUBLE", new TypeDesc(DBPDataKind.NUMERIC, Types.DOUBLE, 308, 0, 6));
+    	PREDEFINED_TYPES.put("TINYINT", new TypeDesc(DBPDataKind.NUMERIC, Types.TINYINT, 3, 0, 0));
+    	PREDEFINED_TYPES.put("SMALLINT", new TypeDesc(DBPDataKind.NUMERIC, Types.SMALLINT, 5, 0, 0));
+    	PREDEFINED_TYPES.put("NUMERIC", new TypeDesc(DBPDataKind.NUMERIC, Types.NUMERIC, 0, 0, 0));
     	PREDEFINED_TYPES.put("CHAR", new TypeDesc(DBPDataKind.STRING, Types.CHAR, 0, 0, 0));
     	PREDEFINED_TYPES.put("VARCHAR", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 0, 0, 0));
     	PREDEFINED_TYPES.put("CLOB", new TypeDesc(DBPDataKind.CONTENT, Types.CLOB, 0, 0, 0));
@@ -98,24 +98,24 @@ public class XuguDataType extends XuguObject<DBSObject>
     	PREDEFINED_TYPES.put("ROWVERSION", new TypeDesc(DBPDataKind.ROWID, Types.ROWID, 0, 0, 0));
     	
     	PREDEFINED_TYPES.put("DATE", new TypeDesc(DBPDataKind.DATETIME, Types.TIMESTAMP, 0, 0, 0));
-    	PREDEFINED_TYPES.put("DATETIME", new TypeDesc(DBPDataKind.DATETIME, Types.TIMESTAMP, 0, 0, 0));
-    	PREDEFINED_TYPES.put("DATETIME WITH TIME ZONE", new TypeDesc(DBPDataKind.DATETIME, Types.TIMESTAMP, 0, 0, 0));
-    	PREDEFINED_TYPES.put("TIME", new TypeDesc(DBPDataKind.DATETIME, Types.TIMESTAMP, 0, 0, 0));
-    	PREDEFINED_TYPES.put("TIME WITH TIME ZONE", new TypeDesc(DBPDataKind.DATETIME, Types.TIMESTAMP, 0, 0, 0));
+    	PREDEFINED_TYPES.put("DATETIME", new TypeDesc(DBPDataKind.DATETIME, Types.TIMESTAMP, 6, 0, 0));
+    	PREDEFINED_TYPES.put("DATETIME WITH TIME ZONE", new TypeDesc(DBPDataKind.DATETIME, Types.TIMESTAMP, 6, 0, 0));
+    	PREDEFINED_TYPES.put("TIME", new TypeDesc(DBPDataKind.DATETIME, Types.TIMESTAMP, 3, 0, 0));
+    	PREDEFINED_TYPES.put("TIME WITH TIME ZONE", new TypeDesc(DBPDataKind.DATETIME, Types.TIMESTAMP, 3, 0, 0));
         
     	PREDEFINED_TYPES.put("INTERVAL YEAR", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 9, 0, 0));
     	PREDEFINED_TYPES.put("INTERVAL MONTH", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 9, 0, 0));
     	PREDEFINED_TYPES.put("INTERVAL DAY", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 9, 0, 0));
     	PREDEFINED_TYPES.put("INTERVAL HOUR", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 9, 0, 0));
     	PREDEFINED_TYPES.put("INTERVAL MINUTE", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 9, 0, 0));
-    	PREDEFINED_TYPES.put("INTERVAL SECOND", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 9, 0, 6));
+    	PREDEFINED_TYPES.put("INTERVAL SECOND", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 9, 0, 3));
     	PREDEFINED_TYPES.put("INTERVAL YEAR TO MONTH", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 8, 0, 0));
     	PREDEFINED_TYPES.put("INTERVAL DAY TO HOUR", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 7, 0, 0));
     	PREDEFINED_TYPES.put("INTERVAL DAY TO MINUTE", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 6, 0, 0));
-    	PREDEFINED_TYPES.put("INTERVAL DAY TO SECOND", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 6, 0, 6));
+    	PREDEFINED_TYPES.put("INTERVAL DAY TO SECOND", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 6, 3, 3));
     	PREDEFINED_TYPES.put("INTERVAL HOUR TO MINUTE", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 7, 0, 0));
-    	PREDEFINED_TYPES.put("INTERVAL HOUR TO SECOND", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 7, 0, 6));
-    	PREDEFINED_TYPES.put("INTERVAL MINUTE TO SECOND", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 7, 0, 6));
+    	PREDEFINED_TYPES.put("INTERVAL HOUR TO SECOND", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 7, 3, 3));
+    	PREDEFINED_TYPES.put("INTERVAL MINUTE TO SECOND", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 7, 3, 3));
        
         for (TypeDesc type : PREDEFINED_TYPES.values()) {
             PREDEFINED_TYPE_IDS.put(type.valueType, type);
@@ -269,7 +269,7 @@ public class XuguDataType extends XuguObject<DBSObject>
     @Override
     public Integer getScale()
     {
-        return typeDesc == null ? 0 : typeDesc.minScale;
+        return typeDesc == null ? 0 : typeDesc.maxScale;
     }
 
     @Override
@@ -461,7 +461,7 @@ public class XuguDataType extends XuguObject<DBSObject>
                         String compTypeSchema = JDBCUtils.safeGetString(dbResults, "ELEM_TYPE_OWNER");
                         String compTypeName = JDBCUtils.safeGetString(dbResults, "ELEM_TYPE_NAME");
                         //String compTypeMod = JDBCUtils.safeGetString(dbResults, "ELEM_TYPE_MOD");
-                        componentType = XuguDataType.resolveDataType(monitor, getDataSource(), compTypeSchema, compTypeName);
+                        componentType = XuguDataType.resolveDataType(compTypeName);
                     } else {
                         log.warn("Can't resolve collection type [" + getName() + "]");
                     }
@@ -489,36 +489,11 @@ public class XuguDataType extends XuguObject<DBSObject>
         return getFullyQualifiedName(DBPEvaluationContext.UI);
     }
 
-    public static XuguDataType resolveDataType(DBRProgressMonitor monitor, XuguDataSource dataSource, String typeOwner, String typeName)
+    public static XuguDataType resolveDataType(String typeName)
     {
         typeName = normalizeTypeName(typeName);
-        XuguSchema typeSchema = null;
         XuguDataType type = null;
         PREDEFINED_TYPES.get(typeName);
-//        if (typeOwner != null) {
-//            try {
-//                typeSchema = dataSource.getSchema(monitor, typeOwner);
-//                if (typeSchema == null) {
-//                    log.error("Type attr schema '" + typeOwner + "' not found");
-//                } else {
-//                    type = typeSchema.getDataType(monitor, typeName);
-//                }
-//            } catch (DBException e) {
-//                log.error(e);
-//            }
-//        } else {
-//            type = (XuguDataType)dataSource.getLocalDataType(typeName);
-//        }
-//        if (type == null) {
-//            log.debug("Data type '" + typeName + "' not found - declare new one");
-//            type = new XuguDataType(typeSchema == null ? dataSource : typeSchema, typeName, true);
-//            type.flagPredefined = true;
-//            if (typeSchema == null) {
-//                dataSource.dataTypeCache.cacheObject(type);
-//            } else {
-//                typeSchema.dataTypeCache.cacheObject(type);
-//            }
-//        }
         return type;
     }
 

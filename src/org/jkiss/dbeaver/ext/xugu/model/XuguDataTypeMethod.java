@@ -74,11 +74,7 @@ public class XuguDataTypeMethod extends XuguDataTypeMember implements DBSEntityM
 
         String resultTypeName = JDBCUtils.safeGetString(dbResult, "RESULT_TYPE_NAME");
         if (!CommonUtils.isEmpty(resultTypeName)) {
-            this.resultType = XuguDataType.resolveDataType(
-                monitor,
-                getDataSource(),
-                JDBCUtils.safeGetString(dbResult, "RESULT_TYPE_OWNER"),
-                resultTypeName);
+            this.resultType = XuguDataType.resolveDataType(resultTypeName);
             this.resultTypeMod = XuguDataTypeModifier.resolveTypeModifier(
                 JDBCUtils.safeGetString(dbResult, "RESULT_TYPE_MOD"));
         }

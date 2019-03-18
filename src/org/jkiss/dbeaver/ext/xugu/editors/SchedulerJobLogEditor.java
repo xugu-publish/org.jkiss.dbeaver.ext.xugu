@@ -62,7 +62,7 @@ public class SchedulerJobLogEditor extends AbstractDataEditor<XuguSchedulerJob>
                 DBDAttributeConstraint ac = new DBDAttributeConstraint(ownerAttr, ownerAttr.getOrdinalPosition());
                 ac.setVisible(false);
                 ac.setOperator(DBCLogicalOperator.EQUALS);
-                ac.setValue(job.getOwner());
+                ac.setValue(job.getSchema());
                 constraints.add(ac);
             }
             XuguTableColumn jobNameAttr = logView.getAttribute(monitor, "JOB_NAME");

@@ -129,11 +129,11 @@ public class XuguView extends XuguTableBase implements XuguSourceObject
         this.viewText = source;
     }
 
-    @Override
-    public AdditionalInfo getAdditionalInfo()
-    {
-        return additionalInfo;
-    }
+//    @Override
+//    public AdditionalInfo getAdditionalInfo()
+//    {
+//        return additionalInfo;
+//    }
 
     @Override
     protected String getTableTypeName()
@@ -141,17 +141,17 @@ public class XuguView extends XuguTableBase implements XuguSourceObject
         return "VIEW";
     }
 
-    @PropertyGroup()
-    @LazyProperty(cacheValidator = AdditionalInfoValidator.class)
-    public AdditionalInfo getAdditionalInfo(DBRProgressMonitor monitor) throws DBException
-    {
-        synchronized (additionalInfo) {
-            if (!additionalInfo.loaded && monitor != null) {
-                loadAdditionalInfo(monitor);
-            }
-            return additionalInfo;
-        }
-    }
+//    @PropertyGroup()
+//    @LazyProperty(cacheValidator = AdditionalInfoValidator.class)
+//    public AdditionalInfo getAdditionalInfo(DBRProgressMonitor monitor) throws DBException
+//    {
+//        synchronized (additionalInfo) {
+//            if (!additionalInfo.loaded && monitor != null) {
+//                loadAdditionalInfo(monitor);
+//            }
+//            return additionalInfo;
+//        }
+//    }
 
     @Override
     public void refreshObjectState(@NotNull DBRProgressMonitor monitor) throws DBCException

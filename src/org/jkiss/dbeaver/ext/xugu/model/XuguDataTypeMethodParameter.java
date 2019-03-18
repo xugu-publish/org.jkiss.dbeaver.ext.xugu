@@ -46,11 +46,7 @@ public class XuguDataTypeMethodParameter implements DBSParameter {
         this.name = JDBCUtils.safeGetString(dbResult, "PARAM_NAME");
         this.number = JDBCUtils.safeGetInt(dbResult, "PARAM_NO");
         this.mode = XuguParameterMode.getMode(JDBCUtils.safeGetString(dbResult, "PARAM_MODE"));
-        this.type = XuguDataType.resolveDataType(
-            monitor,
-            method.getDataSource(),
-            JDBCUtils.safeGetString(dbResult, "PARAM_TYPE_OWNER"),
-            JDBCUtils.safeGetString(dbResult, "PARAM_TYPE_NAME"));
+        this.type = XuguDataType.resolveDataType(JDBCUtils.safeGetString(dbResult, "PARAM_TYPE_NAME"));
         this.typeMod = XuguDataTypeModifier.resolveTypeModifier(
             JDBCUtils.safeGetString(dbResult, "PARAM_TYPE_MOD"));
     }

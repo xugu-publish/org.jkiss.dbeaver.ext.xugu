@@ -173,48 +173,49 @@ public class JobRunHandler extends XuguTaskHandler
 
     public static boolean runJob(DBRProgressMonitor monitor, DBCCompileLog compileLog, XuguSchedulerJob job) throws DBCException
     {
-        final DBEPersistAction[] compileActions = job.getRunActions();
-        if (ArrayUtils.isEmpty(compileActions)) {
-            return true;
-        }
-
-        try (JDBCSession session = DBUtils.openUtilSession(monitor, job, "Run '" + job.getName() + "'")) {
-            boolean success = true;
-            for (DBEPersistAction action : compileActions) {
-                final String script = action.getScript();
-                compileLog.trace(script);
-
-                if (monitor.isCanceled()) {
-                    break;
-                }
-                try {
-                    try (DBCStatement dbStat = session.prepareStatement(
-                        DBCStatementType.SCRIPT,
-                        script,
-                        false, false, false))
-                    {
-                        action.beforeExecute(session);
-                        dbStat.executeStatement();
-                    }
-                    action.afterExecute(session, null);
-                } catch (DBCException e) {
-                    action.afterExecute(session, e);
-                    throw e;
-                }
-                if (action instanceof XuguObjectPersistAction) {
-                    if (!logObjectErrors(session, compileLog, job, ((XuguObjectPersistAction) action).getObjectType())) {
-                        success = false;
-                    }
-                }
-            }
-            final DBSObjectState oldState = job.getObjectState();
-            job.refreshObjectState(monitor);
-            if (job.getObjectState() != oldState) {
-                job.getDataSource().getContainer().fireEvent(new DBPEvent(DBPEvent.Action.OBJECT_UPDATE, job));
-            }
-
-            return success;
-        }
+    	return true;
+//        final DBEPersistAction[] compileActions = job.getRunActions();
+//        if (ArrayUtils.isEmpty(compileActions)) {
+//            return true;
+//        }
+//
+//        try (JDBCSession session = DBUtils.openUtilSession(monitor, job, "Run '" + job.getName() + "'")) {
+//            boolean success = true;
+//            for (DBEPersistAction action : compileActions) {
+//                final String script = action.getScript();
+//                compileLog.trace(script);
+//
+//                if (monitor.isCanceled()) {
+//                    break;
+//                }
+//                try {
+//                    try (DBCStatement dbStat = session.prepareStatement(
+//                        DBCStatementType.SCRIPT,
+//                        script,
+//                        false, false, false))
+//                    {
+//                        action.beforeExecute(session);
+//                        dbStat.executeStatement();
+//                    }
+//                    action.afterExecute(session, null);
+//                } catch (DBCException e) {
+//                    action.afterExecute(session, e);
+//                    throw e;
+//                }
+//                if (action instanceof XuguObjectPersistAction) {
+//                    if (!logObjectErrors(session, compileLog, job, ((XuguObjectPersistAction) action).getObjectType())) {
+//                        success = false;
+//                    }
+//                }
+//            }
+//            final DBSObjectState oldState = job.getObjectState();
+//            job.refreshObjectState(monitor);
+//            if (job.getObjectState() != oldState) {
+//                job.getDataSource().getContainer().fireEvent(new DBPEvent(DBPEvent.Action.OBJECT_UPDATE, job));
+//            }
+//
+//            return success;
+//        }
     }
 
 }

@@ -31,7 +31,6 @@ import org.jkiss.dbeaver.model.exec.jdbc.JDBCSession;
 import org.jkiss.dbeaver.model.exec.jdbc.JDBCStatement;
 import org.jkiss.dbeaver.model.impl.DBObjectNameCaseTransformer;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
-import org.jkiss.dbeaver.model.impl.jdbc.cache.JDBCObjectCache;
 import org.jkiss.dbeaver.model.impl.jdbc.cache.JDBCStructCache;
 import org.jkiss.dbeaver.model.impl.jdbc.struct.JDBCTable;
 import org.jkiss.dbeaver.model.impl.jdbc.struct.JDBCTableColumn;
@@ -68,14 +67,6 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
         boolean isLoaded() { return loaded; }
     }
 
-    public static class AdditionalInfoValidator implements IPropertyCacheValidator<XuguTableBase> {
-        @Override
-        public boolean isPropertyCached(XuguTableBase object, Object propertyId)
-        {
-            return object.getAdditionalInfo().isLoaded();
-        }
-    }
-
     public static class CommentsValidator implements IPropertyCacheValidator<XuguTableBase> {
         @Override
         public boolean isPropertyCached(XuguTableBase object, Object propertyId)
@@ -85,10 +76,6 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
     }
 
     public final TriggerCache triggerCache = new TriggerCache();
-//    private final TablePrivCache tablePrivCache = new TablePrivCache();
-
-    public abstract TableAdditionalInfo getAdditionalInfo();
-
     protected abstract String getTableTypeName();
 
     protected boolean valid;

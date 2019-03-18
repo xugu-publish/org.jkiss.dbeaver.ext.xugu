@@ -54,6 +54,29 @@ public class XuguTableColumn extends JDBCTableColumn<XuguTableBase> implements D
     private String comment;
     private boolean hidden;
 
+    private int dbID;
+    private int tableID;
+    private boolean varying;
+    private boolean isSerial;
+    private int serialID;
+    private String timeStamp_t;
+    private String collator;
+    private String colHistory;
+    private int domainID;
+    private boolean deleted;
+    private boolean isVirtual;
+    private String comments;
+    private double repetRate;
+    private double dispersion;
+    private String maxVal;
+    private String minVal;
+    
+    private int colNo;
+    private String colName;
+    private int scale;
+    private String defVal;
+    private boolean notNull;
+    
     public XuguTableColumn(XuguTableBase table)
     {
         super(table, false);
@@ -68,29 +91,122 @@ public class XuguTableColumn extends JDBCTableColumn<XuguTableBase> implements D
         super(table, true);
         // Read default value first because it is of LONG type and has to be read before others
         //xfc 修改字段
-        setDefaultValue(JDBCUtils.safeGetString(dbResult, "DEF_VAL"));
-        setName(JDBCUtils.safeGetString(dbResult, "COL_NAME"));
-        setOrdinalPosition(JDBCUtils.safeGetInt(dbResult, "COL_NO"));
+        this.dbID = JDBCUtils.safeGetInt(dbResult, "DB_ID");
+        this.tableID = JDBCUtils.safeGetInt(dbResult, "TABLE_ID");
+        this.colNo = JDBCUtils.safeGetInt(dbResult, "COL_NO");
+        this.colName = JDBCUtils.safeGetString(dbResult, "COL_NAME");
         this.typeName = JDBCUtils.safeGetString(dbResult, "TYPE_NAME");
+        this.varying = JDBCUtils.safeGetBoolean(dbResult, "VARYING");
+        this.notNull = JDBCUtils.safeGetBoolean(dbResult, "NOT_NULL");
+        this.isSerial = JDBCUtils.safeGetBoolean(dbResult, "IS_SERIAL");
+        this.serialID = JDBCUtils.safeGetInt(dbResult, "SERIAL_ID");
+        this.timeStamp_t = JDBCUtils.safeGetString(dbResult, "TIMESTAMP_T");
+        this.collator = JDBCUtils.safeGetString(dbResult, "COLLATOR");
+        this.defVal = JDBCUtils.safeGetString(dbResult, "DEF_VAL");
+        this.colHistory = JDBCUtils.safeGetString(dbResult, "COL_HISTORY");
+        this.domainID = JDBCUtils.safeGetInt(dbResult, "DOMAIN_ID");
+        this.deleted = JDBCUtils.safeGetBoolean(dbResult, "DELETED");
+        this.isVirtual = JDBCUtils.safeGetBoolean(dbResult, "IS_VIRTUAL");
+        this.comments = JDBCUtils.safeGetString(dbResult, "COMMENTS");
+        this.repetRate = JDBCUtils.safeGetDouble(dbResult, "REPET_RATE");
+        this.dispersion = JDBCUtils.safeGetDouble(dbResult, "DISPERSION");
+        this.maxVal = JDBCUtils.safeGetString(dbResult, "MAX_VAL");
+        this.minVal = JDBCUtils.safeGetString(dbResult, "MIN_VAL");
+        
+        setDefaultValue(this.defVal);
+        setName(this.colName);
+        setOrdinalPosition(this.colNo);
         this.type = new XuguDataType(this, this.typeName, true);
-        System.out.println("TTTType "+this.type.getFullTypeName()+" "+this.type.getMaxLength()+" "+this.type.getMinScale()+" ");
-        System.out.print(this.type.getPrecision()+" ");
         if (this.type != null) {
             this.typeName = type.getFullyQualifiedName(DBPEvaluationContext.DDL);
             this.valueType = type.getTypeID();
+            if(this.typeName.equals("NUMERIC")){
+            	this.scale = JDBCUtils.safeGetInt(dbResult, "SCALE")%65536;
+            	this.precision = (JDBCUtils.safeGetInt(dbResult, "SCALE")-this.scale)/65536;
+            }else if(this.typeName.equals("CHAR")) {
+            	this.precision = JDBCUtils.safeGetInt(dbResult, "SCALE");
+            	this.scale = 0;
+            }else if(this.typeName.matches("INTERVAL(.*)")) {
+            	this.scale = JDBCUtils.safeGetInt(dbResult, "SCALE")%65536;
+            	this.precision = (JDBCUtils.safeGetInt(dbResult, "SCALE")-this.scale)/65536;
+            }else {
+            	this.precision = this.type.getPrecision();
+            	this.scale = this.type.getMaxScale();
+            }
         }
         if (typeMod == XuguDataTypeModifier.REF) {
             this.valueType = Types.REF;
         }
-//        String charUsed = JDBCUtils.safeGetString(dbResult, "CHAR_USED");
-//        setMaxLength(JDBCUtils.safeGetLong(dbResult, "C".equals(charUsed) ? "CHAR_LENGTH" : "DATA_LENGTH"));
-        setRequired(!"Y".equals(JDBCUtils.safeGetString(dbResult, "NOT_NULL")));
-        setScale(JDBCUtils.safeGetInteger(dbResult, "SCALE"));
-        setPrecision(this.type.getPrecision());
-//        this.hidden = JDBCUtils.safeGetBoolean(dbResult, "HIDDEN_COLUMN", XuguConstants.YES);
+        setRequired(this.notNull);
+        setScale(this.scale);
+        setPrecision(this.precision);
     }
 
-    @NotNull
+    public int getDbID() {
+		return dbID;
+	}
+
+	public int getTableID() {
+		return tableID;
+	}
+
+	public boolean isVarying() {
+		return varying;
+	}
+
+	public boolean isSerial() {
+		return isSerial;
+	}
+
+	public int getSerialID() {
+		return serialID;
+	}
+
+	public String getTimeStamp_t() {
+		return timeStamp_t;
+	}
+
+	public String getCollator() {
+		return collator;
+	}
+
+	public String getColHistory() {
+		return colHistory;
+	}
+
+	public int getDomainID() {
+		return domainID;
+	}
+
+	public boolean isDeleted() {
+		return deleted;
+	}
+
+	public boolean isVirtual() {
+		return isVirtual;
+	}
+
+	public String getComments() {
+		return comments;
+	}
+
+	public double getRepetRate() {
+		return repetRate;
+	}
+
+	public double getDispersion() {
+		return dispersion;
+	}
+
+	public String getMaxVal() {
+		return maxVal;
+	}
+
+	public String getMinVal() {
+		return minVal;
+	}
+
+	@NotNull
     @Override
     public XuguDataSource getDataSource()
     {
