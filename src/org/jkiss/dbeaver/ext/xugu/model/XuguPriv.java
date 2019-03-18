@@ -26,24 +26,16 @@ import java.sql.ResultSet;
 /**
  * OraclePrivRole
  */
-public abstract class XuguPriv extends XuguObject<XuguGrantee> implements DBAPrivilege {
-    private boolean adminOption;
+public abstract class XuguPriv extends XuguObject<XuguRole> implements DBAPrivilege {
 
-    public XuguPriv(XuguGrantee user, String name, ResultSet resultSet) {
-        super(user, name, true);
-        this.adminOption = JDBCUtils.safeGetBoolean(resultSet, "ADMIN_OPTION", "Y");
+    public XuguPriv(XuguRole owner, String name, ResultSet resultSet) {
+        super(owner, name, true);
     }
 
     @NotNull
     @Override
     public String getName() {
         return super.getName();
-    }
-
-    @Property(viewable = true, order = 3)
-    public boolean isAdminOption()
-    {
-        return adminOption;
     }
 
 }

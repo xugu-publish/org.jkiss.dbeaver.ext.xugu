@@ -33,7 +33,7 @@ public class XuguPrivRole extends XuguPriv implements DBSObjectLazy<XuguDataSour
     private Object role;
     private boolean defaultRole;
 
-    public XuguPrivRole(XuguGrantee user, ResultSet resultSet) {
+    public XuguPrivRole(XuguRole user, ResultSet resultSet) {
         super(user, JDBCUtils.safeGetString(resultSet, "GRANTED_ROLE"), resultSet);
         this.defaultRole = JDBCUtils.safeGetBoolean(resultSet, "DEFAULT_ROLE", "Y");
         this.role = this.name;

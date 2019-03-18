@@ -194,11 +194,11 @@ public class XuguSchedulerJob extends XuguSchemaObject implements XuguStatefulOb
 	}
     
 
-//    @Association
-//    public Collection<XuguSchedulerJobArgument> getArguments(DBRProgressMonitor monitor) throws DBException
-//    {
-//        return argumentsCache.getAllObjects(monitor, this);
-//    }
+    @Association
+    public Collection<XuguSchedulerJobArgument> getArguments(DBRProgressMonitor monitor) throws DBException
+    {
+        return argumentsCache.getAllObjects(monitor, this);
+    }
 
     static class ArgumentsCache extends JDBCObjectCache<XuguSchedulerJob, XuguSchedulerJobArgument> {
 
@@ -206,11 +206,9 @@ public class XuguSchedulerJob extends XuguSchemaObject implements XuguStatefulOb
         protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguSchedulerJob job) throws SQLException
         {
             JDBCPreparedStatement dbStat = session.prepareStatement(
-                    "SELECT * FROM SYS.ALL_SCHEDULER_JOB_ARGS " +
-                            "WHERE OWNER=? AND JOB_NAME=? " +
-                            "ORDER BY ARGUMENT_POSITION");
-            dbStat.setString(1, job.getSchema().getName());
-            dbStat.setString(2, job.getName());
+                    "SELECT JOB_PARAM_NUM, JOB_ACTION FROM "+job.getSchema().getRoleFlag()+"_JOBS " +
+                            "WHERE JOB_ID=? ");
+            dbStat.setString(1, job.getJobID()+"");
             return dbStat;
         }
 

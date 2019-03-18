@@ -162,6 +162,10 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
     {
         this.user = user;
     }
+    
+    public String getRoleFlag() {
+    	return roleFlag;
+    }
 
     @Association
     public Collection<XuguTableIndex> getIndexes(DBRProgressMonitor monitor)

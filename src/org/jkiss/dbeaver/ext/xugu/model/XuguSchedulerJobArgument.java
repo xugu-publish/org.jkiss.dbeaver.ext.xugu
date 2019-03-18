@@ -32,6 +32,9 @@ public class XuguSchedulerJobArgument implements DBSParameter
 {
     private final XuguSchedulerJob job;
     private String name;
+    private String paramDefine;
+    private int paramNum;
+    
     private int position;
     private final String type;
     private String value;
@@ -43,12 +46,16 @@ public class XuguSchedulerJobArgument implements DBSParameter
         ResultSet dbResult)
     {
         this.job = job;
-        this.name = JDBCUtils.safeGetString(dbResult, "ARGUMENT_NAME");
-        this.position = JDBCUtils.safeGetInt(dbResult, "ARGUMENT_POSITION");
-        this.type = JDBCUtils.safeGetString(dbResult, "ARGUMENT_TYPE");
-        this.value = JDBCUtils.safeGetString(dbResult, "VALUE");
-        this.anyDataValue = JDBCUtils.safeGetString(dbResult, "ANYDATA_VALUE");
-        this.outArgument = JDBCUtils.safeGetString(dbResult, "OUT_ARGUMENT");
+        this.paramNum = JDBCUtils.safeGetInt(dbResult, "JOB_PARAM_NUM");
+        this.paramDefine = JDBCUtils.safeGetString(dbResult, "JOB_ACTION");
+        this.type = "";
+        System.out.println("JOB_PARAM"+this.paramDefine);
+//        this.name = JDBCUtils.safeGetString(dbResult, "ARGUMENT_NAME");
+//        this.position = JDBCUtils.safeGetInt(dbResult, "ARGUMENT_POSITION");
+//        this.type = JDBCUtils.safeGetString(dbResult, "ARGUMENT_TYPE");
+//        this.value = JDBCUtils.safeGetString(dbResult, "VALUE");
+//        this.anyDataValue = JDBCUtils.safeGetString(dbResult, "ANYDATA_VALUE");
+//        this.outArgument = JDBCUtils.safeGetString(dbResult, "OUT_ARGUMENT");
     }
 
     @Nullable

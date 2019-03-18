@@ -39,7 +39,7 @@ import java.util.Collection;
 /**
  * OracleUser
  */
-public class XuguUser extends XuguGrantee implements DBAUser, DBPRefreshableObject, DBPSaveableObject
+public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshableObject, DBPSaveableObject
 {
     private static final Log log = Log.getLog(XuguUser.class);
     
@@ -68,13 +68,13 @@ public class XuguUser extends XuguGrantee implements DBAUser, DBPRefreshableObje
     private Timestamp last_modi_time;
     
     
-    public XuguUser(XuguDataSource dataSource)
-    {
-        super(dataSource);
-    }
+//    public XuguUser(XuguDataSource dataSource)
+//    {
+//        super(dataSource);
+//    }
 
     public XuguUser(XuguDataSource dataSource, ResultSet resultSet) {
-        super(dataSource);
+        super(dataSource, true);
         if(resultSet!=null) {
         	this.db_id = JDBCUtils.safeGetInt(resultSet, "DB_ID");
             this.user_id = JDBCUtils.safeGetInt(resultSet, "USER_ID");
@@ -204,6 +204,12 @@ public class XuguUser extends XuguGrantee implements DBAUser, DBPRefreshableObje
 		return last_modi_time;
 	}
 
+	@Override
+	public DBSObject refreshObject(DBRProgressMonitor monitor) throws DBException {
+		// TODO Auto-generated method stub
+		return this;
+	}
+
 //    @Property(order = 8)
 //    @LazyProperty(cacheValidator = XuguTablespace.TablespaceReferenceValidator.class)
 //    public Object getDefaultTablespace(DBRProgressMonitor monitor) throws DBException
@@ -232,18 +238,18 @@ public class XuguUser extends XuguGrantee implements DBAUser, DBPRefreshableObje
 //        }
 //    }
 
-    @Override
-    @Association
-    public Collection<XuguPrivRole> getRolePrivs(DBRProgressMonitor monitor) throws DBException
-    {
-        return rolePrivCache.getAllObjects(monitor, this);
-    }
+//    @Override
+//    @Association
+//    public Collection<XuguPrivRole> getRolePrivs(DBRProgressMonitor monitor) throws DBException
+//    {
+//        return rolePrivCache.getAllObjects(monitor, this);
+//    }
 
-    @Nullable
-    @Override
-    public DBSObject refreshObject(@NotNull DBRProgressMonitor monitor) throws DBException {
-        return super.refreshObject(monitor);
-    }
+//    @Nullable
+//    @Override
+//    public DBSObject refreshObject(@NotNull DBRProgressMonitor monitor) throws DBException {
+//        return super.refreshObject(monitor);
+//    }
 
 //    public static class ProfileReferenceValidator implements IPropertyCacheValidator<XuguUser> {
 //        @Override

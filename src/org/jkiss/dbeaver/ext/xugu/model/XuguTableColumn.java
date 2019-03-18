@@ -103,7 +103,7 @@ public class XuguTableColumn extends JDBCTableColumn<XuguTableBase> implements D
         this.timeStamp_t = JDBCUtils.safeGetString(dbResult, "TIMESTAMP_T");
         this.collator = JDBCUtils.safeGetString(dbResult, "COLLATOR");
         this.defVal = JDBCUtils.safeGetString(dbResult, "DEF_VAL");
-        this.colHistory = JDBCUtils.safeGetString(dbResult, "COL_HISTORY");
+//        this.colHistory = JDBCUtils.safeGetString(dbResult, "COL_HISTORY");
         this.domainID = JDBCUtils.safeGetInt(dbResult, "DOMAIN_ID");
         this.deleted = JDBCUtils.safeGetBoolean(dbResult, "DELETED");
         this.isVirtual = JDBCUtils.safeGetBoolean(dbResult, "IS_VIRTUAL");

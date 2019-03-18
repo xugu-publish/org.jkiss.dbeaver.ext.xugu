@@ -20,6 +20,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.DBPRefreshableObject;
 import org.jkiss.dbeaver.model.access.DBARole;
 import org.jkiss.dbeaver.model.exec.jdbc.JDBCPreparedStatement;
 import org.jkiss.dbeaver.model.exec.jdbc.JDBCResultSet;
@@ -39,18 +40,22 @@ import java.util.Collection;
 /**
  * OracleRole
  */
-public class XuguRole extends XuguGrantee implements DBARole
+public class XuguRole extends XuguGlobalObject implements DBARole, DBPRefreshableObject
 {
     private static final Log log = Log.getLog(XuguRole.class);
 
     private String name;
+    private int id;
     private String authentication;
     private final UserCache userCache = new UserCache();
 
     public XuguRole(XuguDataSource dataSource, ResultSet resultSet) {
-        super(dataSource);
-        this.name = JDBCUtils.safeGetString(resultSet, "ROLE");
-        this.authentication = JDBCUtils.safeGetStringTrimmed(resultSet, "PASSWORD_REQUIRED");
+        super(dataSource, true);
+        if(resultSet!=null) {
+        	this.name = JDBCUtils.safeGetString(resultSet, "USER_NAME");
+            this.id = JDBCUtils.safeGetInt(resultSet, "USER_ID");
+            this.authentication = JDBCUtils.safeGetString(resultSet, "PASSWORD");
+        }
     }
 
     @NotNull
@@ -66,6 +71,10 @@ public class XuguRole extends XuguGrantee implements DBARole
         return authentication;
     }
 
+    public int getID() {
+    	return this.id;
+    }
+    
     @Association
     public Collection<XuguPrivUser> getUserPrivs(DBRProgressMonitor monitor) throws DBException
     {
@@ -76,7 +85,7 @@ public class XuguRole extends XuguGrantee implements DBARole
     @Override
     public DBSObject refreshObject(@NotNull DBRProgressMonitor monitor) throws DBException {
         userCache.clearCache();
-        return super.refreshObject(monitor);
+        return this;
     }
 
     static class UserCache extends JDBCObjectCache<XuguRole, XuguPrivUser> {
@@ -84,8 +93,9 @@ public class XuguRole extends XuguGrantee implements DBARole
         protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguRole owner) throws SQLException
         {
             final JDBCPreparedStatement dbStat = session.prepareStatement(
-                    "SELECT * FROM DBA_ROLE_PRIVS WHERE GRANTED_ROLE=? ORDER BY GRANTEE");
-            dbStat.setString(1, owner.getName());
+                    "SELECT * FROM SYS_USERS WHERE USER_ID IN \n" + 
+                    "(SELECT USER_ID FROM SYS_ROLE_MEMBERS WHERE ROLE_ID=?)");
+            dbStat.setString(1, owner.getID()+"");
             return dbStat;
         }
 

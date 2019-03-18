@@ -343,13 +343,13 @@ public class XuguDataSource extends JDBCDataSource
         return roleCache.getAllObjects(monitor, this);
     }
 
-    public XuguGrantee getGrantee(DBRProgressMonitor monitor, String name) throws DBException {
-        XuguUser user = userCache.getObject(monitor, this, name);
-        if (user != null) {
-            return user;
-        }
-        return roleCache.getObject(monitor, this, name);
-    }
+//    public XuguGrantee getGrantee(DBRProgressMonitor monitor, String name) throws DBException {
+//        XuguUser user = userCache.getObject(monitor, this, name);
+//        if (user != null) {
+//            return user;
+//        }
+//        return roleCache.getObject(monitor, this, name);
+//    }
 
     @Association
     public Collection<XuguSynonym> getPublicSynonyms(DBRProgressMonitor monitor) throws DBException {
@@ -949,7 +949,7 @@ public class XuguDataSource extends JDBCDataSource
         @Override
         protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguDataSource owner) throws SQLException {
             return session.prepareStatement(
-                "SELECT * FROM DBA_ROLES ORDER BY ROLE");
+                "SELECT * FROM SYS_USERS WHERE IS_ROLE=true");
         }
 
         @Override

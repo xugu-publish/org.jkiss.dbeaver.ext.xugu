@@ -31,11 +31,9 @@ import java.sql.ResultSet;
  */
 public class XuguPrivUser extends XuguPriv implements DBSObjectLazy<XuguDataSource> {
     private Object user;
-    private boolean defaultRole;
 
-    public XuguPrivUser(XuguGrantee user, ResultSet resultSet) {
-        super(user, JDBCUtils.safeGetString(resultSet, "GRANTEE"), resultSet);
-        this.defaultRole = JDBCUtils.safeGetBoolean(resultSet, "DEFAULT_ROLE", "Y");
+    public XuguPrivUser(XuguRole owner, ResultSet resultSet) {
+        super(owner, JDBCUtils.safeGetString(resultSet, "USER_NAME"), resultSet);
         this.user = this.name;
     }
 
@@ -52,12 +50,6 @@ public class XuguPrivUser extends XuguPriv implements DBSObjectLazy<XuguDataSour
             return user;
         }
         return XuguUtils.resolveLazyReference(monitor, getDataSource(), getDataSource().userCache, this, null);
-    }
-
-    @Property(viewable = true, order = 4)
-    public boolean isDefaultRole()
-    {
-        return defaultRole;
     }
 
     @Override
