@@ -77,7 +77,7 @@ public class XuguDataSource extends JDBCDataSource
     private final TablespaceCache tablespaceCache = new TablespaceCache();
     final UserCache userCache = new UserCache();
     final ProfileCache profileCache = new ProfileCache();
-    final RoleCache roleCache = new RoleCache();
+    final public RoleCache roleCache = new RoleCache();
     
     private xuguOutputReader outputReader;
     private XuguSchema publicSchema;

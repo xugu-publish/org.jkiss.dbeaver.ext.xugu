@@ -32,6 +32,7 @@ import java.util.Map;
  */
 public enum XuguObjectType implements DBSObjectType {
 	TABLESPACE("TABLESPACE", null, XuguTablespace.class, null),
+	ROLE("ROLE", null, XuguRole.class, null),
 	CLUSTER("CLUSTER", null, DBSObject.class, null),
     CONSTRAINT ("CONSTRAINT", DBIcon.TREE_CONSTRAINT, XuguTableConstraint.class, null), // fake object
 	CONSUMER_GROUP("CONSUMER GROUP", null, DBSObject.class, null),

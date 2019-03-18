@@ -48,6 +48,7 @@ public class XuguRole extends XuguGlobalObject implements DBARole, DBPRefreshabl
     private int id;
     private String authentication;
     private final UserCache userCache = new UserCache();
+    private String userDesc;
 
     public XuguRole(XuguDataSource dataSource, ResultSet resultSet) {
         super(dataSource, true);
@@ -64,6 +65,10 @@ public class XuguRole extends XuguGlobalObject implements DBARole, DBPRefreshabl
     public String getName() {
         return name;
     }
+    
+    public void setName(String name) {
+    	this.name = name;
+    }
 
     @Property(viewable = true, order = 3)
     public String getAuthentication()
@@ -73,6 +78,14 @@ public class XuguRole extends XuguGlobalObject implements DBARole, DBPRefreshabl
 
     public int getID() {
     	return this.id;
+    }
+    
+    public String getUserDesc() {
+    	return userDesc;
+    }
+    
+    public void setUserDesc(String desc) {
+    	userDesc = desc;
     }
     
     @Association
