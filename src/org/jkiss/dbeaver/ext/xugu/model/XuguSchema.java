@@ -938,7 +938,12 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         	//xfc 修改了获取所有dblink信息的sql
         	StringBuilder sql = new StringBuilder();
         	sql.append("SELECT * FROM ");
-        	sql.append("SYS_DBLINKS");
+        	if(owner.roleFlag.equals("USER")) {
+        		sql.append("SYS");
+        	}else {
+        		sql.append(owner.roleFlag);
+        	}
+        	sql.append("_DBLINKS");
             JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
             return dbStat;
         }
