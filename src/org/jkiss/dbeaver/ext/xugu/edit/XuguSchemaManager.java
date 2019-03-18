@@ -53,7 +53,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * OracleSchemaManager
+ * XuguSchemaManager
  */
 public class XuguSchemaManager extends SQLObjectEditor<XuguSchema, XuguDataSource> implements DBEObjectRenamer<XuguSchema> {
 

@@ -558,12 +558,13 @@
         <initializer class="org.jkiss.dbeaver.ext.xugu.XuguPreferencesInitializer"/>
     </extension>
 
+	<!--
     <extension point="org.eclipse.ui.preferencePages">
         <page category="org.jkiss.dbeaver.preferences.drivers" id="org.jkiss.dbeaver.preferences.xugu.general" class="org.jkiss.dbeaver.ext.xugu.views.PrefPageXugu" name="Xugu">
             <keywordReference id="org.jkiss.dbeaver.core.keyword.dbeaver"/>
         </page>
     </extension>
-
+    
     <extension point="org.eclipse.ui.propertyPages">
         <page id="org.jkiss.dbeaver.preferences.xugu.main" class="org.jkiss.dbeaver.ext.xugu.views.PrefPageXugu" name="%page.org.jkiss.dbeaver.preferences.xugu.main.name">
             <enabledWhen>
@@ -573,7 +574,8 @@
             </enabledWhen>
         </page>
     </extension>
-
+	-->
+	
     <extension point="org.eclipse.ui.importWizards">
         <wizard
             category="org.jkiss.dbeaver.import_config.third-party"

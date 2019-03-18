@@ -54,7 +54,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * OracleSchemaManager
+ * XuguRoleManager
  */
 public class XuguRoleManager extends SQLObjectEditor<XuguRole, XuguDataSource> implements DBEObjectRenamer<XuguRole> {
 

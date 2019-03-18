@@ -50,7 +50,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * MySQLCatalogManager
+ * XuguDatabaseManager
  */
 public class XuguDatabaseManager extends SQLObjectEditor<XuguDatabase, XuguDataSource> implements DBEObjectRenamer<XuguDatabase> {
 
