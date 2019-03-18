@@ -29,6 +29,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.ext.xugu.XuguMessages;
 import org.jkiss.dbeaver.ext.xugu.model.XuguDataSource;
 import org.jkiss.dbeaver.ext.xugu.model.XuguDatabase;
 import org.jkiss.dbeaver.ext.xugu.model.XuguSchema;
@@ -151,23 +152,19 @@ public class XuguSchemaManager extends SQLObjectEditor<XuguSchema, XuguDataSourc
         @Override
         protected Control createDialogArea(Composite parent)
         {
-            getShell().setText("Set schema properties");
+            getShell().setText(XuguMessages.dialog_schema_create_title);
 
             Control container = super.createDialogArea(parent);
-            Composite composite = UIUtils.createPlaceholder((Composite) container, 3, 5);
+            Composite composite = UIUtils.createPlaceholder((Composite) container, 2, 5);
             composite.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-            nameText = UIUtils.createLabelText(composite, "Schema Name", null);
+            nameText = UIUtils.createLabelText(composite, XuguMessages.dialog_schema_name, null);
             nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-            
-            //xfc 增加了设置数据库名和用户名
-//            dbNameText  = UIUtils.createLabelText(composite, "DB Name", null);
-//            dbNameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-            
-            userNameText = UIUtils.createLabelText(composite, "User Name", null);
+  
+            userNameText = UIUtils.createLabelText(composite, XuguMessages.dialog_schema_user, null);
             userNameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-            UIUtils.createInfoLabel(composite, "Creating a schema.", GridData.FILL_HORIZONTAL, 2);
+            UIUtils.createInfoLabel(composite, XuguMessages.dialog_schema_create_info, GridData.FILL_HORIZONTAL, 2);
 
             return parent;
         }

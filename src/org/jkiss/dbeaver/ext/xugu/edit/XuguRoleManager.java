@@ -29,6 +29,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.ext.xugu.XuguMessages;
 import org.jkiss.dbeaver.ext.xugu.model.XuguDataSource;
 import org.jkiss.dbeaver.ext.xugu.model.XuguDatabase;
 import org.jkiss.dbeaver.ext.xugu.model.XuguRole;
@@ -147,23 +148,19 @@ public class XuguRoleManager extends SQLObjectEditor<XuguRole, XuguDataSource> i
         @Override
         protected Control createDialogArea(Composite parent)
         {
-            getShell().setText("Set role properties");
+            getShell().setText(XuguMessages.dialog_role_create_title);
 
             Control container = super.createDialogArea(parent);
-            Composite composite = UIUtils.createPlaceholder((Composite) container, 3, 5);
+            Composite composite = UIUtils.createPlaceholder((Composite) container, 2, 5);
             composite.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-            roleText = UIUtils.createLabelText(composite, "Role Name", null);
+            roleText = UIUtils.createLabelText(composite, XuguMessages.dialog_role_name, null);
             roleText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             
-            //xfc 增加了设置数据库名和用户名
-//            dbNameText  = UIUtils.createLabelText(composite, "DB Name", null);
-//            dbNameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-            
-            userNameText = UIUtils.createLabelText(composite, "User Name", null);
+            userNameText = UIUtils.createLabelText(composite, XuguMessages.dialog_role_user, null);
             userNameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-            UIUtils.createInfoLabel(composite, "Creating a role.", GridData.FILL_HORIZONTAL, 2);
+            UIUtils.createInfoLabel(composite, XuguMessages.dialog_role_create_info, GridData.FILL_HORIZONTAL, 2);
 
             return parent;
         }
