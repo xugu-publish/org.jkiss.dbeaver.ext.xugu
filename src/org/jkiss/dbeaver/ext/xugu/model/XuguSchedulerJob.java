@@ -74,6 +74,7 @@ public class XuguSchedulerJob extends XuguSchemaObject implements XuguStatefulOb
     private boolean autoDrop;
     private boolean isSys;
     private String comments;
+    private Collection<XuguProcedureArgument> procParams;
 
     private final ArgumentsCache argumentsCache = new ArgumentsCache();
 
@@ -90,7 +91,7 @@ public class XuguSchedulerJob extends XuguSchemaObject implements XuguStatefulOb
     	CHAIN_STALLED;
     }
 
-    protected XuguSchedulerJob(XuguSchema schema, ResultSet dbResult) {
+    protected XuguSchedulerJob(DBRProgressMonitor monitor, JDBCSession session, XuguSchema schema, ResultSet dbResult) {
         super(schema, JDBCUtils.safeGetString(dbResult, "JOB_NAME"), true);
 
         dbID = JDBCUtils.safeGetInt(dbResult, "DB_ID");
@@ -113,6 +114,51 @@ public class XuguSchedulerJob extends XuguSchemaObject implements XuguStatefulOb
         autoDrop = JDBCUtils.safeGetBoolean(dbResult, "AUTO_DROP");
         isSys = JDBCUtils.safeGetBoolean(dbResult, "IS_SYS");
         comments = JDBCUtils.safeGetString(dbResult, "COMMENTS");
+        //加载参数信息
+        if(paramNum>0) {
+        	String targetPro = actionDef;
+        	if(targetPro.indexOf(".")!=-1) {
+        		targetPro = targetPro.substring(targetPro.indexOf(".")+1, targetPro.length());
+        	}
+        	try {
+        		//目标尚未被缓存
+        		if(schema.proceduresCache.getCachedObject(targetPro)==null) {
+        			try {
+	        			StringBuilder sql = new StringBuilder();
+	                	sql.append("SELECT * FROM ");
+	                	sql.append(schema.getRoleFlag());
+	                	sql.append("_PROCEDURES WHERE SCHEMA_ID=");
+	                	sql.append(schema.getId());
+	                	sql.append(" AND PROC_NAME = '");
+	            		sql.append(targetPro);
+	            		sql.append("'");
+	            		JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
+	            		ResultSet res = dbStat.executeQuery();
+	            		if(res!=null) {
+	            			//为了构造函数可以正常获取数据需要先遍历
+	            			while(res.next()) {
+	            				res.getInt(1);
+	            				res.getInt(2);
+	            				res.getInt(3);
+	            				res.getInt(4);
+	            				res.getString(5);
+	            			}
+	            			XuguProcedureStandalone pro = new XuguProcedureStandalone(monitor, schema, res);
+	            			this.procParams = pro.getParameters(monitor);
+	            		}
+	            		dbStat.close();
+					} catch (SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+        		}else {
+        			this.procParams = schema.proceduresCache.getCachedObject(targetPro).getParameters(monitor);
+        		}
+			} catch (DBException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+        }
     }
 
     public int getJobID() {
@@ -195,11 +241,11 @@ public class XuguSchedulerJob extends XuguSchemaObject implements XuguStatefulOb
 		return comments;
 	}
     
-
     @Association
-    public Collection<XuguSchedulerJobArgument> getArguments(DBRProgressMonitor monitor) throws DBException
+    public Collection<XuguProcedureArgument> getArguments(DBRProgressMonitor monitor) throws DBException
     {
-        return argumentsCache.getAllObjects(monitor, this);
+    	System.out.println("real return the params");
+        return this.procParams;
     }
 
     static class ArgumentsCache extends JDBCObjectCache<XuguSchedulerJob, XuguSchedulerJobArgument> {
@@ -260,59 +306,45 @@ public class XuguSchedulerJob extends XuguSchemaObject implements XuguStatefulOb
         }
 	}
 
-//    public DBEPersistAction[] getRunActions() {
-//        StringBuffer runScript = new StringBuffer();
-//        runScript.append("BEGIN\n");
-//        runScript.append("\tDBMS_SCHEDULER.RUN_JOB(JOB_NAME => '");
-//        runScript.append(getFullyQualifiedName(DBPEvaluationContext.DDL));
-//        runScript.append("', USE_CURRENT_SESSION => FALSE);");
-//        runScript.append("END;");
-//    	return new DBEPersistAction[] {
-//            new XuguObjectPersistAction(
-//                XuguObjectType.JOB,
-//                "Run Job",
-//                runScript.toString()
-//            )};
-//    }
-
 	@Override
 	public String getObjectDefinitionText(DBRProgressMonitor monitor, Map<String, Object> options) throws DBException {
-        if (action == null && monitor != null) {
-        	monitor.beginTask("Load action for '" + this.getName() + "'...", 1);
-        	try (final JDBCSession session = DBUtils.openMetaSession(monitor, this, "Load action for " + XuguObjectType.JOB + " '" + this.getName() + "'")) {
-        		try (JDBCPreparedStatement dbStat = session.prepareStatement(
-                        "SELECT JOB_ACTION FROM " + this.getDataSource().getRoleFlag() + "_JOBS " +
-                            "WHERE DB_ID=? AND JOB_NAME=? ")) {
-                    dbStat.setString(1, getDbID()+"" );
-                    dbStat.setString(2, getName());
-                    dbStat.setFetchSize(DBConstants.METADATA_FETCH_SIZE);
-                    try (JDBCResultSet dbResult = dbStat.executeQuery()) {
-                        StringBuilder actionBuilder = null;
-                        int lineCount = 0;
-                        while (dbResult.next()) {
-                            if (monitor.isCanceled()) {
-                                break;
-                            }
-                            final String line = dbResult.getString(1);
-                            if (actionBuilder == null) {
-                            	actionBuilder = new StringBuilder(4000);
-                            }
-                            actionBuilder.append(line);
-                            lineCount++;
-                            monitor.subTask("Line " + lineCount);
-                        }
-                        if (actionBuilder != null) {
-                        	action = actionBuilder.toString().getBytes();
-                        }
-                    }
-        		}
-            } catch (SQLException e) {
-                throw new DBCException(e, this.getDataSource());
-            } finally {
-                monitor.done();
-            }
-        }
-        return action.toString();
+		return "ACTION STRING";
+//        if (action == null && monitor != null) {
+//        	monitor.beginTask("Load action for '" + this.getName() + "'...", 1);
+//        	try (final JDBCSession session = DBUtils.openMetaSession(monitor, this, "Load action for " + XuguObjectType.JOB + " '" + this.getName() + "'")) {
+//        		try (JDBCPreparedStatement dbStat = session.prepareStatement(
+//                        "SELECT JOB_ACTION FROM " + this.getDataSource().getRoleFlag() + "_JOBS " +
+//                            "WHERE DB_ID=? AND JOB_NAME=? ")) {
+//                    dbStat.setString(1, getDbID()+"" );
+//                    dbStat.setString(2, getName());
+//                    dbStat.setFetchSize(DBConstants.METADATA_FETCH_SIZE);
+//                    try (JDBCResultSet dbResult = dbStat.executeQuery()) {
+//                        StringBuilder actionBuilder = null;
+//                        int lineCount = 0;
+//                        while (dbResult.next()) {
+//                            if (monitor.isCanceled()) {
+//                                break;
+//                            }
+//                            final String line = dbResult.getString(1);
+//                            if (actionBuilder == null) {
+//                            	actionBuilder = new StringBuilder(4000);
+//                            }
+//                            actionBuilder.append(line);
+//                            lineCount++;
+//                            monitor.subTask("Line " + lineCount);
+//                        }
+//                        if (actionBuilder != null) {
+//                        	action = actionBuilder.toString().getBytes();
+//                        }
+//                    }
+//        		}
+//            } catch (SQLException e) {
+//                throw new DBCException(e, this.getDataSource());
+//            } finally {
+//                monitor.done();
+//            }
+//        }
+//        return action.toString();
 	}
 
 	@Override

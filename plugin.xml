@@ -138,18 +138,20 @@
                                 	-->  
                             	</items>
                         	</folder>
-                        	<!--存储过程-->
+                        	<!--存储过程和函数-->
                         	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguProcedureStandalone" label="%tree.procedures.node.name" icon="#procedures" description="Procedures">
                             	<items label="%tree.procedures.node.name" itemLabel="%tree.procedure.node.name" path="procedure" property="procedures" icon="#procedure" id="Procedure">
                                 	<items label="%tree.arguments.node.name" itemLabel="%tree.argument.node.name" path="argument" property="parameters" icon="#argument" navigable="false" inline="false">
 				                    	<items ref="ProcedureArgumentAttributes"/>
 				                    </items>
 				                </items>
+				                <!--
                             	<items label="%tree.functions.node.name" itemLabel="%tree.function.node.name" path="function" property="function" icon="#function" id="Function">
 				                	<items label="%tree.arguments.node.name" itemLabel="%tree.argument.node.name" path="argument" property="parameters" icon="#argument" navigable="false" inline="false">
 				                		<items ref="ProcedureArgumentAttributes"/>
 				                	</items>
 				                </items>
+				                -->
                         	</folder>
 				        	<!--同义词-->               
                         	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguSynonym" label="%tree.synonyms.node.name" icon="#synonyms" description="Synonyms">
@@ -166,6 +168,7 @@
                         	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguDBLink" label="%tree.database_links.node.name" icon="#folder_link" description="Database Links (DBLinks)">
                             	<items label="%tree.database_links.node.name" path="databaseLink" property="databaseLinks" icon="#link"/>
                         	</folder>
+                        	<!--作业-->
 	                        <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguSchedulerJob" label="%tree.scheduler.jobs.node.name" icon="#scheduler_job_folder" description="Scheduler jobs">
                                 <items label="%tree.scheduler.job.node.name" path="schedulerJob" property="schedulerJobs" icon="icons/scheduled_job.png">
                                     <items label="%tree.scheduler.job.arguments.node.name" itemLabel="%tree.scheduler.job.argument.node.name" path="argument" property="arguments" icon="#argument"/>
@@ -487,6 +490,18 @@
                 </with>
             </enabledWhen>
         </handler>
+        <handler commandId="org.jkiss.dbeaver.ext.xugu.code.job.navigate" class="org.jkiss.dbeaver.ext.xugu.actions.JobNavigateHandler">
+            <enabledWhen>
+                <with variable="selection">
+                    <count value="+"/>
+                    <iterate operator="and">
+                        <adapt type="org.jkiss.dbeaver.model.struct.DBSObject">
+                            <instanceof value="org.jkiss.dbeaver.ext.xugu.model.XuguSchedulerJob"/>
+                        </adapt>
+                    </iterate>
+                </with>
+            </enabledWhen>
+        </handler>
         <handler commandId="org.jkiss.dbeaver.ext.xugu.job.run" class="org.jkiss.dbeaver.ext.xugu.actions.JobRunHandler">
             <enabledWhen>
                 <or>
@@ -518,6 +533,9 @@
                 <visibleWhen checkEnabled="true"/>
             </command>
             <command commandId="org.jkiss.dbeaver.ext.xugu.code.package.navigate">
+                <visibleWhen checkEnabled="true"/>
+            </command>
+            <command commandId="org.jkiss.dbeaver.ext.xugu.code.job.navigate">
                 <visibleWhen checkEnabled="true"/>
             </command>
             <command commandId="org.jkiss.dbeaver.ext.xugu.job.run">

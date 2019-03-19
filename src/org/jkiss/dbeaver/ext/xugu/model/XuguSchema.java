@@ -1006,7 +1006,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         protected XuguSchedulerJob fetchObject(@NotNull JDBCSession session, @NotNull XuguSchema owner, @NotNull JDBCResultSet dbResult)
                 throws SQLException, DBException
         {
-            return new XuguSchedulerJob(owner, dbResult);
+            return new XuguSchedulerJob(session.getProgressMonitor(), session, owner, dbResult);
         }
 
     }
