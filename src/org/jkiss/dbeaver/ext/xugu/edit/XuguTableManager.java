@@ -82,13 +82,14 @@ public class XuguTableManager extends SQLTableManager<XuguTable, XuguSchema> imp
 
     @Override
     protected String getNewChildName(DBRProgressMonitor monitor, XuguSchema parent, String baseName) throws DBException {
-        for (int i = 0; ; i++) {
+        for (int i = 0; i<20; i++) {
             String tableName = i == 0 ? baseName : (baseName + "_" + i);
             DBSObject child = parent.getChild(monitor, tableName);
             if (child == null) {
                 return tableName;
             }
         }
+        return "NEW_TABLE_";
     }
     
     @Override
