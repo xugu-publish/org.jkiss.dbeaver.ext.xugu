@@ -58,9 +58,9 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
     private String alias;
     private boolean is_sys;
     private String trust_ip;
-    private int mem_quota;
+//    private int mem_quota;
     private int temp_space_quota;
-    private int undo_space_quota;
+//    private int undo_space_quota;
     private int cursor_quota;
     private int session_quota;
     private int io_quota;
@@ -90,9 +90,9 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
             this.alias = JDBCUtils.safeGetString(resultSet, "ALIAS");
             this.is_sys = JDBCUtils.safeGetBoolean(resultSet, "IS_SYS");
             this.trust_ip = JDBCUtils.safeGetString(resultSet, "TRUST_IP");
-            this.mem_quota = JDBCUtils.safeGetInt(resultSet, "MEM_QUOTA");
+//            this.mem_quota = JDBCUtils.safeGetInt(resultSet, "MEM_QUOTA");
             this.temp_space_quota = JDBCUtils.safeGetInt(resultSet, "TEMP_SPACE_QUOTA");
-            this.undo_space_quota = JDBCUtils.safeGetInt(resultSet, "UNDO_SPACE_QUOTA");
+//            this.undo_space_quota = JDBCUtils.safeGetInt(resultSet, "UNDO_SPACE_QUOTA");
             this.cursor_quota = JDBCUtils.safeGetInt(resultSet, "CURSOR_QUOTA");
             this.session_quota = JDBCUtils.safeGetInt(resultSet, "SESSION_QUOTA");
             this.io_quota = JDBCUtils.safeGetInt(resultSet, "IO_QUOTA");
@@ -172,17 +172,17 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
 		return trust_ip;
 	}
 
-	public int getMem_quota() {
-		return mem_quota;
-	}
+//	public int getMem_quota() {
+//		return mem_quota;
+//	}
 
 	public int getTemp_space_quota() {
 		return temp_space_quota;
 	}
 
-	public int getUndo_space_quota() {
-		return undo_space_quota;
-	}
+//	public int getUndo_space_quota() {
+//		return undo_space_quota;
+//	}
 
 	public int getCursor_quota() {
 		return cursor_quota;
@@ -209,57 +209,4 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
 		// TODO Auto-generated method stub
 		return this;
 	}
-
-//    @Property(order = 8)
-//    @LazyProperty(cacheValidator = XuguTablespace.TablespaceReferenceValidator.class)
-//    public Object getDefaultTablespace(DBRProgressMonitor monitor) throws DBException
-//    {
-//        return XuguTablespace.resolveTablespaceReference(monitor, this, "defaultTablespace");
-//    }
-//
-//    @Property(order = 9)
-//    @LazyProperty(cacheValidator = XuguTablespace.TablespaceReferenceValidator.class)
-//    public Object getTempTablespace(DBRProgressMonitor monitor) throws DBException
-//    {
-//        return XuguTablespace.resolveTablespaceReference(monitor, this, "tempTablespace");
-//    }
-
-//    @Override
-//    public Object getLazyReference(Object propertyId)
-//    {
-//        if ("defaultTablespace".equals(propertyId)) {
-//            return defaultTablespace;
-//        } else if ("tempTablespace".equals(propertyId)) {
-//            return tempTablespace;
-//        } else if ("profile".equals(propertyId)) {
-//            return profile;
-//        } else {
-//            return null;
-//        }
-//    }
-
-//    @Override
-//    @Association
-//    public Collection<XuguPrivRole> getRolePrivs(DBRProgressMonitor monitor) throws DBException
-//    {
-//        return rolePrivCache.getAllObjects(monitor, this);
-//    }
-
-//    @Nullable
-//    @Override
-//    public DBSObject refreshObject(@NotNull DBRProgressMonitor monitor) throws DBException {
-//        return super.refreshObject(monitor);
-//    }
-
-//    public static class ProfileReferenceValidator implements IPropertyCacheValidator<XuguUser> {
-//        @Override
-//        public boolean isPropertyCached(XuguUser object, Object propertyId)
-//        {
-//            return
-//                object.getLazyReference(propertyId) instanceof XuguUserProfile ||
-//                object.getLazyReference(propertyId) == null ||
-//                object.getDataSource().profileCache.isFullyCached();
-//        }
-//    }
-
 }
