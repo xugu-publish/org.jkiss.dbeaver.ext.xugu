@@ -103,6 +103,7 @@ public class XuguSynonym extends XuguSchemaObject implements DBSAlias {
     
     public void setName(String name) {
     	objectName = name;
+    	this.name = name;
     }
     
     public void setTargetName(String name) {

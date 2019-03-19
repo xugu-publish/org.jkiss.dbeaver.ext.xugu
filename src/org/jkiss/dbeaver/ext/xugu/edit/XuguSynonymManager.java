@@ -107,7 +107,7 @@ public class XuguSynonymManager extends SQLObjectEditor<XuguSynonym, XuguSchema>
         protected Point getInitialSize() {
         	return new Point(300, 200);
         }
-
+        
         @Override
         protected Control createDialogArea(Composite parent)
         {
