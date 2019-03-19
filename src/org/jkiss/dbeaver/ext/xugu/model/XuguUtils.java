@@ -196,11 +196,13 @@ public class XuguUtils {
             "Set target schema",
             "ALTER SESSION SET CURRENT_SCHEMA=" + object.getSchema().getName(),
             DBEPersistAction.ActionType.INITIALIZER));
-        if (object.getSchema() != object.getDataSource().getDefaultObject()) {
-            actions.add(new SQLDatabasePersistAction(
-                "Set current schema",
-                "ALTER SESSION SET CURRENT_SCHEMA=" + object.getDataSource().getDefaultObject().getName(),
-                DBEPersistAction.ActionType.FINALIZER));
+        if(object.getDataSource().getDefaultObject()!=null) {
+        	if (object.getSchema() != object.getDataSource().getDefaultObject()) {
+                actions.add(new SQLDatabasePersistAction(
+                    "Set current schema",
+                    "ALTER SESSION SET CURRENT_SCHEMA=" + object.getDataSource().getDefaultObject().getName(),
+                    DBEPersistAction.ActionType.FINALIZER));
+            }
         }
     }
 
