@@ -854,7 +854,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         protected XuguProcedureStandalone fetchObject(@NotNull JDBCSession session, @NotNull XuguSchema owner, @NotNull JDBCResultSet dbResult)
             throws SQLException, DBException
         {
-            return new XuguProcedureStandalone(owner, dbResult);
+            return new XuguProcedureStandalone(session.getProgressMonitor(), owner, dbResult);
         }
 
     }

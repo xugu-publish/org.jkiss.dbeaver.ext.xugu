@@ -61,7 +61,8 @@ public class XuguSchedulerJob extends XuguSchemaObject implements XuguStatefulOb
     private int jobNo;
     private String jobType;
     private int paramNum;
-    private byte[] param;
+    private String paramDef;
+    private String actionDef;
     private byte[] action;
     private Date beginTime;
     private Date endTime;
@@ -99,7 +100,8 @@ public class XuguSchedulerJob extends XuguSchemaObject implements XuguStatefulOb
         jobNo = JDBCUtils.safeGetInt(dbResult, "JOB_NO");
         jobType = JDBCUtils.safeGetString(dbResult, "JOB_TYPE");
         paramNum = JDBCUtils.safeGetInt(dbResult, "JOB_PARAM_NUM");
-        param = JDBCUtils.safeGetBytes(dbResult, "JOB_PARAM");
+        paramDef = JDBCUtils.safeGetString(dbResult, "JOB_PARAM");
+        actionDef = JDBCUtils.safeGetString(dbResult, "JOB_ACTION");
         jobType = JDBCUtils.safeGetString(dbResult, "JOB_TYPE");
         beginTime = JDBCUtils.safeGetDate(dbResult, "BEGIN_T");
         endTime = JDBCUtils.safeGetDate(dbResult, "END_T");
@@ -149,8 +151,8 @@ public class XuguSchedulerJob extends XuguSchemaObject implements XuguStatefulOb
 		return paramNum;
 	}
 
-	public byte[] getParam() {
-		return param;
+	public String getParamDef() {
+		return paramDef;
 	}
 
 	public Date getBeginTime() {

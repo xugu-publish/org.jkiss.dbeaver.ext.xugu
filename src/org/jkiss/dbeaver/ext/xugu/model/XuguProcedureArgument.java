@@ -18,6 +18,7 @@ package org.jkiss.dbeaver.ext.xugu.model;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPDataKind;
 import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
@@ -54,6 +55,19 @@ public class XuguProcedureArgument implements DBSProcedureParameter, DBSTypedObj
     private String define;
     private List<XuguProcedureArgument> attributes;
 
+    public XuguProcedureArgument(DBRProgressMonitor monitor, XuguProcedureBase procedure, String name, String datatype, String mode) {
+    	this.procedure = procedure;
+    	this.name = name;
+    	//对int做转化
+    	if(datatype.equals("int") || datatype.equals("INT")) {
+    		datatype = "INTEGER";
+    	}
+    	this.dataType = new XuguDataType(this, datatype.toUpperCase(), true);
+    	this.dataScale = this.dataType.getMaxScale();
+    	this.dataPrecision = this.dataType.getPrecision();
+    	this.mode = XuguParameterMode.getMode(mode);
+    }
+    
     public XuguProcedureArgument(
         DBRProgressMonitor monitor,
         XuguProcedureBase procedure,

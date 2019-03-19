@@ -33,6 +33,8 @@ import org.jkiss.dbeaver.model.struct.rdb.DBSProcedureType;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 
 import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -43,8 +45,8 @@ public class XuguProcedureStandalone extends XuguProcedureBase<XuguSchema> imple
 
     private boolean valid;
     private String sourceDeclaration;
-
-    public XuguProcedureStandalone(
+    private Collection<XuguProcedureArgument> procParams;
+    public XuguProcedureStandalone(DBRProgressMonitor monitor,
         XuguSchema schema,
         ResultSet dbResult)
     {
@@ -53,11 +55,68 @@ public class XuguProcedureStandalone extends XuguProcedureBase<XuguSchema> imple
             JDBCUtils.safeGetString(dbResult, "PROC_NAME"),
             JDBCUtils.safeGetLong(dbResult, "PROC_ID"),
             DBSProcedureType.valueOf(JDBCUtils.safeGetString(dbResult, "RET_TYPE")==null?"PROCEDURE":"FUNCTION"));
-        System.out.println(JDBCUtils.safeGetString(dbResult, "PROC_NAME"));
+        
         this.valid = JDBCUtils.safeGetBoolean(dbResult, "VALID");
+        //通过define字段手动解析参数列表（仅支持查看）
         this.sourceDeclaration = JDBCUtils.safeGetString(dbResult, "DEFINE");
+        String reg = "";
+        if(this.sourceDeclaration.toUpperCase().indexOf("IS")!=-1) {
+        	reg = "IS";
+        }else if(this.sourceDeclaration.toUpperCase().indexOf("AS")!=-1) {
+        	reg = "AS";
+        }else {
+        	reg = null;
+        }
+        if(reg!=null) {
+        	String head = this.sourceDeclaration.substring(0, this.sourceDeclaration.toUpperCase().indexOf(reg));
+            if(head.indexOf("(")!=-1) {
+            	String param = head.substring(head.indexOf("(")+1, head.indexOf(")"));
+                String[] params = param.split(",");
+                this.procParams = new ArrayList<XuguProcedureArgument>();
+                for(int i=0; i<params.length; i++) {
+                	params[i] = params[i].trim();
+                	String mode = "";
+                	if(params[i].toUpperCase().indexOf("IN OUT")!=-1) {
+                		mode = "IN OUT";
+                	}else if(params[i].toUpperCase().indexOf("IN")!=-1) {
+                		mode = "IN";
+                	}else if(params[i].toUpperCase().indexOf("OUT")!=-1) {
+                		mode = "OUT";
+                	}
+                	String[] duals = params[i].split(" ");
+                	procParams.add(new XuguProcedureArgument(monitor, this,duals[0], duals[duals.length-1], mode));
+                	System.out.println(JDBCUtils.safeGetString(dbResult, "PROC_NAME")+" proc params :"+duals[0]+" "+duals[duals.length-1]);
+                }
+            }
+        }
     }
 
+    class ParamInfo{
+    	private String type;
+    	private String name;
+    	
+    	public ParamInfo(String type, String name) {
+    		this.type = type;
+    		this.name = name;
+    	}
+    	
+    	private void setType(String type) {
+    		this.type = type;
+    	}
+    	
+    	private void setName(String name) {
+    		this.name = name;
+    	}
+    	
+    	public String getType() {
+    		return type;
+    	}
+    	
+    	public String getName() {
+    		return name;
+    	}
+    }
+    
     public XuguProcedureStandalone(XuguSchema xuguSchema, String name, DBSProcedureType procedureType)
     {
         super(xuguSchema, name, 0l, procedureType);
@@ -68,6 +127,12 @@ public class XuguProcedureStandalone extends XuguProcedureBase<XuguSchema> imple
             "END " + name + ";" + GeneralUtils.getDefaultLineSeparator();
     }
 
+    @Override
+    public Collection<XuguProcedureArgument> getParameters(DBRProgressMonitor monitor) throws DBException
+    {
+        return this.procParams;
+    }
+    
     @Property(viewable = true, order = 3)
     public boolean isValid()
     {

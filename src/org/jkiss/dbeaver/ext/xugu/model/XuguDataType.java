@@ -81,6 +81,7 @@ public class XuguDataType extends XuguObject<DBSObject>
     static final Map<Integer, TypeDesc> PREDEFINED_TYPE_IDS = new HashMap<>();
     //修改了数据类型定义
     static  {
+    	PREDEFINED_TYPES.put("INT", new TypeDesc(DBPDataKind.NUMERIC, Types.INTEGER, 10, 0, 0));
     	PREDEFINED_TYPES.put("INTEGER", new TypeDesc(DBPDataKind.NUMERIC, Types.INTEGER, 10, 0, 0));
     	PREDEFINED_TYPES.put("BIGINT", new TypeDesc(DBPDataKind.NUMERIC, Types.BIGINT, 19, 0, 0));
     	PREDEFINED_TYPES.put("FLOAT", new TypeDesc(DBPDataKind.NUMERIC, Types.FLOAT, 38, 0, 6));
