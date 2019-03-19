@@ -96,8 +96,7 @@ public class XuguRoleManager extends SQLObjectEditor<XuguRole, XuguDataSource> i
         String sql = "CREATE ROLE " + role.getName();
         if(user!=null && !user.equals("")) {
         	sql += " INIT USER "+user;
-        }
-        System.out.println("CCCCCSQL "+sql);		
+        }		
         actions.add(new SQLDatabasePersistAction("Create role", sql));
     }
 
