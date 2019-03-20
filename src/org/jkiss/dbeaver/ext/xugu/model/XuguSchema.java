@@ -54,7 +54,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
     private static final Log log = Log.getLog(XuguSchema.class);
 
     final public TableCache tableCache = new TableCache();
-    final public MViewCache mviewCache = new MViewCache();
+    final public ViewCache viewCache = new ViewCache();
     final public ConstraintCache constraintCache = new ConstraintCache();
     final public ForeignKeyCache foreignKeyCache = new ForeignKeyCache();
     final public TriggerCache triggerCache = new TriggerCache();
@@ -191,21 +191,21 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
     public Collection<XuguView> getViews(DBRProgressMonitor monitor)
         throws DBException
     {
-        return tableCache.getTypedObjects(monitor, this, XuguView.class);
+        return viewCache.getAllObjects(monitor, this);
     }
 
     public XuguView getView(DBRProgressMonitor monitor, String name)
         throws DBException
     {
-        return tableCache.getObject(monitor, this, name, XuguView.class);
+        return viewCache.getObject(monitor, this, name, XuguView.class);
     }
 
-    @Association
-    public Collection<XuguMaterializedView> getMaterializedViews(DBRProgressMonitor monitor)
-        throws DBException
-    {
-        return mviewCache.getAllObjects(monitor, this);
-    }
+//    @Association
+//    public Collection<XuguMaterializedView> getMaterializedViews(DBRProgressMonitor monitor)
+//        throws DBException
+//    {
+//        return viewCache.getAllObjects(monitor, this);
+//    }
 
     @Association
     public Collection<XuguDataType> getDataTypes(DBRProgressMonitor monitor)
@@ -466,7 +466,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
             if (tableType==0) {
                 return new XuguTable(session.getProgressMonitor(), owner, dbResult);
             } else {
-                return new XuguView(owner, dbResult);
+                return new XuguView(session.getProgressMonitor(), session, owner, dbResult);
             }
         }
 
@@ -908,7 +908,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         }
     }
 
-    static class MViewCache extends JDBCObjectCache<XuguSchema, XuguMaterializedView> {
+    static class ViewCache extends JDBCObjectCache<XuguSchema, XuguView> {
 
         @Override
         protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguSchema owner)
@@ -919,18 +919,17 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         	sql.append("SELECT * FROM ");
         	sql.append(owner.roleFlag);
         	sql.append("_VIEWS WHERE SCHEMA_ID=");
-        	sql.append(owner.roleFlag);
+        	sql.append(owner.getId());
             JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
             return dbStat;
         }
 
         @Override
-        protected XuguMaterializedView fetchObject(@NotNull JDBCSession session, @NotNull XuguSchema owner, @NotNull JDBCResultSet dbResult)
+        protected XuguView fetchObject(@NotNull JDBCSession session, @NotNull XuguSchema owner, @NotNull JDBCResultSet dbResult)
             throws SQLException, DBException
         {
-            return new XuguMaterializedView(owner, dbResult);
+            return new XuguView(session.getProgressMonitor(), session, owner, dbResult);
         }
-
     }
 
     static class DBLinkCache extends JDBCObjectCache<XuguSchema, XuguDBLink> {

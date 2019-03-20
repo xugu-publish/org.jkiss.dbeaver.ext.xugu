@@ -29,6 +29,7 @@ import org.jkiss.dbeaver.model.exec.jdbc.JDBCResultSet;
 import org.jkiss.dbeaver.model.exec.jdbc.JDBCSession;
 import org.jkiss.dbeaver.model.impl.DBObjectNameCaseTransformer;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
+import org.jkiss.dbeaver.model.meta.Association;
 import org.jkiss.dbeaver.model.meta.LazyProperty;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.meta.PropertyGroup;
@@ -37,8 +38,11 @@ import org.jkiss.utils.CommonUtils;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
+
+import javax.xml.validation.Schema;
 
 /**
  * OracleView
@@ -46,50 +50,116 @@ import java.util.Map;
 public class XuguView extends XuguTableBase implements XuguSourceObject
 {
     private static final Log log = Log.getLog(XuguView.class);
-
-    public class AdditionalInfo extends TableAdditionalInfo {
-        private String typeText;
-        private String oidText;
-        private String typeOwner;
-        private String typeName;
-        private XuguView superView;
-
-
-        @Property(viewable = false, order = 10)
-        public Object getType(DBRProgressMonitor monitor) throws DBException
-        {
-            if (typeOwner == null) {
-                return null;
-            }
-            XuguSchema owner = getDataSource().getSchema(monitor, typeOwner);
-            return owner == null ? null : owner.getDataType(monitor, typeName);
-        }
-        @Property(viewable = false, order = 11)
-        public String getTypeText() { return typeText; }
-        public void setTypeText(String typeText) { this.typeText = typeText; }
-        @Property(viewable = false, order = 12)
-        public String getOidText() { return oidText; }
-        public void setOidText(String oidText) { this.oidText = oidText; }
-        @Property(viewable = false, editable = true, order = 5)
-        public XuguView getSuperView() { return superView; }
-        public void setSuperView(XuguView superView) { this.superView = superView; }
-    }
-
-    private final AdditionalInfo additionalInfo = new AdditionalInfo();
     private String viewText;
-
+    private Collection<XuguTableColumn> columns = new ArrayList<XuguTableColumn>();
     public XuguView(XuguSchema schema, String name)
     {
         super(schema, name, false);
     }
 
-    public XuguView(
-        XuguSchema schema,
-        ResultSet dbResult)
+    public XuguView(DBRProgressMonitor monitor, JDBCSession session, XuguSchema schema, ResultSet dbResult)
     {
-        super(schema, dbResult);
+        super(schema, dbResult, 1);
+        this.viewText = JDBCUtils.safeGetString(dbResult, "DEFINE");
+        innerSetColumns(monitor, session, schema);
     }
 
+    private XuguTable innerFetchTable(DBRProgressMonitor monitor, JDBCSession session, XuguSchema schema, String tableName) {
+    	try {
+	    	StringBuilder sql = new StringBuilder();
+	    	sql.append("SELECT * FROM ");
+	    	sql.append(getContainer().getRoleFlag());
+	    	sql.append("_TABLES WHERE SCHEMA_ID=");
+	    	sql.append(schema.getId());
+	    	//当有检索条件时 只查询指定表 用于新建表之后的刷新工作
+			sql.append(" AND TABLE_NAME = '");
+			sql.append(tableName);
+			sql.append("'");
+    	
+			final JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
+			ResultSet res = dbStat.executeQuery();
+			XuguTable table = new XuguTable(monitor, schema, res);
+			dbStat.close();
+			return table;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+    }
+    
+    private void innerFetchColumns(DBRProgressMonitor monitor, JDBCSession session, XuguTable table, String tableName, String colName) {
+    	StringBuilder sql = new StringBuilder(500);
+        sql.append("SELECT * FROM ");
+    	sql.append(getContainer().getRoleFlag());
+    	sql.append("_COLUMNS");
+        sql.append(" where COL_NAME='");
+        sql.append(colName);
+        sql.append("' AND TABLE_ID=(SELECT TABLE_ID FROM ");
+        sql.append(getContainer().getRoleFlag());
+        sql.append("_TABLES WHERE TABLE_NAME='");
+        sql.append(tableName);
+        sql.append("')");
+        try {
+			JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
+			ResultSet set = dbStat.executeQuery();
+			if(set!=null) {
+    			//为了构造函数可以正常获取数据需要先遍历
+    			while(set.next()) {
+    				set.getInt(1);
+    				set.getInt(2);
+    				set.getInt(3);
+    				set.getString(4);
+    			}
+    			XuguTableColumn column = new XuguTableColumn(monitor, table, set);
+    			columns.add(column);
+    		}
+    		dbStat.close();
+		} catch (SQLException | DBException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
+    
+    private void innerSetColumns(DBRProgressMonitor monitor, JDBCSession session, XuguSchema schema) {
+    	String define = viewText.substring(viewText.toUpperCase().indexOf("SELECT")+6, viewText.toUpperCase().indexOf("FROM"));
+    	String[] defines = define.split(",");
+    	String nowTable = "";
+    	XuguTable table = null;
+    	for(int i=0; i<defines.length; i++) {
+    		String tableName = defines[i].split("\\.")[0].trim();
+    		tableName = tableName.substring(tableName.indexOf("\"")+1, tableName.lastIndexOf("\""));
+    		if(i==0) {
+    			nowTable = tableName;
+    		}
+    		String colName = defines[i].split("\\.")[1].trim();
+    		colName = colName.substring(colName.indexOf("\"")+1, colName.lastIndexOf("\""));
+    		//目标若尚未缓存则手动获取列信息
+    		if(getContainer().tableCache.getCachedObject(tableName)==null) {
+    			//对于表只需缓存一次结果集
+    			if(nowTable!=tableName || i==0) {
+    				table = innerFetchTable(monitor, session, schema, tableName);
+    			}
+    			innerFetchColumns(monitor, session, table, tableName, colName);
+    		}
+    		else {
+    			try {
+					columns.add(getContainer().tableCache.getCachedObject(tableName).getAttribute(monitor, colName));
+				} catch (DBException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+    		}
+    	}
+    }
+    
+    @Association
+    public Collection<XuguTableColumn> getColumns(@NotNull DBRProgressMonitor monitor)
+        throws DBException
+    {
+    	return columns;
+    }
+    
     @NotNull
     @Property(viewable = true, editable = true, valueTransformer = DBObjectNameCaseTransformer.class, order = 1)
     @Override
@@ -114,13 +184,6 @@ public class XuguView extends XuguTableBase implements XuguSourceObject
     @Property(hidden = true, editable = true, updatable = true, order = -1)
     public String getObjectDefinitionText(DBRProgressMonitor monitor, Map<String, Object> options) throws DBException
     {
-        if (viewText == null) {
-            try {
-                viewText = XuguUtils.getDDL(monitor, getTableTypeName(), this, XuguDDLFormat.FULL, options);
-            } catch (DBException e) {
-                log.warn("Error getting view definition from system package", e);
-            }
-        }
         return viewText;
     }
 
@@ -129,30 +192,12 @@ public class XuguView extends XuguTableBase implements XuguSourceObject
         this.viewText = source;
     }
 
-//    @Override
-//    public AdditionalInfo getAdditionalInfo()
-//    {
-//        return additionalInfo;
-//    }
-
     @Override
     protected String getTableTypeName()
     {
         return "VIEW";
     }
-
-//    @PropertyGroup()
-//    @LazyProperty(cacheValidator = AdditionalInfoValidator.class)
-//    public AdditionalInfo getAdditionalInfo(DBRProgressMonitor monitor) throws DBException
-//    {
-//        synchronized (additionalInfo) {
-//            if (!additionalInfo.loaded && monitor != null) {
-//                loadAdditionalInfo(monitor);
-//            }
-//            return additionalInfo;
-//        }
-//    }
-
+    
     @Override
     public void refreshObjectState(@NotNull DBRProgressMonitor monitor) throws DBCException
     {
@@ -165,61 +210,6 @@ public class XuguView extends XuguTableBase implements XuguSourceObject
 
     public void setViewText(String viewText) {
         this.viewText = viewText;
-    }
-
-    private void loadAdditionalInfo(DBRProgressMonitor monitor) throws DBException
-    {
-        if (!isPersisted()) {
-            additionalInfo.loaded = true;
-            return;
-        }
-        String viewDefinitionText = null; // It is truncated definition text
-        try (JDBCSession session = DBUtils.openMetaSession(monitor, this, "Load table status")) {
-            boolean isOracle9 = getDataSource().isAtLeastV9();
-            try (JDBCPreparedStatement dbStat = session.prepareStatement(
-                "SELECT TEXT,TYPE_TEXT,OID_TEXT,VIEW_TYPE_OWNER,VIEW_TYPE" + (isOracle9 ? ",SUPERVIEW_NAME" : "") + "\n" +
-                    "FROM SYS.ALL_VIEWS WHERE OWNER=? AND VIEW_NAME=?")) {
-                dbStat.setString(1, getContainer().getName());
-                dbStat.setString(2, getName());
-                try (JDBCResultSet dbResult = dbStat.executeQuery()) {
-                    if (dbResult.next()) {
-                        viewDefinitionText = JDBCUtils.safeGetString(dbResult, "TEXT");
-                        additionalInfo.setTypeText(JDBCUtils.safeGetStringTrimmed(dbResult, "TYPE_TEXT"));
-                        additionalInfo.setOidText(JDBCUtils.safeGetStringTrimmed(dbResult, "OID_TEXT"));
-                        additionalInfo.typeOwner = JDBCUtils.safeGetStringTrimmed(dbResult, "VIEW_TYPE_OWNER");
-                        additionalInfo.typeName = JDBCUtils.safeGetStringTrimmed(dbResult, "VIEW_TYPE");
-                        if (isOracle9) {
-                            String superViewName = JDBCUtils.safeGetString(dbResult, "SUPERVIEW_NAME");
-                            if (!CommonUtils.isEmpty(superViewName)) {
-                                additionalInfo.setSuperView(getContainer().getView(monitor, superViewName));
-                            }
-                        }
-                    } else {
-                        log.warn("Cannot find view '" + getFullyQualifiedName(DBPEvaluationContext.UI) + "' metadata");
-                    }
-                    additionalInfo.loaded = true;
-                }
-            }
-        }
-        catch (SQLException e) {
-            throw new DBCException(e, getDataSource());
-        }
-
-        if (viewDefinitionText != null) {
-            StringBuilder paramsList = new StringBuilder();
-            Collection<XuguTableColumn> attributes = getAttributes(monitor);
-            if (attributes != null) {
-                paramsList.append("\n(");
-                boolean first = true;
-                for (XuguTableColumn column : attributes) {
-                    if (!first) paramsList.append(",");
-                    paramsList.append(DBUtils.getQuotedIdentifier(column));
-                    first = false;
-                }
-                paramsList.append(")");
-            }
-            viewText = "CREATE OR REPLACE VIEW " + getFullyQualifiedName(DBPEvaluationContext.DDL) + paramsList + "\nAS\n" + viewDefinitionText;
-        }
     }
 
     @Override

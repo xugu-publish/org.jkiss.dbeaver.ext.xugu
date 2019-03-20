@@ -70,7 +70,7 @@ public abstract class XuguTablePhysical extends XuguTableBase implements DBSObje
         XuguSchema schema,
         ResultSet dbResult)
     {
-        super(schema, dbResult);
+        super(schema, dbResult, 0);
 //        this.rowCount = JDBCUtils.safeGetLong(dbResult, "NUM_ROWS");
         //this.valid = "VALID".equals(JDBCUtils.safeGetString(dbResult, "STATUS"));
 

@@ -86,13 +86,20 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
         super(schema, name, persisted);
     }
 
-    protected XuguTableBase(XuguSchema xuguSchema, ResultSet dbResult)
+    protected XuguTableBase(XuguSchema xuguSchema, ResultSet dbResult, int type)
     {
         super(xuguSchema, true);
-        setName(JDBCUtils.safeGetString(dbResult, "TABLE_NAME"));
-        this.id = JDBCUtils.safeGetInt(dbResult, "TABLE_ID");
+        // type=0 当前对象为表
+        if(type==0) {
+        	setName(JDBCUtils.safeGetString(dbResult, "TABLE_NAME"));
+            this.id = JDBCUtils.safeGetInt(dbResult, "TABLE_ID");
+        }
+        // type=1 当前对象为视图
+        else {
+        	setName(JDBCUtils.safeGetString(dbResult, "VIEW_NAME"));
+        	this.id = JDBCUtils.safeGetInt(dbResult, "VIEW_ID");
+        }
         this.valid = JDBCUtils.safeGetBoolean(dbResult, "VALID");
-        //this.comment = JDBCUtils.safeGetString(dbResult, "COMMENTS");
     }
 
     @Override

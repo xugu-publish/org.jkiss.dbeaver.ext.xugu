@@ -64,7 +64,8 @@ public class XuguMaterializedViewManager extends SQLObjectEditor<XuguMaterialize
     @Override
     public DBSObjectCache<? extends DBSObject, XuguMaterializedView> getObjectsCache(XuguMaterializedView object)
     {
-        return object.getSchema().mviewCache;
+//        return object.getSchema().mviewCache;
+    	return null;
     }
 
     @Override
