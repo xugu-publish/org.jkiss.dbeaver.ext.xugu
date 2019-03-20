@@ -133,10 +133,10 @@ public class XuguTableColumn extends JDBCTableColumn<XuguTableBase> implements D
             if (this.type != null) {
                 this.typeName = type.getFullyQualifiedName(DBPEvaluationContext.DDL);
                 this.valueType = type.getTypeID();
-                if(this.typeName.equals("NUMERIC")){
+                if("NUMERIC".equals(this.typeName)){
                 	this.scale = JDBCUtils.safeGetInt(dbResult, "SCALE")%65536;
                 	this.precision = (JDBCUtils.safeGetInt(dbResult, "SCALE")-this.scale)/65536;
-                }else if(this.typeName.equals("CHAR")) {
+                }else if("CHAR".equals(this.typeName)) {
                 	this.precision = JDBCUtils.safeGetInt(dbResult, "SCALE");
                 	this.scale = 0;
                 }else if(this.typeName.matches("INTERVAL(.*)")) {

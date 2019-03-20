@@ -116,6 +116,7 @@ public class XuguDataTypeMethod extends XuguDataTypeMember implements DBSEntityM
         return flagOverriding;
     }
 
+    @Override
     @Association
     public Collection<XuguDataTypeMethodParameter> getParameters(DBRProgressMonitor monitor)
         throws DBException

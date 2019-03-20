@@ -148,9 +148,9 @@ public class XuguUtils {
 
     public static String getCurrentSchema(JDBCSession session, String role) throws SQLException {
     	String sql = "";
-    	if(role.equals("SYSDBA")) {
+    	if("SYSDBA".equals(role)) {
     		sql = XuguExecuteSQL_SYSDBA.gui_dialog_create_CreateRealJobDialog_schema;
-    	}else if(role.equals("DBA")) {
+    	}else if("DBA".equals(role)) {
     		sql = XuguExecuteSQL_DBA.gui_dialog_create_CreateRealJobDialog_schema;
     	}else {
     		sql = XuguExecuteSQL_NORMAL.gui_dialog_create_CreateRealJobDialog_schema;

@@ -99,6 +99,7 @@ public class XuguSequence extends XuguSchemaObject implements DBSSequence {
         this.curVal = curVal;
     }
 
+    @Override
     @Property(viewable = true, editable = true, updatable = true, order = 3)
     public BigDecimal getMinValue()
     {
@@ -109,6 +110,7 @@ public class XuguSequence extends XuguSchemaObject implements DBSSequence {
         this.minValue = minValue;
     }
 
+    @Override
     @Property(viewable = true, editable = true, updatable = true, order = 4)
     public BigDecimal getMaxValue()
     {
@@ -119,6 +121,7 @@ public class XuguSequence extends XuguSchemaObject implements DBSSequence {
         this.maxValue = maxValue;
     }
 
+    @Override
     @Property(viewable = true, editable = true, updatable = true, order = 5)
     public BigDecimal getIncrementBy()
     {

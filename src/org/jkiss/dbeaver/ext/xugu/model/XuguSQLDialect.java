@@ -89,6 +89,7 @@ class XuguSQLDialect extends JDBCSQLDialect {
         super("Oracle");
     }
 
+    @Override
     public void initDriverSettings(JDBCDataSource dataSource, JDBCDatabaseMetaData metaData) {
         super.initDriverSettings(dataSource, metaData);
         crlfBroken = !dataSource.isServerVersionAtLeast(11, 0);

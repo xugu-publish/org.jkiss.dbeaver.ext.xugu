@@ -65,6 +65,7 @@ public class XuguView extends XuguTableBase implements XuguSourceObject
         this.viewText = JDBCUtils.safeGetString(dbResult, "DEFINE");
     }
     
+    @Override
     @Association
     public Collection<XuguTableColumn> getAttributes(@NotNull DBRProgressMonitor monitor)
         throws DBException
@@ -110,6 +111,7 @@ public class XuguView extends XuguTableBase implements XuguSourceObject
         return viewText;
     }
 
+    @Override
     public void setObjectDefinitionText(String source)
     {
         this.viewText = source;

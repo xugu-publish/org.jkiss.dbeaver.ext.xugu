@@ -213,6 +213,7 @@ public class XuguDataType extends XuguObject<DBSObject>
         return sourceDeclaration;
     }
 
+    @Override
     public void setObjectDefinitionText(String sourceDeclaration)
     {
         this.sourceDeclaration = sourceDeclaration;
@@ -441,6 +442,7 @@ public class XuguDataType extends XuguObject<DBSObject>
         return typeOID;
     }
 
+    @Override
     @Property(viewable = true, order = 8)
     public XuguDataType getComponentType(@NotNull DBRProgressMonitor monitor)
         throws DBException

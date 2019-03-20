@@ -101,7 +101,7 @@ public class XuguProcedureManager extends SQLObjectEditor<XuguProcedureStandalon
             return;
         }
         //强制增加CREATE OR REPLACE关键字
-        String keyWord = procedure.getProcedureType().toString().equals("PROCEDURE")?"PROCEDURE":"FUNCTION";
+        String keyWord = "PROCEDURE".equals(procedure.getProcedureType().toString())?"PROCEDURE":"FUNCTION";
     	Pattern p = Pattern.compile("("+keyWord+")", Pattern.CASE_INSENSITIVE);
         Matcher m = p.matcher(source);
         if(m.find()) {

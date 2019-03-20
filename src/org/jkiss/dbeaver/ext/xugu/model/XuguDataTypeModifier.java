@@ -28,7 +28,7 @@ public enum XuguDataTypeModifier {
     {
         if (typeMod == null || typeMod.length() == 0) {
             return null;
-        } else if (typeMod.equals("REF")) {
+        } else if ("REF".equals(typeMod)) {
             return REF;
         } else {
             return POINTER;

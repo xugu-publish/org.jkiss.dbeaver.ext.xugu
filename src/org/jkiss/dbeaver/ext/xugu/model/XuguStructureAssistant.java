@@ -218,7 +218,9 @@ public class XuguStructureAssistant implements DBSStructureAssistant
             }
         }
         for (XuguObjectType objectType : oracleObjectTypes) {
-            if (objectTypeClause.length() > 0) objectTypeClause.append(",");
+            if (objectTypeClause.length() > 0) {
+            	objectTypeClause.append(",");
+            }
             objectTypeClause.append("'").append(objectType.getTypeName()).append("'");
         }
         if (objectTypeClause.length() == 0) {

@@ -47,7 +47,8 @@ import javax.swing.text.Utilities;
  * XuguPackageManager
  */
 public class XuguPackageManager extends SQLObjectEditor<XuguPackage, XuguSchema> {
-
+	private final static Pattern PATTERN_OR = Pattern.compile("(OR)", Pattern.CASE_INSENSITIVE);
+	private final static Pattern PATTERN_PACKAGE = Pattern.compile("(PACKAGE)", Pattern.CASE_INSENSITIVE);
     @Nullable
     @Override
     public DBSObjectCache<? extends DBSObject, XuguPackage> getObjectsCache(XuguPackage object)
@@ -118,12 +119,11 @@ public class XuguPackageManager extends SQLObjectEditor<XuguPackage, XuguSchema>
         try {
             String header = pack.getObjectDefinitionText(new VoidProgressMonitor(), DBPScriptObject.EMPTY_OPTIONS);
             //对header进行预处理
-        	//强制增加CREATE OR REPLACE关键字
-        	Pattern p1 = Pattern.compile("(OR)", Pattern.CASE_INSENSITIVE);
-            Matcher m1 = p1.matcher(header);
+        	//强制增加CREATE OR REPLACE关键字	
+            Matcher m1 = PATTERN_OR.matcher(header);
             String keyWord1 = "OR";
-            Pattern p2 = Pattern.compile("(PACKAGE)", Pattern.CASE_INSENSITIVE);
-            Matcher m2 = p2.matcher(header);
+            
+            Matcher m2 = PATTERN_PACKAGE.matcher(header);
             String keyWord2 = "PACKAGE";
             if(m1.find()) {
             	keyWord1 = m1.group(0);
@@ -144,10 +144,8 @@ public class XuguPackageManager extends SQLObjectEditor<XuguPackage, XuguSchema>
             String body = pack.getExtendedDefinitionText(new VoidProgressMonitor());
             //对body进行预处理
             //强制增加CREATE OR REPLACE关键字
-        	Pattern p3 = Pattern.compile("(OR)", Pattern.CASE_INSENSITIVE);
-            Matcher m3 = p3.matcher(body);
-            Pattern p4 = Pattern.compile("(PACKAGE)", Pattern.CASE_INSENSITIVE);
-            Matcher m4 = p4.matcher(body);
+            Matcher m3 = PATTERN_OR.matcher(body);
+            Matcher m4 = PATTERN_PACKAGE.matcher(body);
             if(m3.find()) {
             	keyWord1 = m3.group(0);
             }

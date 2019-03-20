@@ -48,7 +48,9 @@ public class XuguCLOBValueHandler extends JDBCContentValueHandler {
         String[] parts = splitString(strValue);
         for (int i = 0; i < parts.length; i++) {
             String part = parts[i];
-            if (i > 0) writer.write("||");
+            if (i > 0) {
+            	writer.write("||");
+            }
             writer.write("TO_CLOB('");
             writer.write(part.replace("'", "''"));
             writer.write("')");
@@ -57,7 +59,9 @@ public class XuguCLOBValueHandler extends JDBCContentValueHandler {
 
     private static String[] splitString(String strValue) {
         int partCount = strValue.length() / MAX_PART_SIZE;
-        if (strValue.length() % MAX_PART_SIZE > 0) partCount++;
+        if (strValue.length() % MAX_PART_SIZE > 0) {
+        	partCount++;
+        }
         String[] parts = new String[partCount];
         for (int i = 0; i < partCount; i++) {
             int startOffset = i * MAX_PART_SIZE;

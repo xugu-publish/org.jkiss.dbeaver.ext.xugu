@@ -161,6 +161,7 @@ public class XuguMaterializedView extends XuguSchemaObject implements XuguSource
         return query;
     }
 
+    @Override
     public void setObjectDefinitionText(String source)
     {
         this.query = source;

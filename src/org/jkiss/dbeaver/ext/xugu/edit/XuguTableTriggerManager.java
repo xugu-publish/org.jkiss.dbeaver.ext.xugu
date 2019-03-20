@@ -42,7 +42,7 @@ import java.util.regex.Pattern;
  * OracleTableTriggerManager
  */
 public class XuguTableTriggerManager extends SQLTriggerManager<XuguTableTrigger, XuguTableBase> {
-
+	private final static Pattern PATTERN_TRIGGER = Pattern.compile("(TRIGGER)", Pattern.CASE_INSENSITIVE);
     @Nullable
     @Override
     public DBSObjectCache<? extends DBSObject, XuguTableTrigger> getObjectsCache(XuguTableTrigger object)
@@ -79,6 +79,7 @@ public class XuguTableTriggerManager extends SQLTriggerManager<XuguTableTrigger,
         );
     }
 
+    @Override
     protected void createOrReplaceTriggerQuery(List<DBEPersistAction> actions, XuguTableTrigger trigger)
     {
         String source = XuguUtils.normalizeSourceName(trigger, false);
@@ -87,8 +88,8 @@ public class XuguTableTriggerManager extends SQLTriggerManager<XuguTableTrigger,
         }
         else{
         	//强制增加CREATE OR REPLACE关键字
-        	Pattern p = Pattern.compile("(TRIGGER)", Pattern.CASE_INSENSITIVE);
-            Matcher m = p.matcher(source);
+        	
+            Matcher m = PATTERN_TRIGGER.matcher(source);
             String keyWord = "TRIGGER";
             if(m.find()) {
             	keyWord = m.group(0);

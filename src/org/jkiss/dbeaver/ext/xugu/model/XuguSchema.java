@@ -255,6 +255,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         return packageCache.getAllObjects(monitor, this);
     }
 
+    @Override
     @Association
     public Collection<XuguProcedureStandalone> getProcedures(DBRProgressMonitor monitor)
         throws DBException

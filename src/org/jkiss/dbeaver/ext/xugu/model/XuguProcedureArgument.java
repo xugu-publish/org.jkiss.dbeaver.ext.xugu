@@ -59,7 +59,7 @@ public class XuguProcedureArgument implements DBSProcedureParameter, DBSTypedObj
     	this.procedure = procedure;
     	this.name = name;
     	//对int做转化
-    	if(datatype.equals("int") || datatype.equals("INT")) {
+    	if("INT".equals(datatype.toUpperCase())) {
     		datatype = "INTEGER";
     	}
     	this.dataType = new XuguDataType(this, datatype.toUpperCase(), true);

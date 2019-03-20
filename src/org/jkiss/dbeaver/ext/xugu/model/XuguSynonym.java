@@ -101,6 +101,7 @@ public class XuguSynonym extends XuguSchemaObject implements DBSAlias {
         return null;
     }
     
+    @Override
     public void setName(String name) {
     	objectName = name;
     	this.name = name;

@@ -52,6 +52,7 @@ public class XuguTableColumnManager extends SQLTableColumnManager<XuguTableColum
         return object.getParentObject().getContainer().tableCache.getChildrenCache(object.getParentObject());
     }
 
+    @Override
     protected ColumnModifier[] getSupportedModifiers(XuguTableColumn column, Map<String, Object> options)
     {
         return new ColumnModifier[] {DataTypeModifier, DefaultModifier, NullNotNullModifierConditional};

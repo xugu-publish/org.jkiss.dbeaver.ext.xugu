@@ -52,6 +52,7 @@ public class XuguDataTypeAttribute extends XuguDataTypeMember implements DBSEnti
         this.scale = JDBCUtils.safeGetInteger(dbResult, "SCALE");
     }
 
+    @Override
     @Property(viewable = true, editable = true, order = 3)
     public XuguDataType getDataType()
     {

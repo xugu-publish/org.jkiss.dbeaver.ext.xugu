@@ -112,6 +112,7 @@ public class XuguTimestampValueHandler extends JDBCDateTimeValueHandler {
         return super.getNativeValueFormat(type);
     }
 
+    @Override
     protected String getFormatterId(DBSTypedObject column)
     {
 /*

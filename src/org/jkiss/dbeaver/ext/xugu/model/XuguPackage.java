@@ -100,6 +100,7 @@ public class XuguPackage extends XuguSchemaObject
         return sourceDeclaration;
     }
 
+    @Override
     public void setObjectDefinitionText(String sourceDeclaration)
     {
         this.sourceDeclaration = sourceDeclaration;
@@ -120,6 +121,7 @@ public class XuguPackage extends XuguSchemaObject
         this.sourceDefinition = source;
     }
 
+    @Override
     @Association
     public Collection<XuguProcedurePackaged> getProcedures(DBRProgressMonitor monitor) throws DBException
     {

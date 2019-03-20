@@ -268,6 +268,7 @@ public class XuguSchedulerJob extends XuguSchemaObject implements XuguStatefulOb
 
     }
 
+    @Override
 	public void refreshObjectState(DBRProgressMonitor monitor) {
         if (monitor != null) {
         	monitor.beginTask("Load action for '" + this.getName() + "'...", 1);
@@ -357,7 +358,7 @@ public class XuguSchedulerJob extends XuguSchemaObject implements XuguStatefulOb
 	public DBSObjectState getObjectState() {
 		DBSObjectState objectState = null;
 		try {
-			if ( state.equals("IDLE") ) {
+			if ( "IDLE".equals(state) ) {
 				objectState = DBSObjectState.ACTIVE;
 			} else {
 				objectState = DBSObjectState.NORMAL;

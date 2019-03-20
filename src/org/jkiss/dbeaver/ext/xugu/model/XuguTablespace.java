@@ -132,7 +132,7 @@ public class XuguTablespace extends XuguGlobalObject implements DBPRefreshableOb
         @Override
         protected XuguDataFile fetchObject(@NotNull JDBCSession session, @NotNull XuguTablespace owner, @NotNull JDBCResultSet resultSet) throws SQLException, DBException
         {
-            return new XuguDataFile(owner, resultSet, owner.getSpaceType().equals("TEMP_SPACE"));
+            return new XuguDataFile(owner, resultSet, "TEMP_SPACE".equals(owner.getSpaceType()));
         }
     }
     

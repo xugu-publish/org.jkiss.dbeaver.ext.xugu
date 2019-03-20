@@ -158,7 +158,7 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
         if (comment == null) {
         	System.out.println("CCCComents "+getTableTypeName());
         	int tableType = 0;
-        	if(getTableTypeName().equals("VIEW")) {
+        	if("VIEW".equals(getTableTypeName())) {
         		tableType = 1;
         	}
             try (JDBCSession session = DBUtils.openMetaSession(monitor, this, "Load table comments")) {

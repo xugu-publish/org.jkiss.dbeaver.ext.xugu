@@ -38,7 +38,7 @@ public class XuguProcedurePackaged extends XuguProcedureBase<XuguPackage> implem
     {
         super(ownerPackage,
             JDBCUtils.safeGetString(dbResult, "PROCEDURE_NAME"),
-            0l,
+            0L,
             DBSProcedureType.valueOf(JDBCUtils.safeGetString(dbResult, "PROCEDURE_TYPE")));
     }
 

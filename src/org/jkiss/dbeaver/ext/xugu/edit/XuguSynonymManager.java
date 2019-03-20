@@ -36,6 +36,7 @@ public class XuguSynonymManager extends SQLObjectEditor<XuguSynonym, XuguSchema>
         return FEATURE_EDITOR_ON_CREATE;
     }
 	
+	@Override
 	protected XuguSynonym createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context,
 			final XuguSchema parent, Object copyFrom) throws DBException {
 		return new UITask<XuguSynonym>() {

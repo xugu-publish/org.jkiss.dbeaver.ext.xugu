@@ -104,6 +104,7 @@ public class XuguConstraintManager extends SQLConstraintManager<XuguTableConstra
     }
 
     @NotNull
+    @Override
     protected String getAddConstraintTypeClause(XuguTableConstraint constraint) {
         if (constraint.getConstraintType() == DBSEntityConstraintType.UNIQUE_KEY) {
             return "UNIQUE"; //$NON-NLS-1$

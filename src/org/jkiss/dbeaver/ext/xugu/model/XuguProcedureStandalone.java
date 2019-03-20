@@ -96,7 +96,7 @@ public class XuguProcedureStandalone extends XuguProcedureBase<XuguSchema> imple
     
     public XuguProcedureStandalone(XuguSchema xuguSchema, String name, DBSProcedureType procedureType)
     {
-        super(xuguSchema, name, 0l, procedureType);
+        super(xuguSchema, name, 0L, procedureType);
         sourceDeclaration =
             procedureType.name() + " " + name + GeneralUtils.getDefaultLineSeparator() +
             "IS" + GeneralUtils.getDefaultLineSeparator() +
@@ -155,6 +155,7 @@ public class XuguProcedureStandalone extends XuguProcedureBase<XuguSchema> imple
         return sourceDeclaration;
     }
 
+    @Override
     public void setObjectDefinitionText(String sourceDeclaration)
     {
         this.sourceDeclaration = sourceDeclaration;
