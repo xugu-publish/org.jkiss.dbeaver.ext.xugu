@@ -240,7 +240,7 @@ public class XuguConnectionPage extends ConnectionPageAbstract implements ICompo
             passwordText.setText(CommonUtils.notEmpty(connectionInfo.getUserPassword()));
         }
         if (roleCombo != null) {
-            roleCombo.select(0);
+            roleCombo.select(2);
         }
         if (serverTimezoneCombo != null) {
             String tzProp = connectionInfo.getProviderProperty(XuguConstants.PROP_SERVER_TIMEZONE);
