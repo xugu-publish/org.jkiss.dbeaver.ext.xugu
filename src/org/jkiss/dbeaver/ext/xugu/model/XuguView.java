@@ -51,6 +51,7 @@ public class XuguView extends XuguTableBase implements XuguSourceObject
 {
     private static final Log log = Log.getLog(XuguView.class);
     private String viewText;
+    private int viewId;
     private Collection<XuguTableColumn> columns = new ArrayList<XuguTableColumn>();
     public XuguView(XuguSchema schema, String name)
     {
@@ -60,104 +61,26 @@ public class XuguView extends XuguTableBase implements XuguSourceObject
     public XuguView(DBRProgressMonitor monitor, JDBCSession session, XuguSchema schema, ResultSet dbResult)
     {
         super(schema, dbResult, 1);
+        this.viewId = JDBCUtils.safeGetInt(dbResult, "VIEW_ID");
         this.viewText = JDBCUtils.safeGetString(dbResult, "DEFINE");
-        innerSetColumns(monitor, session, schema);
-    }
-
-    private XuguTable innerFetchTable(DBRProgressMonitor monitor, JDBCSession session, XuguSchema schema, String tableName) {
-    	try {
-	    	StringBuilder sql = new StringBuilder();
-	    	sql.append("SELECT * FROM ");
-	    	sql.append(getContainer().getRoleFlag());
-	    	sql.append("_TABLES WHERE SCHEMA_ID=");
-	    	sql.append(schema.getId());
-	    	//当有检索条件时 只查询指定表 用于新建表之后的刷新工作
-			sql.append(" AND TABLE_NAME = '");
-			sql.append(tableName);
-			sql.append("'");
-    	
-			final JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
-			ResultSet res = dbStat.executeQuery();
-			XuguTable table = new XuguTable(monitor, schema, res);
-			dbStat.close();
-			return table;
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
-    }
-    
-    private void innerFetchColumns(DBRProgressMonitor monitor, JDBCSession session, XuguTable table, String tableName, String colName) {
-    	StringBuilder sql = new StringBuilder(500);
-        sql.append("SELECT * FROM ");
-    	sql.append(getContainer().getRoleFlag());
-    	sql.append("_COLUMNS");
-        sql.append(" where COL_NAME='");
-        sql.append(colName);
-        sql.append("' AND TABLE_ID=(SELECT TABLE_ID FROM ");
-        sql.append(getContainer().getRoleFlag());
-        sql.append("_TABLES WHERE TABLE_NAME='");
-        sql.append(tableName);
-        sql.append("')");
-        try {
-			JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
-			ResultSet set = dbStat.executeQuery();
-			if(set!=null) {
-    			//为了构造函数可以正常获取数据需要先遍历
-    			while(set.next()) {
-    				set.getInt(1);
-    				set.getInt(2);
-    				set.getInt(3);
-    				set.getString(4);
-    			}
-    			XuguTableColumn column = new XuguTableColumn(monitor, table, set);
-    			columns.add(column);
-    		}
-    		dbStat.close();
-		} catch (SQLException | DBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    }
-    
-    private void innerSetColumns(DBRProgressMonitor monitor, JDBCSession session, XuguSchema schema) {
-    	String define = viewText.substring(viewText.toUpperCase().indexOf("SELECT")+6, viewText.toUpperCase().indexOf("FROM"));
-    	String[] defines = define.split(",");
-    	String nowTable = "";
-    	XuguTable table = null;
-    	for(int i=0; i<defines.length; i++) {
-    		String tableName = defines[i].split("\\.")[0].trim();
-    		tableName = tableName.substring(tableName.indexOf("\"")+1, tableName.lastIndexOf("\""));
-    		if(i==0) {
-    			nowTable = tableName;
-    		}
-    		String colName = defines[i].split("\\.")[1].trim();
-    		colName = colName.substring(colName.indexOf("\"")+1, colName.lastIndexOf("\""));
-    		//目标若尚未缓存则手动获取列信息
-    		if(getContainer().tableCache.getCachedObject(tableName)==null) {
-    			//对于表只需缓存一次结果集
-    			if(nowTable!=tableName || i==0) {
-    				table = innerFetchTable(monitor, session, schema, tableName);
-    			}
-    			innerFetchColumns(monitor, session, table, tableName, colName);
-    		}
-    		else {
-    			try {
-					columns.add(getContainer().tableCache.getCachedObject(tableName).getAttribute(monitor, colName));
-				} catch (DBException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-    		}
-    	}
     }
     
     @Association
-    public Collection<XuguTableColumn> getColumns(@NotNull DBRProgressMonitor monitor)
+    public Collection<XuguTableColumn> getAttributes(@NotNull DBRProgressMonitor monitor)
         throws DBException
     {
-    	return columns;
+    	return getContainer().viewCache.getChildren(monitor, getContainer(), this);
+    }
+    
+    @Override
+    public XuguTableColumn getAttribute(@NotNull DBRProgressMonitor monitor, @NotNull String attributeName)
+        throws DBException
+    {
+        return getContainer().viewCache.getChild(monitor, getContainer(), this, attributeName);
+    }
+    
+    public int getId() {
+    	return viewId;
     }
     
     @NotNull

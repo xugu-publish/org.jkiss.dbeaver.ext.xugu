@@ -60,6 +60,7 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
     private static final Log log = Log.getLog(XuguTableBase.class);
 
     private int id;
+    private int tableType;
     
     public static class TableAdditionalInfo {
         volatile boolean loaded = false;
@@ -100,8 +101,13 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
         	this.id = JDBCUtils.safeGetInt(dbResult, "VIEW_ID");
         }
         this.valid = JDBCUtils.safeGetBoolean(dbResult, "VALID");
+        this.tableType = type;
     }
 
+    public int getType() {
+    	return tableType;
+    }
+    
     @Override
     public JDBCStructCache<XuguSchema, ? extends JDBCTable, ? extends JDBCTableColumn> getCache()
     {

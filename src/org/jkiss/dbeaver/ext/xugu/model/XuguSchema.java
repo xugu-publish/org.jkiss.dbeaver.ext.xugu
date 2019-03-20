@@ -908,18 +908,30 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         }
     }
 
-    static class ViewCache extends JDBCObjectCache<XuguSchema, XuguView> {
-
+    static class ViewCache extends JDBCStructLookupCache<XuguSchema, XuguView, XuguTableColumn> {
+    	
+    	ViewCache()
+        {
+            super("VIEW_NAME");
+            setListOrderComparator(DBUtils.nameComparator());
+        }
+    	
         @Override
-        protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguSchema owner)
+		public JDBCStatement prepareLookupStatement(@NotNull JDBCSession session, @NotNull XuguSchema owner, XuguView object,
+				String objectName)
             throws SQLException
         {
+        	System.out.println("select all views");
         	//xfc 修改了获取所有视图信息的sql
         	StringBuilder sql = new StringBuilder();
         	sql.append("SELECT * FROM ");
         	sql.append(owner.roleFlag);
         	sql.append("_VIEWS WHERE SCHEMA_ID=");
         	sql.append(owner.getId());
+        	if(object!=null) {
+        		sql.append(" AND VIEW_ID=");
+        		sql.append(object.getId());
+        	}
             JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
             return dbStat;
         }
@@ -929,6 +941,38 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
             throws SQLException, DBException
         {
             return new XuguView(session.getProgressMonitor(), session, owner, dbResult);
+        }
+        
+     // 获取列信息
+        @Override
+        protected JDBCStatement prepareChildrenStatement(@NotNull JDBCSession session, @NotNull XuguSchema owner, @Nullable XuguView forView)
+            throws SQLException
+        {
+        	//xfc 修改了获取列信息的sql
+            StringBuilder sql = new StringBuilder(500);
+            sql.append("SELECT * FROM ");
+        	sql.append(owner.roleFlag);
+        	sql.append("_VIEW_COLUMNS");
+            if (forView != null) {
+                sql.append(" where VIEW_ID=");
+                sql.append(forView.getId());
+            }
+            System.out.println("sql... "+sql.toString());
+            JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
+            return dbStat;
+        }
+
+        @Override
+        protected XuguTableColumn fetchChild(@NotNull JDBCSession session, @NotNull XuguSchema owner, @NotNull XuguView view, @NotNull JDBCResultSet dbResult)
+            throws SQLException, DBException
+        {
+            return new XuguTableColumn(session.getProgressMonitor(), view, dbResult);
+        }
+
+        @Override
+        protected void cacheChildren(XuguView parent, List<XuguTableColumn> xuguTableColumns) {
+        	xuguTableColumns.sort(DBUtils.orderComparator());
+            super.cacheChildren(parent, xuguTableColumns);
         }
     }
 

@@ -90,56 +90,71 @@ public class XuguTableColumn extends JDBCTableColumn<XuguTableBase> implements D
     {
         super(table, true);
         // Read default value first because it is of LONG type and has to be read before others
-        //xfc 修改字段
-        this.dbID = JDBCUtils.safeGetInt(dbResult, "DB_ID");
-        this.tableID = JDBCUtils.safeGetInt(dbResult, "TABLE_ID");
-        this.colNo = JDBCUtils.safeGetInt(dbResult, "COL_NO");
-        this.colName = JDBCUtils.safeGetString(dbResult, "COL_NAME");
-        this.typeName = JDBCUtils.safeGetString(dbResult, "TYPE_NAME");
-        this.varying = JDBCUtils.safeGetBoolean(dbResult, "VARYING");
-        this.notNull = JDBCUtils.safeGetBoolean(dbResult, "NOT_NULL");
-        this.isSerial = JDBCUtils.safeGetBoolean(dbResult, "IS_SERIAL");
-        this.serialID = JDBCUtils.safeGetInt(dbResult, "SERIAL_ID");
-        this.timeStamp_t = JDBCUtils.safeGetString(dbResult, "TIMESTAMP_T");
-        this.collator = JDBCUtils.safeGetString(dbResult, "COLLATOR");
-        this.defVal = JDBCUtils.safeGetString(dbResult, "DEF_VAL");
-//        this.colHistory = JDBCUtils.safeGetString(dbResult, "COL_HISTORY");
-        this.domainID = JDBCUtils.safeGetInt(dbResult, "DOMAIN_ID");
-        this.deleted = JDBCUtils.safeGetBoolean(dbResult, "DELETED");
-        this.isVirtual = JDBCUtils.safeGetBoolean(dbResult, "IS_VIRTUAL");
-        this.comments = JDBCUtils.safeGetString(dbResult, "COMMENTS");
-        this.repetRate = JDBCUtils.safeGetDouble(dbResult, "REPET_RATE");
-        this.dispersion = JDBCUtils.safeGetDouble(dbResult, "DISPERSION");
-        this.maxVal = JDBCUtils.safeGetString(dbResult, "MAX_VAL");
-        this.minVal = JDBCUtils.safeGetString(dbResult, "MIN_VAL");
-        
-        setDefaultValue(this.defVal);
-        setName(this.colName);
-        setOrdinalPosition(this.colNo);
-        this.type = new XuguDataType(this, this.typeName, true);
-        if (this.type != null) {
-            this.typeName = type.getFullyQualifiedName(DBPEvaluationContext.DDL);
-            this.valueType = type.getTypeID();
-            if(this.typeName.equals("NUMERIC")){
-            	this.scale = JDBCUtils.safeGetInt(dbResult, "SCALE")%65536;
-            	this.precision = (JDBCUtils.safeGetInt(dbResult, "SCALE")-this.scale)/65536;
-            }else if(this.typeName.equals("CHAR")) {
-            	this.precision = JDBCUtils.safeGetInt(dbResult, "SCALE");
-            	this.scale = 0;
-            }else if(this.typeName.matches("INTERVAL(.*)")) {
-            	this.scale = JDBCUtils.safeGetInt(dbResult, "SCALE")%65536;
-            	this.precision = (JDBCUtils.safeGetInt(dbResult, "SCALE")-this.scale)/65536;
-            }else {
-            	this.precision = this.type.getPrecision();
-            	this.scale = this.type.getMaxScale();
+        //根据表和视图区分要获取的字段
+        if(dbResult!=null) {
+        	//type=0时为表 type=1时为视图
+        	if(table.getType()==0) {
+        		this.dbID = JDBCUtils.safeGetInt(dbResult, "DB_ID");
+                this.tableID = JDBCUtils.safeGetInt(dbResult, "TABLE_ID");
+                this.colNo = JDBCUtils.safeGetInt(dbResult, "COL_NO");
+                this.colName = JDBCUtils.safeGetString(dbResult, "COL_NAME");
+                this.typeName = JDBCUtils.safeGetString(dbResult, "TYPE_NAME");
+                this.varying = JDBCUtils.safeGetBoolean(dbResult, "VARYING");
+                this.notNull = JDBCUtils.safeGetBoolean(dbResult, "NOT_NULL");
+                this.isSerial = JDBCUtils.safeGetBoolean(dbResult, "IS_SERIAL");
+                this.serialID = JDBCUtils.safeGetInt(dbResult, "SERIAL_ID");
+                this.timeStamp_t = JDBCUtils.safeGetString(dbResult, "TIMESTAMP_T");
+                this.collator = JDBCUtils.safeGetString(dbResult, "COLLATOR");
+                this.defVal = JDBCUtils.safeGetString(dbResult, "DEF_VAL");
+                this.domainID = JDBCUtils.safeGetInt(dbResult, "DOMAIN_ID");
+                this.deleted = JDBCUtils.safeGetBoolean(dbResult, "DELETED");
+                this.isVirtual = JDBCUtils.safeGetBoolean(dbResult, "IS_VIRTUAL");
+                this.comments = JDBCUtils.safeGetString(dbResult, "COMMENTS");
+                this.repetRate = JDBCUtils.safeGetDouble(dbResult, "REPET_RATE");
+                this.dispersion = JDBCUtils.safeGetDouble(dbResult, "DISPERSION");
+                this.maxVal = JDBCUtils.safeGetString(dbResult, "MAX_VAL");
+                this.minVal = JDBCUtils.safeGetString(dbResult, "MIN_VAL");
+                
+                setDefaultValue(this.defVal);
+                setName(this.colName);
+                setOrdinalPosition(this.colNo);
+        	}else {
+        		this.dbID = JDBCUtils.safeGetInt(dbResult, "DB_ID");
+                this.tableID = JDBCUtils.safeGetInt(dbResult, "VIEW_ID");
+                this.colNo = JDBCUtils.safeGetInt(dbResult, "COL_NO");
+                this.colName = JDBCUtils.safeGetString(dbResult, "COL_NAME");
+                this.typeName = JDBCUtils.safeGetString(dbResult, "TYPE_NAME");
+                this.varying = JDBCUtils.safeGetBoolean(dbResult, "VARYING");
+                setName(this.colName);
+                setOrdinalPosition(this.colNo);
+        	}
+        	//对数据类型、精度标度进行统一处理
+        	this.type = new XuguDataType(this, this.typeName, true);
+            if (this.type != null) {
+                this.typeName = type.getFullyQualifiedName(DBPEvaluationContext.DDL);
+                this.valueType = type.getTypeID();
+                if(this.typeName.equals("NUMERIC")){
+                	this.scale = JDBCUtils.safeGetInt(dbResult, "SCALE")%65536;
+                	this.precision = (JDBCUtils.safeGetInt(dbResult, "SCALE")-this.scale)/65536;
+                }else if(this.typeName.equals("CHAR")) {
+                	this.precision = JDBCUtils.safeGetInt(dbResult, "SCALE");
+                	this.scale = 0;
+                }else if(this.typeName.matches("INTERVAL(.*)")) {
+                	this.scale = JDBCUtils.safeGetInt(dbResult, "SCALE")%65536;
+                	this.precision = (JDBCUtils.safeGetInt(dbResult, "SCALE")-this.scale)/65536;
+                }else {
+                	this.precision = this.type.getPrecision();
+                	this.scale = this.type.getMaxScale();
+                }
             }
+            if (typeMod == XuguDataTypeModifier.REF) {
+                this.valueType = Types.REF;
+            }
+            setRequired(this.notNull);
+            setScale(this.scale);
+            setPrecision(this.precision);
         }
-        if (typeMod == XuguDataTypeModifier.REF) {
-            this.valueType = Types.REF;
-        }
-        setRequired(this.notNull);
-        setScale(this.scale);
-        setPrecision(this.precision);
+        
     }
 
     public int getDbID() {
