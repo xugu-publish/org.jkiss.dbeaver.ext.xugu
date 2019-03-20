@@ -63,7 +63,7 @@ public class XuguViewManager extends SQLObjectEditor<XuguView, XuguSchema> {
     @Override
     public DBSObjectCache<? extends DBSObject, XuguView> getObjectsCache(XuguView object)
     {
-        return (DBSObjectCache) object.getSchema().tableCache;
+        return (DBSObjectCache) object.getSchema().viewCache;
     }
 
     @Override
@@ -99,6 +99,11 @@ public class XuguViewManager extends SQLObjectEditor<XuguView, XuguSchema> {
         final XuguView view = command.getObject();
         boolean hasComment = command.getProperty("comment") != null;
         if (!hasComment || command.getProperties().size() > 1) {
+        	if(view.getViewText().toUpperCase().indexOf("REPLACE")==-1) {
+        		String newText = view.getViewText();
+        		newText = newText.substring(0, newText.toUpperCase().indexOf("CREATE")+6)+" OR REPLACE"+newText.substring(newText.indexOf("CREATE")+6);
+        		view.setViewText(newText);
+        	}
             actions.add(new SQLDatabasePersistAction("Create view", view.getViewText()));
         }
         if (hasComment) {

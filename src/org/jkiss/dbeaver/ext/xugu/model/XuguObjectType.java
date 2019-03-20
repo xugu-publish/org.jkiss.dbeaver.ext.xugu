@@ -152,7 +152,8 @@ public enum XuguObjectType implements DBSObjectType {
             return schema.dataTypeCache.getObject(monitor, schema, objectName);
         }
     }),
-	VIEW("VIEW", DBIcon.TREE_VIEW, XuguView.class, new ObjectFinder() {
+	//view的OBJ_TYPE为9
+	VIEW("9", DBIcon.TREE_VIEW, XuguView.class, new ObjectFinder() {
         @Override
         public XuguView findObject(DBRProgressMonitor monitor, XuguSchema schema, String objectName) throws DBException
         {
