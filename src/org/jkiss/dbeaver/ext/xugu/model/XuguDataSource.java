@@ -65,6 +65,7 @@ import java.util.regex.Pattern;
 
 /**
  * GenericDataSource
+ * @author Luke
  */
 public class XuguDataSource extends JDBCDataSource
     implements DBSObjectSelector, DBCQueryPlanner, IAdaptable {
@@ -86,7 +87,9 @@ public class XuguDataSource extends JDBCDataSource
     private boolean isAdminVisible;
     private String planTableName;
     private boolean useRuleHint;
-    //xfc 添加了用户角色属性
+    /**
+     * userRole 角色属性，用于在查询时设置表名的前缀
+     */
     private String userRole;
     private String roleFlag;
     
@@ -105,12 +108,12 @@ public class XuguDataSource extends JDBCDataSource
         switch (featureId) {
             case DBConstants.FEATURE_MAX_STRING_LENGTH:
                 return 4000;
+            default:
+            	return super.getDataSourceFeature(featureId);
         }
-
-        return super.getDataSourceFeature(featureId);
     }
 
-    public boolean isViewAvailable(@NotNull DBRProgressMonitor monitor, @NotNull String schemaName, @NotNull String viewName) {
+    public Boolean isViewAvailable(@NotNull DBRProgressMonitor monitor, @NotNull String schemaName, @NotNull String viewName) {
         viewName = viewName.toUpperCase();
         Boolean available;
         synchronized (availableViews) {
@@ -208,6 +211,7 @@ public class XuguDataSource extends JDBCDataSource
         }
     }
 
+    @Override
     protected void initializeContextState(@NotNull DBRProgressMonitor monitor, @NotNull JDBCExecutionContext context, boolean setActiveObject) throws DBCException {
         if (outputReader == null) {
             outputReader = new xuguOutputReader();
@@ -267,11 +271,7 @@ public class XuguDataSource extends JDBCDataSource
 
     @Override
     protected Map<String, String> getInternalConnectionProperties(DBRProgressMonitor monitor, DBPDriver driver, String purpose, DBPConnectionConfiguration connectionInfo) throws DBCException {
-        Map<String, String> connectionsProps = new HashMap<>();
-//        if (!getContainer().getPreferenceStore().getBoolean(ModelPreferences.META_CLIENT_NAME_DISABLE)) {
-//            // Program name
-//            connectionsProps.put("v$session.program", CommonUtils.truncateString(DBUtils.getClientApplicationName(getContainer(), purpose), 48));
-//        }
+        Map<String, String> connectionsProps = new HashMap<String, String>();
         if (CommonUtils.toBoolean(connectionInfo.getProviderProperty(XuguConstants.OS_AUTH_PROP))) {
             connectionsProps.put("v$session.osuser", System.getProperty(StandardConstants.ENV_USER_NAME));
         }
@@ -397,12 +397,12 @@ public class XuguDataSource extends JDBCDataSource
         }
         //xfc 从连接信息中获取userRole
         this.userRole = connectionInfo.getProviderProperty(XuguConstants.PROP_INTERNAL_LOGON);
-        if(this.userRole.equals("SYSDBA")) {
+        if("SYSDBA".equals(this.userRole)) {
         	this.roleFlag = "SYS";
-        }else if(this.userRole.equals("DBA")) {
+        }else if("DBA".equals(this.userRole)) {
         	this.roleFlag = "DBA";
         }else {
-        	this.roleFlag = "USER";
+        	this.roleFlag = "ALL";
         }
         this.publicSchema = new XuguSchema(this, 1, XuguConstants.USER_PUBLIC);
         {
