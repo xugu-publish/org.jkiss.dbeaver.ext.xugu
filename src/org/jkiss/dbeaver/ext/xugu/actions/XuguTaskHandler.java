@@ -25,6 +25,7 @@ import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.commands.IElementUpdater;
 import org.eclipse.ui.menus.UIElement;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.ext.xugu.model.XuguDataSource;
 import org.jkiss.dbeaver.ext.xugu.model.XuguObjectType;
 import org.jkiss.dbeaver.ext.xugu.model.source.XuguSourceObject;
 import org.jkiss.dbeaver.ext.xugu.model.source.XuguStatefulObject;
@@ -81,34 +82,35 @@ public abstract class XuguTaskHandler extends AbstractHandler implements IElemen
         XuguStatefulObject schemaObject,
         XuguObjectType objectType)
     {
-        try {
-            try (JDBCPreparedStatement dbStat = session.prepareStatement(
-                "SELECT * FROM SYS.ALL_ERRORS WHERE OWNER=? AND NAME=? AND TYPE=? ORDER BY SEQUENCE")) {
-                dbStat.setString(1, schemaObject.getSchema().getName());
-                dbStat.setString(2, schemaObject.getName());
-                dbStat.setString(3, objectType.getTypeName());
-                try (ResultSet dbResult = dbStat.executeQuery()) {
-                    boolean hasErrors = false;
-                    while (dbResult.next()) {
-                        DBCCompileError error = new DBCCompileError(
-                            "ERROR".equals(dbResult.getString("ATTRIBUTE")),
-                            dbResult.getString("TEXT"),
-                            dbResult.getInt("LINE"),
-                            dbResult.getInt("POSITION"));
-                        hasErrors = true;
-                        if (error.isError()) {
-                            compileLog.error(error);
-                        } else {
-                            compileLog.warn(error);
+    	//只对sys用户开放错误日志信息
+    	if(schemaObject.getSchema().getRoleFlag()=="SYS") {
+    		try {
+                try (JDBCPreparedStatement dbStat = session.prepareStatement(
+                    "SELECT * FROM SYS_ERROR_LOG WHERE USER='"+schemaObject.getDataSource().getName()+"'")) {
+                    try (ResultSet dbResult = dbStat.executeQuery()) {
+                        boolean hasErrors = false;
+                        while (dbResult.next()) {
+                            DBCCompileError error = new DBCCompileError(
+                                true,
+                                dbResult.getString("ERR_STR"),
+                                dbResult.getInt("ERR_CODE"),
+                                dbResult.getInt("ERR_NO"));
+                            hasErrors = true;
+                            if (error.isError()) {
+                                compileLog.error(error);
+                            } else {
+                                compileLog.warn(error);
+                            }
                         }
+                        return !hasErrors;
                     }
-                    return !hasErrors;
                 }
+            } catch (Exception e) {
+                log.error("Can't read user errors", e);
+                return false;
             }
-        } catch (Exception e) {
-            log.error("Can't read user errors", e);
-            return false;
-        }
+    	}
+        return false;
     }
 
 }
