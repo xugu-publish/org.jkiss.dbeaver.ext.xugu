@@ -51,6 +51,6 @@ public class SchedulerJobActionEditor extends SQLSourceViewer<XuguSchedulerJob> 
 
     @Override
     protected boolean isReadOnly() {
-        return false;
+        return true;
     }
 }

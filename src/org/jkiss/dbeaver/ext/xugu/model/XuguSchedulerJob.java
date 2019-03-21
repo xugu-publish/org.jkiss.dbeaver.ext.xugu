@@ -63,7 +63,6 @@ public class XuguSchedulerJob extends XuguSchemaObject implements XuguStatefulOb
     private int paramNum;
     private String paramDef;
     private String actionDef;
-    private byte[] action;
     private Date beginTime;
     private Date endTime;
     private String repetInterval;
@@ -114,50 +113,55 @@ public class XuguSchedulerJob extends XuguSchemaObject implements XuguStatefulOb
         autoDrop = JDBCUtils.safeGetBoolean(dbResult, "AUTO_DROP");
         isSys = JDBCUtils.safeGetBoolean(dbResult, "IS_SYS");
         comments = JDBCUtils.safeGetString(dbResult, "COMMENTS");
-        //加载参数信息
-        if(paramNum>0) {
-        	String targetPro = actionDef;
-        	if(targetPro.indexOf(".")!=-1) {
-        		targetPro = targetPro.substring(targetPro.indexOf(".")+1, targetPro.length());
-        	}
-        	try {
+        //加载参数信息和Action信息
+        String targetPro = actionDef;
+        //定义中包含有存储过程
+        if(targetPro.indexOf(".")!=-1) {
+    		targetPro = targetPro.substring(targetPro.indexOf(".")+1, targetPro.length());
+    		try {
         		//目标尚未被缓存
         		if(schema.proceduresCache.getCachedObject(targetPro)==null) {
         			try {
-	        			StringBuilder sql = new StringBuilder();
-	                	sql.append("SELECT * FROM ");
-	                	sql.append(schema.getRoleFlag());
-	                	sql.append("_PROCEDURES WHERE SCHEMA_ID=");
-	                	sql.append(schema.getId());
-	                	sql.append(" AND PROC_NAME = '");
-	            		sql.append(targetPro);
-	            		sql.append("'");
-	            		JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
-	            		ResultSet res = dbStat.executeQuery();
-	            		if(res!=null) {
-	            			//为了构造函数可以正常获取数据需要先遍历
-	            			while(res.next()) {
-	            				res.getInt(1);
-	            				res.getInt(2);
-	            				res.getInt(3);
-	            				res.getInt(4);
-	            				res.getString(5);
-	            			}
-	            			XuguProcedureStandalone pro = new XuguProcedureStandalone(monitor, schema, res);
-	            			this.procParams = pro.getParameters(monitor);
-	            		}
-	            		dbStat.close();
-					} catch (SQLException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+            			StringBuilder sql = new StringBuilder();
+                    	sql.append("SELECT * FROM ");
+                    	sql.append(schema.getRoleFlag());
+                    	sql.append("_PROCEDURES WHERE SCHEMA_ID=");
+                    	sql.append(schema.getId());
+                    	sql.append(" AND PROC_NAME = '");
+                		sql.append(targetPro);
+                		sql.append("'");
+                		JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
+                		ResultSet res = dbStat.executeQuery();
+                		if(res!=null) {
+                			//为了构造函数可以正常获取数据需要先遍历
+                			while(res.next()) {
+                				res.getInt(1);
+                				res.getInt(2);
+                				res.getInt(3);
+                				res.getInt(4);
+                				res.getString(5);
+                			}
+                			XuguProcedureStandalone pro = new XuguProcedureStandalone(monitor, schema, res);
+                			if(this.paramNum!=0) {
+                				this.procParams = pro.getParameters(monitor);
+                			}
+                			this.actionDef = pro.getObjectDefinitionText(monitor, null);
+                		}
+                		dbStat.close();
+    				} catch (SQLException e) {
+    					// TODO Auto-generated catch block
+    					e.printStackTrace();
+    				}
         		}else {
-        			this.procParams = schema.proceduresCache.getCachedObject(targetPro).getParameters(monitor);
+        			if(this.paramNum!=0) {
+        				this.procParams = schema.proceduresCache.getCachedObject(targetPro).getParameters(monitor);
+        			}
+        			this.actionDef = schema.proceduresCache.getCachedObject(targetPro).getObjectDefinitionText(monitor, null);
         		}
-			} catch (DBException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+    		} catch (DBException e) {
+    			// TODO Auto-generated catch block
+    			e.printStackTrace();
+    		}
         }
     }
 
@@ -169,8 +173,8 @@ public class XuguSchedulerJob extends XuguSchemaObject implements XuguStatefulOb
 		return dbID;
 	}
 
-	public byte[] getAction() {
-		return action;
+	public String getAction() {
+		return actionDef;
 	}
 	
 	public int getUserID() {
