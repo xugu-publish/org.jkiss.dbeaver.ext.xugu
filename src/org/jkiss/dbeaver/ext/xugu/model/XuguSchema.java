@@ -48,6 +48,7 @@ import java.util.*;
 
 /**
  * XuguSchema
+ * @author luke
  */
 public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefreshableObject, DBPSystemObject, DBSProcedureContainer
 {
@@ -61,23 +62,24 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
     final public IndexCache indexCache = new IndexCache();
     final public DataTypeCache dataTypeCache = new DataTypeCache();
     final public SequenceCache sequenceCache = new SequenceCache();
-    //final public QueueCache queueCache = new QueueCache();
     final public PackageCache packageCache = new PackageCache();
     final public SynonymCache synonymCache = new SynonymCache();
     final public DBLinkCache dbLinkCache = new DBLinkCache();
     final public ProceduresCache proceduresCache = new ProceduresCache();
-    //final public JavaCache javaCache = new JavaCache();
     final public SchedulerJobCache schedulerJobCache = new SchedulerJobCache();
-//    final public SchedulerProgramCache schedulerProgramCache = new SchedulerProgramCache();
-//    final public RecycleBin recycleBin = new RecycleBin();
 
     private long id;
     private String name;
     private String roleFlag;
-    //private Date createTime;
     private XuguDatabase parent;
     private transient XuguUser user;
 
+    /**
+     * 通过指定模式ID和模式名称构造一个新的模式对象
+     * @param dataSource 数据源
+     * @param id 模式ID
+     * @param name 模式名称
+     */
     public XuguSchema(XuguDataSource dataSource, long id, String name)
     {
         super(dataSource, id > 0);
@@ -86,6 +88,12 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         this.roleFlag = dataSource.getRoleFlag();
     }
 
+    /**
+     * 通过结果集构造一个新的模式对象，同时指定其所属数据库
+     * @param dataSource 数据源
+     * @param parent 所属数据库
+     * @param dbResult 查询结果集
+     */
     public XuguSchema(@NotNull XuguDataSource dataSource, XuguDatabase parent, ResultSet dbResult) {
     	super(dataSource, true);
     	this.id = JDBCUtils.safeGetLong(dbResult, "SCHEMA_ID");
@@ -98,6 +106,11 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         }
     }
     
+    /**
+     *  通过结果集构造一个新的模式对象
+     * @param dataSource 
+     * @param dbResult
+     */
     public XuguSchema(@NotNull XuguDataSource dataSource, @NotNull ResultSet dbResult)
     {
         super(dataSource, true);
@@ -108,7 +121,6 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
             log.warn("Empty schema name fetched");
             this.name = "? " + super.hashCode();
         }
-        //this.createTime = JDBCUtils.safeGetTimestamp(dbResult, "CREATED");
     }
     
 
@@ -148,11 +160,6 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         return null;
     }
 
-    /**
-     * User reference never read directly from database.
-     * It is used by managers to create/delete/alter schemas
-     * @return user reference or null
-     */
     public XuguUser getUser()
     {
         return user;
@@ -167,120 +174,194 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
     	return roleFlag;
     }
 
+    /**
+     * 从索引缓存中获取模式包含的所有索引信息（提供给界面展示）
+     * @param monitor 监控
+     * @return list 索引列表
+     * @throws DBException
+     */
     @Association
     public Collection<XuguTableIndex> getIndexes(DBRProgressMonitor monitor)
         throws DBException
     {
-        return indexCache.getObjects(monitor, this, null);
+    	Collection<XuguTableIndex> list = indexCache.getObjects(monitor, this, null);
+        return list;
     }
 
+    /**
+     * 从表缓存中获取模式包含的所有表信息（提供给界面展示）
+     * @param monitor 监控
+     * @return list 表列表
+     * @throws DBException
+     */
     @Association
     public Collection<XuguTable> getTables(DBRProgressMonitor monitor)
         throws DBException
     {
-        return tableCache.getTypedObjects(monitor, this, XuguTable.class);
+    	Collection<XuguTable> list = tableCache.getTypedObjects(monitor, this, XuguTable.class);
+        return list;
     }
 
+    /**
+     * 根据表名从缓存中获取指定的表信息
+     * @param monitor 监控
+     * @param name 表名
+     * @return table 表对象
+     * @throws DBException
+     */
     public XuguTable getTable(DBRProgressMonitor monitor, String name)
         throws DBException
     {
-        return tableCache.getObject(monitor, this, name, XuguTable.class);
+    	XuguTable table = tableCache.getObject(monitor, this, name, XuguTable.class);
+        return table;
     }
 
+    /**
+     * 从视图缓存中获取所有视图信息（提供给界面展示）
+     * @param monitor 监控
+     * @return list 视图列表
+     * @throws DBException
+     */
     @Association
     public Collection<XuguView> getViews(DBRProgressMonitor monitor)
         throws DBException
     {
-        return viewCache.getAllObjects(monitor, this);
+    	Collection<XuguView> list = viewCache.getAllObjects(monitor, this);
+        return list;
     }
 
+    /**
+     * 根据视图名从缓存中获取指定的视图信息
+     * @param monitor 监控
+     * @param name 视图名
+     * @return view 视图对象
+     * @throws DBException
+     */
     public XuguView getView(DBRProgressMonitor monitor, String name)
         throws DBException
     {
-        return viewCache.getObject(monitor, this, name, XuguView.class);
+    	XuguView view = viewCache.getObject(monitor, this, name, XuguView.class);
+    	return view;
     }
-
-//    @Association
-//    public Collection<XuguMaterializedView> getMaterializedViews(DBRProgressMonitor monitor)
-//        throws DBException
-//    {
-//        return viewCache.getAllObjects(monitor, this);
-//    }
-
+    
+    /**
+     * 从数据类型缓存中获取全部数据类型信息（提供给界面展示）
+     * @param monitor 监控
+     * @return list 数据类型列表
+     * @throws DBException
+     */
     @Association
     public Collection<XuguDataType> getDataTypes(DBRProgressMonitor monitor)
         throws DBException
     {
-        return dataTypeCache.getAllObjects(monitor, this);
+        Collection<XuguDataType> list = dataTypeCache.getAllObjects(monitor, this);
+        return list;
     }
 
+    /**
+     * 根据数据类型名从缓存中获取指定的数据类型对象
+     * @param monitor 监控
+     * @param name 数据类型名
+     * @return type 数据类型对象
+     * @throws DBException
+     */
     public XuguDataType getDataType(DBRProgressMonitor monitor, String name)
         throws DBException
     {
         XuguDataType type = dataTypeCache.getObject(monitor, this, name);
-        //不对同义词类型进行检查
-//        if (type == null) {
-//            final XuguSynonym synonym = synonymCache.getObject(monitor, this, name);
-//            if (synonym != null && synonym.getObjectType() == XuguObjectType.TYPE) {
-//                Object object = synonym.getObject(monitor);
-//                if (object instanceof XuguDataType) {
-//                    return (XuguDataType)object;
-//                }
-//            }
-//            return null;
-//        } else {
-//            return type;
-//        }
         return type;
     }
 
-//    @Association
-//    public Collection<XuguQueue> getQueues(DBRProgressMonitor monitor)
-//        throws DBException
-//    {
-//        return queueCache.getAllObjects(monitor, this);
-//    }
-
+    /**
+     * 从序列缓存中获取全部的缓存信息（提供给界面展示）
+     * @param monitor 监控
+     * @return list 序列列表
+     * @throws DBException
+     */
     @Association
     public Collection<XuguSequence> getSequences(DBRProgressMonitor monitor)
         throws DBException
     {
-        return sequenceCache.getAllObjects(monitor, this);
+    	Collection<XuguSequence> list = sequenceCache.getAllObjects(monitor, this);
+        return list;
     }
 
+    /**
+     * 从包缓存中获取全部的包信息（提供给界面展示）
+     * @param monitor 监控
+     * @return list 包列表
+     * @throws DBException
+     */
     @Association
     public Collection<XuguPackage> getPackages(DBRProgressMonitor monitor)
         throws DBException
     {
-        return packageCache.getAllObjects(monitor, this);
+        Collection<XuguPackage> list = packageCache.getAllObjects(monitor, this);
+        return list;
     }
 
+    /**
+     * 从存储过程缓存中获取全部的存储过程信息（提供给界面展示）
+     * @param monitor 监控
+     * @return list 存储过程列表
+     * @throws DBException
+     */
     @Override
     @Association
     public Collection<XuguProcedureStandalone> getProcedures(DBRProgressMonitor monitor)
         throws DBException
     {
-        return proceduresCache.getAllObjects(monitor, this);
+        Collection<XuguProcedureStandalone> list = proceduresCache.getAllObjects(monitor, this);
+        return list;
     }
 
+    /**
+     * 根据存储过程名从缓存中获取指定的存储过程信息
+     * @param monitor 监控
+     * @param uniqueName 存储过程名
+     * @return procedure 存储过程对象
+     * @throws DBException
+     */
     @Override
     public XuguProcedureStandalone getProcedure(DBRProgressMonitor monitor, String uniqueName) throws DBException {
-        return proceduresCache.getObject(monitor, this, uniqueName);
+        XuguProcedureStandalone procedure = proceduresCache.getObject(monitor, this, uniqueName);
+        return procedure;
     }
 
+    /**
+     * 从同义词缓存中获取全部的同义词信息
+     * @param monitor 监控
+     * @return list 同义词列表
+     * @throws DBException
+     */
     @Association
     public Collection<XuguSynonym> getSynonyms(DBRProgressMonitor monitor)
         throws DBException
     {
-        return synonymCache.getAllObjects(monitor, this);
+        Collection<XuguSynonym> list = synonymCache.getAllObjects(monitor, this);
+        return list;
     }
 
+    /**
+     * 根据指定的同义词名从缓存中获取指定的同义词信息
+     * @param monitor 监控
+     * @param name 同义词名
+     * @return synonym 同义词对象
+     * @throws DBException
+     */
     public XuguSynonym getSynonym(DBRProgressMonitor monitor, String name)
         throws DBException
     {
-        return synonymCache.getObject(monitor, this, name, XuguSynonym.class);
+        XuguSynonym synonym = synonymCache.getObject(monitor, this, name, XuguSynonym.class);
+        return synonym;
     }
 
+    /**
+     * 从触发器缓存中获取全部的触发器信息
+     * @param monitor 监控
+     * @return list 触发器列表
+     * @throws DBException
+     */
     @Association
     public Collection<XuguSchemaTrigger> getTriggers(DBRProgressMonitor monitor)
         throws DBException
@@ -288,33 +369,48 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         return triggerCache.getAllObjects(monitor, this);
     }
 
-    @Association
-    public Collection<XuguTableTrigger> getTableTriggers(DBRProgressMonitor monitor)
-            throws DBException
-    {
-        List<XuguTableTrigger> allTableTriggers = new ArrayList<>();
-        for (XuguTableBase table : tableCache.getAllObjects(monitor, this)) {
-            Collection<XuguTableTrigger> triggers = table.getTriggers(monitor);
-            if (!CommonUtils.isEmpty(triggers)) {
-                allTableTriggers.addAll(triggers);
-            }
-        }
-        allTableTriggers.sort(Comparator.comparing(XuguTrigger::getName));
-        return allTableTriggers;
-    }
+    
+//    @Association
+//    public Collection<XuguTableTrigger> getTableTriggers(DBRProgressMonitor monitor)
+//            throws DBException
+//    {
+//        List<XuguTableTrigger> allTableTriggers = new ArrayList<>();
+//        for (XuguTableBase table : tableCache.getAllObjects(monitor, this)) {
+//            Collection<XuguTableTrigger> triggers = table.getTriggers(monitor);
+//            if (!CommonUtils.isEmpty(triggers)) {
+//                allTableTriggers.addAll(triggers);
+//            }
+//        }
+//        allTableTriggers.sort(Comparator.comparing(XuguTrigger::getName));
+//        return allTableTriggers;
+//    }
 
+    /**
+     * 从数据库连接缓存中获取全部的数据库连接信息
+     * @param monitor 监控
+     * @return list 数据库连接列表
+     * @throws DBException
+     */
     @Association
     public Collection<XuguDBLink> getDatabaseLinks(DBRProgressMonitor monitor)
         throws DBException
     {
-        return dbLinkCache.getAllObjects(monitor, this);
+    	Collection<XuguDBLink> list = dbLinkCache.getAllObjects(monitor, this);
+    	return list;
     }
     
+    /**
+     * 从作业缓存中获取全部的作业信息
+     * @param monitor 监控
+     * @return list 作业列表
+     * @throws DBException
+     */
     @Association
     public Collection<XuguSchedulerJob> getSchedulerJobs(DBRProgressMonitor monitor)
             throws DBException
     {
-        return schedulerJobCache.getAllObjects(monitor, this);
+        Collection<XuguSchedulerJob> list = schedulerJobCache.getAllObjects(monitor, this);
+        return list;
     }
 
     @Property(order = 90)
@@ -328,8 +424,17 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
     {
         List<DBSObject> children = new ArrayList<>();
         children.addAll(tableCache.getAllObjects(monitor, this));
-        children.addAll(synonymCache.getAllObjects(monitor, this));
+        children.addAll(viewCache.getAllObjects(monitor, this));
+        children.addAll(constraintCache.getAllObjects(monitor, this));
+        children.addAll(foreignKeyCache.getAllObjects(monitor, this));
+        children.addAll(triggerCache.getAllObjects(monitor, this));
+        children.addAll(indexCache.getAllObjects(monitor, this));
+        children.addAll(dataTypeCache.getAllObjects(monitor, this));
+        children.addAll(sequenceCache.getAllObjects(monitor, this));
         children.addAll(packageCache.getAllObjects(monitor, this));
+        children.addAll(synonymCache.getAllObjects(monitor, this));
+        children.addAll(dbLinkCache.getAllObjects(monitor, this));
+        children.addAll(schedulerJobCache.getAllObjects(monitor, this));
         return children;
     }
 
@@ -337,11 +442,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
     public DBSObject getChild(@NotNull DBRProgressMonitor monitor, @NotNull String childName)
         throws DBException
     {
-        XuguTableBase table = tableCache.getObject(monitor, this, childName);;
-        //下拉菜单已经展开时才处理tableCache
-        //避免了当下拉菜单没有展开时就点击新建表会无限循环加载的问题
-        //if(!tableCache.isFullyCached())
-        	
+        XuguTableBase table = tableCache.getObject(monitor, this, childName);
         if (table != null) {
             System.out.println("TTTTTTTTt "+table.getName()+" ");
             return table;
@@ -366,9 +467,13 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
     {
         monitor.subTask("Cache tables");
         tableCache.getAllObjects(monitor, this);
+        monitor.subTask("Cache views");
+        viewCache.getAllObjects(monitor, this);
         if ((scope & STRUCT_ATTRIBUTES) != 0) {
             monitor.subTask("Cache table columns");
             tableCache.loadChildren(monitor, this, null);
+            monitor.subTask("Cache view columns");
+            viewCache.loadChildren(monitor, this, null);
         }
         if ((scope & STRUCT_ASSOCIATIONS) != 0) {
             monitor.subTask("Cache table indexes");
@@ -376,6 +481,22 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
             monitor.subTask("Cache table constraints");
             constraintCache.getObjects(monitor, this, null);
             foreignKeyCache.getObjects(monitor, this, null);
+            monitor.subTask("Cache triggers");
+            triggerCache.getAllObjects(monitor, this);
+            monitor.subTask("Cache indexes");
+            indexCache.getAllObjects(monitor, this);
+            monitor.subTask("Cache datatypes");
+            dataTypeCache.getAllObjects(monitor, this);
+            monitor.subTask("Cache sequences");
+            sequenceCache.getAllObjects(monitor, this);
+            monitor.subTask("Cache packages");
+            packageCache.getAllObjects(monitor, this);
+            monitor.subTask("Cache synonyms");
+            synonymCache.getAllObjects(monitor, this);
+            monitor.subTask("Cache dblink");
+            dbLinkCache.getAllObjects(monitor, this);
+            monitor.subTask("Cache job");
+            schedulerJobCache.getAllObjects(monitor, this);
         }
     }
 
@@ -986,7 +1107,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         	//xfc 修改了获取所有dblink信息的sql
         	StringBuilder sql = new StringBuilder();
         	sql.append("SELECT * FROM ");
-        	if(owner.roleFlag.equals("USER")) {
+        	if(owner.roleFlag.equals("ALL")) {
         		sql.append("SYS");
         	}else {
         		sql.append(owner.roleFlag);
