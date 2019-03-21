@@ -550,6 +550,9 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         return tableColumn;
     }
 
+    /**
+     *	表缓存
+     */
     public static class TableCache extends JDBCStructLookupCache<XuguSchema, XuguTableBase, XuguTableColumn> {
 
         TableCache()
@@ -626,11 +629,10 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         	xuguTableColumns.sort(DBUtils.orderComparator());
             super.cacheChildren(parent, xuguTableColumns);
         }
-
     }
 
     /**
-     * Index cache implementation
+     *	约束缓存
      */
     class ConstraintCache extends JDBCCompositeCache<XuguSchema, XuguTableBase, XuguTableConstraint, XuguTableConstraintColumn> {
         ConstraintCache()
@@ -714,8 +716,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
                     object,
                     tableColumn,
                     tableColumn.getOrdinalPosition()) };
-            }
-            
+            }       
         }
 
         @Override
@@ -725,6 +726,9 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         }
     }
 
+    /**
+     *	外键缓存
+     */
     class ForeignKeyCache extends JDBCCompositeCache<XuguSchema, XuguTable, XuguTableForeignKey, XuguTableForeignKeyColumn> {
         ForeignKeyCache()
         {
@@ -826,7 +830,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
 
 
     /**
-     * Index cache implementation
+     *	索引缓存
      */
     class IndexCache extends JDBCCompositeCache<XuguSchema, XuguTablePhysical, XuguTableIndex, XuguTableIndexColumn> {
         IndexCache()
@@ -907,7 +911,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
     }
 
     /**
-     * DataType cache implementation
+     *	数据类型缓存 
      */
     static class DataTypeCache extends JDBCObjectCache<XuguSchema, XuguDataType> {
         @Override
@@ -927,7 +931,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
     }
 
     /**
-     * Sequence cache implementation
+     *	序列缓存
      */
     static class SequenceCache extends JDBCObjectCache<XuguSchema, XuguSequence> {
         @Override
@@ -950,7 +954,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
     }
 
     /**
-     * Procedures cache implementation
+     *	存储过程缓存
      */
     static class ProceduresCache extends JDBCObjectLookupCache<XuguSchema, XuguProcedureStandalone> {
 
@@ -978,9 +982,11 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         {
             return new XuguProcedureStandalone(session.getProgressMonitor(), owner, dbResult);
         }
-
     }
 
+    /**
+     *	包缓存
+     */
     static class PackageCache extends JDBCObjectCache<XuguSchema, XuguPackage> {
 
         @Override
@@ -1007,7 +1013,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
     }
 
     /**
-     * Sequence cache implementation
+     *	同义词缓存
      */
     static class SynonymCache extends JDBCObjectCache<XuguSchema, XuguSynonym> {
         @Override
@@ -1030,6 +1036,9 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         }
     }
 
+    /**
+     *	视图缓存
+     */
     static class ViewCache extends JDBCStructLookupCache<XuguSchema, XuguView, XuguTableColumn> {
     	
     	ViewCache()
@@ -1098,6 +1107,9 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         }
     }
 
+    /**
+     *	数据库连接缓存
+     */
     static class DBLinkCache extends JDBCObjectCache<XuguSchema, XuguDBLink> {
 
         @Override
@@ -1126,6 +1138,9 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
 
     }
 
+    /**
+     *	触发器缓存
+     */
     static class TriggerCache extends JDBCObjectCache<XuguSchema, XuguSchemaTrigger> {
 
         @Override
@@ -1148,6 +1163,9 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         }
     }
 
+    /**
+     *	作业缓存
+     */
     static class SchedulerJobCache extends JDBCObjectCache<XuguSchema, XuguSchedulerJob> {
 
         @Override
@@ -1173,7 +1191,6 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         {
             return new XuguSchedulerJob(session.getProgressMonitor(), session, owner, dbResult);
         }
-
     }
 
 }
