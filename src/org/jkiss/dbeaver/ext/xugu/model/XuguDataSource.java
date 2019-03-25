@@ -337,10 +337,10 @@ public class XuguDataSource extends JDBCDataSource
         return publicSchema.getSynonyms(monitor);
     }
 
-    @Association
-    public Collection<XuguDBLink> getPublicDatabaseLinks(DBRProgressMonitor monitor) throws DBException {
-        return publicSchema.getDatabaseLinks(monitor);
-    }
+//    @Association
+//    public Collection<XuguDBLink> getPublicDatabaseLinks(DBRProgressMonitor monitor) throws DBException {
+//        return publicSchema.getDatabaseLinks(monitor);
+//    }
 
 //    @Association
 //    public Collection<XuguRecycledObject> getUserRecycledObjects(DBRProgressMonitor monitor) throws DBException {

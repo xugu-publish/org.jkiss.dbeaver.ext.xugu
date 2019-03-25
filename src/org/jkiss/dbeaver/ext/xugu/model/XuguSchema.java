@@ -64,7 +64,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
     final public SequenceCache sequenceCache = new SequenceCache();
     final public PackageCache packageCache = new PackageCache();
     final public SynonymCache synonymCache = new SynonymCache();
-    final public DBLinkCache dbLinkCache = new DBLinkCache();
+//    final public DBLinkCache dbLinkCache = new DBLinkCache();
     final public ProceduresCache proceduresCache = new ProceduresCache();
     final public SchedulerJobCache schedulerJobCache = new SchedulerJobCache();
 
@@ -391,13 +391,13 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
      * @return list 数据库连接列表
      * @throws DBException
      */
-    @Association
-    public Collection<XuguDBLink> getDatabaseLinks(DBRProgressMonitor monitor)
-        throws DBException
-    {
-    	Collection<XuguDBLink> list = dbLinkCache.getAllObjects(monitor, this);
-    	return list;
-    }
+//    @Association
+//    public Collection<XuguDBLink> getDatabaseLinks(DBRProgressMonitor monitor)
+//        throws DBException
+//    {
+//    	Collection<XuguDBLink> list = dbLinkCache.getAllObjects(monitor, this);
+//    	return list;
+//    }
     
     /**
      * 从作业缓存中获取全部的作业信息
@@ -433,7 +433,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         children.addAll(sequenceCache.getAllObjects(monitor, this));
         children.addAll(packageCache.getAllObjects(monitor, this));
         children.addAll(synonymCache.getAllObjects(monitor, this));
-        children.addAll(dbLinkCache.getAllObjects(monitor, this));
+//        children.addAll(dbLinkCache.getAllObjects(monitor, this));
         children.addAll(schedulerJobCache.getAllObjects(monitor, this));
         return children;
     }
@@ -493,8 +493,8 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
             packageCache.getAllObjects(monitor, this);
             monitor.subTask("Cache synonyms");
             synonymCache.getAllObjects(monitor, this);
-            monitor.subTask("Cache dblink");
-            dbLinkCache.getAllObjects(monitor, this);
+//            monitor.subTask("Cache dblink");
+//            dbLinkCache.getAllObjects(monitor, this);
             monitor.subTask("Cache job");
             schedulerJobCache.getAllObjects(monitor, this);
         }
@@ -1107,36 +1107,36 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         }
     }
 
-    /**
-     *	数据库连接缓存
-     */
-    static class DBLinkCache extends JDBCObjectCache<XuguSchema, XuguDBLink> {
-
-        @Override
-        protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguSchema owner)
-            throws SQLException
-        {
-        	//xfc 修改了获取所有dblink信息的sql
-        	StringBuilder sql = new StringBuilder();
-        	sql.append("SELECT * FROM ");
-        	if(owner.roleFlag.equals("ALL")) {
-        		sql.append("SYS");
-        	}else {
-        		sql.append(owner.roleFlag);
-        	}
-        	sql.append("_DBLINKS");
-            JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
-            return dbStat;
-        }
-
-        @Override
-        protected XuguDBLink fetchObject(@NotNull JDBCSession session, @NotNull XuguSchema owner, @NotNull JDBCResultSet dbResult)
-            throws SQLException, DBException
-        {
-            return new XuguDBLink(session.getProgressMonitor(), owner, dbResult);
-        }
-
-    }
+//    /**
+//     *	数据库连接缓存
+//     */
+//    static class DBLinkCache extends JDBCObjectCache<XuguSchema, XuguDBLink> {
+//
+//        @Override
+//        protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguSchema owner)
+//            throws SQLException
+//        {
+//        	//xfc 修改了获取所有dblink信息的sql
+//        	StringBuilder sql = new StringBuilder();
+//        	sql.append("SELECT * FROM ");
+//        	if(owner.roleFlag.equals("ALL")) {
+//        		sql.append("SYS");
+//        	}else {
+//        		sql.append(owner.roleFlag);
+//        	}
+//        	sql.append("_DBLINKS");
+//            JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
+//            return dbStat;
+//        }
+//
+//        @Override
+//        protected XuguDBLink fetchObject(@NotNull JDBCSession session, @NotNull XuguSchema owner, @NotNull JDBCResultSet dbResult)
+//            throws SQLException, DBException
+//        {
+//            return new XuguDBLink(session.getProgressMonitor(), owner, dbResult);
+//        }
+//
+//    }
 
     /**
      *	触发器缓存
