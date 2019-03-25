@@ -28,7 +28,6 @@ import org.jkiss.dbeaver.ext.xugu.XuguExecuteSQL_NORMAL;
 import org.jkiss.dbeaver.ext.xugu.model.XuguCharset;
 import org.jkiss.dbeaver.ext.xugu.XuguExecuteSQL_SYSDBA;
 import org.jkiss.dbeaver.ext.xugu.XuguMessages;
-import org.jkiss.dbeaver.ext.xugu.model.plan.XuguPlanAnalyser;
 import org.jkiss.dbeaver.ext.xugu.model.session.XuguServerSessionManager;
 import org.jkiss.dbeaver.model.*;
 import org.jkiss.dbeaver.model.access.DBAPasswordChangeInfo;
@@ -64,11 +63,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * GenericDataSource
+ * XuguDataSource
  * @author Luke
  */
 public class XuguDataSource extends JDBCDataSource
-    implements DBSObjectSelector, DBCQueryPlanner, IAdaptable {
+    implements DBSObjectSelector, IAdaptable {
     private static final Log log = Log.getLog(XuguDataSource.class);
 
     final public SchemaCache schemaCache = new SchemaCache();
@@ -122,6 +121,8 @@ public class XuguDataSource extends JDBCDataSource
         if (available == null) {
             try {
                 try (JDBCSession session = DBUtils.openMetaSession(monitor, this, "Check view existence")) {
+                	String target = "SELECT 1 FROM " + DBUtils.getQuotedIdentifier(this, schemaName) + "." +
+                            DBUtils.getQuotedIdentifier(this, viewName) + " WHERE 1<>1";
                     try (final JDBCPreparedStatement dbStat = session.prepareStatement(
                         "SELECT 1 FROM " + DBUtils.getQuotedIdentifier(this, schemaName) + "." +
                         DBUtils.getQuotedIdentifier(this, viewName) + " WHERE 1<>1"))
@@ -143,25 +144,9 @@ public class XuguDataSource extends JDBCDataSource
 
     @Override
     protected Connection openConnection(@NotNull DBRProgressMonitor monitor, JDBCRemoteInstance remoteInstance, @NotNull String purpose) throws DBCException {
-/*
-        // Set tns admin directory
-        DBPConnectionConfiguration connectionInfo = getContainer().getActualConnectionConfiguration();
-        String tnsPathProp = CommonUtils.toString(connectionInfo.getProviderProperty(xuguConstants.PROP_TNS_PATH));
-        if (!CommonUtils.isEmpty(tnsPathProp)) {
-            System.setProperty(xuguConstants.VAR_xugu_NET_TNS_ADMIN, tnsPathProp);
-        } else {
-            DBPNativeClientLocation clientHome = getContainer().getNativeClientHome();
-            if (clientHome != null) {
-                System.setProperty(xuguConstants.VAR_xugu_NET_TNS_ADMIN, new File(clientHome.getPath(), OCIUtils.TNSNAMES_FILE_PATH).getAbsolutePath());
-            }
-        }
-*/
-
         try {
-        	System.out.println("PPPPPPP? "+purpose);
             return super.openConnection(monitor, remoteInstance, purpose);
         } catch (DBCException e) {
-        	System.out.println("PPPPPPP? "+purpose);
             if (e.getErrorCode() == XuguConstants.EC_PASSWORD_EXPIRED) {
                 // Here we could try to ask for expired password change
                 // This is supported  for thin driver since xugu 12.2
@@ -175,8 +160,6 @@ public class XuguDataSource extends JDBCDataSource
     }
 
     private boolean changeExpiredPassword(DBRProgressMonitor monitor, String purpose) {
-        // Ref: https://stackoverflow.com/questions/21733300/xugu-password-expiry-and-grace-period-handling-using-java-xugu-jdbc
-
         DBPConnectionConfiguration connectionInfo = getContainer().getActualConnectionConfiguration();
         DBAPasswordChangeInfo passwordInfo = DBUserInterface.getInstance().promptUserPasswordChange("Password has expired. Set new password.", connectionInfo.getUserName(), connectionInfo.getUserPassword());
         if (passwordInfo == null) {
@@ -226,8 +209,6 @@ public class XuguDataSource extends JDBCDataSource
         }
 
         {
-            DBPConnectionConfiguration connectionInfo = getContainer().getConnectionConfiguration();
-
             try (JDBCSession session = context.openSession(monitor, DBCExecutionPurpose.META, "Set connection parameters")) {
              // Read charsets and collations
                 {
@@ -495,6 +476,7 @@ public class XuguDataSource extends JDBCDataSource
         return getActiveSchemaName() == null ? null : schemaCache.getCachedObject(getActiveSchemaName());
     }
 
+    //设为活动对象
     @Override
     public void setDefaultObject(@NotNull DBRProgressMonitor monitor, @NotNull DBSObject object)
         throws DBException {
@@ -545,19 +527,19 @@ public class XuguDataSource extends JDBCDataSource
         }
     }
 
-    @NotNull
-    @Override
-    public DBCPlan planQueryExecution(@NotNull DBCSession session, @NotNull String query) throws DBException {
-        XuguPlanAnalyser plan = new XuguPlanAnalyser(this, (JDBCSession) session, query);
-        plan.explain();
-        return plan;
-    }
+//    @NotNull
+//    @Override
+//    public DBCPlan planQueryExecution(@NotNull DBCSession session, @NotNull String query) throws DBException {
+//        XuguPlanAnalyser plan = new XuguPlanAnalyser(this, (JDBCSession) session, query);
+//        plan.explain();
+//        return plan;
+//    }
 
-    @NotNull
-    @Override
-    public DBCPlanStyle getPlanStyle() {
-        return DBCPlanStyle.PLAN;
-    }
+//    @NotNull
+//    @Override
+//    public DBCPlanStyle getPlanStyle() {
+//        return DBCPlanStyle.PLAN;
+//    }
 
     @Nullable
     @Override

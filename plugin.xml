@@ -136,10 +136,7 @@
                                 <items label="%tree.scheduler.job.node.name" path="schedulerJob" property="schedulerJobs" icon="icons/scheduled_job.png">
                                     <items label="%tree.scheduler.job.arguments.node.name" itemLabel="%tree.scheduler.job.argument.node.name" path="argument" property="arguments" icon="#argument"/>
                                 </items>
-	                        </folder> 
-                        	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguRecycledObject" label="%tree.recycle_bin.node.name" icon="#recycle_bin" description="Recycle Bin" visibleIf="object.dataSource.adminVisible &amp;&amp; object.dataSource.isAtLeastV10()">
-                            	<items label="%tree.recycled_object.node.name" path="object" property="recycledObjects" icon="#recycle_bin"/>
-                        	</folder>  			
+	                        </folder> 			
 		                </items>
 		            </folder>
                     <!--存储管理-->
@@ -162,9 +159,11 @@
                     	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguDBLink" label="%tree.public_database_links.node.name" icon="#links" description="Public database links">
                         	<items label="%tree.database_link.node.name" path="databaseLink" property="publicDatabaseLinks" icon="#link"/>
                     	</folder>   
+                    	<!--
                     	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguRecycledObject" label="%tree.user_recycle_bin.node.name" icon="#recycle_bin" description="Current user's recycle bin">
                         	<items label="%tree.recycled_object.node.name" path="object" property="userRecycledObjects" icon="#recycle_bin"/>
                     	</folder>
+                    	-->
                 	</folder>
                 	<!--安全管理-->
                 	<folder type="org.jkiss.dbeaver.model.struct.DBSObject" label="%tree.security.node.name" icon="#security" description="Security management">
@@ -254,12 +253,14 @@
         </view>
     </extension>
     
+    <!--
     <extension point="org.jkiss.dbeaver.ui.propertyConfigurator">
         <propertyConfigurator class="org.jkiss.dbeaver.ext.mysql.model.net.MySQLSSLHandlerImpl" uiClass="org.jkiss.dbeaver.ext.mysql.views.MySQLSSLConfigurator"/>
     	<view
     		id="org.jkiss.dbeaver.ext.xugu.testView">
     	</view>
     </extension>
+    -->
 
     <extension point="org.jkiss.dbeaver.objectManager">
     	<manager class="org.jkiss.dbeaver.ext.xugu.edit.XuguUserManager" objectType="org.jkiss.dbeaver.ext.xugu.model.XuguUser"/>
@@ -355,7 +356,7 @@
 
         </provider>
     </extension>
-
+	<!--
     <extension point="org.jkiss.dbeaver.tools">
         <tools>
             <toolGroup id="org.jkiss.dbeaver.ext.xugu.tools.statistics" label="Statistics"/>
@@ -368,6 +369,7 @@
                 <objectType name="org.jkiss.dbeaver.ext.xugu.model.XuguDataSource"/>
                 <objectType name="org.jkiss.dbeaver.ext.xugu.model.XuguSchema"/>
             </tool>
+            
             <tool
                     class="org.jkiss.dbeaver.ext.xugu.tools.maintenance.XuguToolValidateStructure"
                     description="Validate Structure"
@@ -377,6 +379,7 @@
                     singleton="false">
                 <objectType name="org.jkiss.dbeaver.ext.xugu.model.XuguTable"/>
             </tool>
+            
             <tool
                     class="org.jkiss.dbeaver.ext.xugu.tools.maintenance.XuguToolGatherStatistics"
                     description="Gather statistics"
@@ -399,31 +402,32 @@
             </tool>
         </tools>
     </extension>
-
+	-->
     <extension point="org.eclipse.ui.commands">
         <category id="org.jkiss.dbeaver.ext.xugu" name="Xugu" description="Xugu Commands"/>
+        <!--
         <command id="org.jkiss.dbeaver.ext.xugu.code.compile" name="Compile" description="Compile" categoryId="org.jkiss.dbeaver.ext.xugu"/>
-        <command id="org.jkiss.dbeaver.ext.xugu.code.package.navigate" name="Go to source code" description="Navigate to object source code" categoryId="org.jkiss.dbeaver.ext.xugu"/>
         <command id="org.jkiss.dbeaver.ext.xugu.job.run" name="Run" description="Run Job" categoryId="org.jkiss.dbeaver.ext.xugu"/>
+    	<command id="org.jkiss.dbeaver.ext.xugu.code.package.navigate" name="Go to source code" description="Navigate to object source code" categoryId="org.jkiss.dbeaver.ext.xugu"/>
+        -->
     </extension>
 
     <extension point="org.eclipse.ui.commandImages">
+    	<!--
         <image commandId="org.jkiss.dbeaver.ext.xugu.code.compile" icon="icons/compile.png"/>
         <image commandId="org.jkiss.dbeaver.ext.xugu.code.package.navigate" icon="icons/source_navigate.png"/>
         <image commandId="org.jkiss.dbeaver.ext.xugu.job.run" icon="icons/run.png"/>
+        -->
     </extension>
 
     <extension point="org.eclipse.ui.handlers">
+    	<!--
         <handler commandId="org.jkiss.dbeaver.ext.xugu.code.compile" class="org.jkiss.dbeaver.ext.xugu.actions.CompileHandler">
             <enabledWhen>
                 <or>
                     <with variable="selection">
                         <count value="+"/>
                         <iterate operator="and">
-                            <!-- Here and below we use double check - adapt + instanceof.
-                                sing <adapt> with final (Xugu-specific) type will force plugin activation (since E4.6)
-                                see https://bugs.eclipse.org/bugs/show_bug.cgi?id=485569
-                            -->
                             <adapt type="org.jkiss.dbeaver.model.struct.DBSObject">
                                 <instanceof value="org.jkiss.dbeaver.ext.xugu.model.source.XuguSourceObject"/>
                             </adapt>
@@ -437,6 +441,8 @@
                 </or>
             </enabledWhen>
         </handler>
+        -->
+        <!--
         <handler commandId="org.jkiss.dbeaver.ext.xugu.code.package.navigate" class="org.jkiss.dbeaver.ext.xugu.actions.PackageNavigateHandler">
             <enabledWhen>
                 <with variable="selection">
@@ -445,7 +451,6 @@
                         <adapt type="org.jkiss.dbeaver.model.struct.DBSObject">
                             <instanceof value="org.jkiss.dbeaver.ext.xugu.model.XuguProcedurePackaged"/>
                         </adapt>
-                        <!--<adapt type="org.jkiss.dbeaver.ext.xugu.model.XuguProcedurePackaged"/>-->
                     </iterate>
                 </with>
             </enabledWhen>
@@ -462,16 +467,14 @@
                 </with>
             </enabledWhen>
         </handler>
+        -->
+        <!--
         <handler commandId="org.jkiss.dbeaver.ext.xugu.job.run" class="org.jkiss.dbeaver.ext.xugu.actions.JobRunHandler">
             <enabledWhen>
                 <or>
                     <with variable="selection">
                         <count value="+"/>
                         <iterate operator="and">
-                            <!-- Here and below we use double check - adapt + instanceof.
-                                sing <adapt> with final (Xugu-specific) type will force plugin activation (since E4.6)
-                                see https://bugs.eclipse.org/bugs/show_bug.cgi?id=485569
-                            -->
                             <adapt type="org.jkiss.dbeaver.model.struct.DBSObject">
                                 <instanceof value="org.jkiss.dbeaver.ext.xugu.model.XuguSchedulerJob"/>
                             </adapt>
@@ -485,35 +488,44 @@
                 </or>
             </enabledWhen>
         </handler>
+        -->
     </extension>
 
     <extension point="org.eclipse.ui.menus">
         <menuContribution allPopups="false" locationURI="popup:org.eclipse.ui.popup.any?after=additions">
+            <!--
             <command commandId="org.jkiss.dbeaver.ext.xugu.code.compile">
                 <visibleWhen checkEnabled="true"/>
             </command>
+            
             <command commandId="org.jkiss.dbeaver.ext.xugu.code.package.navigate">
                 <visibleWhen checkEnabled="true"/>
             </command>
             <command commandId="org.jkiss.dbeaver.ext.xugu.code.job.navigate">
                 <visibleWhen checkEnabled="true"/>
             </command>
+            
             <command commandId="org.jkiss.dbeaver.ext.xugu.job.run">
                 <visibleWhen checkEnabled="true"/>
             </command>
+            -->
         </menuContribution>
     </extension>
     <extension point="org.eclipse.core.runtime.adapters">
         <factory adaptableType="java.lang.Object" class="org.jkiss.dbeaver.ext.xugu.actions.XuguObjectAdapter">
             <adapter type="org.jkiss.dbeaver.ext.xugu.model.source.XuguSourceObject"/>
+            <!--
             <adapter type="org.jkiss.dbeaver.ext.xugu.model.XuguProcedurePackaged"/>
             <adapter type="org.jkiss.dbeaver.ext.xugu.model.XuguSchedulerJob"/>
+            -->
         </factory>
     </extension>
+    <!--
     <extension point="org.eclipse.ui.bindings">
         <key commandId="org.jkiss.dbeaver.ext.xugu.code.compile" schemeId="org.jkiss.dbeaver.defaultKeyScheme" sequence="CTRL+F9"/>
     </extension>
-
+	-->
+	
     <extension point="org.eclipse.ui.editors">
         <editor
             name="Session Manager"
@@ -522,18 +534,20 @@
             id="org.jkiss.dbeaver.ext.xugu.editors.XuguSessionEditor"
             contributorClass="org.jkiss.dbeaver.ui.editors.EditorSearchActionsContributor">
         </editor>
+        <!--
         <editor
             name="Lock Manager"
             icon="platform:/plugin/org.jkiss.dbeaver.model/icons/tree/locks.png"
             class="org.jkiss.dbeaver.ext.xugu.editors.XuguLockEditor"
             id="org.jkiss.dbeaver.ext.xugu.editors.XuguLockEditor">
         </editor>
+        -->
     </extension>
-
+	<!--
     <extension point="org.eclipse.core.runtime.preferences">
         <initializer class="org.jkiss.dbeaver.ext.xugu.XuguPreferencesInitializer"/>
     </extension>
-
+	-->
 	<!--
     <extension point="org.eclipse.ui.preferencePages">
         <page category="org.jkiss.dbeaver.preferences.drivers" id="org.jkiss.dbeaver.preferences.xugu.general" class="org.jkiss.dbeaver.ext.xugu.views.PrefPageXugu" name="Xugu">
@@ -551,7 +565,7 @@
         </page>
     </extension>
 	-->
-	
+	<!--
     <extension point="org.eclipse.ui.importWizards">
         <wizard
             category="org.jkiss.dbeaver.import_config.third-party"
@@ -562,4 +576,5 @@
             <description>Xugu SQL Developer</description>
         </wizard>
     </extension>
+    -->
 </plugin>

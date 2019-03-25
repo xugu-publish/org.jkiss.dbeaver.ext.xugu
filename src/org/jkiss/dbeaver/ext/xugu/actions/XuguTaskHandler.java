@@ -43,12 +43,13 @@ import java.util.List;
 
 /**
  * Base task handler
+ * 加载相关日志信息
  */
 public abstract class XuguTaskHandler extends AbstractHandler implements IElementUpdater
 {
     private static final Log log = Log.getLog(XuguTaskHandler.class);
 
-    protected List<XuguSourceObject> getOracleSourceObjects(UIElement element) {
+    protected List<XuguSourceObject> getXuguSourceObjects(UIElement element) {
         List<XuguSourceObject> objects = new ArrayList<>();
         IWorkbenchPartSite partSite = UIUtils.getWorkbenchPartSite(element.getServiceLocator());
         if (partSite != null) {

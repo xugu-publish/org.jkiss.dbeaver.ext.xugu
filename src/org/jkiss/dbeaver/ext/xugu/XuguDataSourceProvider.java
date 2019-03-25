@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+//加载数据源信息
 public class XuguDataSourceProvider extends JDBCDataSourceProvider implements DBPNativeClientLocationManager {
 
     public XuguDataSourceProvider()

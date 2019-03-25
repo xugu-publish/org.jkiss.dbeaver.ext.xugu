@@ -161,8 +161,6 @@ public class XuguPackage extends XuguSchemaObject
     public DBSObject refreshObject(@NotNull DBRProgressMonitor monitor) throws DBException
     {
         this.proceduresCache.clearCache();
-        this.sourceDeclaration = null;
-        this.sourceDefinition = null;
         return this;
     }
 

@@ -261,7 +261,6 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
     public XuguTableConstraint getConstraint(DBRProgressMonitor monitor, String ukName)
         throws DBException
     {
-        System.out.println("UUUk name "+ukName);
     	return getContainer().constraintCache.getObject(monitor, getContainer(), this, ukName);
     }
 
@@ -273,13 +272,13 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
     @Override
     public Collection<XuguTableForeignKey> getAssociations(@NotNull DBRProgressMonitor monitor) throws DBException
     {
-        return null;
+        return getContainer().foreignKeyCache.getAllObjects(monitor, this.getSchema());
     }
 
     @Override
     public Collection<XuguTableForeignKey> getReferences(@NotNull DBRProgressMonitor monitor) throws DBException
     {
-        return null;
+        return getContainer().foreignKeyCache.getAllObjects(monitor, this.getSchema());
     }
 
     public String getDDL(DBRProgressMonitor monitor, XuguDDLFormat ddlFormat, Map<String, Object> options)
@@ -310,13 +309,6 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
         }
     }
 
-//    @Association
-//    public Collection<XuguPrivTable> getTablePrivs(DBRProgressMonitor monitor) throws DBException
-//    {
-//        return tablePrivCache.getAllObjects(monitor, this);
-//    }
-
-
     static class TriggerCache extends JDBCStructCache<XuguTableBase, XuguTableTrigger, XuguTriggerColumn> {
         TriggerCache()
         {
@@ -327,12 +319,15 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
         @Override
         protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguTableBase owner) throws SQLException
         {
-            JDBCPreparedStatement dbStat = session.prepareStatement(
-                "SELECT *, tr.OBJ_ID AS TABLE_ID\n" +
-                    "FROM " + owner.getDataSource().getRoleFlag()+"_TRIGGERS tr" + 
-                    " WHERE SCHEMA_ID=(SELECT SCHEMA_ID FROM "+owner.getDataSource().getRoleFlag()+"_SCHEMAS WHERE SCHEMA_NAME=?) AND "
-                    + "TABLE_ID=(SELECT TABLE_ID FROM "+owner.getDataSource().getRoleFlag()+"_TABLES WHERE TABLE_NAME=?)\n" +
-                    "ORDER BY TRIG_NAME");
+        	StringBuilder builder = new StringBuilder();
+        	builder.append("SELECT *, tr.OBJ_ID AS TABLE_ID\nFROM ");
+        	builder.append(owner.getDataSource().getRoleFlag());
+        	builder.append("_TRIGGERS tr WHERE SCHEMA_ID=(SELECT SCHEMA_ID FROM ");
+        	builder.append(owner.getDataSource().getRoleFlag());
+        	builder.append("_SCHEMAS WHERE SCHEMA_NAME=?) AND TABLE_ID=(SELECT TABLE_ID FROM ");
+        	builder.append(owner.getDataSource().getRoleFlag());
+        	builder.append("_TABLES WHERE TABLE_NAME=?)\n ORDER BY TRIG_NAME");
+            JDBCPreparedStatement dbStat = session.prepareStatement(builder.toString());
             dbStat.setString(1, owner.getSchema().getName());
             dbStat.setString(2, owner.getName());
             return dbStat;

@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * OracleTable
+ * XuguTable
  */
 public class XuguTable extends XuguTablePhysical implements DBPScriptObject
 {

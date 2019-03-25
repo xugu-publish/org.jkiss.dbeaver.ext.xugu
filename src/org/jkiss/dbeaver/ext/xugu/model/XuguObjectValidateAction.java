@@ -44,6 +44,7 @@ public class XuguObjectValidateAction extends XuguObjectPersistAction {
             return;
         }
         DBCCompileLog log = new DBCCompileLogBase();
+        // 获取jdbc返回的错误信息
         XuguTaskHandler.logObjectErrors((JDBCSession) session, log, object, getObjectType());
         if (!log.getErrorStack().isEmpty()) {
             StringBuilder message = new StringBuilder();

@@ -45,7 +45,7 @@ import java.util.List;
 
 /**
  * Xugu physical table
- * 加载表相关物理信息（分区信息）
+ * 加载表相关物理信息（分区信息、表空间信息）
  */
 public abstract class XuguTablePhysical extends XuguTableBase implements DBSObjectLazy<XuguDataSource>
 {

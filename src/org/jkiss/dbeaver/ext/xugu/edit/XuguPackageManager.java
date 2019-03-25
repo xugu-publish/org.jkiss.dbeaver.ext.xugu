@@ -172,7 +172,7 @@ public class XuguPackageManager extends SQLObjectEditor<XuguPackage, XuguSchema>
         } catch (DBException e) {
             log.warn(e);
         }
-        XuguUtils.addSchemaChangeActions(actionList, pack);
+//        XuguUtils.addSchemaChangeActions(actionList, pack);
     }
 
 }
