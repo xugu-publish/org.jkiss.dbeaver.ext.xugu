@@ -86,25 +86,23 @@ public abstract class XuguTrigger<PARENT extends DBSObject> extends XuguObject<P
     }
 
     public XuguTrigger(
-        PARENT parent,
+        XuguTableBase parent,
         ResultSet dbResult)
     {
-        super(parent, JDBCUtils.safeGetString(dbResult, "TRIG_NAME"), true);
+        super((PARENT)parent, JDBCUtils.safeGetString(dbResult, "TRIG_NAME"), true);
         //只有一种类型触发器
         this.objectType = BaseObjectType.TABLE;
         this.triggerType = JDBCUtils.safeGetInt(dbResult, "TRIG_TYPE");
         this.triggeringEvent = JDBCUtils.safeGetInt(dbResult, "TRIG_EVENT");
         //根据obj_id获取？是否代表列id？
-        this.obj_id = JDBCUtils.safeGetInt(dbResult, "TABLE_ID");
-//        this.columnName = JDBCUtils.safeGetString(dbResult, "COL_NAME");
-//        this.refNames = JDBCUtils.safeGetString(dbResult, "REFERENCING_NAMES");
-//        this.whenClause = JDBCUtils.safeGetString(dbResult, "WHEN_CLAUSE");
+        if(parent.getType()==0) {
+        	this.obj_id = JDBCUtils.safeGetInt(dbResult, "TABLE_ID");
+        }else {
+        	this.obj_id = JDBCUtils.safeGetInt(dbResult, "VIEW_ID");
+        }
         this.status = JDBCUtils.safeGetBoolean(dbResult, "ENABLE")?XuguObjectStatus.ENABLED:XuguObjectStatus.DISABLED;
         this.valid = JDBCUtils.safeGetBoolean(dbResult, "VALID");
-//        this.deleted = JDBCUtils.safeGetBoolean(dbResult, "DELETED");
         this.define = JDBCUtils.safeGetString(dbResult, "DEFINE");
-//        this.description = JDBCUtils.safeGetString(dbResult, "DESCRIPTION");
-//        this.actionType = "CALL".equals(JDBCUtils.safeGetString(dbResult, "ACTION_TYPE")) ? ActionType.CALL : ActionType.PLSQL;
     }
 
     @NotNull

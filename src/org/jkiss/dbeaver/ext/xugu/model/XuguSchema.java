@@ -58,7 +58,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
     final public ViewCache viewCache = new ViewCache();
     final public ConstraintCache constraintCache = new ConstraintCache();
     final public ForeignKeyCache foreignKeyCache = new ForeignKeyCache();
-    final public TriggerCache triggerCache = new TriggerCache();
+//    final public TriggerCache triggerCache = new TriggerCache();
     final public IndexCache indexCache = new IndexCache();
     final public DataTypeCache dataTypeCache = new DataTypeCache();
     final public SequenceCache sequenceCache = new SequenceCache();
@@ -362,12 +362,12 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
      * @return list 触发器列表
      * @throws DBException
      */
-    @Association
-    public Collection<XuguSchemaTrigger> getTriggers(DBRProgressMonitor monitor)
-        throws DBException
-    {
-        return triggerCache.getAllObjects(monitor, this);
-    }
+//    @Association
+//    public Collection<XuguSchemaTrigger> getTriggers(DBRProgressMonitor monitor)
+//        throws DBException
+//    {
+//        return triggerCache.getAllObjects(monitor, this);
+//    }
 
     
 //    @Association
@@ -427,7 +427,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         children.addAll(viewCache.getAllObjects(monitor, this));
         children.addAll(constraintCache.getAllObjects(monitor, this));
         children.addAll(foreignKeyCache.getAllObjects(monitor, this));
-        children.addAll(triggerCache.getAllObjects(monitor, this));
+//        children.addAll(triggerCache.getAllObjects(monitor, this));
         children.addAll(indexCache.getAllObjects(monitor, this));
         children.addAll(dataTypeCache.getAllObjects(monitor, this));
         children.addAll(sequenceCache.getAllObjects(monitor, this));
@@ -481,8 +481,8 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
             monitor.subTask("Cache table constraints");
             constraintCache.getObjects(monitor, this, null);
             foreignKeyCache.getObjects(monitor, this, null);
-            monitor.subTask("Cache triggers");
-            triggerCache.getAllObjects(monitor, this);
+//            monitor.subTask("Cache triggers");
+//            triggerCache.getAllObjects(monitor, this);
             monitor.subTask("Cache indexes");
             indexCache.getAllObjects(monitor, this);
             monitor.subTask("Cache datatypes");
@@ -510,7 +510,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         indexCache.clearCache();
         packageCache.clearCache();
         proceduresCache.clearCache();
-        triggerCache.clearCache();
+//        triggerCache.clearCache();
         dataTypeCache.clearCache();
         sequenceCache.clearCache();
         synonymCache.clearCache();
@@ -1141,27 +1141,27 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
     /**
      *	触发器缓存
      */
-    static class TriggerCache extends JDBCObjectCache<XuguSchema, XuguSchemaTrigger> {
-
-        @Override
-        protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguSchema schema) throws SQLException
-        {
-        	//xfc 修改了获取所有触发器信息的sql语句
-        	StringBuilder sql = new StringBuilder();
-        	sql.append("SELECT * FROM ");
-        	sql.append(schema.roleFlag);
-        	sql.append("_TRIGGERS WHERE SCHEMA_ID=");
-        	sql.append(schema.id);
-            JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
-            return dbStat;
-        }
-
-        @Override
-        protected XuguSchemaTrigger fetchObject(@NotNull JDBCSession session, @NotNull XuguSchema oracleSchema, @NotNull JDBCResultSet resultSet) throws SQLException, DBException
-        {
-            return new XuguSchemaTrigger(oracleSchema, resultSet);
-        }
-    }
+//    static class TriggerCache extends JDBCObjectCache<XuguSchema, XuguSchemaTrigger> {
+//
+//        @Override
+//        protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguSchema schema) throws SQLException
+//        {
+//        	//xfc 修改了获取所有触发器信息的sql语句
+//        	StringBuilder sql = new StringBuilder();
+//        	sql.append("SELECT * FROM ");
+//        	sql.append(schema.roleFlag);
+//        	sql.append("_TRIGGERS WHERE SCHEMA_ID=");
+//        	sql.append(schema.id);
+//            JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
+//            return dbStat;
+//        }
+//
+//        @Override
+//        protected XuguSchemaTrigger fetchObject(@NotNull JDBCSession session, @NotNull XuguSchema oracleSchema, @NotNull JDBCResultSet resultSet) throws SQLException, DBException
+//        {
+//            return new XuguSchemaTrigger(oracleSchema, resultSet);
+//        }
+//    }
 
     /**
      *	作业缓存

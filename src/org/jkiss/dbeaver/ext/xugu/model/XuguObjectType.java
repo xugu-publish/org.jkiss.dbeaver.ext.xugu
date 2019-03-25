@@ -131,13 +131,7 @@ public enum XuguObjectType implements DBSObjectType {
     }),
 	TABLE_PARTITION("TABLE PARTITION", null, DBSObject.class, null),
 	//trigger的OBJ_TYPE为11
-	TRIGGER("11", DBIcon.TREE_TRIGGER, XuguTrigger.class, new ObjectFinder() {
-        @Override
-        public XuguTrigger findObject(DBRProgressMonitor monitor, XuguSchema schema, String objectName) throws DBException
-        {
-            return schema.triggerCache.getObject(monitor, schema, objectName);
-        }
-    }),
+	TRIGGER("11", DBIcon.TREE_TRIGGER, XuguTrigger.class, null),
 	TYPE("TYPE", DBIcon.TREE_DATA_TYPE, XuguDataType.class, new ObjectFinder() {
         @Override
         public XuguDataType findObject(DBRProgressMonitor monitor, XuguSchema schema, String objectName) throws DBException

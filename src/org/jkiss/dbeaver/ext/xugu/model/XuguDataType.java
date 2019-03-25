@@ -105,6 +105,7 @@ public class XuguDataType extends XuguObject<DBSObject>
     	PREDEFINED_TYPES.put("DATETIME WITH TIME ZONE", new TypeDesc(DBPDataKind.DATETIME, Types.TIMESTAMP, 6, 0, 0, 0));
     	PREDEFINED_TYPES.put("TIME", new TypeDesc(DBPDataKind.DATETIME, Types.TIMESTAMP, 3, 0, 0, 0));
     	PREDEFINED_TYPES.put("TIME WITH TIME ZONE", new TypeDesc(DBPDataKind.DATETIME, Types.TIMESTAMP, 3, 0, 0, 0));
+    	PREDEFINED_TYPES.put("TIMESTAMP", new TypeDesc(DBPDataKind.DATETIME, Types.TIMESTAMP, 6, 0, 0, 0));
         
     	PREDEFINED_TYPES.put("INTERVAL YEAR", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 0, 9, 0, 0));
     	PREDEFINED_TYPES.put("INTERVAL MONTH", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 0, 9, 0, 0));

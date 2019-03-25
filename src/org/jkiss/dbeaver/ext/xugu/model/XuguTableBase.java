@@ -320,13 +320,27 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
         protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguTableBase owner) throws SQLException
         {
         	StringBuilder builder = new StringBuilder();
-        	builder.append("SELECT *, tr.OBJ_ID AS TABLE_ID\nFROM ");
-        	builder.append(owner.getDataSource().getRoleFlag());
-        	builder.append("_TRIGGERS tr WHERE SCHEMA_ID=(SELECT SCHEMA_ID FROM ");
-        	builder.append(owner.getDataSource().getRoleFlag());
-        	builder.append("_SCHEMAS WHERE SCHEMA_NAME=?) AND TABLE_ID=(SELECT TABLE_ID FROM ");
-        	builder.append(owner.getDataSource().getRoleFlag());
-        	builder.append("_TABLES WHERE TABLE_NAME=?)\n ORDER BY TRIG_NAME");
+        	//对象类型为table
+        	if(owner.getType()==0) {
+        		builder.append("SELECT *, tr.OBJ_ID AS TABLE_ID\nFROM ");
+            	builder.append(owner.getDataSource().getRoleFlag());
+            	builder.append("_TRIGGERS tr WHERE SCHEMA_ID=(SELECT SCHEMA_ID FROM ");
+            	builder.append(owner.getDataSource().getRoleFlag());
+            	builder.append("_SCHEMAS WHERE SCHEMA_NAME=?) AND TABLE_ID=(SELECT TABLE_ID FROM ");
+            	builder.append(owner.getDataSource().getRoleFlag());
+            	builder.append("_TABLES WHERE TABLE_NAME=?)\n ORDER BY TRIG_NAME");
+        	}
+        	//对象类型为view
+        	else {
+        		builder.append("SELECT *, tr.OBJ_ID AS VIEW_ID\nFROM ");
+            	builder.append(owner.getDataSource().getRoleFlag());
+            	builder.append("_TRIGGERS tr WHERE SCHEMA_ID=(SELECT SCHEMA_ID FROM ");
+            	builder.append(owner.getDataSource().getRoleFlag());
+            	builder.append("_SCHEMAS WHERE SCHEMA_NAME=?) AND VIEW_ID=(SELECT VIEW_ID FROM ");
+            	builder.append(owner.getDataSource().getRoleFlag());
+            	builder.append("_VIEWS WHERE VIEW_NAME=?)\n ORDER BY TRIG_NAME");
+        	}
+        	
             JDBCPreparedStatement dbStat = session.prepareStatement(builder.toString());
             dbStat.setString(1, owner.getSchema().getName());
             dbStat.setString(2, owner.getName());

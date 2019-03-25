@@ -28,7 +28,7 @@ import java.sql.ResultSet;
 import java.util.Collection;
 
 /**
- * OracleTableTrigger
+ * XuguTableTrigger
  */
 public class XuguTableTrigger extends XuguTrigger<XuguTableBase>
 {
