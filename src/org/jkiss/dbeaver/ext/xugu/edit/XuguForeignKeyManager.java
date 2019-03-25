@@ -55,7 +55,7 @@ public class XuguForeignKeyManager extends SQLForeignKeyManager<XuguTableForeign
                     table,
                     new DBSForeignKeyModifyRule[] {
                         DBSForeignKeyModifyRule.NO_ACTION,
-                        DBSForeignKeyModifyRule.CASCADE, DBSForeignKeyModifyRule.RESTRICT,
+                        DBSForeignKeyModifyRule.CASCADE,
                         DBSForeignKeyModifyRule.SET_NULL,
                         DBSForeignKeyModifyRule.SET_DEFAULT });
                 if (!editPage.edit()) {
@@ -67,7 +67,8 @@ public class XuguForeignKeyManager extends SQLForeignKeyManager<XuguTableForeign
                     null,
                     null,
                     (XuguTableConstraint) editPage.getUniqueConstraint(),
-                    editPage.getOnDeleteRule());
+                    editPage.getOnDeleteRule(),
+                    editPage.getOnUpdateRule());
                 foreignKey.setName(getNewConstraintName(monitor, foreignKey));
                 int colIndex = 1;
                 for (EditForeignKeyPage.FKColumnInfo tableColumn : editPage.getColumns()) {
@@ -81,14 +82,4 @@ public class XuguForeignKeyManager extends SQLForeignKeyManager<XuguTableForeign
             }
         }.execute();
     }
-
-/*
-    // FIX: Oracle uses standard syntax
-    @Override
-    protected String getDropForeignKeyPattern(OracleTableForeignKey foreignKey)
-    {
-        return "ALTER TABLE " + PATTERN_ITEM_TABLE + " DROP FOREIGN KEY " + PATTERN_ITEM_CONSTRAINT; //$NON-NLS-1$ //$NON-NLS-2$
-    }
-*/
-
 }

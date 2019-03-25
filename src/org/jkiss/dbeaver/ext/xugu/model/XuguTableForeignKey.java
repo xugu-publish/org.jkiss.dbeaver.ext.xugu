@@ -43,17 +43,20 @@ public class XuguTableForeignKey extends XuguTableConstraintBase implements DBST
 
     private XuguTableConstraint referencedKey;
     private DBSForeignKeyModifyRule deleteRule;
+    private DBSForeignKeyModifyRule updateRule;
 
     public XuguTableForeignKey(
         @NotNull XuguTableBase xuguTable,
         @Nullable String name,
         @Nullable XuguObjectStatus status,
         @NotNull XuguTableConstraint referencedKey,
-        @NotNull DBSForeignKeyModifyRule deleteRule)
+        @NotNull DBSForeignKeyModifyRule deleteRule,
+        @NotNull DBSForeignKeyModifyRule updateRule)
     {
         super(xuguTable, name, DBSEntityConstraintType.FOREIGN_KEY, status, false);
         this.referencedKey = referencedKey;
         this.deleteRule = deleteRule;
+        this.updateRule = updateRule;
     }
 
     public XuguTableForeignKey(
@@ -87,9 +90,44 @@ public class XuguTableForeignKey extends XuguTableConstraintBase implements DBST
                 referencedKey = new XuguTableConstraint(refTable, "refName", DBSEntityConstraintType.UNIQUE_KEY, null, XuguObjectStatus.ERROR);
             }
         }
-
-        //String deleteRuleName = JDBCUtils.safeGetString(dbResult, "DELETE_RULE");
-        //this.deleteRule = "CASCADE".equals(deleteRuleName) ? DBSForeignKeyModifyRule.CASCADE : DBSForeignKeyModifyRule.NO_ACTION;
+        
+        String updateAction = JDBCUtils.safeGetString(dbResult, "UPDATE_ACTION");
+        switch(updateAction) {
+	        case "n":
+	        	this.updateRule = DBSForeignKeyModifyRule.NO_ACTION;
+	        	break;
+	        case "u":
+	        	this.updateRule = DBSForeignKeyModifyRule.SET_NULL;
+	        	break;
+	        case "d":
+	        	this.updateRule = DBSForeignKeyModifyRule.SET_DEFAULT;
+	        	break;
+	        case "c":
+	        	this.updateRule = DBSForeignKeyModifyRule.CASCADE;
+	        	break;
+	        default:
+	        	this.updateRule = DBSForeignKeyModifyRule.NO_ACTION;
+	        	break;
+        }
+        
+        String deleteAction = JDBCUtils.safeGetString(dbResult, "DELETE_ACTION");
+        switch(deleteAction) {
+	        case "n":
+	        	this.deleteRule = DBSForeignKeyModifyRule.NO_ACTION;
+	        	break;
+	        case "u":
+	        	this.deleteRule = DBSForeignKeyModifyRule.SET_NULL;
+	        	break;
+	        case "d":
+	        	this.deleteRule = DBSForeignKeyModifyRule.SET_DEFAULT;
+	        	break;
+	        case "c":
+	        	this.deleteRule = DBSForeignKeyModifyRule.CASCADE;
+	        	break;
+	        default:
+	        	this.deleteRule = DBSForeignKeyModifyRule.NO_ACTION;
+	        	break;
+        }
     }
 
     @Property(viewable = true, order = 3)
@@ -119,7 +157,7 @@ public class XuguTableForeignKey extends XuguTableConstraintBase implements DBST
     @Override
     public DBSForeignKeyModifyRule getUpdateRule()
     {
-        return DBSForeignKeyModifyRule.NO_ACTION;
+        return updateRule;
     }
 
     @Override
@@ -152,7 +190,6 @@ public class XuguTableForeignKey extends XuguTableConstraintBase implements DBST
             return new DBSForeignKeyModifyRule[] {
                 DBSForeignKeyModifyRule.NO_ACTION,
                 DBSForeignKeyModifyRule.CASCADE,
-                DBSForeignKeyModifyRule.RESTRICT,
                 DBSForeignKeyModifyRule.SET_NULL,
                 DBSForeignKeyModifyRule.SET_DEFAULT };
         }
