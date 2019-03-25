@@ -73,7 +73,7 @@ public class XuguTableColumn extends JDBCTableColumn<XuguTableBase> implements D
     
     private int colNo;
     private String colName;
-    private int scale;
+    private Integer scale;
     private String defVal;
     private boolean notNull;
     
@@ -133,12 +133,14 @@ public class XuguTableColumn extends JDBCTableColumn<XuguTableBase> implements D
             if (this.type != null) {
                 this.typeName = type.getFullyQualifiedName(DBPEvaluationContext.DDL);
                 this.valueType = type.getTypeID();
+                this.maxLength = this.type.getLength();
                 if("NUMERIC".equals(this.typeName)){
                 	this.scale = JDBCUtils.safeGetInt(dbResult, "SCALE")%65536;
                 	this.precision = (JDBCUtils.safeGetInt(dbResult, "SCALE")-this.scale)/65536;
                 }else if("CHAR".equals(this.typeName)) {
                 	this.precision = JDBCUtils.safeGetInt(dbResult, "SCALE");
-                	this.scale = 0;
+                	this.maxLength = this.precision;
+                	this.scale = null;
                 }else if(this.typeName.matches("INTERVAL(.*)")) {
                 	this.scale = JDBCUtils.safeGetInt(dbResult, "SCALE")%65536;
                 	this.precision = (JDBCUtils.safeGetInt(dbResult, "SCALE")-this.scale)/65536;
@@ -151,8 +153,9 @@ public class XuguTableColumn extends JDBCTableColumn<XuguTableBase> implements D
                 this.valueType = Types.REF;
             }
             setRequired(this.notNull);
-            setScale(this.scale);
-            setPrecision(this.precision);
+            setScale(this.scale==null||this.scale==0?null:this.scale);
+            setPrecision(this.precision==null||this.precision==0?null:this.precision);
+            setMaxLength(this.maxLength);
         }
         
     }

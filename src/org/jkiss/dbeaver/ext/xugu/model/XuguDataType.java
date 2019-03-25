@@ -63,14 +63,16 @@ public class XuguDataType extends XuguObject<DBSObject>
     static class TypeDesc {
         final DBPDataKind dataKind;
         final int valueType;
+        final int length;
         final int precision;
         final int minScale;
         final int maxScale;
         
-        private TypeDesc(DBPDataKind dataKind, int valueType, int precision, int minScale, int maxScale)
+        private TypeDesc(DBPDataKind dataKind, int valueType, int length, int precision, int minScale, int maxScale)
         {
             this.dataKind = dataKind;
             this.valueType = valueType;
+            this.length = length;
             this.precision = precision;
             this.minScale = minScale;
             this.maxScale = maxScale;
@@ -81,42 +83,42 @@ public class XuguDataType extends XuguObject<DBSObject>
     static final Map<Integer, TypeDesc> PREDEFINED_TYPE_IDS = new HashMap<>();
     //修改了数据类型定义
     static  {
-    	PREDEFINED_TYPES.put("INT", new TypeDesc(DBPDataKind.NUMERIC, Types.INTEGER, 10, 0, 0));
-    	PREDEFINED_TYPES.put("INTEGER", new TypeDesc(DBPDataKind.NUMERIC, Types.INTEGER, 10, 0, 0));
-    	PREDEFINED_TYPES.put("BIGINT", new TypeDesc(DBPDataKind.NUMERIC, Types.BIGINT, 19, 0, 0));
-    	PREDEFINED_TYPES.put("FLOAT", new TypeDesc(DBPDataKind.NUMERIC, Types.FLOAT, 38, 0, 6));
-    	PREDEFINED_TYPES.put("DOUBLE", new TypeDesc(DBPDataKind.NUMERIC, Types.DOUBLE, 308, 0, 6));
-    	PREDEFINED_TYPES.put("TINYINT", new TypeDesc(DBPDataKind.NUMERIC, Types.TINYINT, 3, 0, 0));
-    	PREDEFINED_TYPES.put("SMALLINT", new TypeDesc(DBPDataKind.NUMERIC, Types.SMALLINT, 5, 0, 0));
-    	PREDEFINED_TYPES.put("NUMERIC", new TypeDesc(DBPDataKind.NUMERIC, Types.NUMERIC, 0, 0, 0));
-    	PREDEFINED_TYPES.put("CHAR", new TypeDesc(DBPDataKind.STRING, Types.CHAR, 0, 0, 0));
-    	PREDEFINED_TYPES.put("VARCHAR", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 0, 0, 0));
-    	PREDEFINED_TYPES.put("CLOB", new TypeDesc(DBPDataKind.CONTENT, Types.CLOB, 0, 0, 0));
-    	PREDEFINED_TYPES.put("BOOLEAN", new TypeDesc(DBPDataKind.BOOLEAN, Types.BOOLEAN, 0, 0, 0));
-    	PREDEFINED_TYPES.put("BLOB", new TypeDesc(DBPDataKind.CONTENT, Types.BLOB, 0, 0, 0));
+    	PREDEFINED_TYPES.put("INT", new TypeDesc(DBPDataKind.NUMERIC, Types.INTEGER, 10, 0, 0, 0));
+    	PREDEFINED_TYPES.put("INTEGER", new TypeDesc(DBPDataKind.NUMERIC, Types.INTEGER, 10, 0, 0, 0));
+    	PREDEFINED_TYPES.put("BIGINT", new TypeDesc(DBPDataKind.NUMERIC, Types.BIGINT, 19, 0, 0, 0));
+    	PREDEFINED_TYPES.put("FLOAT", new TypeDesc(DBPDataKind.NUMERIC, Types.FLOAT, 38, 0, 6, 0));
+    	PREDEFINED_TYPES.put("DOUBLE", new TypeDesc(DBPDataKind.NUMERIC, Types.DOUBLE, 308, 0, 6, 0));
+    	PREDEFINED_TYPES.put("TINYINT", new TypeDesc(DBPDataKind.NUMERIC, Types.TINYINT, 3, 0, 0, 0));
+    	PREDEFINED_TYPES.put("SMALLINT", new TypeDesc(DBPDataKind.NUMERIC, Types.SMALLINT, 5, 0, 0, 0));
+    	PREDEFINED_TYPES.put("NUMERIC", new TypeDesc(DBPDataKind.NUMERIC, Types.NUMERIC, 0, 0, 0, 0));
+    	PREDEFINED_TYPES.put("CHAR", new TypeDesc(DBPDataKind.STRING, Types.CHAR, 0, 0, 0, 0));
+    	PREDEFINED_TYPES.put("VARCHAR", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 0, 0, 0, 0));
+    	PREDEFINED_TYPES.put("CLOB", new TypeDesc(DBPDataKind.CONTENT, Types.CLOB, 0, 0, 0, 0));
+    	PREDEFINED_TYPES.put("BOOLEAN", new TypeDesc(DBPDataKind.BOOLEAN, Types.BOOLEAN, 0, 0, 0, 0));
+    	PREDEFINED_TYPES.put("BLOB", new TypeDesc(DBPDataKind.CONTENT, Types.BLOB, 0, 0, 0, 0));
         
-    	PREDEFINED_TYPES.put("GUID", new TypeDesc(DBPDataKind.ROWID, Types.ROWID, 0, 0, 0));
-    	PREDEFINED_TYPES.put("ROWVERSION", new TypeDesc(DBPDataKind.ROWID, Types.ROWID, 0, 0, 0));
+    	PREDEFINED_TYPES.put("GUID", new TypeDesc(DBPDataKind.ROWID, Types.ROWID, 0, 0, 0, 0));
+    	PREDEFINED_TYPES.put("ROWVERSION", new TypeDesc(DBPDataKind.ROWID, Types.ROWID, 0, 0, 0, 0));
     	
-    	PREDEFINED_TYPES.put("DATE", new TypeDesc(DBPDataKind.DATETIME, Types.TIMESTAMP, 0, 0, 0));
-    	PREDEFINED_TYPES.put("DATETIME", new TypeDesc(DBPDataKind.DATETIME, Types.TIMESTAMP, 6, 0, 0));
-    	PREDEFINED_TYPES.put("DATETIME WITH TIME ZONE", new TypeDesc(DBPDataKind.DATETIME, Types.TIMESTAMP, 6, 0, 0));
-    	PREDEFINED_TYPES.put("TIME", new TypeDesc(DBPDataKind.DATETIME, Types.TIMESTAMP, 3, 0, 0));
-    	PREDEFINED_TYPES.put("TIME WITH TIME ZONE", new TypeDesc(DBPDataKind.DATETIME, Types.TIMESTAMP, 3, 0, 0));
+    	PREDEFINED_TYPES.put("DATE", new TypeDesc(DBPDataKind.DATETIME, Types.TIMESTAMP, 0, 0, 0, 0));
+    	PREDEFINED_TYPES.put("DATETIME", new TypeDesc(DBPDataKind.DATETIME, Types.TIMESTAMP, 6, 0, 0, 0));
+    	PREDEFINED_TYPES.put("DATETIME WITH TIME ZONE", new TypeDesc(DBPDataKind.DATETIME, Types.TIMESTAMP, 6, 0, 0, 0));
+    	PREDEFINED_TYPES.put("TIME", new TypeDesc(DBPDataKind.DATETIME, Types.TIMESTAMP, 3, 0, 0, 0));
+    	PREDEFINED_TYPES.put("TIME WITH TIME ZONE", new TypeDesc(DBPDataKind.DATETIME, Types.TIMESTAMP, 3, 0, 0, 0));
         
-    	PREDEFINED_TYPES.put("INTERVAL YEAR", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 9, 0, 0));
-    	PREDEFINED_TYPES.put("INTERVAL MONTH", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 9, 0, 0));
-    	PREDEFINED_TYPES.put("INTERVAL DAY", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 9, 0, 0));
-    	PREDEFINED_TYPES.put("INTERVAL HOUR", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 9, 0, 0));
-    	PREDEFINED_TYPES.put("INTERVAL MINUTE", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 9, 0, 0));
-    	PREDEFINED_TYPES.put("INTERVAL SECOND", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 9, 0, 3));
-    	PREDEFINED_TYPES.put("INTERVAL YEAR TO MONTH", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 8, 0, 0));
-    	PREDEFINED_TYPES.put("INTERVAL DAY TO HOUR", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 7, 0, 0));
-    	PREDEFINED_TYPES.put("INTERVAL DAY TO MINUTE", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 6, 0, 0));
-    	PREDEFINED_TYPES.put("INTERVAL DAY TO SECOND", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 6, 3, 3));
-    	PREDEFINED_TYPES.put("INTERVAL HOUR TO MINUTE", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 7, 0, 0));
-    	PREDEFINED_TYPES.put("INTERVAL HOUR TO SECOND", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 7, 3, 3));
-    	PREDEFINED_TYPES.put("INTERVAL MINUTE TO SECOND", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 7, 3, 3));
+    	PREDEFINED_TYPES.put("INTERVAL YEAR", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 0, 9, 0, 0));
+    	PREDEFINED_TYPES.put("INTERVAL MONTH", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 0, 9, 0, 0));
+    	PREDEFINED_TYPES.put("INTERVAL DAY", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 0, 9, 0, 0));
+    	PREDEFINED_TYPES.put("INTERVAL HOUR", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 0, 9, 0, 0));
+    	PREDEFINED_TYPES.put("INTERVAL MINUTE", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 0, 9, 0, 0));
+    	PREDEFINED_TYPES.put("INTERVAL SECOND", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 0, 9, 0, 3));
+    	PREDEFINED_TYPES.put("INTERVAL YEAR TO MONTH", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 0, 8, 0, 0));
+    	PREDEFINED_TYPES.put("INTERVAL DAY TO HOUR", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 0, 7, 0, 0));
+    	PREDEFINED_TYPES.put("INTERVAL DAY TO MINUTE", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 0, 6, 0, 0));
+    	PREDEFINED_TYPES.put("INTERVAL DAY TO SECOND", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 0, 6, 3, 3));
+    	PREDEFINED_TYPES.put("INTERVAL HOUR TO MINUTE", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 0, 7, 0, 0));
+    	PREDEFINED_TYPES.put("INTERVAL HOUR TO SECOND", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 0, 7, 3, 3));
+    	PREDEFINED_TYPES.put("INTERVAL MINUTE TO SECOND", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 0, 7, 3, 3));
        
         for (TypeDesc type : PREDEFINED_TYPES.values()) {
             PREDEFINED_TYPE_IDS.put(type.valueType, type);
@@ -271,7 +273,7 @@ public class XuguDataType extends XuguObject<DBSObject>
     @Override
     public Integer getScale()
     {
-        return typeDesc == null ? 0 : typeDesc.maxScale;
+        return typeDesc == null|| typeDesc.maxScale==0 ? null : typeDesc.maxScale;
     }
 
     @Override
@@ -286,6 +288,10 @@ public class XuguDataType extends XuguObject<DBSObject>
         return CommonUtils.toInt(getPrecision());
     }
 
+    public int getLength() {
+    	return typeDesc.length;
+    }
+    
     @Override
     public int getMinScale()
     {
