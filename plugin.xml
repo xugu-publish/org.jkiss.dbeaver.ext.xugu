@@ -43,13 +43,7 @@
                     	<items label="%tree.database.node.name" path="database" property="databases" icon="#database">
                     	</items>
                     </folder>
-                    <!--角色-->
-                    <!--
-                	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguRole" label="%tree.roles.node.name" icon="#folder_role" description="Roles">
-                    	<items label="%tree.role.node.name" path="role" property="roles" icon="#user_group">
-                    	</items>
-                	</folder>    
-                	-->                 
+                          
                     <!--模式-->
 		            <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguSchema" label="%tree.schemas.node.name" icon="#folder_schema" description="Database schemas">
 		            	<items label="%tree.schema.node.name" path="schema" property="schemas" icon="#schema">
@@ -166,21 +160,6 @@
                     	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguDataType" label="%tree.types.node.name" icon="#data_types" description="Types">
                         	<items label="%tree.data_type.node.name" path="type" property="localDataTypes" icon="#data_type"/>
                     	</folder>
-                    	<!--
-                    	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguSynonym" label="%tree.public_synonyms.node.name" icon="#synonyms" description="Public synonyms">
-                        	<items label="%tree.synonym.node.name" path="synonym" property="publicSynonyms" icon="#synonym"/>
-                    	</folder>
-                    	-->
-                    	<!--
-                    	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguDBLink" label="%tree.public_database_links.node.name" icon="#links" description="Public database links">
-                        	<items label="%tree.database_link.node.name" path="databaseLink" property="publicDatabaseLinks" icon="#link"/>
-                    	</folder>   
-                    	-->
-                    	<!--
-                    	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguRecycledObject" label="%tree.user_recycle_bin.node.name" icon="#recycle_bin" description="Current user's recycle bin">
-                        	<items label="%tree.recycled_object.node.name" path="object" property="userRecycledObjects" icon="#recycle_bin"/>
-                    	</folder>
-                    	-->
                 	</folder>
                 	<!--安全管理-->
                 	<folder type="org.jkiss.dbeaver.model.struct.DBSObject" label="%tree.security.node.name" icon="#security" description="Security management">
@@ -203,7 +182,12 @@
                                 	</items>
                             	</folder>
                         	</items>
-                    	</folder>                 
+                    	</folder>
+                    	<!--角色-->
+	                	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguRole" label="%tree.roles.node.name" icon="#folder_role" description="Roles">
+	                    	<items label="%tree.role.node.name" path="role" property="roles" icon="#user_group">
+	                    	</items>
+	                	</folder>                          
                 	</folder>    
             </tree>
 

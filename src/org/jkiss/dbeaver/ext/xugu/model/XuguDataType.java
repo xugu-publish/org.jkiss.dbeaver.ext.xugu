@@ -121,6 +121,14 @@ public class XuguDataType extends XuguObject<DBSObject>
     	PREDEFINED_TYPES.put("INTERVAL HOUR TO SECOND", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 0, 7, 3, 3));
     	PREDEFINED_TYPES.put("INTERVAL MINUTE TO SECOND", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 0, 7, 3, 3));
        
+    	PREDEFINED_TYPES.put("NULL", new TypeDesc(DBPDataKind.STRING, Types.NULL, 0, 0, 0, 0));
+    	PREDEFINED_TYPES.put("GEOMETRY", new TypeDesc(DBPDataKind.OBJECT, Types.JAVA_OBJECT, 0, 0, 0, 0));
+    	PREDEFINED_TYPES.put("POINT", new TypeDesc(DBPDataKind.OBJECT, Types.JAVA_OBJECT, 0, 0, 0, 0));
+    	PREDEFINED_TYPES.put("BOX", new TypeDesc(DBPDataKind.OBJECT, Types.JAVA_OBJECT, 0, 0, 0, 0));
+    	PREDEFINED_TYPES.put("POLYLINE", new TypeDesc(DBPDataKind.OBJECT, Types.JAVA_OBJECT, 0, 0, 0, 0));
+    	PREDEFINED_TYPES.put("POLYGON", new TypeDesc(DBPDataKind.OBJECT, Types.JAVA_OBJECT, 0, 0, 0, 0));
+    	PREDEFINED_TYPES.put("ROWID", new TypeDesc(DBPDataKind.ROWID, Types.ROWID, 0, 0, 0, 0));
+    	
         for (TypeDesc type : PREDEFINED_TYPES.values()) {
             PREDEFINED_TYPE_IDS.put(type.valueType, type);
         }

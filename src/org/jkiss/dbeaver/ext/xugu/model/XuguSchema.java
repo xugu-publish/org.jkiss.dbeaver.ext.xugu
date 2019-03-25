@@ -1107,62 +1107,6 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         }
     }
 
-//    /**
-//     *	数据库连接缓存
-//     */
-//    static class DBLinkCache extends JDBCObjectCache<XuguSchema, XuguDBLink> {
-//
-//        @Override
-//        protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguSchema owner)
-//            throws SQLException
-//        {
-//        	//xfc 修改了获取所有dblink信息的sql
-//        	StringBuilder sql = new StringBuilder();
-//        	sql.append("SELECT * FROM ");
-//        	if(owner.roleFlag.equals("ALL")) {
-//        		sql.append("SYS");
-//        	}else {
-//        		sql.append(owner.roleFlag);
-//        	}
-//        	sql.append("_DBLINKS");
-//            JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
-//            return dbStat;
-//        }
-//
-//        @Override
-//        protected XuguDBLink fetchObject(@NotNull JDBCSession session, @NotNull XuguSchema owner, @NotNull JDBCResultSet dbResult)
-//            throws SQLException, DBException
-//        {
-//            return new XuguDBLink(session.getProgressMonitor(), owner, dbResult);
-//        }
-//
-//    }
-
-    /**
-     *	触发器缓存
-     */
-//    static class TriggerCache extends JDBCObjectCache<XuguSchema, XuguSchemaTrigger> {
-//
-//        @Override
-//        protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguSchema schema) throws SQLException
-//        {
-//        	//xfc 修改了获取所有触发器信息的sql语句
-//        	StringBuilder sql = new StringBuilder();
-//        	sql.append("SELECT * FROM ");
-//        	sql.append(schema.roleFlag);
-//        	sql.append("_TRIGGERS WHERE SCHEMA_ID=");
-//        	sql.append(schema.id);
-//            JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
-//            return dbStat;
-//        }
-//
-//        @Override
-//        protected XuguSchemaTrigger fetchObject(@NotNull JDBCSession session, @NotNull XuguSchema oracleSchema, @NotNull JDBCResultSet resultSet) throws SQLException, DBException
-//        {
-//            return new XuguSchemaTrigger(oracleSchema, resultSet);
-//        }
-//    }
-
     /**
      *	作业缓存
      */
