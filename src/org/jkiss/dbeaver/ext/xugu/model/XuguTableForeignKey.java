@@ -146,15 +146,15 @@ public class XuguTableForeignKey extends XuguTableConstraintBase implements DBST
 
     @NotNull
     @Override
-    @Property(viewable = true, editable = true, listProvider = ConstraintModifyRuleListProvider.class, order = 5)
+    @Property(viewable = true, editable = false, listProvider = ConstraintModifyRuleListProvider.class, order = 5)
     public DBSForeignKeyModifyRule getDeleteRule()
     {
         return deleteRule;
     }
 
-    // Update rule is not supported by Oracle
     @NotNull
     @Override
+    @Property(viewable = true, editable = false, listProvider = ConstraintModifyRuleListProvider.class, order = 6)
     public DBSForeignKeyModifyRule getUpdateRule()
     {
         return updateRule;
