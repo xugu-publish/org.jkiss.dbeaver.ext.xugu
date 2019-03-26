@@ -324,28 +324,10 @@ public class XuguDataSource extends JDBCDataSource
         return roleCache.getAllObjects(monitor, this);
     }
 
-//    public XuguGrantee getGrantee(DBRProgressMonitor monitor, String name) throws DBException {
-//        XuguUser user = userCache.getObject(monitor, this, name);
-//        if (user != null) {
-//            return user;
-//        }
-//        return roleCache.getObject(monitor, this, name);
-//    }
-
     @Association
     public Collection<XuguSynonym> getPublicSynonyms(DBRProgressMonitor monitor) throws DBException {
         return publicSchema.getSynonyms(monitor);
     }
-
-//    @Association
-//    public Collection<XuguDBLink> getPublicDatabaseLinks(DBRProgressMonitor monitor) throws DBException {
-//        return publicSchema.getDatabaseLinks(monitor);
-//    }
-
-//    @Association
-//    public Collection<XuguRecycledObject> getUserRecycledObjects(DBRProgressMonitor monitor) throws DBException {
-//        return publicSchema.getRecycledObjects(monitor);
-//    }
 
     public boolean isAtLeastV9() {
         return getInfo().getDatabaseVersion().getMajor() >= 9;

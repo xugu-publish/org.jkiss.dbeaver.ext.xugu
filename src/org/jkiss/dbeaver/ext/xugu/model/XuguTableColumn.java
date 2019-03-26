@@ -129,7 +129,24 @@ public class XuguTableColumn extends JDBCTableColumn<XuguTableBase> implements D
                 setOrdinalPosition(this.colNo);
         	}
         	//对数据类型、精度标度进行统一处理
+        	if("DATETIME".equals(this.typeName)) {
+        		String t = JDBCUtils.safeGetString(dbResult, "TIMESTAMP_T");
+        		if("n".equals(t)) {
+        			this.typeName = "DATETIME";
+        		}else {
+        			this.typeName = "TIMESTAMP";
+        		}
+        	}
+        	else if("CHAR".equals(this.typeName)){
+        		boolean v = JDBCUtils.safeGetBoolean(dbResult, "VARYING");
+        		if(v) {
+        			this.typeName = "VARCHAR";
+        		}else {
+        			this.typeName = "CHAR";
+        		}
+        	}
         	this.type = new XuguDataType(this, this.typeName, true);
+        	
             if (this.type != null) {
                 this.typeName = type.getFullyQualifiedName(DBPEvaluationContext.DDL);
                 this.valueType = type.getTypeID();
@@ -138,7 +155,7 @@ public class XuguTableColumn extends JDBCTableColumn<XuguTableBase> implements D
                 	this.scale = JDBCUtils.safeGetInt(dbResult, "SCALE")%65536;
                 	this.precision = (JDBCUtils.safeGetInt(dbResult, "SCALE")-this.scale)/65536;
                 	this.maxLength = this.precision;
-                }else if("CHAR".equals(this.typeName)) {
+                }else if("CHAR".equals(this.typeName)||"VARCHAR".equals(this.typeName)) {
                 	this.precision = JDBCUtils.safeGetInt(dbResult, "SCALE");
                 	this.maxLength = this.precision;
                 	this.scale = null;
