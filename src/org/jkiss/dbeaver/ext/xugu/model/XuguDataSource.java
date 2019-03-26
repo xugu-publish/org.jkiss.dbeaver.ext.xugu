@@ -26,6 +26,7 @@ import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.XuguExecuteSQL_DBA;
 import org.jkiss.dbeaver.ext.xugu.XuguExecuteSQL_NORMAL;
 import org.jkiss.dbeaver.ext.xugu.model.XuguCharset;
+import org.jkiss.dbeaver.ext.xugu.model.plan.XuguPlanAnalyser;
 import org.jkiss.dbeaver.ext.xugu.XuguExecuteSQL_SYSDBA;
 import org.jkiss.dbeaver.ext.xugu.XuguMessages;
 import org.jkiss.dbeaver.ext.xugu.model.session.XuguServerSessionManager;
@@ -67,7 +68,7 @@ import java.util.regex.Pattern;
  * @author Luke
  */
 public class XuguDataSource extends JDBCDataSource
-    implements DBSObjectSelector, IAdaptable {
+    implements DBSObjectSelector, DBCQueryPlanner, IAdaptable {
     private static final Log log = Log.getLog(XuguDataSource.class);
 
     final public SchemaCache schemaCache = new SchemaCache();
@@ -84,7 +85,6 @@ public class XuguDataSource extends JDBCDataSource
     private String activeSchemaName;
     private boolean isAdmin;
     private boolean isAdminVisible;
-    private String planTableName;
     private boolean useRuleHint;
     /**
      * userRole 角色属性，用于在查询时设置表名的前缀
@@ -603,51 +603,51 @@ public class XuguDataSource extends JDBCDataSource
         }
     }
 
-    @Nullable
-    public String getPlanTableName(JDBCSession session)
-        throws DBException
-    {
-        if (planTableName == null) {
-            String[] candidateNames;
-            String tableName = getContainer().getPreferenceStore().getString(XuguConstants.PREF_EXPLAIN_TABLE_NAME);
-            if (!CommonUtils.isEmpty(tableName)) {
-                candidateNames = new String[]{tableName};
-            } else {
-                candidateNames = new String[]{"PLAN_TABLE", "TOAD_PLAN_TABLE"};
-            }
-            for (String candidate : candidateNames) {
-                try {
-                    JDBCUtils.executeSQL(session, "SELECT 1 FROM " + candidate);
-                } catch (SQLException e) {
-                    // No such table
-                    continue;
-                }
-                planTableName = candidate;
-                break;
-            }
-            if (planTableName == null) {
-                final String newPlanTableName = candidateNames[0];
-                // Plan table not found - try to create new one
-                if (!UIUtils.confirmAction(
-                    "xugu PLAN_TABLE missing",
-                    "PLAN_TABLE not found in current user's session. " +
-                        "Do you want DBeaver to create new PLAN_TABLE (" + newPlanTableName + ")?")) {
-                    return null;
-                }
-                planTableName = createPlanTable(session, newPlanTableName);
-            }
-        }
-        return planTableName;
-    }
+//    @Nullable
+//    public String getPlanTableName(JDBCSession session)
+//        throws DBException
+//    {
+//        if (planTableName == null) {
+//            String[] candidateNames;
+//            String tableName = getContainer().getPreferenceStore().getString(XuguConstants.PREF_EXPLAIN_TABLE_NAME);
+//            if (!CommonUtils.isEmpty(tableName)) {
+//                candidateNames = new String[]{tableName};
+//            } else {
+//                candidateNames = new String[]{"PLAN_TABLE", "TOAD_PLAN_TABLE"};
+//            }
+//            for (String candidate : candidateNames) {
+//                try {
+//                    JDBCUtils.executeSQL(session, "SELECT 1 FROM " + candidate);
+//                } catch (SQLException e) {
+//                    // No such table
+//                    continue;
+//                }
+//                planTableName = candidate;
+//                break;
+//            }
+//            if (planTableName == null) {
+//                final String newPlanTableName = candidateNames[0];
+//                // Plan table not found - try to create new one
+//                if (!UIUtils.confirmAction(
+//                    "xugu PLAN_TABLE missing",
+//                    "PLAN_TABLE not found in current user's session. " +
+//                        "Do you want DBeaver to create new PLAN_TABLE (" + newPlanTableName + ")?")) {
+//                    return null;
+//                }
+//                planTableName = createPlanTable(session, newPlanTableName);
+//            }
+//        }
+//        return planTableName;
+//    }
 
-    private String createPlanTable(JDBCSession session, String tableName) throws DBException {
-        try {
-            JDBCUtils.executeSQL(session, XuguConstants.PLAN_TABLE_DEFINITION.replace("${TABLE_NAME}", tableName));
-        } catch (SQLException e) {
-            throw new DBException("Error creating PLAN table", e, this);
-        }
-        return tableName;
-    }
+//    private String createPlanTable(JDBCSession session, String tableName) throws DBException {
+//        try {
+//            JDBCUtils.executeSQL(session, XuguConstants.PLAN_TABLE_DEFINITION.replace("${TABLE_NAME}", tableName));
+//        } catch (SQLException e) {
+//            throw new DBException("Error creating PLAN table", e, this);
+//        }
+//        return tableName;
+//    }
 
     @Nullable
     @Override
@@ -978,5 +978,19 @@ public class XuguDataSource extends JDBCDataSource
 	public String getActiveSchemaName() {
 		return activeSchemaName;
 	}
+
+	 @NotNull
+    @Override
+    public DBCPlan planQueryExecution(@NotNull DBCSession session, @NotNull String query) throws DBException {
+        XuguPlanAnalyser plan = new XuguPlanAnalyser(this, (JDBCSession) session, query);
+        plan.explain();
+        return plan;
+    }
+
+    @NotNull
+    @Override
+    public DBCPlanStyle getPlanStyle() {
+        return DBCPlanStyle.PLAN;
+    }
     
 }
