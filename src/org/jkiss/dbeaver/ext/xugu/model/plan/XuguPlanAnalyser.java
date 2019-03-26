@@ -85,7 +85,6 @@ public class XuguPlanAnalyser implements DBCPlan {
             // Read explained plan
             JDBCResultSet dbResult = dbStat.executeQuery(planQuery);
             rootNodes = new ArrayList<>();
-//            IntKeyMap<XuguPlanNode> allNodes = new IntKeyMap<>();
             while (dbResult.next()) {
                 XuguPlanNode node = new XuguPlanNode(dataSource, dbResult);
                 rootNodes.add(node);
