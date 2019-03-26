@@ -120,15 +120,31 @@ public abstract class XuguTrigger<PARENT extends DBSObject> extends XuguObject<P
     }
 
     @Property(viewable = true, order = 5)
-    public int getTriggerType()
+    public String getTriggerType()
     {
-        return triggerType;
+    	switch(triggerType) {
+    	case 1:
+    		return "ROW";
+    	case 2:
+    		return "STATEMENT";
+		default:
+			return triggerType+"";
+    	}
     }
 
     @Property(viewable = true, order = 6)
-    public int getTriggeringEvent()
+    public String getTriggeringEvent()
     {
-        return triggeringEvent;
+    	switch(triggeringEvent) {
+    	case 1:
+    		return "insert";
+    	case 2:
+    		return "update";
+    	case 4:
+    		return "delete";
+    	default:
+    		return triggeringEvent+"";
+    	}
     }
 
 //    @Property(viewable = true, order = 7)
