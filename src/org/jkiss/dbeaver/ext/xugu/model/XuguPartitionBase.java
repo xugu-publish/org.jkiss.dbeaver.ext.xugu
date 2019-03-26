@@ -17,6 +17,7 @@
 package org.jkiss.dbeaver.ext.xugu.model;
 
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.ext.xugu.XuguMessages;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
 import org.jkiss.dbeaver.model.meta.LazyProperty;
 import org.jkiss.dbeaver.model.meta.Property;
@@ -38,52 +39,13 @@ public abstract class XuguPartitionBase<PARENT extends DBSObject> extends XuguOb
         HASH,
         LIST,
     }
-
-    public static final String CAT_PARTITIONING = "Partitioning";
-
-    public static class PartitionInfoBase {
-        private PartitionType partitionType;
-        private PartitionType subpartitionType;
-//        private Object partitionTablespace;
-
-        @Property(category = CAT_PARTITIONING, order = 120)
-        public PartitionType getPartitionType()
-        {
-            return partitionType;
-        }
-
-        @Property(category = CAT_PARTITIONING, order = 121)
-        public PartitionType getSubpartitionType()
-        {
-            return subpartitionType;
-        }
-
-//        @Property(category = CAT_PARTITIONING, order = 122)
-//        public Object getPartitionTablespace()
-//        {
-//            return partitionTablespace;
-//        }
-
-        public PartitionInfoBase(DBRProgressMonitor monitor, XuguDataSource dataSource, ResultSet dbResult) throws DBException
-        {
-            this.partitionType = CommonUtils.valueOf(PartitionType.class, JDBCUtils.safeGetStringTrimmed(dbResult, "PARTITIONING_TYPE"));
-            this.subpartitionType = CommonUtils.valueOf(PartitionType.class, JDBCUtils.safeGetStringTrimmed(dbResult, "SUBPARTITIONING_TYPE"));
-//            this.partitionTablespace = JDBCUtils.safeGetStringTrimmed(dbResult, "DEF_TABLESPACE_NAME");
-//            if (dataSource.isAdmin()) {
-//                this.partitionTablespace = dataSource.getTablespaceCache().getObject(monitor, dataSource, (String) partitionTablespace);
-//            }
-        }
-    }
-
-//    private int position;
+    
+    private String partiName;
     private String partiValue;
     private int partiNo;
     private boolean online;
-//    private boolean usable;
-//    private Object tablespace;
-//    private long numRows;
-//    private long sampleSize;
-//    private Timestamp lastAnalyzed;
+    private String partiKey;
+    private int partiType;
 
     protected XuguPartitionBase(PARENT parent, boolean subpartition, ResultSet dbResult)
     {
@@ -93,63 +55,54 @@ public abstract class XuguPartitionBase<PARENT extends DBSObject> extends XuguOb
                 JDBCUtils.safeGetString(dbResult, "SUBPARTI_NAME") :
                 JDBCUtils.safeGetString(dbResult, "PARTI_NAME"),
             true);
+        this.partiName = subpartition? JDBCUtils.safeGetString(dbResult, "SUBPARTI_NAME"):JDBCUtils.safeGetString(dbResult, "PARTI_NAME");
         this.partiValue = subpartition? JDBCUtils.safeGetString(dbResult, "SUBPARTI_VAL") : JDBCUtils.safeGetString(dbResult, "PARTI_VAL");
         this.partiNo = subpartition? JDBCUtils.safeGetInt(dbResult, "SUBPARTI_NO") : JDBCUtils.safeGetInt(dbResult, "PARTI_NO");
         this.online = subpartition? true : JDBCUtils.safeGetBoolean(dbResult, "ONLINE");
+        this.partiKey = JDBCUtils.safeGetString(dbResult, "PARTI_KEY");
+        this.partiType = JDBCUtils.safeGetInt(dbResult, "PARTI_TYPE");
     }
-
-//    @Override
-//    public Object getLazyReference(Object propertyId)
-//    {
-//        return tablespace;
-//    }
-
-    @Property(viewable = true, order = 10)
-    public String getPartiVal()
-    {
-        return partiValue;
+    @Property(viewable=true, order=0, name="Name")
+    public String getName() {
+    	return partiName;
     }
     
-    @Property(viewable = true, order = 10)
+    @Property(viewable = true, order = 1, name="No.")
     public int getPartiNo()
     {
         return partiNo;
     }
+    
+    @Property(viewable=true, order=2, name="Type")
+    public String getPartiType() {
+    	switch(partiType) {
+    	case 1:
+    			return "Range";
+		case 2:
+    			return "List";
+		case 3:
+    			return "Hash";
+		default:
+    			return partiType+"";
+    	}
+    }
+    
+    @Property(viewable=true, order=3, name="Keys")
+    public String getPartiKey() {
+    	return partiKey;
+    }
+    
+    @Property(viewable = true, order = 4, name="Value")
+    public String getPartiVal()
+    {
+    	if(partiType==3)
+    		return null;
+        return partiValue;
+    }
 
-    @Property(viewable = true, order = 11)
+    @Property(viewable = true, order = 5, name="Online")
     public boolean isOnline()
     {
         return online;
     }
-
-//    @Property(viewable = true, order = 12)
-//    @LazyProperty(cacheValidator = XuguTablespace.TablespaceReferenceValidator.class)
-//    public Object getTablespace(DBRProgressMonitor monitor) throws DBException
-//    {
-//        return XuguTablespace.resolveTablespaceReference(monitor, this, null);
-//    }
-
-//    @Property(viewable = true, order = 30)
-//    public String getHighValue()
-//    {
-//        return highValue;
-//    }
-//
-//    @Property(viewable = true, order = 40)
-//    public long getNumRows()
-//    {
-//        return numRows;
-//    }
-//
-//    @Property(viewable = true, order = 41)
-//    public long getSampleSize()
-//    {
-//        return sampleSize;
-//    }
-//
-//    @Property(viewable = true, order = 42)
-//    public Timestamp getLastAnalyzed()
-//    {
-//        return lastAnalyzed;
-//    }
 }

@@ -30,7 +30,6 @@ public class XuguMessages extends NLS {
 
 	private XuguMessages() {
 	}
-
 	public static String dialog_connection_advanced_tab;
 	public static String dialog_connection_advanced_tab_tooltip;
 	public static String dialog_connection_general_tab;
