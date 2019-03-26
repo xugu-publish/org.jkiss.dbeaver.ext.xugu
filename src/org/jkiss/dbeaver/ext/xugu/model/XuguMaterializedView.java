@@ -34,7 +34,7 @@ import java.util.Date;
 import java.util.Map;
 
 /**
- * Oracle materialized view
+ * Xugu materialized view
  */
 public class XuguMaterializedView extends XuguSchemaObject implements XuguSourceObject, DBSObjectLazy<XuguDataSource>
 {

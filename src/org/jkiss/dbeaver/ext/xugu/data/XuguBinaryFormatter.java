@@ -19,7 +19,7 @@ package org.jkiss.dbeaver.ext.xugu.data;
 import org.jkiss.dbeaver.model.impl.data.formatters.BinaryFormatterHex;
 
 /**
- * OracleBinaryFormatter
+ * XuguBinaryFormatter
  */
 public class XuguBinaryFormatter extends BinaryFormatterHex {
 
@@ -36,7 +36,7 @@ public class XuguBinaryFormatter extends BinaryFormatterHex {
     @Override
     public String getTitle()
     {
-        return "Oracle Hex";
+        return "Xugu Hex";
     }
 
     @Override

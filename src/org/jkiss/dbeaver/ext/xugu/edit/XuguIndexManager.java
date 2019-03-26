@@ -45,7 +45,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Oracle index manager
+ * Xugu index manager
  */
 public class XuguIndexManager extends SQLIndexManager<XuguTableIndex, XuguTablePhysical> {
 

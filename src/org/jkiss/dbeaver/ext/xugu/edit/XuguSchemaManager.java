@@ -110,7 +110,7 @@ public class XuguSchemaManager extends SQLObjectEditor<XuguSchema, XuguDataSourc
     @Override
     public void renameObject(DBECommandContext commandContext, XuguSchema schema, String newName) throws DBException
     {
-        throw new DBException("Direct database rename is not yet implemented in Oracle. You should use export/import functions for that.");
+        throw new DBException("Direct database rename is not yet implemented in Xugu. You should use export/import functions for that.");
     }
 
     static class NewUserDialog extends Dialog {

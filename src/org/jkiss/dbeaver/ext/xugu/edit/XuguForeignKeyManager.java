@@ -32,7 +32,7 @@ import org.jkiss.dbeaver.ui.editors.object.struct.EditForeignKeyPage;
 import org.jkiss.utils.CommonUtils;
 
 /**
- * Oracle foreign key manager
+ * Xugu foreign key manager
  */
 public class XuguForeignKeyManager extends SQLForeignKeyManager<XuguTableForeignKey, XuguTableBase> {
 

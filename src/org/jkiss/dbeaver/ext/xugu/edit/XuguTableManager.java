@@ -44,7 +44,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Oracle table manager
+ * Xugu table manager
  */
 public class XuguTableManager extends SQLTableManager<XuguTable, XuguSchema> implements DBEObjectRenamer<XuguTable> {
 

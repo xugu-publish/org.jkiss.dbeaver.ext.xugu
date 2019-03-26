@@ -38,7 +38,7 @@ import java.sql.Types;
 import java.util.Collection;
 
 /**
- * Oracle data type attribute
+ * Xugu data type attribute
  */
 public class XuguDataTypeMethod extends XuguDataTypeMember implements DBSEntityMethod, DBSParametrizedObject {
 

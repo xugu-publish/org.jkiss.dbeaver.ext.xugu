@@ -29,7 +29,7 @@ import java.sql.SQLException;
 import java.sql.SQLXML;
 
 /**
- * Oracle XML wrapper.
+ * Xugu XML wrapper.
  * Actual type of xmlType object is oracle.xdb.XMLType
  */
 public class XuguXMLWrapper implements SQLXML {

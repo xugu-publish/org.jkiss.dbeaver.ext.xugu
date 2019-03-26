@@ -29,7 +29,7 @@ import java.sql.ResultSet;
 import java.sql.Types;
 
 /**
- * Oracle data type attribute
+ * Xugu data type attribute
  */
 public class XuguDataTypeAttribute extends XuguDataTypeMember implements DBSEntityAttribute, DBSTypedObjectEx
 {

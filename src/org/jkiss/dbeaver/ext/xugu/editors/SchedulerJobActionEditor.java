@@ -9,7 +9,7 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.ui.editors.sql.SQLSourceViewer;
 
 /**
- * Oracle Scheduler Job Action editor
+ * Xugu Scheduler Job Action editor
  */
 public class SchedulerJobActionEditor extends SQLSourceViewer<XuguSchedulerJob> {
 

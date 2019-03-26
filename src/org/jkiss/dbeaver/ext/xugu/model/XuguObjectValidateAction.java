@@ -27,7 +27,7 @@ import org.jkiss.dbeaver.model.exec.compile.DBCCompileLogBase;
 import org.jkiss.dbeaver.model.exec.jdbc.JDBCSession;
 
 /**
- * Oracle persist action with validation
+ * Xugu persist action with validation
  */
 public class XuguObjectValidateAction extends XuguObjectPersistAction {
 

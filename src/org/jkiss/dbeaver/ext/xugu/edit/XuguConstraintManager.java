@@ -39,7 +39,7 @@ import org.jkiss.dbeaver.ui.UITask;
 import org.jkiss.dbeaver.ui.editors.object.struct.EditConstraintPage;
 
 /**
- * Oracle constraint manager
+ * Xugu constraint manager
  */
 public class XuguConstraintManager extends SQLConstraintManager<XuguTableConstraint, XuguTableBase> {
 

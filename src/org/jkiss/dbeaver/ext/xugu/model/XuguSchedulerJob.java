@@ -44,7 +44,7 @@ import java.util.Collection;
 import java.util.Map;
 
 /**
- * Oracle scheduler job
+ * Xugu scheduler job
  */
 public class XuguSchedulerJob extends XuguSchemaObject implements XuguStatefulObject, DBPScriptObjectExt {
 

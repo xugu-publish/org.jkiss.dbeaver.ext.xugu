@@ -27,7 +27,7 @@ import org.jkiss.utils.CommonUtils;
 import java.sql.ResultSet;
 
 /**
- * Oracle segments (objects)
+ * Xugu segments (objects)
  */
 public class XuguSegment<PARENT extends DBSObject> extends XuguObject<PARENT> {
 

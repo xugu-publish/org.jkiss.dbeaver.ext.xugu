@@ -50,7 +50,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Oracle data type
+ * Xugu data type
  */
 public class XuguDataType extends XuguObject<DBSObject>
     implements DBSDataType, DBSEntity, DBPQualifiedObject, XuguSourceObject, DBPScriptObjectExt {

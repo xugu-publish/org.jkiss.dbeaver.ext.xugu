@@ -29,7 +29,7 @@ import java.sql.Date;
 import java.sql.ResultSet;
 
 /**
- * Oracle synonym
+ * Xugu synonym
  */
 public class XuguSynonym extends XuguSchemaObject implements DBSAlias {
 

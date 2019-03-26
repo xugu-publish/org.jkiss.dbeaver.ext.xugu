@@ -27,7 +27,7 @@ import java.sql.Date;
 import java.sql.ResultSet;
 
 /**
- * Oracle sequence
+ * Xugu sequence
  */
 public class XuguSequence extends XuguSchemaObject implements DBSSequence {
 

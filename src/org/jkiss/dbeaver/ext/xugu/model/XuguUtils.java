@@ -46,7 +46,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Oracle utils
+ * Xugu utils
  */
 public class XuguUtils {
 
@@ -131,7 +131,7 @@ public class XuguUtils {
 
         } catch (SQLException e) {
             if (object instanceof XuguTablePhysical) {
-                log.error("Error generating Oracle DDL. Generate default.", e);
+                log.error("Error generating Xugu DDL. Generate default.", e);
                 return JDBCUtils.generateTableDDL(monitor, (XuguTableBase)object, options, true);
             } else {
                 throw new DBException(e, dataSource);

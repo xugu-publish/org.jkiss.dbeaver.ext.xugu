@@ -19,7 +19,7 @@ package org.jkiss.dbeaver.ext.xugu.model;
 import org.jkiss.dbeaver.model.impl.edit.SQLDatabasePersistAction;
 
 /**
- * Oracle persist action
+ * Xugu persist action
  */
 public class XuguObjectPersistAction extends SQLDatabasePersistAction {
 

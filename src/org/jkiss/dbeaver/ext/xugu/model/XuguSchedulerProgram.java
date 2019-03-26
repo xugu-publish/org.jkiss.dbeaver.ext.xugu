@@ -34,7 +34,7 @@ import java.sql.SQLException;
 import java.util.Collection;
 
 /**
- * Oracle scheduler program
+ * Xugu scheduler program
  */
 public class XuguSchedulerProgram extends XuguSchemaObject {
 

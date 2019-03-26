@@ -112,7 +112,7 @@ public class XuguRoleManager extends SQLObjectEditor<XuguRole, XuguDataSource> i
     @Override
     public void renameObject(DBECommandContext commandContext, XuguRole role, String newName) throws DBException
     {
-        throw new DBException("Direct database rename is not yet implemented in Oracle. You should use export/import functions for that.");
+        throw new DBException("Direct database rename is not yet implemented in Xugu. You should use export/import functions for that.");
     }
 
     static class NewRoleDialog extends Dialog {

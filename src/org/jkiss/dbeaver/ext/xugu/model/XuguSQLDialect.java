@@ -32,7 +32,7 @@ import org.jkiss.utils.ArrayUtils;
 import java.util.Arrays;
 
 /**
- * Oracle SQL dialect
+ * Xugu SQL dialect
  */
 class XuguSQLDialect extends JDBCSQLDialect {
 
@@ -86,7 +86,7 @@ class XuguSQLDialect extends JDBCSQLDialect {
     private DBPPreferenceStore preferenceStore;
 
     public XuguSQLDialect() {
-        super("Oracle");
+        super("Xugu");
     }
 
     @Override

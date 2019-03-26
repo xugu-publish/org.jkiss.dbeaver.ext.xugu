@@ -57,7 +57,7 @@ public class XuguTimestampValueHandler extends JDBCDateTimeValueHandler {
                 try {
                     return getTimestampReadMethod(object.getClass(), ((JDBCSession)session).getOriginal(), object);
                 } catch (Exception e) {
-                    throw new DBCException("Error extracting Oracle TIMESTAMP value", e);
+                    throw new DBCException("Error extracting Xugu TIMESTAMP value", e);
                 }
             }
         }
@@ -76,7 +76,7 @@ public class XuguTimestampValueHandler extends JDBCDateTimeValueHandler {
                 return getNativeMethod(aClass, "timestampValue", Connection.class, Calendar.class)
                     .invoke(object, connection, Calendar.getInstance());
         }
-        throw new DBException("Unsupported Oracle TIMESTAMP type: " + aClass.getName());
+        throw new DBException("Unsupported Xugu TIMESTAMP type: " + aClass.getName());
     }
 
     private static Method getNativeMethod(Class<?> aClass, String name, Class<?> ... args) throws NoSuchMethodException {

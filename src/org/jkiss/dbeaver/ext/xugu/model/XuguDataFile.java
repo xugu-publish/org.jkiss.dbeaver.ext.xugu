@@ -25,7 +25,7 @@ import java.math.BigDecimal;
 import java.sql.ResultSet;
 
 /**
- * Oracle tablespace file
+ * Xugu tablespace file
  */
 public class XuguDataFile extends XuguObject<XuguTablespace> {
 

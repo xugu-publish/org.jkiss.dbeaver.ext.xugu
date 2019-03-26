@@ -23,7 +23,7 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.ui.editors.sql.SQLSourceViewer;
 
 /**
- * Oracle source declaration editor
+ * Xugu source declaration editor
  */
 public class XuguSourceDeclarationEditor extends SQLSourceViewer<XuguSourceObject> {
     @Override

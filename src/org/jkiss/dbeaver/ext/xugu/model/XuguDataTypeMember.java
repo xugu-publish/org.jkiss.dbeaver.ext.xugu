@@ -27,7 +27,7 @@ import org.jkiss.dbeaver.model.struct.DBSEntityElement;
 import java.sql.ResultSet;
 
 /**
- * Oracle data type member
+ * Xugu data type member
  */
 public abstract class XuguDataTypeMember implements DBSEntityElement
 {

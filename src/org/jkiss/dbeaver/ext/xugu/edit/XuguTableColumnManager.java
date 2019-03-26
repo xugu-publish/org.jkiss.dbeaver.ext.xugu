@@ -41,7 +41,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Oracle table column manager
+ * Xugu table column manager
  */
 public class XuguTableColumnManager extends SQLTableColumnManager<XuguTableColumn, XuguTableBase> implements DBEObjectRenamer<XuguTableColumn> {
 

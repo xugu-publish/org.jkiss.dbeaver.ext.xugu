@@ -28,7 +28,7 @@ import org.jkiss.dbeaver.model.struct.DBSTypedObject;
 import java.sql.Types;
 
 /**
- * Oracle data types provider
+ * Xugu data types provider
  */
 public class XuguValueHandlerProvider implements DBDValueHandlerProvider {
 

@@ -29,7 +29,7 @@ import org.jkiss.dbeaver.model.struct.DBSTypedObject;
 import java.sql.ResultSet;
 
 /**
- * Oracle data type attribute
+ * Xugu data type attribute
  */
 public class XuguDataTypeMethodParameter implements DBSParameter {
 

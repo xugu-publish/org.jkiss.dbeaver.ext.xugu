@@ -230,8 +230,6 @@ public class XuguPackage extends XuguSchemaObject
             while (objectIter.hasNext()) {
                 final XuguProcedurePackaged proc = objectIter.next();
                 if (CommonUtils.isEmpty(proc.getName())) {
-                    // Skip procedures with empty names
-                    // Oracle 11+ has dummy procedure with subprogram_id=0 and empty name
                     objectIter.remove();
                     continue;
                 }

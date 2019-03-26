@@ -89,8 +89,6 @@ public class XuguDataSourceProvider extends JDBCDataSourceProvider implements DB
             if (!CommonUtils.isEmpty(tnsDescription)) {
                 url.append(tnsDescription);
             } else {
-                // TNS name not found.
-                // Last chance - set TNS path and hope that Oracle driver find figure something out
                 final File tnsNamesFile = OCIUtils.findTnsNamesFile(oraHomePath, checkTnsAdmin);
                 if (tnsNamesFile != null && tnsNamesFile.exists()) {
                     System.setProperty(XuguConstants.VAR_ORACLE_NET_TNS_ADMIN, tnsNamesFile.getAbsolutePath());
@@ -157,7 +155,7 @@ public class XuguDataSourceProvider extends JDBCDataSourceProvider implements DB
     @Override
     public String getProductName(DBPNativeClientLocation location) throws DBException {
         Integer oraVersion = getOracleVersion(location);
-        return "Oracle" + (oraVersion == null ? "" : " " + oraVersion);
+        return "Xugu" + (oraVersion == null ? "" : " " + oraVersion);
     }
 
     @Override

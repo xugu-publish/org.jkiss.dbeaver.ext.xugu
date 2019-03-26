@@ -30,7 +30,7 @@ import java.sql.ResultSet;
 import java.sql.Timestamp;
 
 /**
- * Oracle abstract partition
+ * Xugu abstract partition
  */
 public abstract class XuguPartitionBase<PARENT extends DBSObject> extends XuguObject<PARENT>
 {
