@@ -62,18 +62,18 @@ public abstract class XuguPartitionBase<PARENT extends DBSObject> extends XuguOb
         this.partiKey = JDBCUtils.safeGetString(dbResult, "PARTI_KEY");
         this.partiType = JDBCUtils.safeGetInt(dbResult, "PARTI_TYPE");
     }
-    @Property(viewable=true, order=0, name="Name")
-    public String getName() {
+    @Property(viewable=true, order=0)
+    public String getPartiName() {
     	return partiName;
     }
     
-    @Property(viewable = true, order = 1, name="No.")
+    @Property(viewable = true, order = 1)
     public int getPartiNo()
     {
         return partiNo;
     }
     
-    @Property(viewable=true, order=2, name="Type")
+    @Property(viewable=true, order=2)
     public String getPartiType() {
     	switch(partiType) {
     	case 1:
@@ -87,20 +87,20 @@ public abstract class XuguPartitionBase<PARENT extends DBSObject> extends XuguOb
     	}
     }
     
-    @Property(viewable=true, order=3, name="Keys")
+    @Property(viewable=true, order=3)
     public String getPartiKey() {
     	return partiKey;
     }
     
-    @Property(viewable = true, order = 4, name="Value")
-    public String getPartiVal()
+    @Property(viewable = true, order = 4)
+    public String getPartiValue()
     {
     	if(partiType==3)
     		return null;
         return partiValue;
     }
 
-    @Property(viewable = true, order = 5, name="Online")
+    @Property(viewable = true, order = 5)
     public boolean isOnline()
     {
         return online;
