@@ -212,8 +212,8 @@ public class XuguDataSource extends JDBCDataSource
              // Read charsets and collations
                 {
                     charsets = new ArrayList<>();
-                    try (JDBCPreparedStatement dbStat = session.prepareStatement("SHOW CHARSET")) {
-                        try (JDBCResultSet dbResult = dbStat.executeQuery()) {
+                    try (JDBCStatement dbStat = session.createStatement()) {
+                        try (JDBCResultSet dbResult = dbStat.executeQuery("SHOW CLIENT_ENCODING")) {
                             while (dbResult.next()) {
                                 XuguCharset charset = new XuguCharset(this, dbResult);
                                 charsets.add(charset);
