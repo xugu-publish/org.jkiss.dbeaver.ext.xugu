@@ -211,7 +211,7 @@ public class XuguTableColumn extends JDBCTableColumn<XuguTableBase> implements D
         return super.getTypeName();
     }
 
-    @Property(viewable = true, editable = true, updatable = true, order = 40)
+    @Property(viewable = false, editable = false, updatable = false, order = 40, hidden=true)
     @Override
     public long getMaxLength()
     {
