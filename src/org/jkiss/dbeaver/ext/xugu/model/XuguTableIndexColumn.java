@@ -46,6 +46,14 @@ public class XuguTableIndexColumn extends AbstractTableIndexColumn
         this.columnExpression = columnExpression;
     }
 
+    XuguTableIndexColumn(XuguTableIndex index, XuguTableColumn tableColumn){
+    	this.index = index;
+    	this.tableColumn = tableColumn;
+    	this.ordinalPosition = tableColumn.getOrdinalPosition();
+    	this.ascending = false;
+        this.columnExpression = "";
+    }
+    
     XuguTableIndexColumn(XuguTableIndex toIndex, XuguTableIndexColumn source)
     {
         this.index = toIndex;

@@ -46,7 +46,7 @@ public class XuguTableIndex extends JDBCTableIndex<XuguSchema, XuguTablePhysical
 
 	private int index_id;
     private String index_name;
-    private String index_typeName;
+    private int index_typeNum;
     private boolean is_primary;
     private boolean is_unique;
     private boolean is_local;
@@ -77,21 +77,21 @@ public class XuguTableIndex extends JDBCTableIndex<XuguSchema, XuguTablePhysical
         ResultSet dbResult)
     {
         super(schema, table, indexName, null, true);
-        this.index_typeName = JDBCUtils.safeGetString(dbResult, "INDEX_TYPE");
-//        this.nonUnique = !"UNIQUE".equals(JDBCUtils.safeGetString(dbResult, "UNIQUENESS"));
-        if (XuguConstants.INDEX_TYPE_BTREE.getId().equals(this.index_typeName)) {
-            indexType = XuguConstants.INDEX_TYPE_BTREE;
-        } else if (XuguConstants.INDEX_TYPE_RTREE.getId().equals(this.index_typeName)) {
-            indexType = XuguConstants.INDEX_TYPE_RTREE;
-        } else if (XuguConstants.INDEX_TYPE_FULL_TEXT.getId().equals(this.index_typeName)) {
-            indexType = XuguConstants.INDEX_TYPE_FULL_TEXT;
-        } else {
-            indexType = DBSIndexType.OTHER;
-        }
         if(dbResult!=null) {
+	        this.index_typeNum = JDBCUtils.safeGetInteger(dbResult, "INDEX_TYPE");
+	//        this.nonUnique = !"UNIQUE".equals(JDBCUtils.safeGetString(dbResult, "UNIQUENESS"));
+	        if (XuguConstants.INDEX_TYPE_BTREE.getId().equals(this.index_typeNum+"")) {
+	            indexType = XuguConstants.INDEX_TYPE_BTREE;
+	        } else if (XuguConstants.INDEX_TYPE_RTREE.getId().equals(this.index_typeNum+"")) {
+	            indexType = XuguConstants.INDEX_TYPE_RTREE;
+	        } else if (XuguConstants.INDEX_TYPE_FULL_TEXT.getId().equals(this.index_typeNum+"")) {
+	            indexType = XuguConstants.INDEX_TYPE_FULL_TEXT;
+	        } else {
+	            indexType = DBSIndexType.OTHER;
+	        }
+        
         	this.index_id = JDBCUtils.safeGetInt(dbResult, "INDEX_ID");
         	this.index_name = JDBCUtils.safeGetString(dbResult, "INDEX_NAME");
-        	this.index_typeName = JDBCUtils.safeGetString(dbResult, "INDEX_TYPE");
         	this.is_primary = JDBCUtils.safeGetBoolean(dbResult, "IS_PRIMARY");
         	this.is_unique = JDBCUtils.safeGetBoolean(dbResult, "IS_UNIQUE");
         	this.is_local = JDBCUtils.safeGetBoolean(dbResult, "IS_LOCAL");
@@ -139,19 +139,6 @@ public class XuguTableIndex extends JDBCTableIndex<XuguSchema, XuguTablePhysical
         return !nonUnique;
     }
 
-//    @Override
-//    public Object getLazyReference(Object propertyId)
-//    {
-//        return tablespace;
-//    }
-
-//    @Property(viewable = true, order = 10)
-//    @LazyProperty(cacheValidator = XuguTablespace.TablespaceReferenceValidator.class)
-//    public Object getTablespace(DBRProgressMonitor monitor) throws DBException
-//    {
-//        return XuguTablespace.resolveTablespaceReference(monitor, this, null);
-//    }
-
     @Nullable
     @Override
     public String getDescription()
@@ -165,12 +152,12 @@ public class XuguTableIndex extends JDBCTableIndex<XuguSchema, XuguTablePhysical
         return columns;
     }
 
-    @Nullable
-    @Association
-    public XuguTableIndexColumn getColumn(String columnName)
-    {
-        return DBUtils.findObject(columns, columnName);
-    }
+//    @Nullable
+//    @Association
+//    public XuguTableIndexColumn getColumn(String columnName)
+//    {
+//        return;
+//    }
 
     void setColumns(List<XuguTableIndexColumn> columns)
     {
@@ -216,8 +203,8 @@ public class XuguTableIndex extends JDBCTableIndex<XuguSchema, XuguTablePhysical
 		return index_name;
 	}
 
-	public String getIndex_typeName() {
-		return index_typeName;
+	public int getIndex_typeNum() {
+		return index_typeNum;
 	}
 
 	public boolean isIs_primary() {
@@ -306,109 +293,5 @@ public class XuguTableIndex extends JDBCTableIndex<XuguSchema, XuguTablePhysical
 
 	public boolean isValid() {
 		return valid;
-	}
-
-	public void setNonUnique(boolean nonUnique) {
-		this.nonUnique = nonUnique;
-	}
-
-	public void setIndex_id(int index_id) {
-		this.index_id = index_id;
-	}
-
-	public void setIndex_name(String index_name) {
-		this.index_name = index_name;
-	}
-
-	public void setIndex_typeName(String index_typeName) {
-		this.index_typeName = index_typeName;
-	}
-
-	public void setIs_primary(boolean is_primary) {
-		this.is_primary = is_primary;
-	}
-
-	public void setIs_unique(boolean is_unique) {
-		this.is_unique = is_unique;
-	}
-
-	public void setIs_local(boolean is_local) {
-		this.is_local = is_local;
-	}
-
-	public void setParti_type(int parti_type) {
-		this.parti_type = parti_type;
-	}
-
-	public void setParti_num(int parti_num) {
-		this.parti_num = parti_num;
-	}
-
-	public void setParti_key(String parti_key) {
-		this.parti_key = parti_key;
-	}
-
-	public void setGsto_no(int gsto_no) {
-		this.gsto_no = gsto_no;
-	}
-
-	public void setCopy_num(int copy_num) {
-		this.copy_num = copy_num;
-	}
-
-	public void setBlock_size(int block_size) {
-		this.block_size = block_size;
-	}
-
-	public void setChunk_size(int chunk_size) {
-		this.chunk_size = chunk_size;
-	}
-
-	public void setField_num(int field_num) {
-		this.field_num = field_num;
-	}
-
-	public void setKeys(String keys) {
-		this.keys = keys;
-	}
-
-	public void setFilter(String filter) {
-		this.filter = filter;
-	}
-
-	public void setVocable(String vocable) {
-		this.vocable = vocable;
-	}
-
-	public void setLexer(String lexer) {
-		this.lexer = lexer;
-	}
-
-	public void setWord_len(int word_len) {
-		this.word_len = word_len;
-	}
-
-	public void setEnable_trans(boolean enable_trans) {
-		this.enable_trans = enable_trans;
-	}
-
-	public void setCreate_time(Date create_time) {
-		this.create_time = create_time;
-	}
-
-	public void setIs_sys(boolean is_sys) {
-		this.is_sys = is_sys;
-	}
-
-	public void setKeepin_cache(boolean keepin_cache) {
-		this.keepin_cache = keepin_cache;
-	}
-
-	public void setNologging(boolean nologging) {
-		this.nologging = nologging;
-	}
-
-	public void setValid(boolean valid) {
-		this.valid = valid;
 	}
 }

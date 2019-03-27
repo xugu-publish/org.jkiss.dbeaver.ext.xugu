@@ -77,9 +77,9 @@ public class XuguConstants {
     public static final int TIMESTAMP_TYPE_LENGTH = 13;
     public static final int DATE_TYPE_LENGTH = 7;
 
-    public static final DBSIndexType INDEX_TYPE_BTREE = new DBSIndexType("BTREE", "BTree");
-    public static final DBSIndexType INDEX_TYPE_RTREE = new DBSIndexType("RTREE", "RTree");
-    public static final DBSIndexType INDEX_TYPE_FULL_TEXT = new DBSIndexType("FULL_TEXT","Full text");
+    public static final DBSIndexType INDEX_TYPE_BTREE = new DBSIndexType("0", "BTree");
+    public static final DBSIndexType INDEX_TYPE_RTREE = new DBSIndexType("1", "RTree");
+    public static final DBSIndexType INDEX_TYPE_FULL_TEXT = new DBSIndexType("2","Full text");
     
     public static final String PROP_OBJECT_DEFINITION = "objectDefinitionText";
     public static final String PROP_OBJECT_BODY_DEFINITION = "extendedDefinitionText";

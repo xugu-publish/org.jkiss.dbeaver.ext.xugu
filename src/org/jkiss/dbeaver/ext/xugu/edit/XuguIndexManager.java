@@ -84,13 +84,13 @@ public class XuguIndexManager extends SQLIndexManager<XuguTableIndex, XuguTableP
                     editPage.getIndexType());
                 int colIndex = 1;
                 for (DBSEntityAttribute tableColumn : editPage.getSelectedAttributes()) {
-                    index.addColumn(
-                        new XuguTableIndexColumn(
-                            index,
-                            (XuguTableColumn) tableColumn,
-                            colIndex++,
-                            !Boolean.TRUE.equals(editPage.getAttributeProperty(tableColumn, EditIndexPage.PROP_DESC)),
-                            null));
+            		index.addColumn(
+                            new XuguTableIndexColumn(
+                                index,
+                                (XuguTableColumn) tableColumn,
+                                colIndex++,
+                                !Boolean.TRUE.equals(editPage.getAttributeProperty(tableColumn, EditIndexPage.PROP_DESC)),
+                                null));
                 }
                 return index;
             }

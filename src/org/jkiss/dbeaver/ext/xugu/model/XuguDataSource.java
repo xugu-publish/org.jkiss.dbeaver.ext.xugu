@@ -147,9 +147,8 @@ public class XuguDataSource extends JDBCDataSource
         try {
             return super.openConnection(monitor, remoteInstance, purpose);
         } catch (DBCException e) {
+        	System.out.println("EEEERror code "+e.getErrorCode());
             if (e.getErrorCode() == XuguConstants.EC_PASSWORD_EXPIRED) {
-                // Here we could try to ask for expired password change
-                // This is supported  for thin driver since xugu 12.2
                 if (changeExpiredPassword(monitor, purpose)) {
                     // Retry
                     return openConnection(monitor, remoteInstance, purpose);

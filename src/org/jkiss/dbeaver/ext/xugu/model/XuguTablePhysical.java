@@ -70,8 +70,6 @@ public abstract class XuguTablePhysical extends XuguTableBase implements DBSObje
         ResultSet dbResult)
     {
         super(schema, dbResult, 0);
-//        this.rowCount = JDBCUtils.safeGetLong(dbResult, "NUM_ROWS");
-        //this.valid = "VALID".equals(JDBCUtils.safeGetString(dbResult, "STATUS"));
 
         //加载表分区信息
         this.partitioned = JDBCUtils.safeGetInteger(dbResult, "PARTI_TYPE");

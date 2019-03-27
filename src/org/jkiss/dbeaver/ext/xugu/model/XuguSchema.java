@@ -754,7 +754,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         {
         	//xfc 修改了获取外键信息的sql
             StringBuilder sql = new StringBuilder(500);
-            sql.append("SELECT *, f.DEFINE AS COL_NAME,"
+            sql.append("SELECT DISTINCT *, f.DEFINE AS COL_NAME,"
             		+ " t2.TABLE_NAME AS REF_TABLE_NAME,"
             		+ " f2.CONS_NAME AS REF_NAME FROM ");
         	sql.append(owner.roleFlag);
@@ -845,7 +845,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         {
         	//xfc 修改了获取索引信息的sql
             StringBuilder sql = new StringBuilder();
-            sql.append("SELECT *, KEYS AS COL_NAME FROM ");
+            sql.append("SELECT DISTINCT *, KEYS AS COL_NAME FROM ");
             sql.append(owner.roleFlag);
             sql.append("_INDEXES i INNER JOIN (SELECT * FROM ");
             sql.append(owner.roleFlag);
@@ -859,7 +859,6 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
                 sql.append(forTable.getName());
                 sql.append("')");
             }
-            System.out.println("GGGet index column "+sql.toString());
             JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
             return dbStat;
         }
@@ -879,28 +878,30 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
             XuguTablePhysical parent, XuguTableIndex object, JDBCResultSet dbResult)
             throws SQLException, DBException
         {
-            String columnName = JDBCUtils.safeGetStringTrimmed(dbResult, "KEYS");
+            String columnName = JDBCUtils.safeGetStringTrimmed(dbResult, "COL_NAME");
             columnName = columnName.replaceAll("\"", "");
-            int ordinalPosition = JDBCUtils.safeGetInt(dbResult, "COL_NO");
-//            boolean isAscending = "ASC".equals(JDBCUtils.safeGetStringTrimmed(dbResult, "DESCEND"));
-//            String columnExpression = JDBCUtils.safeGetStringTrimmed(dbResult, "COLUMN_EXPRESSION");
-
-            //que 这两个字段对应关系是??
-            boolean isAscending = false;
-            String columnExpression = "";
-            
-            XuguTableColumn tableColumn = columnName == null ? null : parent.getAttribute(session.getProgressMonitor(), columnName);
-            if (tableColumn == null) {
-                log.debug("Column '" + columnName + "' not found in table '" + parent.getName() + "' for index '" + object.getName() + "'");
-                return null;
+            //处理多字段情况
+            if(columnName.indexOf(",")!=-1) {
+            	String[] cols = columnName.split(",");
+            	XuguTableIndexColumn[] res = new XuguTableIndexColumn[cols.length];
+            	for(int i=0; i<cols.length; i++) {
+            		XuguTableColumn tableColumn = parent.getAttribute(session.getProgressMonitor(), cols[i]);
+                    if (tableColumn == null) {
+                        log.debug("Column '" + columnName + "' not found in table '" + parent.getName() + "' for index '" + object.getName() + "'");
+                        return null;
+                    }
+                    XuguTableIndexColumn tempIndexCol = new XuguTableIndexColumn(object, tableColumn);
+                    res[i] = tempIndexCol;
+            	}
+            	return res;
+            }else {
+            	XuguTableColumn tableColumn = columnName == null ? null : parent.getAttribute(session.getProgressMonitor(), columnName);
+                if (tableColumn == null) {
+                    log.debug("Column '" + columnName + "' not found in table '" + parent.getName() + "' for index '" + object.getName() + "'");
+                    return null;
+                }
+                return new XuguTableIndexColumn[] { new XuguTableIndexColumn(object, tableColumn) };
             }
-
-            return new XuguTableIndexColumn[] { new XuguTableIndexColumn(
-                object,
-                tableColumn,
-                ordinalPosition,
-                isAscending,
-                columnExpression) };
         }
 
         @Override
