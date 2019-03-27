@@ -171,9 +171,13 @@ public class XuguTableColumn extends JDBCTableColumn<XuguTableBase> implements D
                 this.valueType = Types.REF;
             }
             setRequired(this.notNull);
-            setScale(this.scale==null||this.scale==0?null:this.scale);
-            setPrecision(this.precision==null||this.precision==0?null:this.precision);
-            setMaxLength(this.maxLength);
+            if("NUMERIC".equals(this.typeName)) {
+            	setScale(this.scale);
+            	setPrecision(this.precision);
+            }else {
+            	setScale(this.scale==null||this.scale==0?null:this.scale);
+                setPrecision(this.precision==null||this.precision==0?null:this.precision);
+            }
         }
         
     }
