@@ -116,12 +116,12 @@ public abstract class XuguTablePhysical extends XuguTableBase implements DBSObje
         return tablespace;
     }
 
-    @Property(viewable = true, order = 22, editable = true, updatable = true, listProvider = TablespaceListProvider.class)
-    @LazyProperty(cacheValidator = XuguTablespace.TablespaceReferenceValidator.class)
-    public Object getTablespace(DBRProgressMonitor monitor) throws DBException
-    {
-        return XuguTablespace.resolveTablespaceReference(monitor, this, null);
-    }
+//    @Property(viewable = true, order = 22, editable = true, updatable = true, listProvider = TablespaceListProvider.class)
+//    @LazyProperty(cacheValidator = XuguTablespace.TablespaceReferenceValidator.class)
+//    public Object getTablespace(DBRProgressMonitor monitor) throws DBException
+//    {
+//        return XuguTablespace.resolveTablespaceReference(monitor, this, null);
+//    }
 
     public Object getTablespace() {
         return tablespace;

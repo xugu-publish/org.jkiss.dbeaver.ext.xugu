@@ -82,10 +82,9 @@ public class XuguMaterializedView extends XuguSchemaObject implements XuguSource
     }
 
     @Property(viewable = true, order = 10)
-    @LazyProperty(cacheValidator = XuguTablespace.TablespaceReferenceValidator.class)
     public Object getContainer(DBRProgressMonitor monitor) throws DBException
     {
-        return XuguUtils.resolveLazyReference(monitor, getSchema(), getSchema().tableCache, this, "container");
+        return getSchema();
     }
 
     @Property(viewable = true, order = 14)

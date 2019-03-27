@@ -60,101 +60,18 @@ public class XuguUtils {
         Map<String, Object> options) throws DBException
     {
         String objectFullName = DBUtils.getObjectFullName(object, DBPEvaluationContext.DDL);
-
-        XuguSchema schema = object.getContainer();
-/*
-        if (object instanceof OracleSchemaObject) {
-            schema = ((OracleSchemaObject)object).getSchema();
-        } else if (object instanceof OracleTableBase) {
-            schema = ((OracleTableBase)object).getContainer();
-        }
-*/
-        final XuguDataSource dataSource = object.getDataSource();
-
         monitor.beginTask("Load sources for " + objectType + " '" + objectFullName + "'...", 1);
-        try (final JDBCSession session = DBUtils.openMetaSession(monitor, object, "Load source code for " + objectType + " '" + objectFullName + "'")) {
-            if (dataSource.isAtLeastV9()) {
-                try {
-                    // Do not add semicolon in the end
-//                    JDBCUtils.executeProcedure(
-//                        session,
-//                        "begin DBMS_METADATA.SET_TRANSFORM_PARAM(DBMS_METADATA.SESSION_TRANSFORM,'SQLTERMINATOR',true); end;");
-                    JDBCUtils.executeProcedure(
-                        session,
-                        "begin DBMS_METADATA.SET_TRANSFORM_PARAM(DBMS_METADATA.SESSION_TRANSFORM,'STORAGE'," + ddlFormat.isShowStorage() + "); end;");
-                    JDBCUtils.executeProcedure(
-                        session,
-                        "begin DBMS_METADATA.SET_TRANSFORM_PARAM(DBMS_METADATA.SESSION_TRANSFORM,'TABLESPACE'," + ddlFormat.isShowTablespace() + ");  end;");
-                    JDBCUtils.executeProcedure(
-                        session,
-                        "begin DBMS_METADATA.SET_TRANSFORM_PARAM(DBMS_METADATA.SESSION_TRANSFORM,'SEGMENT_ATTRIBUTES'," + ddlFormat.isShowSegments() + ");  end;");
-                } catch (SQLException e) {
-                    log.error("Can't apply DDL transform parameters", e);
-                }
-            }
-
-            String ddl;
-            try (JDBCPreparedStatement dbStat = session.prepareStatement(
-                "SELECT DBMS_METADATA.GET_DDL(?,?" + (schema == null ? "" : ",?") + ") TXT FROM DUAL")) {
-                dbStat.setString(1, objectType);
-                dbStat.setString(2, object.getName());
-                if (schema != null) {
-                    dbStat.setString(3, schema.getName());
-                }
-                try (JDBCResultSet dbResult = dbStat.executeQuery()) {
-                    if (dbResult.next()) {
-                        ddl = dbResult.getString(1);
-                    } else {
-                        log.warn("No DDL for " + objectType + " '" + objectFullName + "'");
-                        return "-- EMPTY DDL";
-                    }
-                }
-            }
-            if (ddlFormat != XuguDDLFormat.COMPACT) {
-                try (JDBCPreparedStatement dbStat = session.prepareStatement(
-                    "SELECT DBMS_METADATA.GET_DEPENDENT_DDL('COMMENT',?" + (schema == null ? "" : ",?") + ") TXT FROM DUAL")) {
-                    dbStat.setString(1, object.getName());
-                    if (schema != null) {
-                        dbStat.setString(2, schema.getName());
-                    }
-                    try (JDBCResultSet dbResult = dbStat.executeQuery()) {
-                        if (dbResult.next()) {
-                            ddl += "\n" + dbResult.getString(1);
-                        }
-                    }
-                } catch (Exception e) {
-                    // No dependent DDL or something went wrong
-                    log.debug("Error reading dependent DDL", e);
-                }
-            }
-            return ddl;
-
-        } catch (SQLException e) {
-            if (object instanceof XuguTablePhysical) {
-                log.error("Error generating Xugu DDL. Generate default.", e);
-                return JDBCUtils.generateTableDDL(monitor, (XuguTableBase)object, options, true);
-            } else {
-                throw new DBException(e, dataSource);
-            }
-        } finally {
-            monitor.done();
-        }
+        String ddl = JDBCUtils.generateTableDDL(monitor, (XuguTableBase)object, options, true);
+        return ddl;
     }
 
     public static void setCurrentSchema(JDBCSession session, String schema) throws SQLException {
         JDBCUtils.executeSQL(session,
-            "ALTER SESSION SET CURRENT_SCHEMA=" + DBUtils.getQuotedIdentifier(session.getDataSource(), schema));
+            "SET CURRENT_SCHEMA=" + DBUtils.getQuotedIdentifier(session.getDataSource(), schema));
     }
 
     public static String getCurrentSchema(JDBCSession session, String role) throws SQLException {
-    	String sql = "";
-    	if("SYSDBA".equals(role)) {
-    		sql = XuguExecuteSQL_SYSDBA.gui_dialog_create_CreateRealJobDialog_schema;
-    	}else if("DBA".equals(role)) {
-    		sql = XuguExecuteSQL_DBA.gui_dialog_create_CreateRealJobDialog_schema;
-    	}else {
-    		sql = XuguExecuteSQL_NORMAL.gui_dialog_create_CreateRealJobDialog_schema;
-    	}
+    	String sql = "SHOW CURRENT_SCHEMA";
     	return JDBCUtils.queryString(
 	            session,
 	            sql);
@@ -194,75 +111,75 @@ public class XuguUtils {
     {
         actions.add(0, new SQLDatabasePersistAction(
             "Set target schema",
-            "ALTER SESSION SET CURRENT_SCHEMA=" + object.getSchema().getName(),
+            "SET CURRENT_SCHEMA=" + object.getSchema().getName(),
             DBEPersistAction.ActionType.INITIALIZER));
         if(object.getDataSource().getDefaultObject()!=null) {
         	if (object.getSchema() != object.getDataSource().getDefaultObject()) {
                 actions.add(new SQLDatabasePersistAction(
                     "Set current schema",
-                    "ALTER SESSION SET CURRENT_SCHEMA=" + object.getDataSource().getDefaultObject().getName(),
+                    "SET CURRENT_SCHEMA=" + object.getDataSource().getDefaultObject().getName(),
                     DBEPersistAction.ActionType.FINALIZER));
             }
         }
     }
 
-    public static String getSource(DBRProgressMonitor monitor, XuguSourceObject sourceObject, boolean body, boolean insertCreateReplace) throws DBCException
-    {
-        if (sourceObject.getSourceType().isCustom()) {
-            log.warn("Can't read source for custom source objects");
-            return "-- ???? CUSTOM SOURCE";
-        }
-        final String sourceType = sourceObject.getSourceType().name();
-        final XuguSchema sourceOwner = sourceObject.getSchema();
-        if (sourceOwner == null) {
-            log.warn("No source owner for object '" + sourceObject.getName() + "'");
-            return null;
-        }
-        monitor.beginTask("Load sources for '" + sourceObject.getName() + "'...", 1);
-        String sysViewName = XuguConstants.VIEW_DBA_SOURCE;
-        if (!sourceObject.getDataSource().isViewAvailable(monitor, XuguConstants.SCHEMA_SYS, sysViewName)) {
-            sysViewName = XuguConstants.VIEW_ALL_SOURCE;
-        }
-        try (final JDBCSession session = DBUtils.openMetaSession(monitor, sourceOwner, "Load source code for " + sourceType + " '" + sourceObject.getName() + "'")) {
-            try (JDBCPreparedStatement dbStat = session.prepareStatement(
-                "SELECT TEXT FROM ALL_OBJECTS " +
-                    "WHERE TYPE=? AND OWNER=? AND NAME=? " +
-                    "ORDER BY LINE")) {
-                dbStat.setString(1, body ? sourceType + " BODY" : sourceType);
-                dbStat.setString(2, sourceOwner.getName());
-                dbStat.setString(3, sourceObject.getName());
-                dbStat.setFetchSize(DBConstants.METADATA_FETCH_SIZE);
-                try (JDBCResultSet dbResult = dbStat.executeQuery()) {
-                    StringBuilder source = null;
-                    int lineCount = 0;
-                    while (dbResult.next()) {
-                        if (monitor.isCanceled()) {
-                            break;
-                        }
-                        final String line = dbResult.getString(1);
-                        if (source == null) {
-                            source = new StringBuilder(200);
-                        }
-                        source.append(line);
-                        lineCount++;
-                        monitor.subTask("Line " + lineCount);
-                    }
-                    if (source == null) {
-                        return null;
-                    }
-                    if (insertCreateReplace) {
-                        return insertCreateReplace(sourceObject, body, source.toString());
-                    } else {
-                        return source.toString();
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            throw new DBCException(e, sourceOwner.getDataSource());
-        } finally {
-            monitor.done();
-        }
-    }
+//    public static String getSource(DBRProgressMonitor monitor, XuguSourceObject sourceObject, boolean body, boolean insertCreateReplace) throws DBCException
+//    {
+//        if (sourceObject.getSourceType().isCustom()) {
+//            log.warn("Can't read source for custom source objects");
+//            return "-- ???? CUSTOM SOURCE";
+//        }
+//        final String sourceType = sourceObject.getSourceType().name();
+//        final XuguSchema sourceOwner = sourceObject.getSchema();
+//        if (sourceOwner == null) {
+//            log.warn("No source owner for object '" + sourceObject.getName() + "'");
+//            return null;
+//        }
+//        monitor.beginTask("Load sources for '" + sourceObject.getName() + "'...", 1);
+//        String sysViewName = XuguConstants.VIEW_DBA_SOURCE;
+//        if (!sourceObject.getDataSource().isViewAvailable(monitor, XuguConstants.SCHEMA_SYS, sysViewName)) {
+//            sysViewName = XuguConstants.VIEW_ALL_SOURCE;
+//        }
+//        try (final JDBCSession session = DBUtils.openMetaSession(monitor, sourceOwner, "Load source code for " + sourceType + " '" + sourceObject.getName() + "'")) {
+//            try (JDBCPreparedStatement dbStat = session.prepareStatement(
+//                "SELECT TEXT FROM ALL_OBJECTS " +
+//                    "WHERE TYPE=? AND OWNER=? AND NAME=? " +
+//                    "ORDER BY LINE")) {
+//                dbStat.setString(1, body ? sourceType + " BODY" : sourceType);
+//                dbStat.setString(2, sourceOwner.getName());
+//                dbStat.setString(3, sourceObject.getName());
+//                dbStat.setFetchSize(DBConstants.METADATA_FETCH_SIZE);
+//                try (JDBCResultSet dbResult = dbStat.executeQuery()) {
+//                    StringBuilder source = null;
+//                    int lineCount = 0;
+//                    while (dbResult.next()) {
+//                        if (monitor.isCanceled()) {
+//                            break;
+//                        }
+//                        final String line = dbResult.getString(1);
+//                        if (source == null) {
+//                            source = new StringBuilder(200);
+//                        }
+//                        source.append(line);
+//                        lineCount++;
+//                        monitor.subTask("Line " + lineCount);
+//                    }
+//                    if (source == null) {
+//                        return null;
+//                    }
+//                    if (insertCreateReplace) {
+//                        return insertCreateReplace(sourceObject, body, source.toString());
+//                    } else {
+//                        return source.toString();
+//                    }
+//                }
+//            }
+//        } catch (SQLException e) {
+//            throw new DBCException(e, sourceOwner.getDataSource());
+//        } finally {
+//            monitor.done();
+//        }
+//    }
 
     public static String getSysUserViewName(DBRProgressMonitor monitor, XuguDataSource dataSource, String viewName)
     {
@@ -272,18 +189,6 @@ public class XuguUtils {
         } else {
             return XuguConstants.SCHEMA_SYS + ".USER_" + viewName;
         }
-    }
-
-    public static String getAdminAllViewPrefix(DBRProgressMonitor monitor, XuguDataSource dataSource, String viewName)
-    {
-        boolean useDBAView = CommonUtils.toBoolean(dataSource.getContainer().getConnectionConfiguration().getProviderProperty(XuguConstants.PROP_ALWAYS_USE_DBA_VIEWS));
-        if (useDBAView) {
-            String dbaView = "DBA_";
-            if (dataSource.isViewAvailable(monitor, XuguConstants.SCHEMA_SYS, dbaView+ viewName)) {
-                return XuguConstants.SCHEMA_SYS + viewName;
-            }
-        }
-        return "ALL_" + viewName;
     }
 
     public static String getSysCatalogHint(XuguDataSource dataSource)

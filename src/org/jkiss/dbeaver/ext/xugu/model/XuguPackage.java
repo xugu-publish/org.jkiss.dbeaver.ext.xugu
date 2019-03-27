@@ -94,9 +94,6 @@ public class XuguPackage extends XuguSchemaObject
     @Property(hidden = true, editable = true, updatable = true, order = -1)
     public String getObjectDefinitionText(DBRProgressMonitor monitor, Map<String, Object> options) throws DBCException
     {
-        if (sourceDeclaration == null && monitor != null) {
-            sourceDeclaration = XuguUtils.getSource(monitor, this, false, true);
-        }
         return sourceDeclaration;
     }
 
@@ -110,9 +107,6 @@ public class XuguPackage extends XuguSchemaObject
     @Property(hidden = true, editable = true, updatable = true, order = -1)
     public String getExtendedDefinitionText(DBRProgressMonitor monitor) throws DBException
     {
-        if (sourceDefinition == null && monitor != null) {
-            sourceDefinition = XuguUtils.getSource(monitor, this, true, true);
-        }
         return sourceDefinition;
     }
 

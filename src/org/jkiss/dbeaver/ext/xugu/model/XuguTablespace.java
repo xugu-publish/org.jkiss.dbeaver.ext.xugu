@@ -192,27 +192,27 @@ public class XuguTablespace extends XuguGlobalObject implements DBPRefreshableOb
         }
     }
 
-    static Object resolveTablespaceReference(DBRProgressMonitor monitor, DBSObjectLazy<XuguDataSource> referrer, @Nullable Object propertyId) throws DBException
-    {
-        final XuguDataSource dataSource = referrer.getDataSource();
-        if (!dataSource.isAdmin()) {
-            return referrer.getLazyReference(propertyId);
-        } else {
-            return XuguUtils.resolveLazyReference(monitor, dataSource, dataSource.getTablespaceCache(), referrer, propertyId);
-        }
-    }
-
-    public static class TablespaceReferenceValidator implements IPropertyCacheValidator<DBSObjectLazy<XuguDataSource>> {
-        @Override
-        public boolean isPropertyCached(DBSObjectLazy<XuguDataSource> object, Object propertyId)
-        {
-            return
-                object.getLazyReference(propertyId) instanceof XuguTablespace ||
-                object.getLazyReference(propertyId) == null ||
-                object.getDataSource().getTablespaceCache().isFullyCached() ||
-                !object.getDataSource().isAdmin();
-        }
-    }
+//    static Object resolveTablespaceReference(DBRProgressMonitor monitor, DBSObjectLazy<XuguDataSource> referrer, @Nullable Object propertyId) throws DBException
+//    {
+//        final XuguDataSource dataSource = referrer.getDataSource();
+//        if (!dataSource.isAdmin()) {
+//            return referrer.getLazyReference(propertyId);
+//        } else {
+//            return XuguUtils.resolveLazyReference(monitor, dataSource, dataSource.getTablespaceCache(), referrer, propertyId);
+//        }
+//    }
+//
+//    public static class TablespaceReferenceValidator implements IPropertyCacheValidator<DBSObjectLazy<XuguDataSource>> {
+//        @Override
+//        public boolean isPropertyCached(DBSObjectLazy<XuguDataSource> object, Object propertyId)
+//        {
+//            return
+//                object.getLazyReference(propertyId) instanceof XuguTablespace ||
+//                object.getLazyReference(propertyId) == null ||
+//                object.getDataSource().getTablespaceCache().isFullyCached() ||
+//                !object.getDataSource().isAdmin();
+//        }
+//    }
     
 
 	public void setName(String name) {
