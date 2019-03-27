@@ -30,6 +30,7 @@ import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.exec.jdbc.JDBCPreparedStatement;
 import org.jkiss.dbeaver.model.exec.jdbc.JDBCResultSet;
 import org.jkiss.dbeaver.model.exec.jdbc.JDBCSession;
+import org.jkiss.dbeaver.model.exec.jdbc.JDBCStatement;
 import org.jkiss.dbeaver.model.impl.DBObjectNameCaseTransformer;
 import org.jkiss.dbeaver.model.impl.DBSObjectCache;
 import org.jkiss.dbeaver.model.impl.edit.SQLDatabasePersistAction;
@@ -40,6 +41,7 @@ import org.jkiss.dbeaver.model.struct.DBSObjectLazy;
 import org.jkiss.utils.CommonUtils;
 
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -72,9 +74,13 @@ public class XuguUtils {
 
     public static String getCurrentSchema(JDBCSession session, String role) throws SQLException {
     	String sql = "SHOW CURRENT_SCHEMA";
-    	return JDBCUtils.queryString(
-	            session,
-	            sql);
+    	JDBCStatement s = session.createStatement();
+    	JDBCResultSet rs = s.executeQuery(sql);
+    	if (rs.next()) {
+            return rs.getString(1);
+    	}else {
+    		return null;
+    	}
     }
 
     public static String normalizeSourceName(XuguSourceObject object, boolean body)
