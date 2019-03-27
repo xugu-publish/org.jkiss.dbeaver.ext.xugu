@@ -29,6 +29,7 @@ import org.jkiss.dbeaver.model.exec.jdbc.JDBCSession;
 import org.jkiss.dbeaver.model.exec.jdbc.JDBCStatement;
 import org.jkiss.dbeaver.model.impl.AbstractExecutionSource;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
+import org.jkiss.dbeaver.model.impl.jdbc.cache.JDBCObjectCache;
 import org.jkiss.dbeaver.model.impl.jdbc.cache.JDBCStructCache;
 import org.jkiss.dbeaver.model.meta.*;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
@@ -59,6 +60,7 @@ public abstract class XuguTablePhysical extends XuguTableBase implements DBSObje
     private Object tablespace;
     private Integer partitioned;
     private PartitionCache partitionCache;
+    private SubPartitionCache subPartitionCache;
 
     protected XuguTablePhysical(XuguSchema schema, String name)
     {
@@ -73,38 +75,40 @@ public abstract class XuguTablePhysical extends XuguTableBase implements DBSObje
 
         //加载表分区信息
         this.partitioned = JDBCUtils.safeGetInteger(dbResult, "PARTI_TYPE");
-        this.partitionCache = this.partitioned==null ? null : new PartitionCache();
+        this.partitionCache = new PartitionCache();
+        this.subPartitionCache = new SubPartitionCache();
+        System.out.println("yes");
     }
 
-    @Property(category = CAT_STATISTICS, viewable = true, order = 20)
-    public long getRowCount()
-    {
-        return rowCount;
-    }
-
-    @Property(category = CAT_STATISTICS, viewable = false, expensive = true, order = 21)
-    public synchronized Long getRealRowCount(DBRProgressMonitor monitor)
-    {
-        if (realRowCount != null) {
-            return realRowCount;
-        }
-        if (!isPersisted()) {
-            // Do not count rows for views
-            return null;
-        }
-
-        // Query row count
-        try (DBCSession session = DBUtils.openMetaSession(monitor, this, "Read row count")) {
-            realRowCount = countData(new AbstractExecutionSource(this, session.getExecutionContext(), this), session, null, DBSDataContainer.FLAG_NONE);
-        } catch (DBException e) {
-            log.debug("Can't fetch row count", e);
-        }
-        if (realRowCount == null) {
-            realRowCount = -1L;
-        }
-
-        return realRowCount;
-    }
+//    @Property(category = CAT_STATISTICS, viewable = true, order = 20)
+//    public long getRowCount()
+//    {
+//        return rowCount;
+//    }
+//
+//    @Property(category = CAT_STATISTICS, viewable = false, expensive = true, order = 21)
+//    public synchronized Long getRealRowCount(DBRProgressMonitor monitor)
+//    {
+//        if (realRowCount != null) {
+//            return realRowCount;
+//        }
+//        if (!isPersisted()) {
+//            // Do not count rows for views
+//            return null;
+//        }
+//
+//        // Query row count
+//        try (DBCSession session = DBUtils.openMetaSession(monitor, this, "Read row count")) {
+//            realRowCount = countData(new AbstractExecutionSource(this, session.getExecutionContext(), this), session, null, DBSDataContainer.FLAG_NONE);
+//        } catch (DBException e) {
+//            log.debug("Can't fetch row count", e);
+//        }
+//        if (realRowCount == null) {
+//            realRowCount = -1L;
+//        }
+//
+//        return realRowCount;
+//    }
 
     @Override
     public Object getLazyReference(Object propertyId)
@@ -150,9 +154,18 @@ public abstract class XuguTablePhysical extends XuguTableBase implements DBSObje
             return null;
         } else {
             this.partitionCache.getAllObjects(monitor, this);
-            this.partitionCache.loadChildren(monitor, this, null);
             return this.partitionCache.getAllObjects(monitor, this);
         }
+    }
+    
+    @Association
+    public Collection<XuguTablePartition> getSubPartitions(DBRProgressMonitor monitor) throws DBException{
+    	if(subPartitionCache == null) {
+    		return null;
+    	}else {
+    		this.subPartitionCache.getAllObjects(monitor, this);
+    		return this.subPartitionCache.getAllObjects(monitor, this);
+    	}
     }
 
     @Override
@@ -168,14 +181,8 @@ public abstract class XuguTablePhysical extends XuguTableBase implements DBSObje
     {
         this.valid = XuguUtils.getObjectStatus(monitor, this, XuguObjectType.TABLE);
     }
-
-    private static class PartitionCache extends JDBCStructCache<XuguTablePhysical, XuguTablePartition, XuguTablePartition> {
-
-        protected PartitionCache()
-        {
-            super("PARTITION_NAME");
-        }
-
+    
+    private static class PartitionCache extends JDBCObjectCache<XuguTablePhysical, XuguTablePartition> {
         @Override
         protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguTablePhysical table) throws SQLException
         {        	
@@ -191,33 +198,38 @@ public abstract class XuguTablePhysical extends XuguTableBase implements DBSObje
             return dbStat;
         }
 
-        @Override
-        protected XuguTablePartition fetchObject(@NotNull JDBCSession session, @NotNull XuguTablePhysical table, @NotNull JDBCResultSet resultSet) throws SQLException, DBException
-        {
-            return new XuguTablePartition(table, false, resultSet);
-        }
+		@Override
+		protected XuguTablePartition fetchObject(JDBCSession session, XuguTablePhysical owner, JDBCResultSet resultSet)
+				throws SQLException, DBException {
+			// TODO Auto-generated method stub
+			return new XuguTablePartition(owner, false, resultSet);
+		}
+    }
 
-        @Override
-        protected JDBCStatement prepareChildrenStatement(@NotNull JDBCSession session, @NotNull XuguTablePhysical table, @Nullable XuguTablePartition forObject) throws SQLException
-        {
-        	String sql = "SELECT * FROM ALL_SUBPARTIS " +
-                    "WHERE TABLE_ID=(SELECT TABLE_ID FROM ALL_TABLES WHERE TABLE_NAME='"+ table.getName() +"') ";
-        	if(forObject != null) {
-        		sql += "AND PARTITION_NAME='" + forObject.getName() + "'";
-        	}
-        	sql += "ORDER BY SUBPARTI_NO";
-            final JDBCPreparedStatement dbStat = session.prepareStatement(sql);
+    private static class SubPartitionCache extends JDBCObjectCache<XuguTablePhysical, XuguTablePartition>{
+    	@Override
+        protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguTablePhysical table) throws SQLException
+        {        	
+    		StringBuilder builder = new StringBuilder();
+        	builder.append("SELECT * FROM ");
+        	builder.append(table.getSchema().getRoleFlag());
+        	builder.append("_SUBPARTIS SP INNER JOIN (SELECT SUBPARTI_TYPE, SUBPARTI_KEY, TABLE_ID, TABLE_NAME FROM  ");
+        	builder.append(table.getSchema().getRoleFlag());
+        	builder.append("_TABLES T WHERE TABLE_NAME = '");
+        	builder.append(table.getName());
+        	builder.append("') ON SP.TABLE_ID = T.TABLE_ID");
+            final JDBCPreparedStatement dbStat = session.prepareStatement(builder.toString());
             return dbStat;
         }
 
-        @Override
-        protected XuguTablePartition fetchChild(@NotNull JDBCSession session, @NotNull XuguTablePhysical table, @NotNull XuguTablePartition parent, @NotNull JDBCResultSet dbResult) throws SQLException, DBException
-        {
-            return new XuguTablePartition(table, true, dbResult);
-        }
-
+		@Override
+		protected XuguTablePartition fetchObject(JDBCSession session, XuguTablePhysical owner, JDBCResultSet resultSet)
+				throws SQLException, DBException {
+			// TODO Auto-generated method stub
+			return new XuguTablePartition(owner, true, resultSet);
+		}
     }
-
+    
     public static class TablespaceListProvider implements IPropertyValueListProvider<XuguTablePhysical> {
         @Override
         public boolean allowCustomValue()

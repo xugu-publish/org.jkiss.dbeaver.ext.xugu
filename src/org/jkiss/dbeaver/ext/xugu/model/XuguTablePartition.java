@@ -29,7 +29,7 @@ import java.util.List;
  */
 public class XuguTablePartition extends XuguPartitionBase<XuguTablePhysical> {
 
-    private List<XuguTablePartition> subPartitions;
+//    private List<XuguTablePartition> subPartitions;
 
     protected XuguTablePartition(
         XuguTablePhysical xuguTable,
@@ -39,20 +39,20 @@ public class XuguTablePartition extends XuguPartitionBase<XuguTablePhysical> {
         super(xuguTable, subpartition, dbResult);
     }
 
-    @Association
-    public Collection<XuguTablePartition> getSubPartitions()
-    {
-        return subPartitions;
-    }
-
-    public void setSubPartitions(List<XuguTablePartition> subPartitions)
-    {
-        this.subPartitions = subPartitions;
-    }
-
-    public boolean hasSubPartitions()
-    {
-        return !CommonUtils.isEmpty(subPartitions);
-    }
+//    @Association
+//    public Collection<XuguTablePartition> getSubPartitions()
+//    {
+//        return subPartitions;
+//    }
+//
+//    public void setSubPartitions(List<XuguTablePartition> subPartitions)
+//    {
+//        this.subPartitions = subPartitions;
+//    }
+//
+//    public boolean hasSubPartitions()
+//    {
+//        return !CommonUtils.isEmpty(subPartitions);
+//    }
 
 }
