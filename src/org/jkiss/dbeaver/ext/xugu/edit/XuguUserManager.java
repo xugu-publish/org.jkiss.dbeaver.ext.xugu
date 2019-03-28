@@ -18,6 +18,7 @@
 package org.jkiss.dbeaver.ext.xugu.edit;
 
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.ext.xugu.XuguMessages;
 import org.jkiss.dbeaver.ext.xugu.model.XuguDataSource;
 import org.jkiss.dbeaver.ext.xugu.model.XuguUser;
@@ -94,14 +95,7 @@ public class XuguUserManager extends AbstractObjectManager<XuguUser> implements 
     public void filterCommands(DBECommandQueue<XuguUser> queue)
     {
     	System.out.println("Create3 ??"+queue.toString());
-//        if (!queue.isEmpty()) {
-//            // Add privileges flush to the tail
-//            queue.add(
-//                new SQLScriptCommand<>(
-//                    queue.getObject(),
-//                    XuguMessages.edit_user_manager_command_flush_privileges,
-//                    "FLUSH PRIVILEGES")); //$NON-NLS-1$
-//        }
+
     }
 
     private static class CommandCreateUser extends DBECommandAbstract<XuguUser> {
@@ -111,7 +105,6 @@ public class XuguUserManager extends AbstractObjectManager<XuguUser> implements 
             System.out.println("Create2 ??");
         }
     }
-
 
     private static class CommandDropUser extends DBECommandComposite<XuguUser, UserPropertyHandler> {
         protected CommandDropUser(XuguUser user)
@@ -134,5 +127,21 @@ public class XuguUserManager extends AbstractObjectManager<XuguUser> implements 
         }
     }
 
+    private static class CommandRenameUser extends DBECommandComposite<XuguUser, UserPropertyHandler> {
+        protected String newName;
+    	protected CommandRenameUser(XuguUser user, String newName)
+        {
+            super(user, XuguMessages.edit_user_manager_command_drop_user);
+            this.newName = newName;
+        }
+        @Override
+        public DBEPersistAction[] getPersistActions(DBRProgressMonitor monitor, Map<String, Object> options)
+        {
+            return new DBEPersistAction[] {
+                new SQLDatabasePersistAction(XuguMessages.edit_user_manager_command_drop_user, "ALTER USER " + getObject().getName() + " RENAME TO " +this.newName) { //$NON-NLS-2$
+                    
+                }};
+        }
+    }
 }
 

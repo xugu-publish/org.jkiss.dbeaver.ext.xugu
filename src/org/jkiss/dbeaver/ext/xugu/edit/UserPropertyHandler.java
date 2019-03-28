@@ -51,11 +51,12 @@ public enum UserPropertyHandler implements DBEPropertyHandler<XuguUser>, DBEProp
     @Override
     public void reflectValueChange(XuguUser object, Object oldValue, Object newValue)
     {
-        if (this == NAME) {
-            if (this == NAME) {
-                object.setName(CommonUtils.toString(newValue));
-            }
-            DBUtils.fireObjectUpdate(object);
-        }
+    	//为了修改用户名而保留旧名称 不做即时反射更新
+//        if (this == NAME) {
+//            if (this == NAME) {
+//                object.setName(CommonUtils.toString(newValue));
+//            }
+//            DBUtils.fireObjectUpdate(object);
+//        }
     }
 }

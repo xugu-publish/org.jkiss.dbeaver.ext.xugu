@@ -111,7 +111,6 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
 	@Override
 	@Property(viewable = true, order = 0)
 	public String getName() {
-		System.out.println("Wrong user name?? "+user_name);
 		return user_name;
 	}
 

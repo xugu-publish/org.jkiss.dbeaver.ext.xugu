@@ -77,9 +77,8 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
 
             userNameText = UIUtils.createLabelText(loginGroup, XuguMessages.editors_user_editor_general_label_user_name, getDatabaseObject().getName());
             //userNameText.setEditable(newUser);
-            if (newUser) {
-                ControlPropertyCommandListener.create(this, userNameText, UserPropertyHandler.NAME);
-            }
+            //对于新用户进行创建工作 而对于老用户进行改名操作
+            ControlPropertyCommandListener.create(this, userNameText, UserPropertyHandler.NAME);
 
             password = newUser ? "" : DEF_PASSWORD_VALUE; //$NON-NLS-1$
             passwordText = UIUtils.createLabelText(loginGroup, XuguMessages.editors_user_editor_general_label_password, password, SWT.BORDER | SWT.PASSWORD);
@@ -170,8 +169,8 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
                 UIUtils.asyncExec(new Runnable() {
                     @Override
                     public void run() {
-                        userNameText.setEditable(false);
-                        passwordText.setEditable(false);
+                        userNameText.setEditable(true);
+                        passwordText.setEditable(true);
                         //hostText.setEditable(false);
                     }
                 });

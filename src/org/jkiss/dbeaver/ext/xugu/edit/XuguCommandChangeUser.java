@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Grant/Revoke privilege command
+ * 生成修改用户 command
  */
 public class XuguCommandChangeUser extends DBECommandComposite<XuguUser, UserPropertyHandler> {
 
@@ -48,10 +48,8 @@ public class XuguCommandChangeUser extends DBECommandComposite<XuguUser, UserPro
     {
         for (Map.Entry<Object, Object> entry : getProperties().entrySet()) {
             switch (UserPropertyHandler.valueOf((String) entry.getKey())) {
-//                case MAX_QUERIES: getObject().setMaxQuestions(CommonUtils.toInt(entry.getValue())); break;
-//                case MAX_UPDATES: getObject().setMaxUpdates(CommonUtils.toInt(entry.getValue())); break;
-//                case MAX_CONNECTIONS: getObject().setMaxConnections(CommonUtils.toInt(entry.getValue())); break;
-//                case MAX_USER_CONNECTIONS: getObject().setMaxUserConnections(CommonUtils.toInt(entry.getValue())); break;
+                case NAME: getObject().setName(CommonUtils.toString(entry.getValue())); break;
+                case PASSWORD: getObject().setPassword((CommonUtils.toString(entry.getValue()).getBytes())); break;
                 default:
                     break;
             }
@@ -101,27 +99,19 @@ public class XuguCommandChangeUser extends DBECommandComposite<XuguUser, UserPro
     }
 
     private boolean generateAlterScript(StringBuilder script) {
-        boolean hasSet = false, hasResOptions = false;
+        boolean hasSet = false;
         script.append("ALTER USER ").append(getObject().getName()); //$NON-NLS-1$
-        
+        //处理密码更改
         if (getProperties().containsKey(UserPropertyHandler.PASSWORD.name())) {
             script.append("\nIDENTIFIED BY ").append(SQLUtils.quoteString(getObject(), CommonUtils.toString(getProperties().get(UserPropertyHandler.PASSWORD.name())))).append(" ");
             hasSet = true;
         }
-        //用户选项
-//        StringBuilder resOptions = new StringBuilder();
-//        for (Map.Entry<Object, Object> entry : getProperties().entrySet()) {
-//            switch (UserPropertyHandler.valueOf((String) entry.getKey())) {
-//                case MAX_QUERIES: resOptions.append("\n\tMAX_QUERIES_PER_HOUR ").append(CommonUtils.toInt(entry.getValue())); hasResOptions = true; break; //$NON-NLS-1$
-//                case MAX_UPDATES: resOptions.append("\n\tMAX_UPDATES_PER_HOUR ").append(CommonUtils.toInt(entry.getValue())); hasResOptions = true; break; //$NON-NLS-1$
-//                case MAX_CONNECTIONS: resOptions.append("\n\tMAX_CONNECTIONS_PER_HOUR ").append(CommonUtils.toInt(entry.getValue())); hasResOptions = true; break; //$NON-NLS-1$
-//                case MAX_USER_CONNECTIONS: resOptions.append("\n\tMAX_USER_CONNECTIONS ").append(CommonUtils.toInt(entry.getValue())); hasResOptions = true; break; //$NON-NLS-1$
-//            }
-//        }
-//        if (resOptions.length() > 0) {
-//            script.append("\nWITH").append(resOptions);
-//        }
-        return hasSet || hasResOptions;
+        //处理用户名更改
+        else if(getProperties().containsKey(UserPropertyHandler.NAME.name())) {
+        	script.append("\nRENAME TO ").append(CommonUtils.toString(getProperties().get(UserPropertyHandler.NAME.name()))).append(" ");
+        	hasSet = true;
+        }
+        return hasSet;
     }
 
 }
