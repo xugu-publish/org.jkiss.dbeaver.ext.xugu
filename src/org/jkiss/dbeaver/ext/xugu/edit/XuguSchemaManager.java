@@ -42,6 +42,7 @@ import org.jkiss.dbeaver.model.edit.DBEObjectRenamer;
 import org.jkiss.dbeaver.model.impl.DBObjectNameCaseTransformer;
 import org.jkiss.dbeaver.model.impl.DBSObjectCache;
 import org.jkiss.dbeaver.model.impl.edit.SQLDatabasePersistAction;
+import org.jkiss.dbeaver.model.impl.edit.AbstractObjectManager.CreateObjectReflector;
 import org.jkiss.dbeaver.model.impl.sql.edit.SQLObjectEditor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSObject;
@@ -94,25 +95,37 @@ public class XuguSchemaManager extends SQLObjectEditor<XuguSchema, XuguDataSourc
         XuguUser user = command.getObject().getUser();
         XuguSchema schema = command.getObject();
         String sql = "CREATE SCHEMA " + schema.getName() +" AUTHORIZATION " +user.getName();
-        System.out.println("CCCCCSQL "+sql);		
         actions.add(new SQLDatabasePersistAction("Create schema", sql));
     }
 
     @Override
-    protected void addObjectDeleteActions(List<DBEPersistAction> actions, ObjectDeleteCommand command, Map<String, Object> options)
-    {
+    protected void addObjectRenameActions(DBRProgressMonitor monitor, List<DBEPersistAction> actions, ObjectRenameCommand command, Map<String, Object> options)
+    { 
         actions.add(
-            new SQLDatabasePersistAction("Drop schema",
-                "DROP SCHEMA " + DBUtils.getQuotedIdentifier(command.getObject()) + " CASCADE") //$NON-NLS-2$
+            new SQLDatabasePersistAction(
+                "Rename schema",
+                "ALTER SCHEMA " + DBUtils.getQuotedIdentifier(command.getObject().getDataSource(), command.getOldName()) + //$NON-NLS-1$
+                    " RENAME TO " + DBUtils.getQuotedIdentifier(command.getObject().getDataSource(), command.getNewName())) //$NON-NLS-1$
         );
+    }
+
+    // 对模式的修改只能是重命名
+    protected void addObjectModifyActions(DBRProgressMonitor monitor, List<DBEPersistAction> actionList, ObjectChangeCommand command, Map<String, Object> options) throws DBException {
+    	// do nothing
     }
     
     @Override
-    public void renameObject(DBECommandContext commandContext, XuguSchema schema, String newName) throws DBException
-    {
-        throw new DBException("Direct database rename is not yet implemented in Xugu. You should use export/import functions for that.");
-    }
+	public void renameObject(DBECommandContext commandContext, XuguSchema object, String newName) throws DBException {
+		processObjectRename(commandContext, object, newName);
+	}
 
+	@Override
+	protected void addObjectDeleteActions(List<DBEPersistAction> actions,
+			SQLObjectEditor<XuguSchema, XuguDataSource>.ObjectDeleteCommand command, Map<String, Object> options) {
+		String sql = "DROP SCHEMA " + command.getObject().getName();
+        actions.add(new SQLDatabasePersistAction("Create schema", sql));
+	}
+    
     static class NewUserDialog extends Dialog {
     	
     	private XuguSchema schema;
@@ -120,13 +133,15 @@ public class XuguSchemaManager extends SQLObjectEditor<XuguSchema, XuguDataSourc
         private Text nameText;
         //private Text dbNameText;
         private Text userNameText;
+        private XuguDataSource dataSource;
 		
 
         public NewUserDialog(Shell parentShell, XuguDataSource dataSource)
         {
             super(parentShell);
             this.schema = new XuguSchema(dataSource, -1, null);
-            this.user = new XuguUser(dataSource, null);   
+            this.user = new XuguUser(dataSource, null);
+            this.dataSource = dataSource;
         }
 
         public XuguUser getUser()
@@ -179,6 +194,5 @@ public class XuguSchemaManager extends SQLObjectEditor<XuguSchema, XuguDataSourc
         }
 
     }
-
 }
 

@@ -83,6 +83,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
     public XuguSchema(XuguDataSource dataSource, long id, String name)
     {
         super(dataSource, id > 0);
+        System.out.println("new Schema!1 "+name);
         this.id = id;
         this.name = name;
         this.roleFlag = dataSource.getRoleFlag();
@@ -96,6 +97,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
      */
     public XuguSchema(@NotNull XuguDataSource dataSource, XuguDatabase parent, ResultSet dbResult) {
     	super(dataSource, true);
+    	System.out.println("new Schema!2 "+JDBCUtils.safeGetString(dbResult, "SCHEMA_NAME"));
     	this.id = JDBCUtils.safeGetLong(dbResult, "SCHEMA_ID");
         this.name = JDBCUtils.safeGetString(dbResult, "SCHEMA_NAME");
         this.roleFlag = dataSource.getRoleFlag();
@@ -114,6 +116,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
     public XuguSchema(@NotNull XuguDataSource dataSource, @NotNull ResultSet dbResult)
     {
         super(dataSource, true);
+        System.out.println("new Schema!3 "+JDBCUtils.safeGetString(dbResult, "SCHEMA_NAME"));
         this.id = JDBCUtils.safeGetLong(dbResult, "SCHEMA_ID");
         this.name = JDBCUtils.safeGetString(dbResult, "SCHEMA_NAME");
         this.roleFlag = dataSource.getRoleFlag();
@@ -516,7 +519,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         synonymCache.clearCache();
         schedulerJobCache.clearCache();
         //recycleBin.clearCache();
-        return this;
+        return this.getDataSource().schemaCache.refreshObject(monitor, this.getDataSource(), this);
     }
 
     @Override
@@ -577,7 +580,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         		sql.append("'");
         	}
         	final JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
-        	System.out.println("prepareLookup stmt "+dbStat.getQueryString());
+        	System.out.println("find tables stmt "+dbStat.getQueryString());
         
             return dbStat;
         }

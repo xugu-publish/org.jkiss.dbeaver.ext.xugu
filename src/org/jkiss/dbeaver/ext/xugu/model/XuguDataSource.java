@@ -824,26 +824,30 @@ public class XuguDataSource extends JDBCDataSource
 		}
     }
     
-    static class SchemaCache extends JDBCObjectCache<XuguDataSource, XuguSchema> {
+    static class SchemaCache extends JDBCStructLookupCache<XuguDataSource, XuguSchema, XuguSchema> {
         SchemaCache() {
+        	super("SCHEMA_NAME");
             setListOrderComparator(DBUtils.<XuguSchema>nameComparator());
         }
         
         @Override
-        protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguDataSource owner) throws SQLException {
+		public JDBCStatement prepareLookupStatement(@NotNull JDBCSession session, @NotNull XuguDataSource owner, XuguSchema schema, String name) throws SQLException {
             StringBuilder schemasQuery = new StringBuilder();
-
             //过滤条件
             DBSObjectFilter schemaFilters = owner.getContainer().getObjectFilter(XuguSchema.class, null, false);
         	//xfc 根据owner的用户角色选取不同的语句来查询schema
         	schemasQuery.append("SELECT * FROM ");
         	schemasQuery.append(owner.roleFlag);
         	schemasQuery.append("_SCHEMAS");
+        	//当有检索条件时 只查询指定表 用于新建表之后的刷新工作
+        	if(schema!=null) {
+        		schemasQuery.append(" WHERE SCHEMA_NAME = '");
+        		schemasQuery.append(schema.getName());
+        		schemasQuery.append("'");
+        	}
             JDBCPreparedStatement dbStat = session.prepareStatement(schemasQuery.toString());
-            if (schemaFilters != null) {
-            	System.out.println("FFFilter is not null! 2");
-                JDBCUtils.setFilterParameters(dbStat, 1, schemaFilters);
-            }
+            
+            System.out.println("find schemas stmt "+dbStat.getQueryString());
             return dbStat;
         }
 
@@ -861,6 +865,22 @@ public class XuguDataSource extends JDBCDataSource
                     new XuguSchema(owner, 100, owner.getActiveSchemaName()));
             }
         }
+
+        // do nothing
+		@Override
+		protected JDBCStatement prepareChildrenStatement(JDBCSession session, XuguDataSource owner,
+				XuguSchema forObject) throws SQLException {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		// do nothing
+		@Override
+		protected XuguSchema fetchChild(JDBCSession session, XuguDataSource owner, XuguSchema parent,
+				JDBCResultSet dbResult) throws SQLException, DBException {
+			// TODO Auto-generated method stub
+			return null;
+		}
     }
     
     

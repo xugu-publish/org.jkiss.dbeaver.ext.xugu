@@ -85,6 +85,7 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
     protected XuguTableBase(XuguSchema schema, String name, boolean persisted)
     {
         super(schema, name, persisted);
+        System.out.println("new table! "+name);
     }
 
     protected XuguTableBase(XuguSchema xuguSchema, ResultSet dbResult, int type)
