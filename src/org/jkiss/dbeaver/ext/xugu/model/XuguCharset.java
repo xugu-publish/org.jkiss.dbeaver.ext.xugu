@@ -35,8 +35,6 @@ import java.util.List;
 public class XuguCharset extends XuguInformation {
 
     private String name;
-    private String description;
-    private int maxLength;
     private List<XuguCollation> collations = new ArrayList<>();
 
     public XuguCharset(XuguDataSource dataSource, ResultSet dbResult)
@@ -49,9 +47,7 @@ public class XuguCharset extends XuguInformation {
     private void loadInfo(ResultSet dbResult)
         throws SQLException
     {
-        this.name = JDBCUtils.safeGetString(dbResult, XuguConstants.COL_CHARSET);
-        this.description = JDBCUtils.safeGetString(dbResult, XuguConstants.COL_DESCRIPTION);
-        this.maxLength = JDBCUtils.safeGetInt(dbResult, XuguConstants.COL_MAX_LEN);
+    	this.name = JDBCUtils.safeGetString(dbResult, "CLIENT_ENCODING");
     }
 
     void addCollation(XuguCollation collation)
@@ -93,18 +89,12 @@ public class XuguCharset extends XuguInformation {
         return null;
     }
 
-    @Property(viewable = true, order = 3)
-    public int getMaxLength()
-    {
-        return maxLength;
-    }
-
     @Nullable
     @Override
     @Property(viewable = true, multiline = true, order = 100)
     public String getDescription()
     {
-        return description;
+        return name;
     }
 
 }
