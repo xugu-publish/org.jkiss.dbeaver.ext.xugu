@@ -48,6 +48,7 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
 {
     //static final Log log = Log.getLog(MySQLUserEditorGeneral.class);
     public static final String DEF_PASSWORD_VALUE = "**********"; //$NON-NLS-1$
+    public static final String DEF_UNTIL_TIME = "1970-1-1 07:00:00.933";
 
     private PageControl pageControl;
     private boolean isLoaded;
@@ -59,7 +60,11 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
     private Button lockCheck;
     private Button expireCheck;
     private Text timeText;
+    private String userName="";
     private String password="";
+    private String untilTime="";
+    private boolean lockFlag;
+    private boolean expireFlag;
     //private Text hostText;
     private CommandListener commandlistener;
 
@@ -73,33 +78,40 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
         container.setLayoutData(gd);
 
         newUser = !getDatabaseObject().isPersisted();
-        //newUser = true;
-        System.out.println("new user??? "+newUser);
-        {
-            Composite loginGroup = UIUtils.createControlGroup(container, XuguMessages.editors_user_editor_general_group_login, 2, GridData.HORIZONTAL_ALIGN_BEGINNING, 200);
+        
+        Composite loginGroup = UIUtils.createControlGroup(container, XuguMessages.editors_user_editor_general_group_login, 2, GridData.HORIZONTAL_ALIGN_BEGINNING, 200);
 
-            userNameText = UIUtils.createLabelText(loginGroup, XuguMessages.editors_user_editor_general_label_user_name, getDatabaseObject().getName());
-            //userNameText.setEditable(newUser);
-            //对于新用户进行创建工作 而对于老用户进行改名操作
-            ControlPropertyCommandListener.create(this, userNameText, UserPropertyHandler.NAME);
+        //创建新用户时使用默认数据 修改用户时则使用当前用户数据 对密码做特殊处理 
+        password = newUser ? "" : DEF_PASSWORD_VALUE;
+        userName = newUser ? "" : getDatabaseObject().getName();
+        untilTime = newUser ? DEF_UNTIL_TIME:getDatabaseObject().getUntil_time().toString();
+        lockFlag = newUser ? false:getDatabaseObject().isLocked();
+        expireFlag = newUser ? false:getDatabaseObject().isExpired();
+        
+        userNameText = UIUtils.createLabelText(loginGroup, XuguMessages.editors_user_editor_general_label_user_name, userName);
+        ControlPropertyCommandListener.create(this, userNameText, UserPropertyHandler.NAME);
+        
+        passwordText = UIUtils.createLabelText(loginGroup, XuguMessages.editors_user_editor_general_label_password, password, SWT.BORDER | SWT.PASSWORD);
+        ControlPropertyCommandListener.create(this, passwordText, UserPropertyHandler.PASSWORD);
 
-            password = newUser ? "" : DEF_PASSWORD_VALUE; //$NON-NLS-1$
-            passwordText = UIUtils.createLabelText(loginGroup, XuguMessages.editors_user_editor_general_label_password, password, SWT.BORDER | SWT.PASSWORD);
-            ControlPropertyCommandListener.create(this, passwordText, UserPropertyHandler.PASSWORD);
-
-            confirmText = UIUtils.createLabelText(loginGroup, XuguMessages.editors_user_editor_general_label_confirm, password, SWT.BORDER | SWT.PASSWORD);
-            ControlPropertyCommandListener.create(this, confirmText, UserPropertyHandler.PASSWORD_CONFIRM);
-            
-            lockCheck =  UIUtils.createLabelCheckbox(loginGroup, "locked", getDatabaseObject().isLocked());
-            ControlPropertyCommandListener.create(this, lockCheck, UserPropertyHandler.LOCKED);
-            
-            expireCheck = UIUtils.createLabelCheckbox(loginGroup, "expired", getDatabaseObject().isExpired());
-            ControlPropertyCommandListener.create(this, expireCheck, UserPropertyHandler.EXPIRED);
-            
-            timeText = UIUtils.createLabelText(loginGroup, "Time", getDatabaseObject().getUntil_time().toString());
-            ControlPropertyCommandListener.create(this, timeText, UserPropertyHandler.UNTIL_TIME);
-            
+        confirmText = UIUtils.createLabelText(loginGroup, XuguMessages.editors_user_editor_general_label_confirm, password, SWT.BORDER | SWT.PASSWORD);
+        ControlPropertyCommandListener.create(this, confirmText, UserPropertyHandler.PASSWORD_CONFIRM);
+        
+        lockCheck =  UIUtils.createLabelCheckbox(loginGroup, XuguMessages.editors_user_editor_general_label_locked, lockFlag);
+        ControlPropertyCommandListener.create(this, lockCheck, UserPropertyHandler.LOCKED);
+        
+        expireCheck = UIUtils.createLabelCheckbox(loginGroup, XuguMessages.editors_user_editor_general_label_pwd_expired, expireFlag);
+        ControlPropertyCommandListener.create(this, expireCheck, UserPropertyHandler.EXPIRED);
+        
+        timeText = UIUtils.createLabelText(loginGroup, XuguMessages.editors_user_editor_general_label_valid_until, untilTime);
+        ControlPropertyCommandListener.create(this, timeText, UserPropertyHandler.UNTIL_TIME);
+        
+        //暂时禁止修改用户锁定及口令失效
+        if(!newUser) {
+        	lockCheck.setEnabled(false);
+        	expireCheck.setEnabled(false);
         }
+        
         pageControl.createProgressPanel();
 
         commandlistener = new CommandListener();
