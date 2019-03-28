@@ -29,6 +29,7 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.sql.SQLUtils;
 import org.jkiss.utils.CommonUtils;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +51,9 @@ public class XuguCommandChangeUser extends DBECommandComposite<XuguUser, UserPro
             switch (UserPropertyHandler.valueOf((String) entry.getKey())) {
                 case NAME: getObject().setName(CommonUtils.toString(entry.getValue())); break;
                 case PASSWORD: getObject().setPassword((CommonUtils.toString(entry.getValue()).getBytes())); break;
+                case LOCKED: getObject().setLocked(CommonUtils.toBoolean(entry.getValue()));break;
+                case EXPIRED: getObject().setExpired(CommonUtils.toBoolean(entry.getValue()));break;
+                case UNTIL_TIME:getObject().setUntil_time(new Timestamp(CommonUtils.toLong(entry.getValue())));break;
                 default:
                     break;
             }
@@ -101,15 +105,43 @@ public class XuguCommandChangeUser extends DBECommandComposite<XuguUser, UserPro
     private boolean generateAlterScript(StringBuilder script) {
         boolean hasSet = false;
         script.append("ALTER USER ").append(getObject().getName()); //$NON-NLS-1$
-        //处理密码更改
-        if (getProperties().containsKey(UserPropertyHandler.PASSWORD.name())) {
-            script.append("\nIDENTIFIED BY ").append(SQLUtils.quoteString(getObject(), CommonUtils.toString(getProperties().get(UserPropertyHandler.PASSWORD.name())))).append(" ");
-            hasSet = true;
-        }
-        //处理用户名更改
-        else if(getProperties().containsKey(UserPropertyHandler.NAME.name())) {
-        	script.append("\nRENAME TO ").append(CommonUtils.toString(getProperties().get(UserPropertyHandler.NAME.name()))).append(" ");
-        	hasSet = true;
+        for(Map.Entry<Object, Object> entry:getProperties().entrySet()) {
+        	String delim = hasSet?",":"";
+        	switch(UserPropertyHandler.valueOf((String)entry.getKey())) {
+	        	//处理密码更改	
+	        	case PASSWORD:
+	        		script.append(delim);
+	        		script.append("\nIDENTIFIED BY ").append(SQLUtils.quoteString(getObject(), CommonUtils.toString(entry.getValue())));
+	                hasSet = true;
+	                break;
+	            //处理用户名更改
+	        	case NAME:
+	        		script.append(delim);
+	        		script.append("\nRENAME TO ").append(CommonUtils.toString(entry.getValue()));
+	            	hasSet = true;
+	            	break;
+	            //处理加锁
+	        	case LOCKED:
+	        		script.append(delim);
+	        		script.append("\nACCOUNT ");
+	        		script.append(CommonUtils.toBoolean(entry.getValue())?"LOCK":"UNLOCK");
+	        		hasSet = true;
+	        		break;
+	        	// 处理密码失效
+	        	case EXPIRED:
+	        		script.append(delim);
+	        		script.append(CommonUtils.toBoolean(entry.getValue())?"\nPASSWORD EXPIRE":"");
+	        		hasSet = CommonUtils.toBoolean(entry.getValue())?true:hasSet;
+	        		break;
+	        		// 处理密码失效
+	        	case UNTIL_TIME:
+	        		script.append(delim);
+	        		script.append("\nVALID UNTIL '").append(CommonUtils.toString(entry.getValue())).append("'");
+	        		hasSet = true;
+	        		break;
+	        	default:
+	        		break;
+        	}
         }
         return hasSet;
     }

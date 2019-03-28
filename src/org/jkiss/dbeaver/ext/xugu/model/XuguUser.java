@@ -77,9 +77,11 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
             this.is_role = JDBCUtils.safeGetBoolean(resultSet, "IS_ROLE");
             this.password = JDBCUtils.safeGetBytes(resultSet, "PASSWORD");
             this.start_time = JDBCUtils.safeGetTimestamp(resultSet, "START_TIME");
+            
             this.until_time = JDBCUtils.safeGetTimestamp(resultSet, "UNTIL_TIME");
             this.locked = JDBCUtils.safeGetBoolean(resultSet, "LOCKED");
             this.expired = JDBCUtils.safeGetBoolean(resultSet, "EXPIRED");
+            
             this.pass_set_time = JDBCUtils.safeGetTimestamp(resultSet, "PASS_SET_TIME");
             this.pass_set_period = JDBCUtils.safeGetTimestamp(resultSet, "PASS_SET_PERIOD");
             this.alias = JDBCUtils.safeGetString(resultSet, "ALIAS");
@@ -139,13 +141,25 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
 	public Timestamp getUntil_time() {
 		return until_time;
 	}
-
+	
+	public void setUntil_time(Timestamp time) {
+		this.until_time = time;
+	}
+	
 	public boolean isLocked() {
 		return locked;
 	}
 
+	public void setLocked(boolean locked) {
+		this.locked = locked;
+	}
+	
 	public boolean isExpired() {
 		return expired;
+	}
+	
+	public void setExpired(boolean expired) {
+		this.expired = expired;
 	}
 
 	public Timestamp getPass_set_time() {

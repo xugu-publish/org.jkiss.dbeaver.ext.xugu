@@ -74,6 +74,9 @@ public class XuguUserManager extends AbstractObjectManager<XuguUser> implements 
         if (copyFrom instanceof XuguUser) {
             XuguUser tplUser = (XuguUser)copyFrom;
             newUser.setName(tplUser.getName());
+            newUser.setPassword(tplUser.getPassword());
+            newUser.setLocked(tplUser.isLocked());
+            newUser.setExpired(tplUser.isExpired());
         }
         //创建新用户
         else {
@@ -95,7 +98,6 @@ public class XuguUserManager extends AbstractObjectManager<XuguUser> implements 
     public void filterCommands(DBECommandQueue<XuguUser> queue)
     {
     	System.out.println("Create3 ??"+queue.toString());
-
     }
 
     private static class CommandCreateUser extends DBECommandAbstract<XuguUser> {
@@ -123,23 +125,6 @@ public class XuguUserManager extends AbstractObjectManager<XuguUser> implements 
                             getObject().setPersisted(false);
                         }
                     }
-                }};
-        }
-    }
-
-    private static class CommandRenameUser extends DBECommandComposite<XuguUser, UserPropertyHandler> {
-        protected String newName;
-    	protected CommandRenameUser(XuguUser user, String newName)
-        {
-            super(user, XuguMessages.edit_user_manager_command_drop_user);
-            this.newName = newName;
-        }
-        @Override
-        public DBEPersistAction[] getPersistActions(DBRProgressMonitor monitor, Map<String, Object> options)
-        {
-            return new DBEPersistAction[] {
-                new SQLDatabasePersistAction(XuguMessages.edit_user_manager_command_drop_user, "ALTER USER " + getObject().getName() + " RENAME TO " +this.newName) { //$NON-NLS-2$
-                    
                 }};
         }
     }

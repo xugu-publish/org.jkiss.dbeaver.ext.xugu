@@ -42,7 +42,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * MySQLUserEditorGeneral
+ * XuguUserEditorGeneral
  */
 public class XuguUserEditorGeneral extends XuguUserEditorAbstract
 {
@@ -56,6 +56,9 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
     private Text userNameText;
     private Text passwordText;
     private Text confirmText;
+    private Button lockCheck;
+    private Button expireCheck;
+    private Text timeText;
     private String password="";
     //private Text hostText;
     private CommandListener commandlistener;
@@ -86,6 +89,16 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
 
             confirmText = UIUtils.createLabelText(loginGroup, XuguMessages.editors_user_editor_general_label_confirm, password, SWT.BORDER | SWT.PASSWORD);
             ControlPropertyCommandListener.create(this, confirmText, UserPropertyHandler.PASSWORD_CONFIRM);
+            
+            lockCheck =  UIUtils.createLabelCheckbox(loginGroup, "locked", getDatabaseObject().isLocked());
+            ControlPropertyCommandListener.create(this, lockCheck, UserPropertyHandler.LOCKED);
+            
+            expireCheck = UIUtils.createLabelCheckbox(loginGroup, "expired", getDatabaseObject().isExpired());
+            ControlPropertyCommandListener.create(this, expireCheck, UserPropertyHandler.EXPIRED);
+            
+            timeText = UIUtils.createLabelText(loginGroup, "Time", getDatabaseObject().getUntil_time().toString());
+            ControlPropertyCommandListener.create(this, timeText, UserPropertyHandler.UNTIL_TIME);
+            
         }
         pageControl.createProgressPanel();
 
