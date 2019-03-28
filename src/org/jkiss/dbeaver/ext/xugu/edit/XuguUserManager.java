@@ -17,10 +17,12 @@
  */
 package org.jkiss.dbeaver.ext.xugu.edit;
 
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.ext.xugu.XuguMessages;
 import org.jkiss.dbeaver.ext.xugu.model.XuguDataSource;
+import org.jkiss.dbeaver.ext.xugu.model.XuguRole;
 import org.jkiss.dbeaver.ext.xugu.model.XuguUser;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.edit.*;
@@ -51,7 +53,7 @@ public class XuguUserManager extends AbstractObjectManager<XuguUser> implements 
     @Override
     public DBSObjectCache<? extends DBSObject, XuguUser> getObjectsCache(XuguUser object)
     {
-        return null;
+        return object.getDataSource().userCache;
     }
 
     @Override
@@ -105,6 +107,20 @@ public class XuguUserManager extends AbstractObjectManager<XuguUser> implements 
         {
             super(user, XuguMessages.edit_user_manager_command_create_user);
             System.out.println("Create2 ??");
+        }
+        @Override
+        public DBEPersistAction[] getPersistActions(DBRProgressMonitor monitor, Map<String, Object> options)
+        {
+            return new DBEPersistAction[] {
+                new SQLDatabasePersistAction(XuguMessages.edit_user_manager_command_create_user, "CREATE USER " + getObject().getName()) { //$NON-NLS-2$
+                    @Override
+                    public void afterExecute(DBCSession session, Throwable error)
+                    {
+                        if (error == null) {
+                            getObject().setPersisted(true);
+                        }
+                    }
+                }};
         }
     }
 

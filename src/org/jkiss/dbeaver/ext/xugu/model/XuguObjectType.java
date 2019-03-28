@@ -31,6 +31,7 @@ import java.util.Map;
  * Object type
  */
 public enum XuguObjectType implements DBSObjectType {
+//	USER("USER", null, XuguUser.class, null),
 	TABLESPACE("TABLESPACE", null, XuguTablespace.class, null),
 	ROLE("ROLE", null, XuguRole.class, null),
 	CLUSTER("CLUSTER", null, DBSObject.class, null),

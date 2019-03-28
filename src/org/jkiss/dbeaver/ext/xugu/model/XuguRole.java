@@ -38,7 +38,7 @@ import java.sql.SQLException;
 import java.util.Collection;
 
 /**
- * OracleRole
+ * XuguRole
  */
 public class XuguRole extends XuguGlobalObject implements DBARole, DBPRefreshableObject
 {

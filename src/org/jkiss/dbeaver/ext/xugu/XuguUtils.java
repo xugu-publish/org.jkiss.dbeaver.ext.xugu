@@ -32,7 +32,7 @@ import java.sql.SQLException;
 import java.util.*;
 
 /**
- * MySQL utils
+ * Xugu utils
  */
 public class XuguUtils {
 
@@ -118,12 +118,6 @@ public class XuguUtils {
             privs.put(privName, "Y".equals(JDBCUtils.safeGetString(resultSet, privName + COLUMN_POSTFIX_PRIV)));
         }
         return privs;
-    }
-
-
-    public static String getMySQLConsoleBinaryName()
-    {
-        return RuntimeUtils.getNativeBinaryName("mysql");
     }
 
     public static String determineCurrentDatabase(JDBCSession session) throws DBCException {

@@ -839,13 +839,11 @@ public class XuguDataSource extends JDBCDataSource
         	schemasQuery.append("SELECT * FROM ");
         	schemasQuery.append(owner.roleFlag);
         	schemasQuery.append("_SCHEMAS");
-            System.out.println("QQQQQQ "+schemasQuery.toString());
             JDBCPreparedStatement dbStat = session.prepareStatement(schemasQuery.toString());
             if (schemaFilters != null) {
             	System.out.println("FFFilter is not null! 2");
                 JDBCUtils.setFilterParameters(dbStat, 1, schemaFilters);
             }
-            System.out.println("QQQQQQ "+dbStat.getQueryString());
             return dbStat;
         }
 

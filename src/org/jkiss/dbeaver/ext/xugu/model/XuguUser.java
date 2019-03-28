@@ -38,7 +38,7 @@ import java.sql.Timestamp;
 import java.util.Collection;
 
 /**
- * OracleUser
+ * XuguUser
  */
 public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshableObject, DBPSaveableObject
 {
@@ -182,17 +182,9 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
 		return trust_ip;
 	}
 
-//	public int getMem_quota() {
-//		return mem_quota;
-//	}
-
 	public int getTemp_space_quota() {
 		return temp_space_quota;
 	}
-
-//	public int getUndo_space_quota() {
-//		return undo_space_quota;
-//	}
 
 	public int getCursor_quota() {
 		return cursor_quota;
