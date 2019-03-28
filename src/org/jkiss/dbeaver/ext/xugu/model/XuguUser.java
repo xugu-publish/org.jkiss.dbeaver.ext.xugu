@@ -25,6 +25,7 @@ import org.jkiss.dbeaver.model.DBPSaveableObject;
 import org.jkiss.dbeaver.model.access.DBAUser;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
 import org.jkiss.dbeaver.model.meta.Association;
+import org.jkiss.dbeaver.model.meta.Property;
 //import org.jkiss.dbeaver.model.meta.IPropertyCacheValidator;
 //import org.jkiss.dbeaver.model.meta.LazyProperty;
 //import org.jkiss.dbeaver.model.meta.Property;
@@ -66,12 +67,6 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
     private int io_quota;
     private Timestamp create_time;
     private Timestamp last_modi_time;
-    
-    
-//    public XuguUser(XuguDataSource dataSource)
-//    {
-//        super(dataSource);
-//    }
 
     public XuguUser(XuguDataSource dataSource, ResultSet resultSet) {
         super(dataSource, true);
@@ -114,7 +109,9 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
 	}
 
 	@Override
+	@Property(viewable = true, order = 0)
 	public String getName() {
+		System.out.println("Wrong user name?? "+user_name);
 		return user_name;
 	}
 
