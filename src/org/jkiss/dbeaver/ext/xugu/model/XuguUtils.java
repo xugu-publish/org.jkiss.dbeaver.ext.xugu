@@ -77,8 +77,11 @@ public class XuguUtils {
     	JDBCStatement s = session.createStatement();
     	JDBCResultSet rs = s.executeQuery(sql);
     	if (rs.next()) {
-            return rs.getString(1);
+    		String res = rs.getString(1);
+    		rs.close();
+            return res;
     	}else {
+    		rs.close();
     		return null;
     	}
     }
