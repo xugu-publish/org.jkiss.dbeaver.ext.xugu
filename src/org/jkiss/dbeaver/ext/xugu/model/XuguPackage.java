@@ -78,12 +78,22 @@ public class XuguPackage extends XuguSchemaObject
         super(schema, name, false);
     }
 
+    @Override
+    @Property(viewable = true, editable = false, updatable = false, order=1)
+    public String getName() {
+    	return this.name;
+    }
+    
     @Property(viewable = true, order = 3)
     public boolean isValid()
     {
         return valid;
     }
 
+    public void setValid(boolean valid) {
+    	this.valid = valid;
+    }
+    
     @Override
     public XuguSourceType getSourceType()
     {

@@ -116,6 +116,10 @@ public class XuguProcedureStandalone extends XuguProcedureBase<XuguSchema> imple
         return valid;
     }
 
+    public void setValid(boolean valid) {
+    	this.valid = valid;
+    }
+    
     @Override
     public XuguSchema getSchema()
     {

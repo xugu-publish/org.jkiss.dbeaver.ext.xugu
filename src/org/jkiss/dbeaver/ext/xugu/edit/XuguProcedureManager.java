@@ -58,10 +58,12 @@ public class XuguProcedureManager extends SQLObjectEditor<XuguProcedureStandalon
                 if (!editPage.edit()) {
                     return null;
                 }
-                return new XuguProcedureStandalone(
-                    parent,
-                    editPage.getProcedureName(),
-                    editPage.getProcedureType());
+                XuguProcedureStandalone proc = new XuguProcedureStandalone(
+                        parent,
+                        editPage.getProcedureName(),
+                        editPage.getProcedureType());
+                proc.setValid(true);
+                return proc;
             }
         }.execute();
     }

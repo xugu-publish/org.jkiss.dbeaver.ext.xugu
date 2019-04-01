@@ -83,7 +83,7 @@ public class XuguSequence extends XuguSchemaObject implements DBSSequence {
 
     @NotNull
     @Override
-    @Property(viewable = true, editable = true, valueTransformer = DBObjectNameCaseTransformer.class, order = 1)
+    @Property(viewable = true, editable = false, updatable = false,  valueTransformer = DBObjectNameCaseTransformer.class, order = 1)
     public String getName()
     {
         return super.getName();

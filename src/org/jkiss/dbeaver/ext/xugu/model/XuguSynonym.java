@@ -60,37 +60,28 @@ public class XuguSynonym extends XuguSchemaObject implements DBSAlias {
             this.targetName = JDBCUtils.safeGetString(dbResult, "TARG_NAME");
             this.is_pub = JDBCUtils.safeGetBoolean(dbResult, "IS_PUBLIC");
             this.valid = JDBCUtils.safeGetBoolean(dbResult, "VALID");
-//            this.deleted = JDBCUtils.safeGetBoolean(dbResult, "DELETED");
             this.createTime = JDBCUtils.safeGetDate(dbResult, "CREATE_TIME");
-//            this.dbLink = JDBCUtils.safeGetString(dbResult, "DB_LINK");
         }
     }
 
     @NotNull
     @Override
-    @Property(viewable = true, editable = true, valueTransformer = DBObjectNameCaseTransformer.class, order = 1)
+    @Property(viewable = true, editable = false, updatable=false, valueTransformer = DBObjectNameCaseTransformer.class, order = 1)
     public String getName()
     {
         return super.getName();
     }
     
+    @Property(viewable = true, editable = true, updatable=true, valueTransformer = DBObjectNameCaseTransformer.class, order = 2)
     public String getTargetName() {
     	return targetName;
     }
 
-    @Property(viewable = true, order = 3)
     public Object getObjectOwner()
     {
         final XuguSchema schema = getDataSource().schemaCache.getCachedObject(objectSchemaName);
         return schema == null ? objectSchemaName : schema;
     }
-
-
-//    @Property(viewable = true, order = 5)
-//    public Object getDbLink(DBRProgressMonitor monitor) throws DBException
-//    {
-//        return XuguDBLink.resolveObject(monitor, getSchema(), dbLink);
-//    }
 
     @Override
     public DBSObject getTargetObject(DBRProgressMonitor monitor) throws DBException {

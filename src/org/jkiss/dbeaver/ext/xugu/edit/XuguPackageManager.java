@@ -80,6 +80,7 @@ public class XuguPackageManager extends SQLObjectEditor<XuguPackage, XuguSchema>
                         "AS\n" +
                         "-- Package body\n" +
                         "END " + packName +";");
+                xuguPackage.setValid(true);
                 return xuguPackage;
             }
         }.execute();

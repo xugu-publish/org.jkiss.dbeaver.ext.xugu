@@ -25,9 +25,11 @@ import org.jkiss.dbeaver.model.impl.DBSObjectCache;
 import org.jkiss.dbeaver.model.impl.edit.SQLDatabasePersistAction;
 import org.jkiss.dbeaver.model.impl.sql.edit.SQLObjectEditor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.dbeaver.model.struct.DBSEntityType;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.ui.UITask;
 import org.jkiss.dbeaver.ui.UIUtils;
+import org.jkiss.dbeaver.ui.editors.object.struct.EntityEditPage;
 
 public class XuguSynonymManager extends SQLObjectEditor<XuguSynonym, XuguSchema> implements DBEObjectRenamer<XuguSynonym> {
 	@Override
@@ -46,7 +48,7 @@ public class XuguSynonymManager extends SQLObjectEditor<XuguSynonym, XuguSchema>
                 if (dialog.open() != IDialogConstants.OK_ID) {
                     return null;
                 }
-                XuguSynonym newSynonym = dialog.getSynonym();
+            	XuguSynonym newSynonym = dialog.getSynonym();
                 return newSynonym;
             }
         }.execute();
