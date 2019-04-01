@@ -82,68 +82,6 @@ public class XuguUDTManager extends SQLObjectEditor<XuguUDT, XuguSchema>{
 		// TODO Auto-generated method stub
 		return object.getSchema().udtCache;
 	}
-	
-	static class NewUDTDialog extends Dialog {
-    	
-    	private XuguUDT udt;
-        private Text nameText;
-        private Text headText;
-        private Text bodyText;
-
-        public NewUDTDialog(Shell parentShell, XuguSchema schema)
-        {
-            super(parentShell);
-            this.udt = new XuguUDT(schema, null);  
-        }
-
-        public XuguUDT getUDT()
-        {
-            return udt;
-        }
-        
-        @Override
-        protected boolean isResizable()
-        {
-            return true;
-        }
-        
-        @Override
-        protected Point getInitialSize() {
-        	return new Point(300, 200);
-        }
-        
-        @Override
-        protected Control createDialogArea(Composite parent)
-        {
-            getShell().setText(XuguMessages.dialog_synonym_create_title);
-
-            Control container = super.createDialogArea(parent);
-            Composite composite = UIUtils.createPlaceholder((Composite) container, 2, 5);
-            composite.setLayoutData(new GridData(GridData.FILL_BOTH));
-            
-            nameText = UIUtils.createLabelText(composite, XuguMessages.dialog_synonym_name, null);
-            nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-            
-            headText = UIUtils.createLabelText(composite, XuguMessages.dialog_synonym_target, null);
-            headText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-            bodyText = UIUtils.createLabelText(composite, XuguMessages.dialog_synonym_name, null);
-            bodyText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-            
-            UIUtils.createInfoLabel(composite, XuguMessages.dialog_synonym_create_info, GridData.FILL_HORIZONTAL, 2);
-
-            return parent;
-        }
-
-        @Override
-        protected void okPressed()
-        {
-            udt.setName(DBObjectNameCaseTransformer.transformObjectName(udt, nameText.getText()));
-            udt.setTypeHead(DBObjectNameCaseTransformer.transformObjectName(udt, headText.getText()));
-            udt.setTypeBody(DBObjectNameCaseTransformer.transformObjectName(udt, bodyText.getText()));
-            super.okPressed();
-        }
-    }
 }
 
 
