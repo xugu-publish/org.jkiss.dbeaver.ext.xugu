@@ -128,6 +128,10 @@
                         	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguSynonym" label="%tree.synonyms.node.name" icon="#synonyms" description="Synonyms">
                             	<items label="%tree.synonym.node.name" path="synonym" property="synonyms" icon="#synonym"/>
                         	</folder>
+                        	<!--自定义数据类型-->        
+                        	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguUDT" label="%tree.UDTs.node.name" icon="#synonyms" description="UDTs">
+                            	<items label="%tree.UDT.node.name" path="UDT" property="UDTs" icon="#synonym"/>
+                        	</folder>
                         	<!--作业-->
 	                        <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguSchedulerJob" label="%tree.scheduler.jobs.node.name" icon="#scheduler_job_folder" description="Scheduler jobs">
                                 <items label="%tree.scheduler.job.node.name" path="schedulerJob" property="schedulerJobs" icon="icons/scheduled_job.png">

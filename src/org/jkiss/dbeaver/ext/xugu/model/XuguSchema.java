@@ -64,6 +64,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
     final public SequenceCache sequenceCache = new SequenceCache();
     final public PackageCache packageCache = new PackageCache();
     final public SynonymCache synonymCache = new SynonymCache();
+    final public UDTCache udtCache = new UDTCache();
 //    final public DBLinkCache dbLinkCache = new DBLinkCache();
     final public ProceduresCache proceduresCache = new ProceduresCache();
     final public SchedulerJobCache schedulerJobCache = new SchedulerJobCache();
@@ -359,6 +360,34 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         return synonym;
     }
 
+    /**
+     * 从用户自定义数据类型缓存中获取全部的自定义数据类型信息
+     * @param monitor 监控
+     * @return list 数据类型列表
+     * @throws DBException
+     */
+    @Association
+    public Collection<XuguUDT> getUDTs(DBRProgressMonitor monitor)
+        throws DBException
+    {
+        Collection<XuguUDT> list = udtCache.getAllObjects(monitor, this);
+        return list;
+    }
+
+    /**
+     * 根据指定的用户自定义数据类型名从缓存中获取指定的数据类型信息
+     * @param monitor 监控
+     * @param name 数据类型名
+     * @return udt 数据类型对象
+     * @throws DBException
+     */
+    public XuguUDT getUDT(DBRProgressMonitor monitor, String name)
+        throws DBException
+    {
+        XuguUDT udt = udtCache.getObject(monitor, this, name, XuguUDT.class);
+        return udt;
+    }
+    
     /**
      * 从触发器缓存中获取全部的触发器信息
      * @param monitor 监控
@@ -1039,7 +1068,31 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
             return new XuguSynonym(owner, resultSet);
         }
     }
+    
+    /**
+     *	用户自定义数据类型缓存
+     */
+    static class UDTCache extends JDBCObjectCache<XuguSchema, XuguUDT> {
+        @Override
+        protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguSchema owner) throws SQLException
+        {
+        	//xfc 修改了获取同义词信息的语句
+        	StringBuilder sql = new StringBuilder();
+        	sql.append("SELECT * FROM ");
+        	sql.append(owner.roleFlag);
+        	sql.append("_TYPES WHERE SCHEMA_ID=");
+        	sql.append(owner.id);
+            JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
+            return dbStat;
+        }
 
+        @Override
+        protected XuguUDT fetchObject(@NotNull JDBCSession session, @NotNull XuguSchema owner, @NotNull JDBCResultSet resultSet) throws SQLException, DBException
+        {
+            return new XuguUDT(owner, resultSet);
+        }
+    }
+    
     /**
      *	视图缓存
      */
