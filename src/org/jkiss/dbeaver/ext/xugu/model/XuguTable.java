@@ -98,6 +98,9 @@ public class XuguTable extends XuguTablePhysical implements DBPScriptObject
         super(schema, dbResult);
         //xfc 修改了模式名获取的方式
         if(dbResult!=null) {
+        	//结果集不为空时，persisted设为true
+            this.setPersisted(true);
+            
         	this.table_name = JDBCUtils.safeGetString(dbResult, "TABLE_NAME");
         	this.db_id = JDBCUtils.safeGetInt(dbResult, "DB_ID");
         	this.user_id = JDBCUtils.safeGetInt(dbResult, "USER_ID");
