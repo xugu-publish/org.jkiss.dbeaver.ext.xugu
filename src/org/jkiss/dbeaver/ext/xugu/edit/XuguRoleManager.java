@@ -19,8 +19,10 @@ package org.jkiss.dbeaver.ext.xugu.edit;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -74,17 +76,21 @@ public class XuguRoleManager extends SQLObjectEditor<XuguRole, XuguDataSource> i
     @Override
     protected XuguRole createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final XuguDataSource parent, Object copyFrom)
     {
-        return new UITask<XuguRole>() {
-            @Override
-            protected XuguRole runTask() {
-                NewRoleDialog dialog = new NewRoleDialog(UIUtils.getActiveWorkbenchShell(), parent);
-                if (dialog.open() != IDialogConstants.OK_ID) {
-                    return null;
+    	if("SYS".equals(parent.getRoleFlag())){
+    		return new UITask<XuguRole>() {
+                @Override
+                protected XuguRole runTask() {
+                    NewRoleDialog dialog = new NewRoleDialog(UIUtils.getActiveWorkbenchShell(), parent);
+                    if (dialog.open() != IDialogConstants.OK_ID) {
+                        return null;
+                    }
+                    XuguRole newRole = dialog.getRole();
+                    return newRole;
                 }
-                XuguRole newRole = dialog.getRole();
-                return newRole;
-            }
-        }.execute();
+            }.execute();
+    	}else {
+    		return null;
+    	}
     }
 
     @Override
@@ -114,12 +120,11 @@ public class XuguRoleManager extends SQLObjectEditor<XuguRole, XuguDataSource> i
     {
         throw new DBException("Direct database rename is not yet implemented in Xugu. You should use export/import functions for that.");
     }
-
+    
     static class NewRoleDialog extends Dialog {
     	
     	private XuguRole role;
         private Text roleText;
-        //private Text dbNameText;
         private Text userNameText;
 		
 
