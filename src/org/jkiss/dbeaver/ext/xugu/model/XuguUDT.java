@@ -18,6 +18,8 @@ package org.jkiss.dbeaver.ext.xugu.model;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.ext.xugu.model.source.XuguSourceObject;
+import org.jkiss.dbeaver.model.DBPScriptObjectExt;
 import org.jkiss.dbeaver.model.impl.DBObjectNameCaseTransformer;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
 import org.jkiss.dbeaver.model.meta.Property;
@@ -27,11 +29,12 @@ import org.jkiss.dbeaver.model.struct.DBSObject;
 
 import java.sql.Date;
 import java.sql.ResultSet;
+import java.util.Map;
 
 /**
- * Xugu synonym
+ * Xugu UDT
  */
-public class XuguUDT extends XuguSchemaObject implements DBSAlias {
+public class XuguUDT extends XuguSchemaObject{
 
 	private String typeName;
 	private String objectSchemaName;
@@ -50,44 +53,42 @@ public class XuguUDT extends XuguSchemaObject implements DBSAlias {
 
     @NotNull
     @Override
-    @Property(viewable = true, editable = true, valueTransformer = DBObjectNameCaseTransformer.class, order = 1)
+    @Property(viewable = true, editable = false, valueTransformer = DBObjectNameCaseTransformer.class, order = 1)
     public String getName()
     {
         return this.typeName;
     }
     
-    @Property(viewable = true, editable = true, multiline = true, valueTransformer = DBObjectNameCaseTransformer.class, order = 2)
+    @Property(viewable = true, editable = true, updatable=true, multiline = true, valueTransformer = DBObjectNameCaseTransformer.class, order = 2)
     public String getTypeHead()
     {
         return this.typeHead;
     }
     
-    @Property(viewable = true, editable = true, multiline = true, valueTransformer = DBObjectNameCaseTransformer.class, order = 3)
+    @Property(viewable = true, editable = true, updatable=true, multiline = true, valueTransformer = DBObjectNameCaseTransformer.class, order = 3)
     public String getTypeBody()
     {
         return this.typeBody;
     }
 
-//    @Property(viewable = false, editable = false)
     public Object getObjectOwner()
     {
         final XuguSchema schema = getDataSource().schemaCache.getCachedObject(objectSchemaName);
         return schema == null ? objectSchemaName : schema;
-    }
-
-    @Override
-    public DBSObject getTargetObject(DBRProgressMonitor monitor) throws DBException {
-        Object object = getObject(monitor);
-        if (object instanceof DBSObject) {
-            return (DBSObject) object;
-        }
-        return null;
     }
     
     @Override
     public void setName(String name) {
     	this.name = name;
     	this.typeName = name;
+    }
+    
+    public void setTypeHead(String head) {
+    	this.typeHead = head;
+    }
+    
+    public void setTypeBody(String body) {
+    	this.typeBody = body;
     }
 
     public Object getObject(DBRProgressMonitor monitor) throws DBException {

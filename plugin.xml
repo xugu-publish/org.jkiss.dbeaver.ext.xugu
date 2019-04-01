@@ -260,6 +260,7 @@
     	<manager class="org.jkiss.dbeaver.ext.xugu.edit.XuguSynonymManager" objectType="org.jkiss.dbeaver.ext.xugu.model.XuguSynonym"/>
     	<manager class="org.jkiss.dbeaver.ext.xugu.edit.XuguTablespaceManager" objectType="org.jkiss.dbeaver.ext.xugu.model.XuguTablespace"/>
     	<manager class="org.jkiss.dbeaver.ext.xugu.edit.XuguRoleManager" objectType="org.jkiss.dbeaver.ext.xugu.model.XuguRole"/>
+    	<manager class="org.jkiss.dbeaver.ext.xugu.edit.XuguUDTManager" objectType="org.jkiss.dbeaver.ext.xugu.model.XuguUDT"/>
     </extension>
     
     <extension point="org.jkiss.dbeaver.databaseEditor">
