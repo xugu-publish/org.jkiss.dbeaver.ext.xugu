@@ -52,11 +52,17 @@ public class XuguRole extends XuguGlobalObject implements DBARole, DBPRefreshabl
 
     public XuguRole(XuguDataSource dataSource, ResultSet resultSet) {
         super(dataSource, true);
-        if(resultSet!=null) {
-        	this.name = JDBCUtils.safeGetString(resultSet, "USER_NAME");
-            this.id = JDBCUtils.safeGetInt(resultSet, "USER_ID");
-            this.authentication = JDBCUtils.safeGetString(resultSet, "PASSWORD");
-        }
+        try {
+        	if(resultSet!=null) {
+        		if(resultSet.getMetaData().getColumnCount()!=1) {
+        			this.name = JDBCUtils.safeGetString(resultSet, "USER_NAME");
+                    this.id = JDBCUtils.safeGetInt(resultSet, "USER_ID");
+                    this.authentication = JDBCUtils.safeGetString(resultSet, "PASSWORD");
+    			}
+        	}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
     }
 
     @NotNull

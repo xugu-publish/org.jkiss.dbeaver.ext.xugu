@@ -320,7 +320,11 @@ public class XuguDataSource extends JDBCDataSource
 
     @Association
     public Collection<XuguRole> getRoles(DBRProgressMonitor monitor) throws DBException {
-        return roleCache.getAllObjects(monitor, this);
+    	if("SYS".equals(this.roleFlag)){
+    		return roleCache.getAllObjects(monitor, this);
+    	}else {
+    		return null;
+    	}
     }
 
     @Association
@@ -414,7 +418,9 @@ public class XuguDataSource extends JDBCDataSource
         this.tablespaceCache.clearCache();
         this.userCache.clearCache();
         this.profileCache.clearCache();
-        this.roleCache.clearCache();
+        if("SYS".equals(this.roleFlag)) {
+        	this.roleCache.clearCache();
+        }
         this.setActiveSchemaName(null);
 
         this.initialize(monitor);
@@ -926,11 +932,17 @@ public class XuguDataSource extends JDBCDataSource
         }
     }
 
-    static class RoleCache extends JDBCObjectCache<XuguDataSource, XuguRole> {
+    class RoleCache extends JDBCObjectCache<XuguDataSource, XuguRole> {
         @Override
         protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguDataSource owner) throws SQLException {
-            return session.prepareStatement(
-                "SELECT * FROM SYS_USERS WHERE IS_ROLE=true");
+            if("SYS".equals(getRoleFlag())) {
+            	return session.prepareStatement(
+                        "SELECT * FROM SYS_USERS WHERE IS_ROLE=true");
+            }else {
+            	JDBCStatement stmt = session.createStatement();
+            	stmt.setQueryString("SELECT * FROM DUAL");
+            	return stmt;
+            }
         }
 
         @Override
