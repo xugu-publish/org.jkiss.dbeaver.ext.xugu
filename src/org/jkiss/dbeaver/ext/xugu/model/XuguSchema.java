@@ -139,11 +139,6 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         return id;
     }
 
-//    @Property(order = 190)
-//    public Date getCreateTime() {
-//        return createTime;
-//    }
-
     @NotNull
     @Override
     @Property(viewable = true, editable = true, order = 1)
@@ -547,7 +542,6 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         sequenceCache.clearCache();
         synonymCache.clearCache();
         schedulerJobCache.clearCache();
-        //recycleBin.clearCache();
         return this.getDataSource().schemaCache.refreshObject(monitor, this.getDataSource(), this);
     }
 

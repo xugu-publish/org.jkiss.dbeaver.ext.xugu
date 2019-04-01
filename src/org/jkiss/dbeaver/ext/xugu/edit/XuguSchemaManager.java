@@ -115,8 +115,10 @@ public class XuguSchemaManager extends SQLObjectEditor<XuguSchema, XuguDataSourc
     }
     
     @Override
-	public void renameObject(DBECommandContext commandContext, XuguSchema object, String newName) throws DBException {
-		processObjectRename(commandContext, object, newName);
+	public void renameObject(DBECommandContext commandContext, XuguSchema object, String newName) throws DBException {		
+    	processObjectRename(commandContext, object, newName);
+    	//在执行完重命名后，修改对象名称（用于前台数据刷新）
+    	object.setName(newName);
 	}
 
 	@Override

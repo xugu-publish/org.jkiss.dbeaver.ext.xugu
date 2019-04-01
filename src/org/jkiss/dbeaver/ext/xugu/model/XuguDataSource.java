@@ -414,7 +414,6 @@ public class XuguDataSource extends JDBCDataSource
         super.refreshObject(monitor);
 
         this.schemaCache.clearCache();
-        //this.dataTypeCache.clearCache();
         this.tablespaceCache.clearCache();
         this.userCache.clearCache();
         this.profileCache.clearCache();
