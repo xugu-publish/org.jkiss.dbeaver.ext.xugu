@@ -79,9 +79,11 @@ public class XuguUtils {
     	if (rs.next()) {
     		String res = rs.getString(1);
     		rs.close();
+    		s.close();
             return res;
     	}else {
     		rs.close();
+    		s.close();
     		return null;
     	}
     }
