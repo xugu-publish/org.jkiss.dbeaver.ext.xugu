@@ -35,6 +35,7 @@ import org.jkiss.dbeaver.model.impl.jdbc.cache.JDBCStructLookupCache;
 import org.jkiss.dbeaver.model.meta.Association;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.dbeaver.model.struct.DBSDataType;
 import org.jkiss.dbeaver.model.struct.DBSEntity;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.rdb.DBSProcedureContainer;
@@ -171,6 +172,10 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
     
     public String getRoleFlag() {
     	return roleFlag;
+    }
+    
+    public Collection<? extends DBSDataType> getLocalDataTypes() {
+        return udtCache.getCachedObjects();
     }
 
     /**
@@ -460,6 +465,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         children.addAll(sequenceCache.getAllObjects(monitor, this));
         children.addAll(packageCache.getAllObjects(monitor, this));
         children.addAll(synonymCache.getAllObjects(monitor, this));
+        children.addAll(udtCache.getAllObjects(monitor, this));
 //        children.addAll(dbLinkCache.getAllObjects(monitor, this));
         children.addAll(schedulerJobCache.getAllObjects(monitor, this));
         return children;
@@ -520,6 +526,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
             packageCache.getAllObjects(monitor, this);
             monitor.subTask("Cache synonyms");
             synonymCache.getAllObjects(monitor, this);
+            udtCache.getAllObjects(monitor, this);
 //            monitor.subTask("Cache dblink");
 //            dbLinkCache.getAllObjects(monitor, this);
             monitor.subTask("Cache job");
@@ -541,6 +548,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         dataTypeCache.clearCache();
         sequenceCache.clearCache();
         synonymCache.clearCache();
+        udtCache.clearCache();
         schedulerJobCache.clearCache();
         return this.getDataSource().schemaCache.refreshObject(monitor, this.getDataSource(), this);
     }

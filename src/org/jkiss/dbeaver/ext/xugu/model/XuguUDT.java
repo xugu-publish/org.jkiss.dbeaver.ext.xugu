@@ -19,13 +19,17 @@ package org.jkiss.dbeaver.ext.xugu.model;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.ext.xugu.model.source.XuguSourceObject;
+import org.jkiss.dbeaver.model.DBPDataKind;
 import org.jkiss.dbeaver.model.DBPScriptObjectExt;
+import org.jkiss.dbeaver.model.exec.DBCLogicalOperator;
 import org.jkiss.dbeaver.model.impl.DBObjectNameCaseTransformer;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSAlias;
+import org.jkiss.dbeaver.model.struct.DBSDataType;
 import org.jkiss.dbeaver.model.struct.DBSObject;
+import org.jkiss.dbeaver.model.struct.DBSTypedObject;
 
 import java.sql.Date;
 import java.sql.ResultSet;
@@ -34,7 +38,7 @@ import java.util.Map;
 /**
  * Xugu UDT
  */
-public class XuguUDT extends XuguSchemaObject{
+public class XuguUDT extends XuguSchemaObject implements DBSDataType{
 
 	private String typeName;
 	private String objectSchemaName;
@@ -99,5 +103,70 @@ public class XuguUDT extends XuguSchemaObject{
             "UDT",
             objectSchemaName,
             typeName);
+	}
+
+	@Override
+	public String getTypeName() {
+		if(typeName.indexOf(".")!=-1) {
+			return typeName.split(".")[1];
+		}else {
+			return typeName;
+		}
+	}
+
+	@Override
+	public String getFullTypeName() {
+		return typeName;
+	}
+
+	@Override
+	public int getTypeID() {
+		return 0;
+	}
+
+	@Override
+	public DBPDataKind getDataKind() {
+		// TODO Auto-generated method stub
+		return DBPDataKind.OBJECT;
+	}
+
+	@Override
+	public Integer getScale() {
+		return -1;
+	}
+
+	@Override
+	public Integer getPrecision() {
+		return -1;
+	}
+
+	@Override
+	public long getMaxLength() {
+		return -1;
+	}
+
+	@Override
+	public Object geTypeExtension() {
+		return null;
+	}
+
+	@Override
+	public DBSDataType getComponentType(DBRProgressMonitor monitor) throws DBException {
+		return null;
+	}
+
+	@Override
+	public int getMinScale() {
+		return -1;
+	}
+
+	@Override
+	public int getMaxScale() {
+		return -1;
+	}
+
+	@Override
+	public DBCLogicalOperator[] getSupportedOperators(DBSTypedObject attribute) {
+		return null;
 	}
 }

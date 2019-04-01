@@ -150,7 +150,7 @@ public class XuguTableColumn extends JDBCTableColumn<XuguTableBase> implements D
             if (this.type != null) {
                 this.typeName = type.getFullyQualifiedName(DBPEvaluationContext.DDL);
                 this.valueType = type.getTypeID();
-                this.maxLength = this.type.getLength();
+//                this.maxLength = this.type.getLength();
                 if("NUMERIC".equals(this.typeName)){
                 	this.scale = JDBCUtils.safeGetInt(dbResult, "SCALE")%65536;
                 	this.precision = (JDBCUtils.safeGetInt(dbResult, "SCALE")-this.scale)/65536;
@@ -309,12 +309,16 @@ public class XuguTableColumn extends JDBCTableColumn<XuguTableBase> implements D
         @Override
         public Object[] getPossibleValues(XuguTableColumn column)
         {
-            List<DBSDataType> dataTypes = new ArrayList<>(column.getTable().getDataSource().getLocalDataTypes());
+        	List<DBSDataType> dataTypes = new ArrayList<>(column.getTable().getDataSource().getLocalDataTypes());
+        	List<DBSDataType> dataTypes2 = new ArrayList<>(column.getTable().getSchema().getLocalDataTypes());
             if (!dataTypes.contains(column.getDataType())) {
             	XuguDataType t=column.getDataType();
             	if(t!=null) {
             		dataTypes.add(column.getDataType());
             	}
+            }
+            for(DBSDataType t:dataTypes2) {
+            	dataTypes.add(t);
             }
             Collections.sort(dataTypes, DBUtils.nameComparator());
             return dataTypes.toArray(new DBSDataType[dataTypes.size()]);
