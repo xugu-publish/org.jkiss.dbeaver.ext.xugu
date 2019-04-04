@@ -78,7 +78,7 @@
                                     	</items>
                                 	</folder>
                                 	<!--表分区-->
-                                	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguPartitionBase" label="%tree.partitions.node.name" icon="#partitions" description="Table partitions">
+                                	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguTablePartition" label="%tree.partitions.node.name" icon="#partitions" description="Table partitions">
 	                                    <items label="%tree.partition.node.name" path="partition" property="partitions" icon="#partition">
 	                                    </items>
                                 	</folder>
@@ -261,6 +261,7 @@
     	<manager class="org.jkiss.dbeaver.ext.xugu.edit.XuguTablespaceManager" objectType="org.jkiss.dbeaver.ext.xugu.model.XuguTablespace"/>
     	<manager class="org.jkiss.dbeaver.ext.xugu.edit.XuguRoleManager" objectType="org.jkiss.dbeaver.ext.xugu.model.XuguRole"/>
     	<manager class="org.jkiss.dbeaver.ext.xugu.edit.XuguUDTManager" objectType="org.jkiss.dbeaver.ext.xugu.model.XuguUDT"/>
+    	<manager class="org.jkiss.dbeaver.ext.xugu.edit.XuguTablePartitionManager" objectType="org.jkiss.dbeaver.ext.xugu.model.XuguTablePartition"/>
     </extension>
     
     <extension point="org.jkiss.dbeaver.databaseEditor">

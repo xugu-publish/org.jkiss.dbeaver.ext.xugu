@@ -33,10 +33,12 @@ import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 //import org.jkiss.dbeaver.model.struct.DBSObjectLazy;
-
+import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Collection;
+import java.util.Vector;
 
 /**
  * XuguUser
@@ -68,10 +70,18 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
     private int io_quota;
     private Timestamp create_time;
     private Timestamp last_modi_time;
+    private Connection conn;
 
     public XuguUser(XuguDataSource dataSource, ResultSet resultSet) {
         super(dataSource, true);
         if(resultSet!=null) {
+        	try {
+				conn = resultSet.getStatement().getConnection();
+//				loadGrants();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
         	this.db_id = JDBCUtils.safeGetInt(resultSet, "DB_ID");
             this.user_id = JDBCUtils.safeGetInt(resultSet, "USER_ID");
             this.user_name = JDBCUtils.safeGetString(resultSet, "USER_NAME");
@@ -214,4 +224,14 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
 	public DBSObject refreshObject(DBRProgressMonitor monitor) throws DBException {
 		return this.getDataSource().userCache.refreshObject(monitor, this.getDataSource(), this);
 	}
+	
+//	public void loadGrants() {
+//		// 获取connection
+//		System.out.println("ok?");
+//		new TestClass().print();
+//		System.out.println("ok?");
+//		new Parsing().loadDDL((com.xugu.cloudjdbc.Connection) this.conn, "SYSDBA", "TEST1");
+//		Vector<Object> grants = new LoadPermission().loadPermission(this.conn, this.user_name);
+//		System.out.println(grants.size());
+//	}
 }

@@ -47,6 +47,13 @@ public abstract class XuguPartitionBase<PARENT extends DBSObject> extends XuguOb
     private String partiKey;
     private int partiType;
 
+    protected XuguPartitionBase(PARENT xuguTable,
+	        boolean subpartition, String name) {
+    	super(
+    			xuguTable, name,
+                true);
+	}
+    
     protected XuguPartitionBase(PARENT parent, boolean subpartition, ResultSet dbResult)
     {
         super(
@@ -100,9 +107,18 @@ public abstract class XuguPartitionBase<PARENT extends DBSObject> extends XuguOb
         return partiValue;
     }
 
+    public void setPartiValue(String value)
+    {
+    	this.partiValue = value;
+    }
+    
     @Property(viewable = true, order = 5)
     public boolean isOnline()
     {
         return online;
+    }
+    
+    public void setOnline(boolean flag) {
+    	this.online = flag;
     }
 }

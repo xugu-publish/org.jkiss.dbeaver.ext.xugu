@@ -30,8 +30,12 @@ import java.util.List;
 public class XuguTablePartition extends XuguPartitionBase<XuguTablePhysical> {
 
 //    private List<XuguTablePartition> subPartitions;
-
-    protected XuguTablePartition(
+	public XuguTablePartition(XuguTablePhysical xuguTable,
+	        boolean subpartition, String name) {
+		super(xuguTable, subpartition, name);
+	}
+	
+    public XuguTablePartition(
         XuguTablePhysical xuguTable,
         boolean subpartition,
         ResultSet dbResult)

@@ -39,7 +39,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * OracleTableTriggerManager
+ * XuguTableTriggerManager
  */
 public class XuguTableTriggerManager extends SQLTriggerManager<XuguTableTrigger, XuguTableBase> {
 	private final static Pattern PATTERN_TRIGGER = Pattern.compile("(TRIGGER)", Pattern.CASE_INSENSITIVE);
