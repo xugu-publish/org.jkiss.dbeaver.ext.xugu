@@ -63,6 +63,10 @@ public class XuguMessages extends NLS {
 	public static String dialog_tablespace_nodeID;
 	public static String dialog_tablespace_filePath;
 	public static String dialog_tablespace_create_info;
+	public static String dialog_tablePartition_create_title;
+	public static String dialog_tablePartition_name;
+	public static String dialog_tablePartition_value;
+	public static String dialog_tablePartition_create_info;
 	public static String dialog_synonym_create_title;
 	public static String dialog_synonym_name;
 	public static String dialog_synonym_target;

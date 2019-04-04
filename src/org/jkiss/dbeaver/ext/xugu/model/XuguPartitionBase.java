@@ -40,7 +40,6 @@ public abstract class XuguPartitionBase<PARENT extends DBSObject> extends XuguOb
         LIST,
     }
     
-    private String partiName;
     private String partiValue;
     private int partiNo;
     private boolean online;
@@ -62,17 +61,17 @@ public abstract class XuguPartitionBase<PARENT extends DBSObject> extends XuguOb
                 JDBCUtils.safeGetString(dbResult, "SUBPARTI_NAME") :
                 JDBCUtils.safeGetString(dbResult, "PARTI_NAME"),
             true);
-        this.partiName = subpartition? JDBCUtils.safeGetString(dbResult, "SUBPARTI_NAME"):JDBCUtils.safeGetString(dbResult, "PARTI_NAME");
+//        this.partiName = subpartition? JDBCUtils.safeGetString(dbResult, "SUBPARTI_NAME"):JDBCUtils.safeGetString(dbResult, "PARTI_NAME");
         this.partiValue = subpartition? JDBCUtils.safeGetString(dbResult, "SUBPARTI_VAL") : JDBCUtils.safeGetString(dbResult, "PARTI_VAL");
         this.partiNo = subpartition? JDBCUtils.safeGetInt(dbResult, "SUBPARTI_NO") : JDBCUtils.safeGetInt(dbResult, "PARTI_NO");
         this.online = subpartition? true : JDBCUtils.safeGetBoolean(dbResult, "ONLINE");
         this.partiKey = subpartition? JDBCUtils.safeGetString(dbResult, "SUBPARTI_KEY"):JDBCUtils.safeGetString(dbResult, "PARTI_KEY");
         this.partiType = subpartition? JDBCUtils.safeGetInt(dbResult, "SUBPARTI_TYPE"):JDBCUtils.safeGetInt(dbResult, "PARTI_TYPE");
     }
-    @Property(viewable=true, order=0)
-    public String getPartiName() {
-    	return partiName;
-    }
+//    @Property(viewable=true, order=0)
+//    public String getPartiName() {
+//    	return partiName;
+//    }
     
     @Property(viewable = true, order = 1)
     public int getPartiNo()
@@ -94,9 +93,27 @@ public abstract class XuguPartitionBase<PARENT extends DBSObject> extends XuguOb
     	}
     }
     
+    public void setPartiType(String partiType) {
+    	switch(partiType) {
+    	case "Range":
+    		this.partiType = 1;
+    		break;
+    	case "List":
+    		this.partiType = 2;
+    		break;
+    	case "Hash":
+    		this.partiType = 3;
+    		break;
+    	}
+    }
+    
     @Property(viewable=true, order=3)
     public String getPartiKey() {
     	return partiKey;
+    }
+    
+    public void setPartiKey(String partiKey) {
+    	this.partiKey = partiKey;
     }
     
     @Property(viewable = true, order = 4)
@@ -112,7 +129,7 @@ public abstract class XuguPartitionBase<PARENT extends DBSObject> extends XuguOb
     	this.partiValue = value;
     }
     
-    @Property(viewable = true, order = 5)
+    @Property(viewable = true, order = 5, updatable=true, editable=true)
     public boolean isOnline()
     {
         return online;

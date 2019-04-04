@@ -1,6 +1,7 @@
 package org.jkiss.dbeaver.ext.xugu.edit;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -54,10 +55,17 @@ public class XuguTablePartitionManager extends SQLObjectEditor<XuguTablePartitio
             @Override
             protected XuguTablePartition runTask() {
                 NewTablePartitionDialog dialog = new NewTablePartitionDialog(UIUtils.getActiveWorkbenchShell(), parent);
+                
                 if (dialog.open() != IDialogConstants.OK_ID) {
                     return null;
                 }
                 XuguTablePartition newTablePartition = dialog.getTablePartition();
+                ArrayList<XuguTablePartition> partList = (ArrayList<XuguTablePartition>) parent.partitionCache.getCachedObjects();
+                if(partList.size()!=0) {
+                	XuguTablePartition model = partList.get(0);
+                	newTablePartition.setPartiType(model.getPartiType());
+                	newTablePartition.setPartiKey(model.getPartiKey());
+                }
 //                XuguDataFile newDataFile = new XuguDataFile(newTablespace, null, false);
                 return newTablePartition;
             }
@@ -90,7 +98,7 @@ public class XuguTablePartitionManager extends SQLObjectEditor<XuguTablePartitio
     @Override
     public void addObjectModifyActions(DBRProgressMonitor monitor, List<DBEPersistAction> actionList, ObjectChangeCommand command, Map<String, Object> options) throws DBException
     {
-    	if(command.getProperty("online") == null) {
+    	if(command.getProperty("online") != null) {
     		StringBuilder sql = new StringBuilder("ALTER TABLE ");
         	sql.append(command.getObject().getParentObject().getName());
         	sql.append(" SET PARTITION ");
@@ -98,6 +106,7 @@ public class XuguTablePartitionManager extends SQLObjectEditor<XuguTablePartitio
         	sql.append((boolean)command.getProperty("online")?" ONLINE":" OFFLINE");
         	actionList.add(new SQLDatabasePersistAction("Alter Partition", sql.toString()));
     	}
+    	System.out.println("No Online option");
     }
     
     static class NewTablePartitionDialog extends Dialog {
@@ -131,19 +140,19 @@ public class XuguTablePartitionManager extends SQLObjectEditor<XuguTablePartitio
         @Override
         protected Control createDialogArea(Composite parent)
         {
-            getShell().setText(XuguMessages.dialog_tablespace_create_title);
+            getShell().setText(XuguMessages.dialog_tablePartition_create_title);
 
             Control container = super.createDialogArea(parent);
             Composite composite = UIUtils.createPlaceholder((Composite) container, 2, 5);
             composite.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-            nameText = UIUtils.createLabelText(composite, XuguMessages.dialog_tablespace_name, null);
+            nameText = UIUtils.createLabelText(composite, XuguMessages.dialog_tablePartition_name, null);
             nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             
-            valueText = UIUtils.createLabelText(composite, XuguMessages.dialog_tablespace_nodeID, null);
+            valueText = UIUtils.createLabelText(composite, XuguMessages.dialog_tablePartition_value, null);
             valueText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-            UIUtils.createInfoLabel(composite, XuguMessages.dialog_tablespace_create_info, GridData.FILL_HORIZONTAL, 2);
+            UIUtils.createInfoLabel(composite, XuguMessages.dialog_tablePartition_create_info, GridData.FILL_HORIZONTAL, 2);
 
             return parent;
         }
@@ -163,6 +172,6 @@ public class XuguTablePartitionManager extends SQLObjectEditor<XuguTablePartitio
 	@Override
 	public DBSObjectCache<? extends DBSObject, XuguTablePartition> getObjectsCache(XuguTablePartition object) {
 		// TODO Auto-generated method stub
-		return null;
+		return object.getParentObject().partitionCache;
 	}
 }

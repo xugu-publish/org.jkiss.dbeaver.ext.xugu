@@ -59,8 +59,8 @@ public abstract class XuguTablePhysical extends XuguTableBase implements DBSObje
     private Long realRowCount;
     private Object tablespace;
     private Integer partitioned;
-    private PartitionCache partitionCache;
-    private SubPartitionCache subPartitionCache;
+    public PartitionCache partitionCache;
+    public SubPartitionCache subPartitionCache;
 
     protected XuguTablePhysical(XuguSchema schema, String name)
     {
@@ -182,7 +182,7 @@ public abstract class XuguTablePhysical extends XuguTableBase implements DBSObje
         this.valid = XuguUtils.getObjectStatus(monitor, this, XuguObjectType.TABLE);
     }
     
-    private static class PartitionCache extends JDBCObjectCache<XuguTablePhysical, XuguTablePartition> {
+    public static class PartitionCache extends JDBCObjectCache<XuguTablePhysical, XuguTablePartition> {
         @Override
         protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguTablePhysical table) throws SQLException
         {        	

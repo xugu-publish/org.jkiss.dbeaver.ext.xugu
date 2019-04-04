@@ -83,7 +83,7 @@
 	                                    </items>
                                 	</folder>
                                 	<!--子分区-->
-                                	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguPartitionBase" label="%tree.subpartitions.node.name" icon="#partitions" description="Table Subpartitions">
+                                	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguTablePartition" label="%tree.subpartitions.node.name" icon="#partitions" description="Table Subpartitions">
 	                                    <items label="%tree.subpartitions.node.name" path="subpartition" property="subPartitions" icon="#partition">
 	                                    </items>
                                 	</folder>
