@@ -23,6 +23,7 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPRefreshableObject;
 import org.jkiss.dbeaver.model.DBPSaveableObject;
 import org.jkiss.dbeaver.model.access.DBAUser;
+import org.jkiss.dbeaver.model.impl.DBObjectNameCaseTransformer;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
 import org.jkiss.dbeaver.model.meta.Association;
 import org.jkiss.dbeaver.model.meta.Property;
@@ -49,9 +50,9 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
 	private int user_id;
     private String user_name;
     private boolean is_role;
-    private byte[] password;
+    private String password;
     private Timestamp start_time;
-    private Timestamp until_time;
+    private String until_time;
     private boolean locked;
     private boolean expired;
     private Timestamp pass_set_time;
@@ -75,10 +76,10 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
             this.user_id = JDBCUtils.safeGetInt(resultSet, "USER_ID");
             this.user_name = JDBCUtils.safeGetString(resultSet, "USER_NAME");
             this.is_role = JDBCUtils.safeGetBoolean(resultSet, "IS_ROLE");
-            this.password = JDBCUtils.safeGetBytes(resultSet, "PASSWORD");
+            this.password = JDBCUtils.safeGetBytes(resultSet, "PASSWORD").toString();
             this.start_time = JDBCUtils.safeGetTimestamp(resultSet, "START_TIME");
             
-            this.until_time = JDBCUtils.safeGetTimestamp(resultSet, "UNTIL_TIME");
+            this.until_time = JDBCUtils.safeGetString(resultSet, "UNTIL_TIME");
             this.locked = JDBCUtils.safeGetBoolean(resultSet, "LOCKED");
             this.expired = JDBCUtils.safeGetBoolean(resultSet, "EXPIRED");
             
@@ -121,11 +122,11 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
         this.user_name = name;
     }
 	
-    public byte[] getPassword() {
+    public String getPassword() {
     	return this.password;
     }
     
-    public void setPassword(byte[] password)
+    public void setPassword(String password)
     {
         this.password = password;
     }
@@ -138,14 +139,16 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
 		return start_time;
 	}
 
-	public Timestamp getUntil_time() {
+	@Property(viewable = true, editable = true, updatable=true, valueTransformer = DBObjectNameCaseTransformer.class, order = 3)
+	public String getUntil_time() {
 		return until_time;
 	}
 	
-	public void setUntil_time(Timestamp time) {
+	public void setUntil_time(String time) {
 		this.until_time = time;
 	}
 	
+	@Property(viewable = true, editable = true, updatable=true, valueTransformer = DBObjectNameCaseTransformer.class, order = 4)
 	public boolean isLocked() {
 		return locked;
 	}
@@ -154,6 +157,7 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
 		this.locked = locked;
 	}
 	
+	@Property(viewable = true, editable = true, updatable=true, valueTransformer = DBObjectNameCaseTransformer.class, order = 5)
 	public boolean isExpired() {
 		return expired;
 	}
@@ -208,7 +212,6 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
 
 	@Override
 	public DBSObject refreshObject(DBRProgressMonitor monitor) throws DBException {
-		// TODO Auto-generated method stub
-		return this;
+		return this.getDataSource().userCache.refreshObject(monitor, this.getDataSource(), this);
 	}
 }

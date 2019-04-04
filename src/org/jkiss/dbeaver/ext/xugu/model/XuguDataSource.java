@@ -917,18 +917,45 @@ public class XuguDataSource extends JDBCDataSource
         }
     }
 
-    static class UserCache extends JDBCObjectCache<XuguDataSource, XuguUser> {
-        @Override
-        protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguDataSource owner) throws SQLException {
-            //xfc 修改了获取用户信息的sql语句
-        	return session.prepareStatement(
-                "SELECT * FROM "+owner.roleFlag+"_USERS");
-        }
+    static class UserCache extends JDBCStructLookupCache<XuguDataSource, XuguUser, XuguUser> {
+        public UserCache() {
+        	super("USER_NAME");
+            setListOrderComparator(DBUtils.<XuguUser>nameComparator());
+		}
 
         @Override
         protected XuguUser fetchObject(@NotNull JDBCSession session, @NotNull XuguDataSource owner, @NotNull JDBCResultSet resultSet) throws SQLException, DBException {
             return new XuguUser(owner, resultSet);
         }
+
+		@Override
+		public JDBCStatement prepareLookupStatement(JDBCSession session, XuguDataSource owner, XuguUser user,
+				String objectName) throws SQLException {
+			StringBuilder sql = new StringBuilder("SELECT * FROM ");
+			sql.append(owner.roleFlag);
+			sql.append("_USERS");
+			//当有检索条件时 只查询指定表 用于新建表之后的刷新工作
+        	if(user!=null) {
+        		sql.append(" WHERE USER_NAME = '");
+        		sql.append(user.getName());
+        		sql.append("'");
+        	}
+        	return session.prepareStatement(sql.toString());
+		}
+
+		@Override
+		protected JDBCStatement prepareChildrenStatement(JDBCSession session, XuguDataSource owner, XuguUser forObject)
+				throws SQLException {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		protected XuguUser fetchChild(JDBCSession session, XuguDataSource owner, XuguUser parent,
+				JDBCResultSet dbResult) throws SQLException, DBException {
+			// TODO Auto-generated method stub
+			return null;
+		}
     }
 
     class RoleCache extends JDBCObjectCache<XuguDataSource, XuguRole> {

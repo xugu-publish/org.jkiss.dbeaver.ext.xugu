@@ -23,8 +23,11 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.ext.xugu.XuguMessages;
 import org.jkiss.dbeaver.ext.xugu.model.XuguDataSource;
 import org.jkiss.dbeaver.ext.xugu.model.XuguRole;
+import org.jkiss.dbeaver.ext.xugu.model.XuguSchema;
+import org.jkiss.dbeaver.ext.xugu.model.XuguSequence;
 import org.jkiss.dbeaver.ext.xugu.model.XuguUser;
 import org.jkiss.dbeaver.model.DBPDataSource;
+import org.jkiss.dbeaver.model.DBPEvaluationContext;
 import org.jkiss.dbeaver.model.edit.*;
 import org.jkiss.dbeaver.model.edit.prop.DBECommandComposite;
 import org.jkiss.dbeaver.model.exec.DBCSession;
@@ -33,15 +36,25 @@ import org.jkiss.dbeaver.model.impl.edit.AbstractObjectManager;
 import org.jkiss.dbeaver.model.impl.edit.DBECommandAbstract;
 import org.jkiss.dbeaver.model.impl.edit.SQLDatabasePersistAction;
 import org.jkiss.dbeaver.model.impl.edit.SQLScriptCommand;
+import org.jkiss.dbeaver.model.impl.sql.edit.SQLObjectEditor;
+//import org.jkiss.dbeaver.model.impl.sql.edit.SQLObjectEditor.ObjectChangeCommand;
+//import org.jkiss.dbeaver.model.impl.sql.edit.SQLObjectEditor.ObjectCreateCommand;
+//import org.jkiss.dbeaver.model.impl.sql.edit.SQLObjectEditor.ObjectDeleteCommand;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.dbeaver.model.struct.DBSEntityType;
 import org.jkiss.dbeaver.model.struct.DBSObject;
+import org.jkiss.dbeaver.ui.UITask;
+import org.jkiss.dbeaver.ui.editors.object.struct.EntityEditPage;
 
+import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.util.List;
 import java.util.Map;
 
 /**
  * XuguUserManager
  */
-public class XuguUserManager extends AbstractObjectManager<XuguUser> implements DBEObjectMaker<XuguUser, XuguDataSource>, DBECommandFilter<XuguUser> {
+public class XuguUserManager extends SQLObjectEditor<XuguUser, XuguDataSource> implements DBEObjectMaker<XuguUser, XuguDataSource>, DBECommandFilter<XuguUser> {
 
     @Override
     public long getMakerOptions(DBPDataSource dataSource)
@@ -69,9 +82,11 @@ public class XuguUserManager extends AbstractObjectManager<XuguUser> implements 
     }
 
     @Override
-    public XuguUser createNewObject(DBRProgressMonitor monitor, DBECommandContext commandContext, XuguDataSource parent, Object copyFrom)
-    {
-        XuguUser newUser = new XuguUser(parent, null);
+    protected XuguUser createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context,
+                                               final XuguDataSource source,
+                                               Object copyFrom) {
+    	context.getUserParams();
+    	XuguUser newUser = new XuguUser(source, null);
         //修改已存在用户
         if (copyFrom instanceof XuguUser) {
             XuguUser tplUser = (XuguUser)copyFrom;
@@ -86,15 +101,73 @@ public class XuguUserManager extends AbstractObjectManager<XuguUser> implements 
         	System.out.println(" ?? "+newUser.isPersisted());
         }
         System.out.println("Create1 ??");
-        commandContext.addCommand(new CommandCreateUser(newUser), new CreateObjectReflector<>(this), true);
+//        commandContext.addCommand(new CommandCreateUser(newUser), new CreateObjectReflector<>(this), true);
         return newUser;
     }
-
+    
     @Override
-    public void deleteObject(DBECommandContext commandContext, XuguUser user, Map<String, Object> options)
+    protected void addObjectCreateActions(DBRProgressMonitor monitor, List<DBEPersistAction> actions, ObjectCreateCommand command, Map<String, Object> options)
     {
-        commandContext.addCommand(new CommandDropUser(user), new DeleteObjectReflector<>(this), true);
+    	//refresh the new object
+    	XuguUser user = command.getObject();
+    	if(command.getProperties()!=null) {
+    		String name = command.getProperties().get(UserPropertyHandler.NAME.toString()).toString();
+        	String key1 = command.getProperties().get(UserPropertyHandler.PASSWORD.toString()).toString();
+        	String key2 = command.getProperties().get(UserPropertyHandler.PASSWORD_CONFIRM.toString()).toString();
+        	if(!key1.equals(key2)) {
+        		log.error("Password confirm different!");
+        	}
+        	else {
+        		user.setName(name);
+        		user.setPassword(key1);
+//        		user.setLocked((boolean) command.getProperties().get(UserPropertyHandler.LOCKED.toString()));
+//        		user.setExpired((boolean) command.getProperties().get(UserPropertyHandler.EXPIRED.toString()));
+        		user.setUntil_time(command.getProperties().get(UserPropertyHandler.UNTIL_TIME.toString()).toString());
+        		user.setPersisted(true);
+        		StringBuilder sql = new StringBuilder();
+        		sql.append("CREATE USER ");
+        		sql.append(user.getName());
+        		sql.append("\nIDENTIFIED BY '");
+        		sql.append(user.getPassword());
+        		sql.append("'");
+        		if(user.getUntil_time()!=null) {
+        			sql.append("\nVALID UNTIL '");
+        			sql.append(user.getUntil_time());
+        			sql.append("'");
+        		}
+//        		sql.append(user.isLocked()?" ACCOUNT LOCK":"");
+//        		sql.append(user.isExpired()?" PASSWORD EXPIRED":"");
+        		
+                DBEPersistAction action = new SQLDatabasePersistAction("Create User", sql.toString());
+                actions.add(action);
+        	}
+    	}
     }
+    
+    @Override
+    protected void addObjectDeleteActions(List<DBEPersistAction> actions, ObjectDeleteCommand command, Map<String, Object> options)
+    {
+    	String sql = "DROP USER " + command.getObject().getName();
+        DBEPersistAction action = new SQLDatabasePersistAction("Drop User", sql);
+        actions.add(action);
+    }
+    
+    @Override
+    protected void addObjectModifyActions(DBRProgressMonitor monitor, List<DBEPersistAction> actionList, ObjectChangeCommand command, Map<String, Object> options)
+    {
+    	for(String k:options.keySet()) {
+    		System.out.println(options.get(k));
+    	}
+    	String sql = "ALTER USER " + command.getObject().getName() + " IDENTIFIED BY ";
+        DBEPersistAction action = new SQLDatabasePersistAction("Alter User", sql);
+        actionList.add(action);
+    }
+
+//    @Override
+//    public void deleteObject(DBECommandContext commandContext, XuguUser user, Map<String, Object> options)
+//    {
+//        commandContext.addCommand(new CommandDropUser(user), new DeleteObjectReflector<>(this), true);
+//    }
 
     @Override
     public void filterCommands(DBECommandQueue<XuguUser> queue)
@@ -102,47 +175,47 @@ public class XuguUserManager extends AbstractObjectManager<XuguUser> implements 
     	System.out.println("Create3 ??"+queue.toString());
     }
 
-    private static class CommandCreateUser extends DBECommandAbstract<XuguUser> {
-        protected CommandCreateUser(XuguUser user)
-        {
-            super(user, XuguMessages.edit_user_manager_command_create_user);
-            System.out.println("Create2 ??");
-        }
-        @Override
-        public DBEPersistAction[] getPersistActions(DBRProgressMonitor monitor, Map<String, Object> options)
-        {
-            return new DBEPersistAction[] {
-                new SQLDatabasePersistAction(XuguMessages.edit_user_manager_command_create_user, "CREATE USER " + getObject().getName()) { //$NON-NLS-2$
-                    @Override
-                    public void afterExecute(DBCSession session, Throwable error)
-                    {
-                        if (error == null) {
-                            getObject().setPersisted(true);
-                        }
-                    }
-                }};
-        }
-    }
+//    private static class CommandCreateUser extends DBECommandAbstract<XuguUser> {
+//        protected CommandCreateUser(XuguUser user)
+//        {
+//            super(user, XuguMessages.edit_user_manager_command_create_user);
+//            System.out.println("Create2 ??");
+//        }
+//        @Override
+//        public DBEPersistAction[] getPersistActions(DBRProgressMonitor monitor, Map<String, Object> options)
+//        {
+//            return new DBEPersistAction[] {
+//                new SQLDatabasePersistAction(XuguMessages.edit_user_manager_command_create_user, "CREATE USER " + getObject().getName()) { //$NON-NLS-2$
+//                    @Override
+//                    public void afterExecute(DBCSession session, Throwable error)
+//                    {
+//                        if (error == null) {
+//                            getObject().setPersisted(true);
+//                        }
+//                    }
+//                }};
+//        }
+//    }
 
-    private static class CommandDropUser extends DBECommandComposite<XuguUser, UserPropertyHandler> {
-        protected CommandDropUser(XuguUser user)
-        {
-            super(user, XuguMessages.edit_user_manager_command_drop_user);
-        }
-        @Override
-        public DBEPersistAction[] getPersistActions(DBRProgressMonitor monitor, Map<String, Object> options)
-        {
-            return new DBEPersistAction[] {
-                new SQLDatabasePersistAction(XuguMessages.edit_user_manager_command_drop_user, "DROP USER " + getObject().getName()) { //$NON-NLS-2$
-                    @Override
-                    public void afterExecute(DBCSession session, Throwable error)
-                    {
-                        if (error == null) {
-                            getObject().setPersisted(false);
-                        }
-                    }
-                }};
-        }
-    }
+//    private static class CommandDropUser extends DBECommandComposite<XuguUser, UserPropertyHandler> {
+//        protected CommandDropUser(XuguUser user)
+//        {
+//            super(user, XuguMessages.edit_user_manager_command_drop_user);
+//        }
+//        @Override
+//        public DBEPersistAction[] getPersistActions(DBRProgressMonitor monitor, Map<String, Object> options)
+//        {
+//            return new DBEPersistAction[] {
+//                new SQLDatabasePersistAction(XuguMessages.edit_user_manager_command_drop_user, "DROP USER " + getObject().getName()) { //$NON-NLS-2$
+//                    @Override
+//                    public void afterExecute(DBCSession session, Throwable error)
+//                    {
+//                        if (error == null) {
+//                            getObject().setPersisted(false);
+//                        }
+//                    }
+//                }};
+//        }
+//    }
 }
 

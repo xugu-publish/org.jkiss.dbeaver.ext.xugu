@@ -106,11 +106,9 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
         timeText = UIUtils.createLabelText(loginGroup, XuguMessages.editors_user_editor_general_label_valid_until, untilTime);
         ControlPropertyCommandListener.create(this, timeText, UserPropertyHandler.UNTIL_TIME);
         
-        //暂时禁止修改用户锁定及口令失效
-        if(!newUser) {
-        	lockCheck.setEnabled(false);
-        	expireCheck.setEnabled(false);
-        }
+        //暂时禁止修改用户锁定及口令失效 无论是否新建用户
+        lockCheck.setEnabled(false);
+    	expireCheck.setEnabled(false);
         
         pageControl.createProgressPanel();
 
@@ -154,12 +152,6 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
     {
         return pageControl;
     }
-
-    //@Override
-//    protected void processGrants(List<MySQLGrant> grants)
-//    {
-//        privTable.fillGrants(grants);
-//    }
 
     @Override
     public void refreshPart(Object source, boolean force)

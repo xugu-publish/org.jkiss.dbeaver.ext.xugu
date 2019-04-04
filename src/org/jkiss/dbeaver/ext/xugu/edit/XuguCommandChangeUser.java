@@ -50,10 +50,10 @@ public class XuguCommandChangeUser extends DBECommandComposite<XuguUser, UserPro
         for (Map.Entry<Object, Object> entry : getProperties().entrySet()) {
             switch (UserPropertyHandler.valueOf((String) entry.getKey())) {
                 case NAME: getObject().setName(CommonUtils.toString(entry.getValue())); break;
-                case PASSWORD: getObject().setPassword((CommonUtils.toString(entry.getValue()).getBytes())); break;
+                case PASSWORD: getObject().setPassword((CommonUtils.toString(entry.getValue()))); break;
                 case LOCKED: getObject().setLocked(CommonUtils.toBoolean(entry.getValue()));break;
                 case EXPIRED: getObject().setExpired(CommonUtils.toBoolean(entry.getValue()));break;
-                case UNTIL_TIME:getObject().setUntil_time(new Timestamp(CommonUtils.toLong(entry.getValue())));break;
+                case UNTIL_TIME:getObject().setUntil_time(CommonUtils.toString(entry.getValue()));break;
                 default:
                     break;
             }
