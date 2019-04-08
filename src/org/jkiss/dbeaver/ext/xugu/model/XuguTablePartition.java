@@ -28,7 +28,7 @@ import java.util.List;
  * Table partition
  */
 public class XuguTablePartition extends XuguPartitionBase<XuguTablePhysical> {
-
+	
 //    private List<XuguTablePartition> subPartitions;
 	public XuguTablePartition(XuguTablePhysical xuguTable,
 	        boolean subpartition, String name) {

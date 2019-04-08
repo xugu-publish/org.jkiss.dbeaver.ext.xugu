@@ -45,12 +45,14 @@ public abstract class XuguPartitionBase<PARENT extends DBSObject> extends XuguOb
     private boolean online;
     private String partiKey;
     private int partiType;
+    private boolean isSubParti;
 
     protected XuguPartitionBase(PARENT xuguTable,
 	        boolean subpartition, String name) {
     	super(
     			xuguTable, name,
                 true);
+    	this.isSubParti = subpartition;
 	}
     
     protected XuguPartitionBase(PARENT parent, boolean subpartition, ResultSet dbResult)
@@ -61,6 +63,7 @@ public abstract class XuguPartitionBase<PARENT extends DBSObject> extends XuguOb
                 JDBCUtils.safeGetString(dbResult, "SUBPARTI_NAME") :
                 JDBCUtils.safeGetString(dbResult, "PARTI_NAME"),
             true);
+        this.isSubParti = subpartition;
 //        this.partiName = subpartition? JDBCUtils.safeGetString(dbResult, "SUBPARTI_NAME"):JDBCUtils.safeGetString(dbResult, "PARTI_NAME");
         this.partiValue = subpartition? JDBCUtils.safeGetString(dbResult, "SUBPARTI_VAL") : JDBCUtils.safeGetString(dbResult, "PARTI_VAL");
         this.partiNo = subpartition? JDBCUtils.safeGetInt(dbResult, "SUBPARTI_NO") : JDBCUtils.safeGetInt(dbResult, "PARTI_NO");
@@ -137,5 +140,13 @@ public abstract class XuguPartitionBase<PARENT extends DBSObject> extends XuguOb
     
     public void setOnline(boolean flag) {
     	this.online = flag;
+    }
+    
+    public boolean isSubPartition() {
+    	return isSubParti;
+    }
+    
+    public void setSubPartition(boolean subFlag) {
+    	this.isSubParti = subFlag;
     }
 }
