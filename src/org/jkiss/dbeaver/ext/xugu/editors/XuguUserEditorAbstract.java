@@ -40,23 +40,6 @@ import java.util.List;
 public abstract class XuguUserEditorAbstract extends AbstractDatabaseObjectEditor<XuguUser>
 {
 
-//    void loadGrants()
-//    {
-//        LoadingJob.createService(
-//            new DatabaseLoadService<List<MySQLGrant>>(MySQLMessages.editors_user_editor_abstract_load_grants, getDatabaseObject().getDataSource()) {
-//                @Override
-//                public java.util.List<MySQLGrant> evaluate(DBRProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-//                    try {
-//                        return getDatabaseObject().getGrants(monitor);
-//                    } catch (DBException e) {
-//                        throw new InvocationTargetException(e);
-//                    }
-//                }
-//            },
-//            getPageControl().createGrantsLoadVisualizer())
-//            .schedule();
-//    }
-
     @Override
     public void setFocus()
     {

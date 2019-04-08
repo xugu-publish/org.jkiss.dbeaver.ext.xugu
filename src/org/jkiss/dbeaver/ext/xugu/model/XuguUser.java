@@ -86,7 +86,7 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
             this.user_id = JDBCUtils.safeGetInt(resultSet, "USER_ID");
             this.user_name = JDBCUtils.safeGetString(resultSet, "USER_NAME");
             this.is_role = JDBCUtils.safeGetBoolean(resultSet, "IS_ROLE");
-            this.password = JDBCUtils.safeGetBytes(resultSet, "PASSWORD").toString();
+            this.password = JDBCUtils.safeGetString(resultSet, "PASSWORD");
             this.start_time = JDBCUtils.safeGetTimestamp(resultSet, "START_TIME");
             
             this.until_time = JDBCUtils.safeGetString(resultSet, "UNTIL_TIME");

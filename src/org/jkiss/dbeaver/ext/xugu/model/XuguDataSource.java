@@ -933,10 +933,10 @@ public class XuguDataSource extends JDBCDataSource
 				String objectName) throws SQLException {
 			StringBuilder sql = new StringBuilder("SELECT * FROM ");
 			sql.append(owner.roleFlag);
-			sql.append("_USERS");
+			sql.append("_USERS WHERE IS_ROLE=FALSE");
 			//当有检索条件时 只查询指定表 用于新建表之后的刷新工作
         	if(user!=null) {
-        		sql.append(" WHERE USER_NAME = '");
+        		sql.append(" AND USER_NAME = '");
         		sql.append(user.getName());
         		sql.append("'");
         	}
