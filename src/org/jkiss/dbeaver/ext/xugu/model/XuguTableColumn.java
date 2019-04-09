@@ -311,6 +311,7 @@ public class XuguTableColumn extends JDBCTableColumn<XuguTableBase> implements D
         {
         	List<DBSDataType> dataTypes = new ArrayList<>(column.getTable().getDataSource().getLocalDataTypes());
         	List<DBSDataType> dataTypes2 = new ArrayList<>(column.getTable().getSchema().getLocalDataTypes());
+        	
             if (!dataTypes.contains(column.getDataType())) {
             	XuguDataType t=column.getDataType();
             	if(t!=null) {

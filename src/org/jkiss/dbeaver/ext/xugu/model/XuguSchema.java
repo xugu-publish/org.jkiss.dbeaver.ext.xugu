@@ -502,6 +502,8 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         tableCache.getAllObjects(monitor, this);
         monitor.subTask("Cache views");
         viewCache.getAllObjects(monitor, this);
+        monitor.subTask("Cache udts");
+        udtCache.getAllObjects(monitor, this);
         if ((scope & STRUCT_ATTRIBUTES) != 0) {
             monitor.subTask("Cache table columns");
             tableCache.loadChildren(monitor, this, null);
@@ -526,7 +528,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
             packageCache.getAllObjects(monitor, this);
             monitor.subTask("Cache synonyms");
             synonymCache.getAllObjects(monitor, this);
-            udtCache.getAllObjects(monitor, this);
+           
 //            monitor.subTask("Cache dblink");
 //            dbLinkCache.getAllObjects(monitor, this);
             monitor.subTask("Cache job");

@@ -262,6 +262,7 @@
     	<manager class="org.jkiss.dbeaver.ext.xugu.edit.XuguRoleManager" objectType="org.jkiss.dbeaver.ext.xugu.model.XuguRole"/>
     	<manager class="org.jkiss.dbeaver.ext.xugu.edit.XuguUDTManager" objectType="org.jkiss.dbeaver.ext.xugu.model.XuguUDT"/>
     	<manager class="org.jkiss.dbeaver.ext.xugu.edit.XuguTablePartitionManager" objectType="org.jkiss.dbeaver.ext.xugu.model.XuguTablePartition"/>
+    	<manager class="org.jkiss.dbeaver.ext.xugu.edit.XuguTableSubPartitionManager" objectType="org.jkiss.dbeaver.ext.xugu.model.XuguTableSubPartition"/>
     </extension>
     
     <extension point="org.jkiss.dbeaver.databaseEditor">

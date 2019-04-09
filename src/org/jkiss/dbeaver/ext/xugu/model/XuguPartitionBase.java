@@ -76,21 +76,21 @@ public abstract class XuguPartitionBase<PARENT extends DBSObject> extends XuguOb
 //    	return partiName;
 //    }
     
-    @Property(viewable = true, order = 1)
+    @Property(viewable = true, order = 1, updatable = true, editable=true)
     public int getPartiNo()
     {
         return partiNo;
     }
     
-    @Property(viewable=true, order=2)
+    @Property(viewable=true, order=2, updatable=true, editable=true)
     public String getPartiType() {
     	switch(partiType) {
     	case 1:
-    			return "Range";
+    			return "RANGE";
 		case 2:
-    			return "List";
+    			return "LIST";
 		case 3:
-    			return "Hash";
+    			return "HASH";
 		default:
     			return partiType+"";
     	}
@@ -98,19 +98,19 @@ public abstract class XuguPartitionBase<PARENT extends DBSObject> extends XuguOb
     
     public void setPartiType(String partiType) {
     	switch(partiType) {
-    	case "Range":
+    	case "RANGE":
     		this.partiType = 1;
     		break;
-    	case "List":
+    	case "LIST":
     		this.partiType = 2;
     		break;
-    	case "Hash":
+    	case "HASH":
     		this.partiType = 3;
     		break;
     	}
     }
     
-    @Property(viewable=true, order=3)
+    @Property(viewable=true, order=3, updatable=true, editable=true)
     public String getPartiKey() {
     	return partiKey;
     }
@@ -119,7 +119,7 @@ public abstract class XuguPartitionBase<PARENT extends DBSObject> extends XuguOb
     	this.partiKey = partiKey;
     }
     
-    @Property(viewable = true, order = 4)
+    @Property(viewable = true, order = 4, updatable=true, editable=true)
     public String getPartiValue()
     {
     	if(partiType==3)

@@ -80,6 +80,8 @@ public class XuguDataSource extends JDBCDataSource
     final ProfileCache profileCache = new ProfileCache();
     final public RoleCache roleCache = new RoleCache();
     
+    private Connection connection;
+    
     private xuguOutputReader outputReader;
     private XuguSchema publicSchema;
     private String activeSchemaName;
@@ -145,13 +147,13 @@ public class XuguDataSource extends JDBCDataSource
     @Override
     protected Connection openConnection(@NotNull DBRProgressMonitor monitor, JDBCRemoteInstance remoteInstance, @NotNull String purpose) throws DBCException {
         try {
-            return super.openConnection(monitor, remoteInstance, purpose);
+            return this.connection = super.openConnection(monitor, remoteInstance, purpose);
         } catch (DBCException e) {
         	System.out.println("EEEERror code "+e.getErrorCode());
             if (e.getErrorCode() == XuguConstants.EC_PASSWORD_EXPIRED) {
                 if (changeExpiredPassword(monitor, purpose)) {
                     // Retry
-                    return openConnection(monitor, remoteInstance, purpose);
+                    return this.connection = openConnection(monitor, remoteInstance, purpose);
                 }
             }
             throw e;
@@ -274,6 +276,10 @@ public class XuguDataSource extends JDBCDataSource
     	return this.roleFlag;
     }
 
+    public Connection getConnection() {
+    	return this.connection;
+    }
+    
     @Association
     public Collection<XuguDatabase> getDatabases(DBRProgressMonitor monitor) throws DBException {
         return databaseCache.getAllObjects(monitor, this);

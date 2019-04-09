@@ -410,25 +410,4 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
 
     }
 
-//    static class TablePrivCache extends JDBCObjectCache<XuguTableBase, XuguPrivTable> {
-//        @Override
-//        protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguTableBase tableBase) throws SQLException
-//        {
-//            boolean hasDBA = tableBase.getDataSource().isViewAvailable(session.getProgressMonitor(), XuguConstants.SCHEMA_SYS, XuguConstants.VIEW_DBA_TAB_PRIVS);
-//            final JDBCPreparedStatement dbStat = session.prepareStatement(
-//                "SELECT p.*\n" +
-//                    "FROM " + (hasDBA ? "DBA_TAB_PRIVS p" : "ALL_TAB_PRIVS p") + "\n" +
-//                    "WHERE p."+ (hasDBA ? "OWNER": "TABLE_SCHEMA") +"=? AND p.TABLE_NAME =?");
-//            dbStat.setString(1, tableBase.getSchema().getName());
-//            dbStat.setString(2, tableBase.getName());
-//            return dbStat;
-//        }
-//
-//        @Override
-//        protected XuguPrivTable fetchObject(@NotNull JDBCSession session, @NotNull XuguTableBase tableBase, @NotNull JDBCResultSet resultSet) throws SQLException, DBException
-//        {
-//            return new XuguPrivTable(tableBase, resultSet);
-//        }
-//    }
-
 }

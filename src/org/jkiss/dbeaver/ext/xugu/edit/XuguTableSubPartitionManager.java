@@ -30,6 +30,7 @@ import org.jkiss.dbeaver.ext.xugu.model.XuguTableColumn;
 import org.jkiss.dbeaver.ext.xugu.model.XuguTableConstraint;
 import org.jkiss.dbeaver.ext.xugu.model.XuguTablePartition;
 import org.jkiss.dbeaver.ext.xugu.model.XuguTablePhysical;
+import org.jkiss.dbeaver.ext.xugu.model.XuguTableSubPartition;
 import org.jkiss.dbeaver.ext.xugu.model.XuguTablespace;
 import org.jkiss.dbeaver.ext.xugu.model.XuguUser;
 import org.jkiss.dbeaver.model.DBPDataSource;
@@ -49,7 +50,7 @@ import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.ui.UITask;
 import org.jkiss.dbeaver.ui.UIUtils;
 
-public class XuguTablePartitionManager extends SQLObjectEditor<XuguTablePartition, XuguTablePhysical>{
+public class XuguTableSubPartitionManager extends SQLObjectEditor<XuguTableSubPartition, XuguTablePhysical>{
 	private String dataFileDesc;
 	@Override
 	public long getMakerOptions(DBPDataSource dataSource) {
@@ -58,25 +59,30 @@ public class XuguTablePartitionManager extends SQLObjectEditor<XuguTablePartitio
 	}
 	
 	@Override
-    protected XuguTablePartition createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final XuguTablePhysical parent, Object copyFrom)
+    protected XuguTableSubPartition createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final XuguTablePhysical parent, Object copyFrom)
     {
-		//禁止对没有分区定义的表进行添加分区操作
-		if(parent.partitionCache!=null || parent.isPersisted()==false) {
-			return new UITask<XuguTablePartition>() {
+		//仅允许对新创建的表进行添加二级分区操作
+		if(parent.isPersisted()==false) {
+			return new UITask<XuguTableSubPartition>() {
 	            @Override
-	            protected XuguTablePartition runTask() {
+	            protected XuguTableSubPartition runTask() {
 	            	NewTablePartitionDialog dialog = new NewTablePartitionDialog(UIUtils.getActiveWorkbenchShell(), monitor, parent);
 	                if (dialog.open() != IDialogConstants.OK_ID) {
 	                    return null;
 	                }
-	                XuguTablePartition newTablePartition = dialog.getTablePartition();
+	                XuguTableSubPartition newTablePartition = dialog.getTablePartition();
 	                if(parent.isPersisted()) {
-	                	ArrayList<XuguTablePartition> partList = (ArrayList<XuguTablePartition>) parent.partitionCache.getCachedObjects();
+	                	ArrayList<XuguTableSubPartition> partList = (ArrayList<XuguTableSubPartition>) parent.subPartitionCache.getCachedObjects();
 	                    if(partList.size()!=0) {
-	                    	XuguTablePartition model = partList.get(0);
+	                    	XuguTableSubPartition model = partList.get(0);
 	                    	newTablePartition.setPartiType(model.getPartiType());
 	                    	newTablePartition.setPartiKey(model.getPartiKey());
 	                    }
+	                }else {
+	                	// 创建新表
+	                }
+	                if(newTablePartition.isSubPartition()) {
+	                	parent.subPartitionCache.cacheObject(newTablePartition);
 	                }
                 	System.out.println("Cache one 1");
 	                return newTablePartition;
@@ -99,42 +105,40 @@ public class XuguTablePartitionManager extends SQLObjectEditor<XuguTablePartitio
 	@Override
     protected void addObjectCreateActions(DBRProgressMonitor monitor, List<DBEPersistAction> actions, ObjectCreateCommand command, Map<String, Object> options)
     {
-		//新建表时在tablemanager中进行添加处理
-		//修改已存在表的分区时新增修改语句
+		//表存在时，禁用二级分区操作
 		if(command.getObject().getParentObject().isPersisted() == true) {
-			StringBuilder sql = new StringBuilder();
-			sql.append("ALTER TABLE ");
-	    	sql.append(command.getObject().getParentObject().getName());
-	    	sql.append(" ADD PARTITION ");
-	    	sql.append(command.getObject().getName());
-	    	switch(command.getObject().getPartiType()) {
-	    	case "LIST":
-	    		sql.append(" VALUES('");
-		    	sql.append(command.getObject().getPartiValue());
-		    	sql.append("')");
-	    	case "RANGE":
-	    		sql.append(" VALUES LESS THAN(");
-		    	sql.append(command.getObject().getPartiValue());
-		    	sql.append(")");
-	    	}
-			actions.add(new SQLDatabasePersistAction("Modify table, Add Partition", sql.toString()));
+			new UITask<String>() {
+				@Override
+				protected String runTask() {
+					WarningDialog dialog2 = new WarningDialog(UIUtils.getActiveWorkbenchShell(), "You can not create subpartition on a table");       
+	                if (dialog2.open() != IDialogConstants.OK_ID) {
+	                    return null;
+	                }
+					return null;
+				}
+	    	}.execute();  
 		}
     }
 
     @Override
     protected void addObjectDeleteActions(List<DBEPersistAction> actions, ObjectDeleteCommand command, Map<String, Object> options)
     {
-    	//当表存在时才可进行删除action
-    	if(command.getObject().getParentObject().isPersisted() == true) {
-    		StringBuilder sql = new StringBuilder("ALTER TABLE ");
-        	sql.append(command.getObject().getParentObject().getName());
-        	sql.append(" DROP PARTITION ");
-        	sql.append(command.getObject().getName());
-        	actions.add(new SQLDatabasePersistAction("Drop Partition", sql.toString()));
+    	//不允许对二级分区进行删除操作
+    	if(command.getObject().getParentObject().isPersisted()==true) {
+    		new UITask<String>() {
+				@Override
+				protected String runTask() {
+					WarningDialog dialog2 = new WarningDialog(UIUtils.getActiveWorkbenchShell(), "You can not drop subpartition on a table");       
+	                if (dialog2.open() != IDialogConstants.OK_ID) {
+	                    return null;
+	                }
+					return null;
+				}
+	    	}.execute();  
     	}
     	//若是新增表情况时则直接将改对象从缓存中剔除
     	else {
-    		command.getObject().getParentObject().partitionCache.removeObject(command.getObject(), true);
+    		command.getObject().getParentObject().subPartitionCache.removeObject(command.getObject(), true);
     	}
     }
     
@@ -145,11 +149,12 @@ public class XuguTablePartitionManager extends SQLObjectEditor<XuguTablePartitio
     	if(command.getObject().getParentObject().isPersisted() == true && command.getProperty("online") != null) {
     		StringBuilder sql = new StringBuilder("ALTER TABLE ");
         	sql.append(command.getObject().getParentObject().getName());
-        	sql.append(" SET PARTITION ");
+        	sql.append(" SET SUBPARTITION ");
         	sql.append(command.getObject().getName());
         	sql.append((boolean)command.getProperty("online")?" ONLINE":" OFFLINE");
         	actionList.add(new SQLDatabasePersistAction("Alter Partition", sql.toString()));
     	}
+    	System.out.println("No Online Option");
     }
     
     static class WarningDialog extends Dialog{
@@ -177,7 +182,7 @@ public class XuguTablePartitionManager extends SQLObjectEditor<XuguTablePartitio
     
     static class NewTablePartitionDialog extends Dialog {
     	
-    	private XuguTablePartition partition;
+    	private XuguTableSubPartition partition;
     	private XuguTablePhysical table;
     	private DBRProgressMonitor monitor;
         private Text nameText;
@@ -192,7 +197,7 @@ public class XuguTablePartitionManager extends SQLObjectEditor<XuguTablePartitio
             this.monitor = monitor;
         }
         
-        public XuguTablePartition getTablePartition() {
+        public XuguTableSubPartition getTablePartition() {
         	return this.partition;
         }
         
@@ -250,12 +255,12 @@ public class XuguTablePartitionManager extends SQLObjectEditor<XuguTablePartitio
         @Override
         protected void okPressed()
         {
-        	this.partition = new XuguTablePartition(table, false ,"");
+        	this.partition = new XuguTableSubPartition(table, false ,"");
             partition.setName(DBObjectNameCaseTransformer.transformObjectName(partition, nameText.getText()));
             partition.setPartiType(DBObjectNameCaseTransformer.transformObjectName(partition, typeCombo.getText()));
             partition.setPartiValue(DBObjectNameCaseTransformer.transformObjectName(partition,valueText.getText())); 
             partition.setPartiKey(DBObjectNameCaseTransformer.transformObjectName(partition, colCombo.getText()));
-            partition.setSubPartition(false);
+            partition.setSubPartition(true);
             partition.setOnline(true);
             super.okPressed();
         }
@@ -263,8 +268,8 @@ public class XuguTablePartitionManager extends SQLObjectEditor<XuguTablePartitio
     }
 
 	@Override
-	public DBSObjectCache<? extends DBSObject, XuguTablePartition> getObjectsCache(XuguTablePartition object) {
+	public DBSObjectCache<? extends DBSObject, XuguTableSubPartition> getObjectsCache(XuguTableSubPartition object) {
 		// TODO Auto-generated method stub
-		return object.getParentObject().partitionCache;
+		return object.getParentObject().subPartitionCache;
 	}
 }

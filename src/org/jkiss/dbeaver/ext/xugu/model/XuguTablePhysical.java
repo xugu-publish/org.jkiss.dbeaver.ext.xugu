@@ -65,6 +65,8 @@ public abstract class XuguTablePhysical extends XuguTableBase implements DBSObje
     protected XuguTablePhysical(XuguSchema schema, String name)
     {
         super(schema, name, false);
+        this.partitionCache = new PartitionCache();
+        this.subPartitionCache = new SubPartitionCache();
     }
 
     protected XuguTablePhysical(
@@ -159,7 +161,7 @@ public abstract class XuguTablePhysical extends XuguTableBase implements DBSObje
     }
     
     @Association
-    public Collection<XuguTablePartition> getSubPartitions(DBRProgressMonitor monitor) throws DBException{
+    public Collection<XuguTableSubPartition> getSubPartitions(DBRProgressMonitor monitor) throws DBException{
     	if(subPartitionCache == null) {
     		return null;
     	}else {
@@ -206,7 +208,7 @@ public abstract class XuguTablePhysical extends XuguTableBase implements DBSObje
 		}
     }
 
-    private static class SubPartitionCache extends JDBCObjectCache<XuguTablePhysical, XuguTablePartition>{
+    public static class SubPartitionCache extends JDBCObjectCache<XuguTablePhysical, XuguTableSubPartition>{
     	@Override
         protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguTablePhysical table) throws SQLException
         {        	
@@ -223,10 +225,10 @@ public abstract class XuguTablePhysical extends XuguTableBase implements DBSObje
         }
 
 		@Override
-		protected XuguTablePartition fetchObject(JDBCSession session, XuguTablePhysical owner, JDBCResultSet resultSet)
+		protected XuguTableSubPartition fetchObject(JDBCSession session, XuguTablePhysical owner, JDBCResultSet resultSet)
 				throws SQLException, DBException {
 			// TODO Auto-generated method stub
-			return new XuguTablePartition(owner, true, resultSet);
+			return new XuguTableSubPartition(owner, true, resultSet);
 		}
     }
     
