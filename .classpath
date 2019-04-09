@@ -8,8 +8,5 @@
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Test2"/>
-	<classpathentry kind="lib" path="lib/cloudjdbcV1002.jar"/>
-	<classpathentry kind="lib" path="lib/xugu-table-ddl-1.0.jar"/>
-	<classpathentry kind="lib" path="lib/AllUtils.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

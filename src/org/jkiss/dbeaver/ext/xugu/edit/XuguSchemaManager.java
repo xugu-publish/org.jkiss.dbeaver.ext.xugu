@@ -23,6 +23,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
@@ -50,6 +51,8 @@ import org.jkiss.dbeaver.ui.UITask;
 import org.jkiss.dbeaver.ui.UIUtils;
 import org.jkiss.utils.CommonUtils;
 
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -77,7 +80,7 @@ public class XuguSchemaManager extends SQLObjectEditor<XuguSchema, XuguDataSourc
         return new UITask<XuguSchema>() {
             @Override
             protected XuguSchema runTask() {
-                NewUserDialog dialog = new NewUserDialog(UIUtils.getActiveWorkbenchShell(), parent);
+                NewUserDialog dialog = new NewUserDialog(UIUtils.getActiveWorkbenchShell(), parent, monitor);
                 if (dialog.open() != IDialogConstants.OK_ID) {
                     return null;
                 }
@@ -133,17 +136,17 @@ public class XuguSchemaManager extends SQLObjectEditor<XuguSchema, XuguDataSourc
     	private XuguSchema schema;
     	private XuguUser user;
         private Text nameText;
-        //private Text dbNameText;
-        private Text userNameText;
         private XuguDataSource dataSource;
-		
+        private Combo schemaOwner;
+        private DBRProgressMonitor monitor;
 
-        public NewUserDialog(Shell parentShell, XuguDataSource dataSource)
+        public NewUserDialog(Shell parentShell, XuguDataSource dataSource, DBRProgressMonitor monitor)
         {
             super(parentShell);
             this.schema = new XuguSchema(dataSource, -1, null);
             this.user = new XuguUser(dataSource, null);
             this.dataSource = dataSource;
+            this.monitor = monitor;
         }
 
         public XuguUser getUser()
@@ -177,10 +180,21 @@ public class XuguSchemaManager extends SQLObjectEditor<XuguSchema, XuguDataSourc
 
             nameText = UIUtils.createLabelText(composite, XuguMessages.dialog_schema_name, null);
             nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-  
-            userNameText = UIUtils.createLabelText(composite, XuguMessages.dialog_schema_user, null);
-            userNameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
+            schemaOwner = UIUtils.createLabelCombo(composite, XuguMessages.dialog_schema_user, 0);
+            schemaOwner.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+            try {
+				Collection<XuguUser> userList = this.dataSource.userCache.getAllObjects(monitor, this.dataSource);
+				Iterator<XuguUser> it = userList.iterator();
+				while(it.hasNext()) {
+					XuguUser user = it.next();
+					schemaOwner.add(user.getName());
+				}
+			} catch (DBException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+            
             UIUtils.createInfoLabel(composite, XuguMessages.dialog_schema_create_info, GridData.FILL_HORIZONTAL, 2);
 
             return parent;
@@ -189,7 +203,7 @@ public class XuguSchemaManager extends SQLObjectEditor<XuguSchema, XuguDataSourc
         @Override
         protected void okPressed()
         {
-            user.setName(DBObjectNameCaseTransformer.transformObjectName(user, userNameText.getText()));
+            user.setName(DBObjectNameCaseTransformer.transformObjectName(user, schemaOwner.getText()));
             schema.setName(DBObjectNameCaseTransformer.transformObjectName(schema,nameText.getText()));
             schema.setUser(user);
             super.okPressed();

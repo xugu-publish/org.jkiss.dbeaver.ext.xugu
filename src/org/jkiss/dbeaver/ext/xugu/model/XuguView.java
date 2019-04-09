@@ -52,6 +52,7 @@ public class XuguView extends XuguTableBase implements XuguSourceObject
     private static final Log log = Log.getLog(XuguView.class);
     private String viewText;
     private int viewId;
+    private boolean force;
     private Collection<XuguTableColumn> columns = new ArrayList<XuguTableColumn>();
     public XuguView(XuguSchema schema, String name)
     {
@@ -63,6 +64,7 @@ public class XuguView extends XuguTableBase implements XuguSourceObject
         super(schema, dbResult, 1);
         this.viewId = JDBCUtils.safeGetInt(dbResult, "VIEW_ID");
         this.viewText = JDBCUtils.safeGetString(dbResult, "DEFINE");
+        this.force = false;
     }
     
     @Override
@@ -117,6 +119,14 @@ public class XuguView extends XuguTableBase implements XuguSourceObject
         this.viewText = source;
     }
 
+    @Property(viewable=true, editable=true, updatable=true, order=2)
+    public boolean getForce() {
+    	return this.force;
+    }
+    
+    public void isForce(boolean force) {
+    	this.force = force;
+    }
     @Override
     protected String getTableTypeName()
     {

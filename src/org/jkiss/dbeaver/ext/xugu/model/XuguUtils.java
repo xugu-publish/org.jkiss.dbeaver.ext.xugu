@@ -40,9 +40,9 @@ import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.DBSObjectLazy;
 import org.jkiss.utils.CommonUtils;
 
-import com.xugu.ddl.Parsing;
-
-import utils.Util;
+//import com.xugu.ddl.Parsing;
+//
+//import utils.Util;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -68,11 +68,11 @@ public class XuguUtils {
     {
         String objectFullName = DBUtils.getObjectFullName(object, DBPEvaluationContext.DDL);
         monitor.beginTask("Load sources for " + objectType + " '" + objectFullName + "'...", 1);
-        String sql = Util.resSql();
-        System.out.println(sql);
+//        String sql = Util.resSql();
+//        System.out.println(sql);
         Connection conn = object.getDataSource().getConnection();
-        String ddl = new Parsing().loadDDL((com.xugu.cloudjdbc.Connection) conn, "SYSDBA", "T1");
-//        String ddl = JDBCUtils.generateTableDDL(monitor, (XuguTableBase)object, options, true);
+//        String ddl = new Parsing().loadDDL((com.xugu.cloudjdbc.Connection) conn, "SYSDBA", "T1");
+        String ddl = JDBCUtils.generateTableDDL(monitor, (XuguTableBase)object, options, true);
         return ddl;
     }
 

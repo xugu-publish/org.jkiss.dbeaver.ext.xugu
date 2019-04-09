@@ -923,7 +923,7 @@ public class XuguDataSource extends JDBCDataSource
         }
     }
 
-    static class UserCache extends JDBCStructLookupCache<XuguDataSource, XuguUser, XuguUser> {
+    public static class UserCache extends JDBCStructLookupCache<XuguDataSource, XuguUser, XuguUser> {
         public UserCache() {
         	super("USER_NAME");
             setListOrderComparator(DBUtils.<XuguUser>nameComparator());
