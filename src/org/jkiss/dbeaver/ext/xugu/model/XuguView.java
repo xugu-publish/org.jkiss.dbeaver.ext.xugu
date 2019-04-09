@@ -53,6 +53,7 @@ public class XuguView extends XuguTableBase implements XuguSourceObject
     private String viewText;
     private int viewId;
     private boolean force;
+    private boolean replace;
     private Collection<XuguTableColumn> columns = new ArrayList<XuguTableColumn>();
     public XuguView(XuguSchema schema, String name)
     {
@@ -120,13 +121,23 @@ public class XuguView extends XuguTableBase implements XuguSourceObject
     }
 
     @Property(viewable=true, editable=true, updatable=true, order=2)
-    public boolean getForce() {
+    public boolean isReplace() {
+    	return this.replace;
+    }
+    
+    public void setReplace(boolean replace) {
+    	this.replace = replace;
+    }
+    
+    @Property(viewable=true, editable=true, updatable=true, order=3)
+    public boolean isForce() {
     	return this.force;
     }
     
-    public void isForce(boolean force) {
+    public void setForce(boolean force) {
     	this.force = force;
     }
+    
     @Override
     protected String getTableTypeName()
     {
