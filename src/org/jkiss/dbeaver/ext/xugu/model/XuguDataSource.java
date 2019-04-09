@@ -311,7 +311,8 @@ public class XuguDataSource extends JDBCDataSource
 
     @Association
     public Collection<XuguUser> getUsers(DBRProgressMonitor monitor) throws DBException {
-        return userCache.getAllObjects(monitor, this);
+    	Collection<XuguUser> allusers = userCache.getAllObjects(monitor, this);
+        return allusers;
     }
 
     @Association
@@ -848,9 +849,7 @@ public class XuguDataSource extends JDBCDataSource
             DBSObjectFilter schemaFilters = owner.getContainer().getObjectFilter(XuguSchema.class, null, false);
         	//xfc 根据owner的用户角色选取不同的语句来查询schema
         	schemasQuery.append("SELECT * FROM ");
-        	schemasQuery.append(owner.roleFlag);
-        	schemasQuery.append("_SCHEMAS");
-        	//当有检索条件时 只查询指定表 用于新建表之后的刷新工作
+        	schemasQuery.append("ALL_SCHEMAS");
         	if(schema!=null) {
         		schemasQuery.append(" WHERE SCHEMA_NAME = '");
         		schemasQuery.append(schema.getName());
@@ -938,9 +937,7 @@ public class XuguDataSource extends JDBCDataSource
 		public JDBCStatement prepareLookupStatement(JDBCSession session, XuguDataSource owner, XuguUser user,
 				String objectName) throws SQLException {
 			StringBuilder sql = new StringBuilder("SELECT * FROM ");
-			sql.append(owner.roleFlag);
-			sql.append("_USERS WHERE IS_ROLE=FALSE");
-			//当有检索条件时 只查询指定表 用于新建表之后的刷新工作
+			sql.append("ALL_USERS WHERE IS_ROLE=FALSE");
         	if(user!=null) {
         		sql.append(" AND USER_NAME = '");
         		sql.append(user.getName());
