@@ -702,6 +702,11 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
                 sql.append("'");
             }
             sql.append(") USING(TABLE_ID)");
+            sql.append(" WHERE DB_ID=(SELECT DB_ID FROM ");
+        	sql.append(owner.roleFlag);
+        	sql.append("_DATABASES WHERE DB_NAME='");
+        	sql.append(owner.getDataSource().connection.getCatalog());
+        	sql.append("')");
             System.out.println("SSSSS "+sql.toString());
             JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
             return dbStat;
@@ -815,6 +820,11 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
             sql.append(owner.roleFlag);
             sql.append("_CONSTRAINTS f2 ON f.REF_TABLE_ID=f2.TABLE_ID ");
             sql.append("WHERE CONS_TYPE='F'");
+            sql.append(" AND DB_ID=(SELECT DB_ID FROM ");
+        	sql.append(owner.roleFlag);
+        	sql.append("_DATABASES WHERE DB_NAME='");
+        	sql.append(owner.getDataSource().connection.getCatalog());
+        	sql.append("')");
             System.out.println("GGGet FFFFkey "+sql.toString());
             JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
 
@@ -893,8 +903,13 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
             sql.append("_COLUMNS) as x INNER JOIN ");
             sql.append(owner.roleFlag);
             sql.append("_TABLES USING(TABLE_ID) USING(TABLE_ID)");
+            sql.append(" WHERE DB_ID=(SELECT DB_ID FROM ");
+        	sql.append(owner.roleFlag);
+        	sql.append("_DATABASES WHERE DB_NAME='");
+        	sql.append(owner.getDataSource().connection.getCatalog());
+        	sql.append("')");
             if (forTable != null) {
-                sql.append(" WHERE TABLE_ID=(SELECT TABLE_ID FROM ");
+                sql.append(" AND TABLE_ID=(SELECT TABLE_ID FROM ");
                 sql.append(owner.roleFlag);
                 sql.append("_TABLES WHERE TABLE_NAME='");
                 sql.append(forTable.getName());
@@ -983,7 +998,12 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         	StringBuilder sql = new StringBuilder();
         	sql.append("SELECT * FROM ");
         	sql.append(owner.roleFlag);
-        	sql.append("_SEQUENCES ORDER BY SEQ_NAME");
+        	sql.append("_SEQUENCES");
+        	sql.append(" WHERE DB_ID=(SELECT DB_ID FROM ");
+        	sql.append(owner.roleFlag);
+        	sql.append("_DATABASES WHERE DB_NAME='");
+        	sql.append(owner.getDataSource().connection.getCatalog());
+        	sql.append("') ORDER BY SEQ_NAME");
             final JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
             return dbStat;
         }
@@ -1009,6 +1029,11 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         	sql.append(owner.roleFlag);
         	sql.append("_PROCEDURES WHERE SCHEMA_ID=");
         	sql.append(owner.id);
+        	sql.append(" AND DB_ID=(SELECT DB_ID FROM ");
+        	sql.append(owner.roleFlag);
+        	sql.append("_DATABASES WHERE DB_NAME='");
+        	sql.append(owner.getDataSource().connection.getCatalog());
+        	sql.append("')");
         	//当有检索条件时 只查询指定表 用于新建表之后的刷新工作
         	if(object!=null) {
         		sql.append(" AND PROC_ID = ");
@@ -1041,6 +1066,11 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         	sql.append(owner.roleFlag);
         	sql.append("_PACKAGES WHERE SCHEMA_ID=");
         	sql.append(owner.id);
+        	sql.append(" AND DB_ID=(SELECT DB_ID FROM ");
+        	sql.append(owner.roleFlag);
+        	sql.append("_DATABASES WHERE DB_NAME='");
+        	sql.append(owner.getDataSource().connection.getCatalog());
+        	sql.append("')");
             JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
             return dbStat;
         }
@@ -1067,6 +1097,11 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         	sql.append(owner.roleFlag);
         	sql.append("_SYNONYMS WHERE SCHEMA_ID=");
         	sql.append(owner.id);
+        	sql.append(" AND DB_ID=(SELECT DB_ID FROM ");
+        	sql.append(owner.roleFlag);
+        	sql.append("_DATABASES WHERE DB_NAME='");
+        	sql.append(owner.getDataSource().connection.getCatalog());
+        	sql.append("')");
             JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
             return dbStat;
         }
@@ -1091,6 +1126,11 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         	sql.append(owner.roleFlag);
         	sql.append("_TYPES WHERE SCHEMA_ID=");
         	sql.append(owner.id);
+        	sql.append(" AND DB_ID=(SELECT DB_ID FROM ");
+        	sql.append(owner.roleFlag);
+        	sql.append("_DATABASES WHERE DB_NAME='");
+        	sql.append(owner.getDataSource().connection.getCatalog());
+        	sql.append("')");
             JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
             return dbStat;
         }
@@ -1125,6 +1165,11 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         	sql.append(owner.roleFlag);
         	sql.append("_VIEWS WHERE SCHEMA_ID=");
         	sql.append(owner.getId());
+        	sql.append(" AND DB_ID=(SELECT DB_ID FROM ");
+        	sql.append(owner.roleFlag);
+        	sql.append("_DATABASES WHERE DB_NAME='");
+        	sql.append(owner.getDataSource().connection.getCatalog());
+        	sql.append("')");
         	if(object!=null) {
         		sql.append(" AND VIEW_ID=");
         		sql.append(object.getId());
