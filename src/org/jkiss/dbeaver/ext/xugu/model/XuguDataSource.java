@@ -847,11 +847,18 @@ public class XuguDataSource extends JDBCDataSource
             StringBuilder schemasQuery = new StringBuilder();
             //过滤条件
             DBSObjectFilter schemaFilters = owner.getContainer().getObjectFilter(XuguSchema.class, null, false);
+            String dbName = owner.connection.getCatalog();
         	//xfc 根据owner的用户角色选取不同的语句来查询schema
         	schemasQuery.append("SELECT * FROM ");
-        	schemasQuery.append("ALL_SCHEMAS");
+        	schemasQuery.append(owner.getRoleFlag());
+        	schemasQuery.append("_SCHEMAS");
+        	schemasQuery.append(" WHERE DB_ID=(SELECT DB_ID FROM ");
+        	schemasQuery.append(owner.getRoleFlag());
+        	schemasQuery.append("_DATABASES WHERE DB_NAME='");
+        	schemasQuery.append(dbName);
+        	schemasQuery.append("')");
         	if(schema!=null) {
-        		schemasQuery.append(" WHERE SCHEMA_NAME = '");
+        		schemasQuery.append(" AND SCHEMA_NAME = '");
         		schemasQuery.append(schema.getName());
         		schemasQuery.append("'");
         	}
@@ -937,7 +944,14 @@ public class XuguDataSource extends JDBCDataSource
 		public JDBCStatement prepareLookupStatement(JDBCSession session, XuguDataSource owner, XuguUser user,
 				String objectName) throws SQLException {
 			StringBuilder sql = new StringBuilder("SELECT * FROM ");
-			sql.append("ALL_USERS WHERE IS_ROLE=FALSE");
+			String dbName = owner.connection.getCatalog();
+        	sql.append(owner.getRoleFlag());
+        	sql.append("_USERS");
+        	sql.append(" WHERE IS_ROLE=FALSE AND DB_ID=(SELECT DB_ID FROM ");
+        	sql.append(owner.getRoleFlag());
+        	sql.append("_DATABASES WHERE DB_NAME='");
+        	sql.append(dbName);
+        	sql.append("')");
         	if(user!=null) {
         		sql.append(" AND USER_NAME = '");
         		sql.append(user.getName());
