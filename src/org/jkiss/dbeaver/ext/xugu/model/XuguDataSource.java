@@ -80,7 +80,7 @@ public class XuguDataSource extends JDBCDataSource
     final ProfileCache profileCache = new ProfileCache();
     final public RoleCache roleCache = new RoleCache();
     
-    private Connection connection;
+    Connection connection;
     
     private xuguOutputReader outputReader;
     private XuguSchema publicSchema;
