@@ -115,6 +115,9 @@ public class XuguTableManager extends SQLTableManager<XuguTable, XuguSchema> imp
     				if("HASH".equals(part.getPartiType())) {
     					tableDef += "\nPARTITION BY "+part.getPartiType()+"("+part.getPartiKey()+") PARTITIONS "+part.getPartiValue();
     					break;
+    				}else if("AUTOMATIC".equals(part.getPartiType())) {
+    					tableDef += "\nPARTITION BY "+"RANGE("+part.getPartiKey()+") INTERVAL "+part.getAutoPartiSpan()+part.getAutoPartiType()
+    					+" PARTITIONS "+part.getPartiValue();
     				}else {
     					tableDef += "\nPARTITION BY "+part.getPartiType()+"("+part.getPartiKey()+") PARTITIONS(";
     				}

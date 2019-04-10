@@ -29,9 +29,9 @@ import java.util.List;
  */
 public class XuguTablePartition extends XuguPartitionBase<XuguTablePhysical> {
 	
-//    private List<XuguTablePartition> subPartitions;
 	public XuguTablePartition(XuguTablePhysical xuguTable,
-	        boolean subpartition, String name) {
+	        boolean subpartition, String name) 
+	{
 		super(xuguTable, subpartition, name);
 	}
 	
@@ -42,21 +42,4 @@ public class XuguTablePartition extends XuguPartitionBase<XuguTablePhysical> {
     {
         super(xuguTable, subpartition, dbResult);
     }
-
-//    @Association
-//    public Collection<XuguTablePartition> getSubPartitions()
-//    {
-//        return subPartitions;
-//    }
-//
-//    public void setSubPartitions(List<XuguTablePartition> subPartitions)
-//    {
-//        this.subPartitions = subPartitions;
-//    }
-//
-//    public boolean hasSubPartitions()
-//    {
-//        return !CommonUtils.isEmpty(subPartitions);
-//    }
-
 }

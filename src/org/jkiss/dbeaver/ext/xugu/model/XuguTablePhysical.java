@@ -191,11 +191,12 @@ public abstract class XuguTablePhysical extends XuguTableBase implements DBSObje
         	StringBuilder builder = new StringBuilder();
         	builder.append("SELECT * FROM ");
         	builder.append(table.getSchema().getRoleFlag());
-        	builder.append("_PARTIS P INNER JOIN (SELECT PARTI_TYPE, PARTI_KEY, TABLE_ID, TABLE_NAME FROM ");
+        	builder.append("_PARTIS P INNER JOIN (SELECT PARTI_TYPE, PARTI_KEY, AUTO_PARTI_TYPE, AUTO_PARTI_SPAN, TABLE_ID, TABLE_NAME FROM ");
         	builder.append(table.getSchema().getRoleFlag());
         	builder.append("_TABLES T WHERE TABLE_NAME = '");
         	builder.append(table.getName());
         	builder.append("') ON P.TABLE_ID = T.TABLE_ID");
+        	
             final JDBCPreparedStatement dbStat = session.prepareStatement(builder.toString());
             return dbStat;
         }

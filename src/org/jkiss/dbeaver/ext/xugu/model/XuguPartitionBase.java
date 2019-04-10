@@ -38,6 +38,7 @@ public abstract class XuguPartitionBase<PARENT extends DBSObject> extends XuguOb
         RANGE,
         HASH,
         LIST,
+        AUTO
     }
     
     private String partiValue;
@@ -45,7 +46,10 @@ public abstract class XuguPartitionBase<PARENT extends DBSObject> extends XuguOb
     private boolean online;
     private String partiKey;
     private int partiType;
+    private int autoPartiType;
+    private int autoPartiSpan;
     private boolean isSubParti;
+    private boolean isAuto;
 
     protected XuguPartitionBase(PARENT xuguTable,
 	        boolean subpartition, String name) {
@@ -70,11 +74,14 @@ public abstract class XuguPartitionBase<PARENT extends DBSObject> extends XuguOb
         this.online = subpartition? true : JDBCUtils.safeGetBoolean(dbResult, "ONLINE");
         this.partiKey = subpartition? JDBCUtils.safeGetString(dbResult, "SUBPARTI_KEY"):JDBCUtils.safeGetString(dbResult, "PARTI_KEY");
         this.partiType = subpartition? JDBCUtils.safeGetInt(dbResult, "SUBPARTI_TYPE"):JDBCUtils.safeGetInt(dbResult, "PARTI_TYPE");
+        if(JDBCUtils.safeGetInteger(dbResult, "AUTO_PARTI_TYPE")!=null) {
+        	this.isAuto = true;
+        	this.autoPartiType = JDBCUtils.safeGetInt(dbResult, "AUTO_PARTI_TYPE");
+        	this.autoPartiSpan = JDBCUtils.safeGetInt(dbResult, "AUTO_PARTI_SPAN");
+        }else {
+        	this.isAuto = false;
+        }
     }
-//    @Property(viewable=true, order=0)
-//    public String getPartiName() {
-//    	return partiName;
-//    }
     
     @Property(viewable = true, order = 1, updatable = true, editable=true)
     public int getPartiNo()
@@ -86,7 +93,7 @@ public abstract class XuguPartitionBase<PARENT extends DBSObject> extends XuguOb
     public String getPartiType() {
     	switch(partiType) {
     	case 1:
-    			return "RANGE";
+    			return this.isAuto?"AUTOMATIC":"RANGE";
 		case 2:
     			return "LIST";
 		case 3:
@@ -100,12 +107,17 @@ public abstract class XuguPartitionBase<PARENT extends DBSObject> extends XuguOb
     	switch(partiType) {
     	case "RANGE":
     		this.partiType = 1;
+    		this.isAuto = false;
     		break;
     	case "LIST":
     		this.partiType = 2;
     		break;
     	case "HASH":
     		this.partiType = 3;
+    		break;
+    	case "AUTOMATIC":
+    		this.partiType = 1;
+    		this.isAuto = true;
     		break;
     	}
     }
@@ -129,7 +141,72 @@ public abstract class XuguPartitionBase<PARENT extends DBSObject> extends XuguOb
 
     public void setPartiValue(String value)
     {
-    	this.partiValue = value;
+    	//对于时间类型进行特殊处理（加入引号）
+    	if(value.indexOf("-")!=-1 && value.indexOf("'")==-1) {
+    		if(value.indexOf(",")==-1) {
+    			this.partiValue = "'"+value+"'";
+    		}else {
+    			String[] values = value.split(",");
+    			for(int i=0; i<values.length; i++) {
+    				this.partiValue += "'"+values[i]+"'";
+    				if(i!=values.length) {
+        				this.partiValue += ",";
+        			}
+    			}
+    		}
+    		String[] values = value.split(",");
+    	}else {
+    		this.partiValue = value;
+    	}
+    }
+    
+    @Property(viewable = true, order = 5, updatable=true, editable=true)
+    public String getAutoPartiType() {
+    	switch(this.autoPartiType) {
+    	case 1:
+    		return "YEAR";
+    	case 2:
+    		return "MONTH";
+    	case 3:
+    		return "DAY";
+    	case 4:
+    		return "HOUR";
+    	default:
+    		return "NULL";	
+    	}
+    }
+    
+    public void setAutoPartiType(String type) {
+    	switch(type) {
+    	case "YEAR":
+    		this.autoPartiType = 1;
+    		break;
+    	case "MONTH":
+    		this.autoPartiType = 2;
+    		break;
+    	case "DAY":
+    		this.autoPartiType = 3;
+    		break;
+    	case "HOUR":
+    		this.autoPartiType = 4;
+    		break;
+    	default:
+    		this.autoPartiType = 0;
+    		break;
+    	}
+    }
+    
+    @Property(viewable = true, order = 6, updatable=true, editable=true)
+    public Integer getAutoPartiSpan()
+    {
+    	if(!this.isAuto)
+    		return null;
+        return this.autoPartiSpan;
+    }
+
+    public void setAutoPartiSpan(int value)
+    {
+    	this.autoPartiSpan = value;
     }
     
     @Property(viewable = true, order = 5, updatable=true, editable=true)
@@ -149,4 +226,5 @@ public abstract class XuguPartitionBase<PARENT extends DBSObject> extends XuguOb
     public void setSubPartition(boolean subFlag) {
     	this.isSubParti = subFlag;
     }
+    
 }

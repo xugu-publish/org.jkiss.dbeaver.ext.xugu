@@ -112,10 +112,17 @@ public class XuguTablePartitionManager extends SQLObjectEditor<XuguTablePartitio
 	    		sql.append(" VALUES('");
 		    	sql.append(command.getObject().getPartiValue());
 		    	sql.append("')");
+		    	break;
 	    	case "RANGE":
 	    		sql.append(" VALUES LESS THAN(");
 		    	sql.append(command.getObject().getPartiValue());
 		    	sql.append(")");
+		    	break;
+	    	case "AUTOMATIC":
+	    		sql.append(" VALUES LESS THAN(");
+	    		sql.append(command.getObject().getPartiValue());
+	    		sql.append(")");
+	    		break;
 	    	}
 			actions.add(new SQLDatabasePersistAction("Modify table, Add Partition", sql.toString()));
 		}
@@ -224,6 +231,7 @@ public class XuguTablePartitionManager extends SQLObjectEditor<XuguTablePartitio
             typeCombo.add("LIST");
             typeCombo.add("RANGE");
             typeCombo.add("HASH");
+            typeCombo.add("AUTOMATIC");
             
             valueText = UIUtils.createLabelText(composite, XuguMessages.dialog_tablePartition_value, null);
             valueText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -241,6 +249,24 @@ public class XuguTablePartitionManager extends SQLObjectEditor<XuguTablePartitio
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+            
+            if(table.isPersisted()) {
+            	try {
+					Collection<XuguTablePartition> parts = table.getPartitions(monitor);
+					if(parts!=null) {
+						XuguTablePartition part = parts.iterator().next();
+						String partType = part.getPartiType();
+						String partKey = part.getPartiKey();
+						typeCombo.setText(partType);
+						colCombo.setText(partKey);
+						typeCombo.setEnabled(false);
+						colCombo.setEnabled(false);
+					}
+				} catch (DBException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+            }
             
             UIUtils.createInfoLabel(composite, XuguMessages.dialog_tablePartition_create_info, GridData.FILL_HORIZONTAL, 2);
 
