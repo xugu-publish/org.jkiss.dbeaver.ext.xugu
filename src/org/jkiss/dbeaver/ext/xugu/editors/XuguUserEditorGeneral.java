@@ -18,6 +18,10 @@
 package org.jkiss.dbeaver.ext.xugu.editors;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.*;
 import org.jkiss.dbeaver.DBException;
@@ -57,6 +61,10 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
     private Text userNameText;
     private Text passwordText;
     private Text confirmText;
+    private Text roleText;
+    private Combo roleCombo;
+    private Button addRole;
+    private Button removeRole;
     private Button lockCheck;
     private Button expireCheck;
     private Text timeText;
@@ -106,10 +114,89 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
         timeText = UIUtils.createLabelText(loginGroup, XuguMessages.editors_user_editor_general_label_valid_until, untilTime);
         ControlPropertyCommandListener.create(this, timeText, UserPropertyHandler.UNTIL_TIME);
         
-        //暂时禁止修改用户锁定及口令失效 无论是否新建用户
+        roleCombo = UIUtils.createLabelCombo(loginGroup, XuguMessages.editors_user_editor_general_label_role_list, 0);
+        if(newUser) {
+        	String[] roles = getDatabaseObject().getRoleList().split(",");
+            for(int i=0; i<roles.length; i++) {
+            	roleCombo.add(roles[i]);
+            }
+        }
+        
+        addRole = UIUtils.createPushButton(loginGroup, XuguMessages.editors_user_editor_general_label_add_role, null);
+        removeRole = UIUtils.createPushButton(loginGroup, XuguMessages.editors_user_editor_general_label_remove_role, null);
+        
+        //不允许手动修改角色列表文本框
+        roleText = UIUtils.createLabelText(loginGroup, XuguMessages.editors_user_editor_general_label_role_choosen, "");
+        ControlPropertyCommandListener.create(this, roleText, UserPropertyHandler.ROLE_LIST);
+        roleText.setEnabled(false);
+        
+        addRole.addSelectionListener(new SelectionListener() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				// TODO Auto-generated method stub
+				String text = roleText.getText();
+				String newRole = roleCombo.getText();
+				//追加新的角色 前提是新角色名不存在于角色文本框内容中
+				if(text!=null && !"".equals(text)) {
+					if(text.indexOf(newRole)==-1) {
+						text += ","+roleCombo.getText();
+					}
+				}else {
+					text = roleCombo.getText();
+				}
+				roleText.setText(text);
+			}
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+				// TODO Auto-generated method stub
+				System.out.println("in here?");
+			}	
+        });
+        removeRole.addSelectionListener(new SelectionListener() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				// TODO Auto-generated method stub
+				String text = roleText.getText();
+				String newRole = roleCombo.getText();
+				//删除已有角色 前提是新角色名存在于角色文本框内容中
+				if(text!=null && !"".equals(text)) {
+					int index;
+					if((index = text.indexOf(newRole))!=-1) {
+						text = text.substring(0, index)+text.substring(index+newRole.length());
+						//处理首尾逗号
+						if(text.indexOf(",")==0) {
+							text = text.substring(1);
+						}else if(text.lastIndexOf(",")==text.length()-1) {
+							text = text.substring(0, text.length()-1);
+						}
+						//处理位于中间的逗号
+						text.replaceAll(",,", ",");
+					}
+				}
+				roleText.setText(text);
+			}
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+				// TODO Auto-generated method stub
+				System.out.println("in here?");
+			}	
+        });
+        
+        
+        //暂时禁止修改用户锁定及口令失效 无论是否新建用户(check类型数据无法被PropertyHandler识别)
         lockCheck.setEnabled(false);
     	expireCheck.setEnabled(false);
         
+    	if(!newUser) {
+    		roleCombo.setEnabled(false);
+    		addRole.setEnabled(false);
+    		removeRole.setEnabled(false);
+    		roleText.setVisible(false);
+    		roleCombo.setVisible(false);
+    		addRole.setVisible(false);
+    		removeRole.setVisible(false);
+    	}
+    	
         pageControl.createProgressPanel();
 
         commandlistener = new CommandListener();
@@ -181,6 +268,10 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
         public void onSave()
         {
         	System.out.println("save and out?");
+        	//绑定用户在界面上的设置
+//        	getDatabaseObject().setRoleList(roleText.getText());
+//        	getDatabaseObject().setExpired(expireCheck.getSelection());
+//        	getDatabaseObject().setLocked(lockCheck.getSelection());
             if (newUser && getDatabaseObject().isPersisted()) {
                 newUser = false;
                 UIUtils.asyncExec(new Runnable() {

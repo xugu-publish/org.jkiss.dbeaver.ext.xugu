@@ -937,7 +937,7 @@ public class XuguDataSource extends JDBCDataSource
 
         @Override
         protected XuguUser fetchObject(@NotNull JDBCSession session, @NotNull XuguDataSource owner, @NotNull JDBCResultSet resultSet) throws SQLException, DBException {
-            return new XuguUser(owner, resultSet);
+            return new XuguUser(owner, resultSet, session.getProgressMonitor());
         }
 
 		@Override
@@ -975,12 +975,16 @@ public class XuguDataSource extends JDBCDataSource
 		}
     }
 
-    class RoleCache extends JDBCObjectCache<XuguDataSource, XuguRole> {
+    public class RoleCache extends JDBCObjectCache<XuguDataSource, XuguRole> {
         @Override
         protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguDataSource owner) throws SQLException {
             if("SYS".equals(getRoleFlag())) {
-            	return session.prepareStatement(
-                        "SELECT * FROM SYS_USERS WHERE IS_ROLE=true");
+            	StringBuilder sql = new StringBuilder();
+            	sql.append("SELECT * FROM SYS_USERS WHERE IS_ROLE=true");
+            	sql.append(" AND DB_ID=(SELECT DB_ID FROM SYS_DATABASES WHERE DB_NAME='");
+            	sql.append(owner.connection.getCatalog());
+            	sql.append("')");
+            	return session.prepareStatement(sql.toString());
             }else {
             	JDBCStatement stmt = session.createStatement();
             	stmt.setQueryString("SELECT * FROM DUAL");

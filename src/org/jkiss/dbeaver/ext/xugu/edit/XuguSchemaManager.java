@@ -144,7 +144,7 @@ public class XuguSchemaManager extends SQLObjectEditor<XuguSchema, XuguDataSourc
         {
             super(parentShell);
             this.schema = new XuguSchema(dataSource, -1, null);
-            this.user = new XuguUser(dataSource, null);
+            this.user = new XuguUser(dataSource, null, monitor);
             this.dataSource = dataSource;
             this.monitor = monitor;
         }

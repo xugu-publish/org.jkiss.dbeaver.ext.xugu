@@ -48,6 +48,8 @@ import org.jkiss.dbeaver.ui.editors.object.struct.EntityEditPage;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -81,12 +83,28 @@ public class XuguUserManager extends SQLObjectEditor<XuguUser, XuguDataSource> i
         return true;
     }
 
+    //新建用户界面显示前的准备工作
     @Override
     protected XuguUser createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context,
                                                final XuguDataSource source,
                                                Object copyFrom) {
     	context.getUserParams();
-    	XuguUser newUser = new XuguUser(source, null);
+    	XuguUser newUser = new XuguUser(source, null, monitor);
+    	//加载roleList
+    	try {
+			Collection<XuguRole> roleList = source.roleCache.getAllObjects(monitor, source);
+			Iterator<XuguRole> it = roleList.iterator();
+			String text = "";
+			while(it.hasNext()) {
+				text += it.next().getName()+",";
+			}
+			text = text.substring(0, text.length()-1);
+			newUser.setRoleList(text);
+		} catch (DBException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	        
         //修改已存在用户
         if (copyFrom instanceof XuguUser) {
             XuguUser tplUser = (XuguUser)copyFrom;
@@ -105,6 +123,7 @@ public class XuguUserManager extends SQLObjectEditor<XuguUser, XuguDataSource> i
         return newUser;
     }
     
+    //点击确定后 真正执行新建用户操作
     @Override
     protected void addObjectCreateActions(DBRProgressMonitor monitor, List<DBEPersistAction> actions, ObjectCreateCommand command, Map<String, Object> options)
     {
@@ -114,14 +133,18 @@ public class XuguUserManager extends SQLObjectEditor<XuguUser, XuguDataSource> i
     		String name = command.getProperties().get(UserPropertyHandler.NAME.toString()).toString();
         	String key1 = command.getProperties().get(UserPropertyHandler.PASSWORD.toString()).toString();
         	String key2 = command.getProperties().get(UserPropertyHandler.PASSWORD_CONFIRM.toString()).toString();
+        	String roleList = "";
+        	if(command.getProperties().get(UserPropertyHandler.ROLE_LIST.toString())!=null)
+        		roleList = command.getProperties().get(UserPropertyHandler.ROLE_LIST.toString()).toString();
         	if(!key1.equals(key2)) {
         		log.error("Password confirm different!");
         	}
         	else {
         		user.setName(name);
         		user.setPassword(key1);
-//        		user.setLocked((boolean) command.getProperties().get(UserPropertyHandler.LOCKED.toString()));
-//        		user.setExpired((boolean) command.getProperties().get(UserPropertyHandler.EXPIRED.toString()));
+//        		user.setLocked(locked);
+//        		user.setExpired(expired);
+        		user.setRoleList(roleList);
         		user.setUntil_time(command.getProperties().get(UserPropertyHandler.UNTIL_TIME.toString()).toString());
         		user.setPersisted(true);
         		StringBuilder sql = new StringBuilder();
@@ -130,13 +153,23 @@ public class XuguUserManager extends SQLObjectEditor<XuguUser, XuguDataSource> i
         		sql.append("\nIDENTIFIED BY '");
         		sql.append(user.getPassword());
         		sql.append("'");
+        		if(user.getRoleList()!=null && !"".equals(user.getRoleList())) {
+        			sql.append(" DEFAULT ROLE ");
+        			String[] roles = user.getRoleList().split(",");
+        			for(int i=0; i<roles.length; i++) {
+        				sql.append(roles[i]);
+        				if(i!=roles.length-1) {
+        					sql.append(",");
+        				}
+        			}
+        		}
         		if(user.getUntil_time()!=null) {
         			sql.append("\nVALID UNTIL '");
         			sql.append(user.getUntil_time());
         			sql.append("'");
         		}
-//        		sql.append(user.isLocked()?" ACCOUNT LOCK":"");
-//        		sql.append(user.isExpired()?" PASSWORD EXPIRED":"");
+        		sql.append(user.isLocked()?" ACCOUNT LOCK":"");
+        		sql.append(user.isExpired()?" PASSWORD EXPIRED":"");
         		
                 DBEPersistAction action = new SQLDatabasePersistAction("Create User", sql.toString());
                 actions.add(action);

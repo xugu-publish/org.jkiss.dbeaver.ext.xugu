@@ -112,6 +112,10 @@ public class XuguMessages extends NLS {
 	public static String editors_user_editor_general_label_locked;
 	public static String editors_user_editor_general_label_pwd_expired;
 	public static String editors_user_editor_general_label_valid_until;
+	public static String editors_user_editor_general_label_role_list;
+	public static String editors_user_editor_general_label_role_choosen;
+	public static String editors_user_editor_general_label_add_role;
+	public static String editors_user_editor_general_label_remove_role;
 	public static String tools_db_export_wizard_job_dump_log_reader;
 	public static String tools_db_export_wizard_message_export_completed;
 	public static String tools_db_export_wizard_monitor_bytes;

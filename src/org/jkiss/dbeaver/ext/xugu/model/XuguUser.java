@@ -71,8 +71,9 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
     private Timestamp create_time;
     private Timestamp last_modi_time;
     private Connection conn;
+    private String role_list;
 
-    public XuguUser(XuguDataSource dataSource, ResultSet resultSet) {
+    public XuguUser(XuguDataSource dataSource, ResultSet resultSet, DBRProgressMonitor monitor) {
         super(dataSource, true);
         if(resultSet!=null) {
         	try {
@@ -176,6 +177,15 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
 		this.expired = expired;
 	}
 
+	@Property(viewable=false, editable = true)
+	public String getRoleList() {
+		return this.role_list;
+	}
+	
+	public void setRoleList(String list) {
+		this.role_list = list;
+	}
+	
 	public Timestamp getPass_set_time() {
 		return pass_set_time;
 	}

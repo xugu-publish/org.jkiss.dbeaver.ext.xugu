@@ -33,6 +33,7 @@ public enum UserPropertyHandler implements DBEPropertyHandler<XuguUser>, DBEProp
     LOCKED,
     EXPIRED,
     UNTIL_TIME,
+    ROLE_LIST,
     MAX_QUERIES,
     MAX_UPDATES,
     MAX_CONNECTIONS,
