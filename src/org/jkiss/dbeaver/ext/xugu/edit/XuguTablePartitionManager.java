@@ -235,7 +235,7 @@ public class XuguTablePartitionManager extends SQLObjectEditor<XuguTablePartitio
             nameText = UIUtils.createLabelText(composite, XuguMessages.dialog_tablePartition_name, null);
             nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             
-            typeCombo = UIUtils.createLabelCombo(composite, "Type", 0);
+            typeCombo = UIUtils.createLabelCombo(composite, XuguMessages.dialog_tablePartition_type, 0);
             typeCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             typeCombo.add("LIST");
             typeCombo.add("RANGE");
@@ -245,7 +245,7 @@ public class XuguTablePartitionManager extends SQLObjectEditor<XuguTablePartitio
             valueText = UIUtils.createLabelText(composite, XuguMessages.dialog_tablePartition_value, null);
             valueText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             
-            colCombo = UIUtils.createLabelCombo(composite, "Avaliable column", 0);
+            colCombo = UIUtils.createLabelCombo(composite, XuguMessages.dialog_tablePartition_col_Combo_label, 0);
             colCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             //加载字段信息
             try {
@@ -260,13 +260,13 @@ public class XuguTablePartitionManager extends SQLObjectEditor<XuguTablePartitio
 				e.printStackTrace();
 			}
             
-            addCol = UIUtils.createPushButton(composite, "Add Col", null);
+            addCol = UIUtils.createPushButton(composite, XuguMessages.dialog_tablePartition_add_col, null);
             addCol.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             
-            removeCol = UIUtils.createPushButton(composite, "Remove Col", null);
+            removeCol = UIUtils.createPushButton(composite, XuguMessages.dialog_tablePartition_remove_col, null);
             removeCol.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             
-            colText = UIUtils.createLabelText(composite, "Choosen column", null);
+            colText = UIUtils.createLabelText(composite, XuguMessages.dialog_tablePartition_col_Text_label, null);
             colText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             
             addCol.addSelectionListener(new SelectionListener() {
@@ -319,14 +319,14 @@ public class XuguTablePartitionManager extends SQLObjectEditor<XuguTablePartitio
     			}	
             });
             
-            autoTypeCombo = UIUtils.createLabelCombo(composite, "Auto Type", 0);
+            autoTypeCombo = UIUtils.createLabelCombo(composite, XuguMessages.dialog_tablePartition_col_AutoType_label, 0);
             autoTypeCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             autoTypeCombo.add("YEAR");
             autoTypeCombo.add("MONTH");
             autoTypeCombo.add("DAY");
             autoTypeCombo.add("HOUR");
             
-            autoSpanText = UIUtils.createLabelText(composite, "Auto Span", null);
+            autoSpanText = UIUtils.createLabelText(composite, XuguMessages.dialog_tablePartition_col_AutoSpan_label, null);
             autoSpanText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             
             //默认禁用autoTypeCombo和autoSpanText
