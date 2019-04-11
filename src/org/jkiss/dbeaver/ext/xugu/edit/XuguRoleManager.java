@@ -37,6 +37,7 @@ import org.jkiss.dbeaver.ext.xugu.model.XuguDatabase;
 import org.jkiss.dbeaver.ext.xugu.model.XuguRole;
 import org.jkiss.dbeaver.ext.xugu.model.XuguSchema;
 import org.jkiss.dbeaver.ext.xugu.model.XuguUser;
+import org.jkiss.dbeaver.ext.xugu.views.XuguWarningDialog;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.edit.DBEPersistAction;
 import org.jkiss.dbeaver.model.DBUtils;
@@ -76,21 +77,17 @@ public class XuguRoleManager extends SQLObjectEditor<XuguRole, XuguDataSource> i
     @Override
     protected XuguRole createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final XuguDataSource parent, Object copyFrom)
     {
-    	if("SYS".equals(parent.getRoleFlag())){
-    		return new UITask<XuguRole>() {
-                @Override
-                protected XuguRole runTask() {
-                    NewRoleDialog dialog = new NewRoleDialog(UIUtils.getActiveWorkbenchShell(), parent);
-                    if (dialog.open() != IDialogConstants.OK_ID) {
-                        return null;
-                    }
-                    XuguRole newRole = dialog.getRole();
-                    return newRole;
+		return new UITask<XuguRole>() {
+            @Override
+            protected XuguRole runTask() {
+                NewRoleDialog dialog = new NewRoleDialog(UIUtils.getActiveWorkbenchShell(), parent);
+                if (dialog.open() != IDialogConstants.OK_ID) {
+                    return null;
                 }
-            }.execute();
-    	}else {
-    		return null;
-    	}
+                XuguRole newRole = dialog.getRole();
+                return newRole;
+            }
+        }.execute();
     }
 
     @Override
@@ -172,12 +169,15 @@ public class XuguRoleManager extends SQLObjectEditor<XuguRole, XuguDataSource> i
         @Override
         protected void okPressed()
         {
-            role.setName(DBObjectNameCaseTransformer.transformObjectName(role, roleText.getText()));
-            role.setUserDesc(DBObjectNameCaseTransformer.transformObjectName(role,userNameText.getText()));
-            super.okPressed();
+        	if(roleText.getText()!=null && !"".equals(roleText.getText())) {
+        		role.setName(DBObjectNameCaseTransformer.transformObjectName(role, roleText.getText()));
+                role.setUserDesc(DBObjectNameCaseTransformer.transformObjectName(role,userNameText.getText()));
+                super.okPressed();
+        	}else {
+        		XuguWarningDialog warnDialog = new XuguWarningDialog(UIUtils.getActiveWorkbenchShell(), "Role name cannot be null");
+        		warnDialog.open();
+        	}
         }
-
     }
-
 }
 
