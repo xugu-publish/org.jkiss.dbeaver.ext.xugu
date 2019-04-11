@@ -35,6 +35,7 @@ import org.jkiss.dbeaver.ext.xugu.model.XuguDataSource;
 import org.jkiss.dbeaver.ext.xugu.model.XuguDatabase;
 import org.jkiss.dbeaver.ext.xugu.model.XuguSchema;
 import org.jkiss.dbeaver.ext.xugu.model.XuguUser;
+import org.jkiss.dbeaver.ext.xugu.views.XuguWarningDialog;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.edit.DBEPersistAction;
 import org.jkiss.dbeaver.model.DBUtils;
@@ -206,10 +207,15 @@ public class XuguSchemaManager extends SQLObjectEditor<XuguSchema, XuguDataSourc
         @Override
         protected void okPressed()
         {
-            user.setName(DBObjectNameCaseTransformer.transformObjectName(user, schemaOwner.getText()));
-            schema.setName(DBObjectNameCaseTransformer.transformObjectName(schema,nameText.getText()));
-            schema.setUser(user);
-            super.okPressed();
+        	if(nameText.getText()!=null && !"".equals(nameText.getText())) {
+        		user.setName(DBObjectNameCaseTransformer.transformObjectName(user, schemaOwner.getText()));
+                schema.setName(DBObjectNameCaseTransformer.transformObjectName(schema,nameText.getText()));
+                schema.setUser(user);
+                super.okPressed();
+        	}else {
+        		XuguWarningDialog warnDialog = new XuguWarningDialog(UIUtils.getActiveWorkbenchShell(), "Schema name cannot be null!");
+        		warnDialog.open();
+        	}
         }
 
     }
