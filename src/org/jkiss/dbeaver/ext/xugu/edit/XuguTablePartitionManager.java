@@ -193,6 +193,9 @@ public class XuguTablePartitionManager extends SQLObjectEditor<XuguTablePartitio
         private Combo typeCombo;
         private Text valueText;
         private Combo colCombo;
+        private Button addCol;
+        private Button removeCol;
+        private Text colText;
         
         //自动扩展分区额外选项
         private Combo autoTypeCombo;
@@ -242,7 +245,7 @@ public class XuguTablePartitionManager extends SQLObjectEditor<XuguTablePartitio
             valueText = UIUtils.createLabelText(composite, XuguMessages.dialog_tablePartition_value, null);
             valueText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             
-            colCombo = UIUtils.createLabelCombo(composite, "column", 0);
+            colCombo = UIUtils.createLabelCombo(composite, "Avaliable column", 0);
             colCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             //加载字段信息
             try {
@@ -256,6 +259,65 @@ public class XuguTablePartitionManager extends SQLObjectEditor<XuguTablePartitio
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+            
+            addCol = UIUtils.createPushButton(composite, "Add Col", null);
+            addCol.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+            
+            removeCol = UIUtils.createPushButton(composite, "Remove Col", null);
+            removeCol.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+            
+            colText = UIUtils.createLabelText(composite, "Choosen column", null);
+            colText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+            
+            addCol.addSelectionListener(new SelectionListener() {
+    			@Override
+    			public void widgetSelected(SelectionEvent e) {
+    				// TODO Auto-generated method stub
+    				String text = colText.getText();
+    				String newCol = colCombo.getText();
+    				//追加新的字段 前提是新字段名不存在于字段文本框内容中
+    				if(text!=null && !"".equals(text)) {
+    					if(text.indexOf(newCol)==-1) {
+    						text += ","+colCombo.getText();
+    					}
+    				}else {
+    					text = colCombo.getText();
+    				}
+    				colText.setText(text);
+    			}
+    			@Override
+    			public void widgetDefaultSelected(SelectionEvent e) {
+    				// do nothing
+    			}	
+            });
+            removeCol.addSelectionListener(new SelectionListener() {
+    			@Override
+    			public void widgetSelected(SelectionEvent e) {
+    				// TODO Auto-generated method stub
+    				String text = colText.getText();
+    				String newCol = colCombo.getText();
+    				//删除已有字段 前提是新字段名存在于字段文本框内容中
+    				if(text!=null && !"".equals(text)) {
+    					int index;
+    					if((index = text.indexOf(newCol))!=-1) {
+    						text = text.substring(0, index)+text.substring(index+newCol.length());
+    						//处理首尾逗号
+    						if(text.indexOf(",")==0) {
+    							text = text.substring(1);
+    						}else if(text.lastIndexOf(",")==text.length()-1) {
+    							text = text.substring(0, text.length()-1);
+    						}
+    						//处理位于中间的逗号
+    						text.replaceAll(",,", ",");
+    					}
+    				}
+    				colText.setText(text);
+    			}
+    			@Override
+    			public void widgetDefaultSelected(SelectionEvent e) {
+    				// do nothing
+    			}	
+            });
             
             autoTypeCombo = UIUtils.createLabelCombo(composite, "Auto Type", 0);
             autoTypeCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -271,6 +333,7 @@ public class XuguTablePartitionManager extends SQLObjectEditor<XuguTablePartitio
             autoTypeCombo.setEnabled(false);
             autoSpanText.setEnabled(false);
             
+            //如果表已存在且分区也存在则对属性进行预设
             if(table.isPersisted()) {
             	try {
 					Collection<XuguTablePartition> parts = table.getPartitions(monitor);
@@ -279,9 +342,13 @@ public class XuguTablePartitionManager extends SQLObjectEditor<XuguTablePartitio
 						String partType = part.getPartiType();
 						String partKey = part.getPartiKey();
 						typeCombo.setText(partType);
-						colCombo.setText(partKey);
+						partKey = partKey.replaceAll("\"", "");
+						colText.setText(partKey);
 						typeCombo.setEnabled(false);
 						colCombo.setEnabled(false);
+						colText.setEnabled(false);
+						addCol.setEnabled(false);
+						removeCol.setEnabled(false);
 						if("AUTOMATIC".equals(partType)) {
 							autoTypeCombo.setText(part.getAutoPartiType());
 							autoSpanText.setText(part.getAutoPartiSpan().toString());
@@ -301,9 +368,18 @@ public class XuguTablePartitionManager extends SQLObjectEditor<XuguTablePartitio
 				@Override
 				public void widgetSelected(SelectionEvent e) {
 					String nowType = typeCombo.getText();
-					if("AUTOMATIC".equals(nowType)) {
+					if("AUTOMATIC".equals(nowType) || "HASH".equals(nowType)) {
 						autoTypeCombo.setEnabled(true);
 						autoSpanText.setEnabled(true);
+						colText.setEnabled(false);
+						addCol.setEnabled(false);
+						removeCol.setEnabled(false);
+					}else {
+						autoTypeCombo.setEnabled(false);
+						autoSpanText.setEnabled(false);
+						colText.setEnabled(true);
+						addCol.setEnabled(true);
+						removeCol.setEnabled(true);
 					}
 				}
 				@Override
@@ -324,12 +400,14 @@ public class XuguTablePartitionManager extends SQLObjectEditor<XuguTablePartitio
             partition.setName(DBObjectNameCaseTransformer.transformObjectName(partition, nameText.getText()));
             partition.setPartiType(DBObjectNameCaseTransformer.transformObjectName(partition, typeCombo.getText()));
             partition.setPartiValue(DBObjectNameCaseTransformer.transformObjectName(partition,valueText.getText())); 
-            partition.setPartiKey(DBObjectNameCaseTransformer.transformObjectName(partition, colCombo.getText()));
             partition.setSubPartition(false);
             partition.setOnline(true);
-            if(autoTypeCombo.getText()!=null) {
+            if(autoTypeCombo.getText()!=null && !"".equals(autoTypeCombo.getText())) {
+            	partition.setPartiKey(DBObjectNameCaseTransformer.transformObjectName(partition, colCombo.getText()));
             	partition.setAutoPartiType(autoTypeCombo.getText());
             	partition.setAutoPartiSpan(Integer.parseInt(autoSpanText.getText()));
+            }else {
+            	partition.setPartiKey(DBObjectNameCaseTransformer.transformObjectName(partition, colText.getText()));
             }
             super.okPressed();
         }
