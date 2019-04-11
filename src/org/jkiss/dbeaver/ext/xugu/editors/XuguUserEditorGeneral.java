@@ -115,13 +115,6 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
         ControlPropertyCommandListener.create(this, timeText, UserPropertyHandler.UNTIL_TIME);
         
         roleCombo = UIUtils.createLabelCombo(loginGroup, XuguMessages.editors_user_editor_general_label_role_list, 0);
-        if(newUser) {
-        	String[] roles = getDatabaseObject().getRoleList().split(",");
-            for(int i=0; i<roles.length; i++) {
-            	roleCombo.add(roles[i]);
-            }
-        }
-        
         addRole = UIUtils.createPushButton(loginGroup, XuguMessages.editors_user_editor_general_label_add_role, null);
         removeRole = UIUtils.createPushButton(loginGroup, XuguMessages.editors_user_editor_general_label_remove_role, null);
         
@@ -129,6 +122,28 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
         roleText = UIUtils.createLabelText(loginGroup, XuguMessages.editors_user_editor_general_label_role_choosen, "");
         ControlPropertyCommandListener.create(this, roleText, UserPropertyHandler.ROLE_LIST);
         roleText.setEnabled(false);
+        
+        if(newUser) {
+        	//无角色信息则禁用角色组件
+        	if(getDatabaseObject().getRoleList()!=null) {
+        		String[] roles = getDatabaseObject().getRoleList().split(",");
+                if(roles!=null && !"".equals(roles[0])) {
+                	for(int i=0; i<roles.length; i++) {
+                    	roleCombo.add(roles[i]);
+                    }
+                }else {
+                	roleCombo.setEnabled(false);
+                	roleText.setEnabled(false);
+                	addRole.setEnabled(false);
+                	removeRole.setEnabled(false);
+                }
+        	}else {
+            	roleCombo.setEnabled(false);
+            	roleText.setEnabled(false);
+            	addRole.setEnabled(false);
+            	removeRole.setEnabled(false);
+            }
+        }
         
         addRole.addSelectionListener(new SelectionListener() {
 			@Override

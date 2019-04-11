@@ -93,13 +93,15 @@ public class XuguUserManager extends SQLObjectEditor<XuguUser, XuguDataSource> i
     	//加载roleList
     	try {
 			Collection<XuguRole> roleList = source.roleCache.getAllObjects(monitor, source);
-			Iterator<XuguRole> it = roleList.iterator();
-			String text = "";
-			while(it.hasNext()) {
-				text += it.next().getName()+",";
+			if(roleList!=null && roleList.size()!=0) {
+				Iterator<XuguRole> it = roleList.iterator();
+				String text = "";
+				while(it.hasNext()) {
+					text += it.next().getName()+",";
+				}
+				text = text.substring(0, text.length()-1);
+				newUser.setRoleList(text);
 			}
-			text = text.substring(0, text.length()-1);
-			newUser.setRoleList(text);
 		} catch (DBException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
