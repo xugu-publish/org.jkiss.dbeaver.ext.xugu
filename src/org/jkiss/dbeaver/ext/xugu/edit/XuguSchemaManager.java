@@ -97,7 +97,10 @@ public class XuguSchemaManager extends SQLObjectEditor<XuguSchema, XuguDataSourc
     	//xfc 修改了创建模式的sql语句 暂时不支持设置数据库
         XuguUser user = command.getObject().getUser();
         XuguSchema schema = command.getObject();
-        String sql = "CREATE SCHEMA " + schema.getName() +" AUTHORIZATION " +user.getName();
+        String sql = "CREATE SCHEMA " + schema.getName();
+        if(user.getName()!=null && !"".equals(user.getName())) {
+        	sql += " AUTHORIZATION " +user.getName();
+        }
         actions.add(new SQLDatabasePersistAction("Create schema", sql));
     }
 
