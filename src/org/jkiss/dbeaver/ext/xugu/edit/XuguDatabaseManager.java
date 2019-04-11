@@ -127,7 +127,7 @@ public class XuguDatabaseManager extends SQLObjectEditor<XuguDatabase, XuguDataS
 
         @Override
         protected Point getInitialSize() {
-        	return new Point(300, 170);
+        	return new Point(300, 300);
         }
         
         @Override
@@ -136,13 +136,13 @@ public class XuguDatabaseManager extends SQLObjectEditor<XuguDatabase, XuguDataS
             getShell().setText(XuguMessages.dialog_database_create_title);
 
             Control container = super.createDialogArea(parent);
-            Composite composite = UIUtils.createPlaceholder((Composite) container, 2, 5);
+            Composite composite = UIUtils.createPlaceholder((Composite) container, 3, 3);
             composite.setLayoutData(new GridData(GridData.FILL_BOTH));
 
             nameText = UIUtils.createLabelText(composite, XuguMessages.dialog_database_name, null);
             nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-            UIUtils.createInfoLabel(composite, XuguMessages.dialog_database_create_info, GridData.FILL_HORIZONTAL, 2);
+            UIUtils.createInfoLabel(composite, XuguMessages.dialog_database_create_info, GridData.FILL_HORIZONTAL, 3);
 
             return parent;
         }
