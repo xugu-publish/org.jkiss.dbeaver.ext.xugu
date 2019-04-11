@@ -10,6 +10,8 @@ import java.util.Map;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
@@ -192,6 +194,10 @@ public class XuguTablePartitionManager extends SQLObjectEditor<XuguTablePartitio
         private Text valueText;
         private Combo colCombo;
         
+        //自动扩展分区额外选项
+        private Combo autoTypeCombo;
+        private Text autoSpanText;
+        
         public NewTablePartitionDialog(Shell parentShell, DBRProgressMonitor monitor, XuguTablePhysical table)
         {
             super(parentShell);
@@ -211,7 +217,7 @@ public class XuguTablePartitionManager extends SQLObjectEditor<XuguTablePartitio
         
         @Override
         protected Point getInitialSize() {
-        	return new Point(300, 250);
+        	return new Point(500, 450);
         }
 
         @Override
@@ -238,6 +244,7 @@ public class XuguTablePartitionManager extends SQLObjectEditor<XuguTablePartitio
             
             colCombo = UIUtils.createLabelCombo(composite, "column", 0);
             colCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+            //加载字段信息
             try {
 				Collection<XuguTableColumn> cols = table.getAttributes(monitor);
 				Iterator<XuguTableColumn> it = cols.iterator();		
@@ -250,6 +257,20 @@ public class XuguTablePartitionManager extends SQLObjectEditor<XuguTablePartitio
 				e.printStackTrace();
 			}
             
+            autoTypeCombo = UIUtils.createLabelCombo(composite, "Auto Type", 0);
+            autoTypeCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+            autoTypeCombo.add("YEAR");
+            autoTypeCombo.add("MONTH");
+            autoTypeCombo.add("DAY");
+            autoTypeCombo.add("HOUR");
+            
+            autoSpanText = UIUtils.createLabelText(composite, "Auto Span", null);
+            autoSpanText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+            
+            //默认禁用autoTypeCombo和autoSpanText
+            autoTypeCombo.setEnabled(false);
+            autoSpanText.setEnabled(false);
+            
             if(table.isPersisted()) {
             	try {
 					Collection<XuguTablePartition> parts = table.getPartitions(monitor);
@@ -261,12 +282,35 @@ public class XuguTablePartitionManager extends SQLObjectEditor<XuguTablePartitio
 						colCombo.setText(partKey);
 						typeCombo.setEnabled(false);
 						colCombo.setEnabled(false);
+						if("AUTOMATIC".equals(partType)) {
+							autoTypeCombo.setText(part.getAutoPartiType());
+							autoSpanText.setText(part.getAutoPartiSpan().toString());
+						}
+						autoTypeCombo.setEnabled(false);
+						autoSpanText.setEnabled(false);
 					}
 				} catch (DBException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
             }
+            
+            //监听typeCombo，当属性为automatic时，运行设置自动扩展分区属性
+            typeCombo.addSelectionListener(new SelectionListener() {
+            	//根据选中类型做出动作
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					String nowType = typeCombo.getText();
+					if("AUTOMATIC".equals(nowType)) {
+						autoTypeCombo.setEnabled(true);
+						autoSpanText.setEnabled(true);
+					}
+				}
+				@Override
+				public void widgetDefaultSelected(SelectionEvent e) {
+					// do nothing
+				}
+            });
             
             UIUtils.createInfoLabel(composite, XuguMessages.dialog_tablePartition_create_info, GridData.FILL_HORIZONTAL, 2);
 
@@ -283,6 +327,10 @@ public class XuguTablePartitionManager extends SQLObjectEditor<XuguTablePartitio
             partition.setPartiKey(DBObjectNameCaseTransformer.transformObjectName(partition, colCombo.getText()));
             partition.setSubPartition(false);
             partition.setOnline(true);
+            if(autoTypeCombo.getText()!=null) {
+            	partition.setAutoPartiType(autoTypeCombo.getText());
+            	partition.setAutoPartiSpan(Integer.parseInt(autoSpanText.getText()));
+            }
             super.okPressed();
         }
 
