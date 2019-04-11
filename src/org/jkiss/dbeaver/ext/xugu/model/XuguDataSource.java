@@ -978,23 +978,25 @@ public class XuguDataSource extends JDBCDataSource
     public class RoleCache extends JDBCObjectCache<XuguDataSource, XuguRole> {
         @Override
         protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguDataSource owner) throws SQLException {
-            if("SYS".equals(getRoleFlag())) {
-            	StringBuilder sql = new StringBuilder();
-            	sql.append("SELECT * FROM SYS_USERS WHERE IS_ROLE=true");
-            	sql.append(" AND DB_ID=(SELECT DB_ID FROM SYS_DATABASES WHERE DB_NAME='");
-            	sql.append(owner.connection.getCatalog());
-            	sql.append("')");
-            	return session.prepareStatement(sql.toString());
-            }else {
-            	JDBCStatement stmt = session.createStatement();
-            	stmt.setQueryString("SELECT * FROM DUAL");
-            	return stmt;
-            }
+        	StringBuilder sql = new StringBuilder();
+        	sql.append("SELECT * FROM ");
+        	sql.append(owner.getRoleFlag());
+        	sql.append("_USERS WHERE IS_ROLE=true");
+        	sql.append(" AND DB_ID=(SELECT DB_ID FROM ");
+        	sql.append(owner.getRoleFlag());
+        	sql.append("_DATABASES WHERE DB_NAME='");
+        	sql.append(owner.connection.getCatalog());
+        	sql.append("')");
+        	return session.prepareStatement(sql.toString());      
         }
 
         @Override
         protected XuguRole fetchObject(@NotNull JDBCSession session, @NotNull XuguDataSource owner, @NotNull JDBCResultSet resultSet) throws SQLException, DBException {
-            return new XuguRole(owner, resultSet);
+            if(resultSet!=null) {
+            	return new XuguRole(owner, resultSet);
+            }else {
+            	return null;
+            }
         }
     }
 
