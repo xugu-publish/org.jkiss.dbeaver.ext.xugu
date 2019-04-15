@@ -577,6 +577,9 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
     private static XuguTableColumn getTableColumn(JDBCSession session, XuguTableBase parent, String columnName) throws DBException
     {
     	//将keys字段中的引号去掉（是否可支持多列？）
+    	if(columnName==null) {
+    		return null;
+    	}
         columnName = columnName.replaceAll("\"", "");
         //que 获取到的列为空？
         XuguTableColumn tableColumn = columnName == null ? null : parent.getAttribute(session.getProgressMonitor(), columnName);
@@ -728,41 +731,41 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
             throws SQLException, DBException
         {
             //处理多列的情况
-            String colName = JDBCUtils.safeGetStringTrimmed(dbResult, "COL_NAME");
-            if(colName.indexOf(",")!=-1) {
-            	if(colName.indexOf("(")!=-1) {
-            		colName = colName.substring(colName.indexOf("(")+1, colName.indexOf(")"));
-            	}
-            	System.out.println("CCCCCCCCoLLLLLL "+colName);
-            	String[] colNames = colName.split(",");
-            	XuguTableConstraintColumn[] con_cols = new XuguTableConstraintColumn[colNames.length];
-            	for(int i=0; i<colNames.length; i++) {
-            		System.out.println("SSingle col "+colNames[i]);
-            		XuguTableColumn tableColumn = getTableColumn(session, parent, colNames[i]);
-            		con_cols[i] = new XuguTableConstraintColumn(
+            String colName = JDBCUtils.safeGetStringTrimmed(dbResult, "DEFINE");
+            if(colName!=null) {
+            	if(colName.indexOf(",")!=-1) {
+                	if(colName.indexOf("(")!=-1) {
+                		colName = colName.substring(colName.indexOf("(")+1, colName.indexOf(")"));
+                	}
+                	System.out.println("CCCCCCCCoLLLLLL "+colName);
+                	String[] colNames = colName.split(",");
+                	XuguTableConstraintColumn[] con_cols = new XuguTableConstraintColumn[colNames.length];
+                	for(int i=0; i<colNames.length; i++) {
+                		System.out.println("SSingle col "+colNames[i]);
+                		XuguTableColumn tableColumn = getTableColumn(session, parent, colNames[i]);
+                		con_cols[i] = new XuguTableConstraintColumn(
+                                object,
+                                tableColumn,
+                                tableColumn.getOrdinalPosition());
+                	}
+                	return con_cols;
+                }
+                //处理单列但是带括号情况
+                else if(colName.indexOf("(")!=-1) {
+                	String realColName = colName.substring(colName.indexOf("(")+1, colName.indexOf(")"));
+                	XuguTableColumn tableColumn = getTableColumn(session, parent, realColName);
+                	return tableColumn == null ? null : new XuguTableConstraintColumn[] { new XuguTableConstraintColumn(
                             object,
                             tableColumn,
-                            tableColumn.getOrdinalPosition());
-            	}
-            	return con_cols;
+                            tableColumn.getOrdinalPosition()) };
+                }
             }
-            //处理单列但是带括号情况
-            else if(colName.indexOf("(")!=-1) {
-            	String realColName = colName.substring(colName.indexOf("(")+1, colName.indexOf(")"));
-            	XuguTableColumn tableColumn = getTableColumn(session, parent, realColName);
-            	return tableColumn == null ? null : new XuguTableConstraintColumn[] { new XuguTableConstraintColumn(
-                        object,
-                        tableColumn,
-                        tableColumn.getOrdinalPosition()) };
-            }
-            else {
-            	final XuguTableColumn tableColumn = getTableColumn(session, parent, dbResult);
-            	//xfc COL_NO无法从结果集直接获取 选择从column中调用get方法
-                return tableColumn == null ? null : new XuguTableConstraintColumn[] { new XuguTableConstraintColumn(
-                    object,
-                    tableColumn,
-                    tableColumn.getOrdinalPosition()) };
-            }       
+            final XuguTableColumn tableColumn = getTableColumn(session, parent, dbResult);
+        	//xfc COL_NO无法从结果集直接获取 选择从column中调用get方法
+            return tableColumn == null ? null : new XuguTableConstraintColumn[] { new XuguTableConstraintColumn(
+                object,
+                tableColumn,
+                tableColumn.getOrdinalPosition()) };
         }
 
         @Override
