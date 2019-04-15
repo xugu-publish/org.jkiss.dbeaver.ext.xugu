@@ -649,12 +649,22 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
             sql.append("SELECT * FROM ");
         	sql.append(owner.roleFlag);
         	sql.append("_COLUMNS");
+        	sql.append(" WHERE DB_ID=(SELECT DB_ID FROM ");
+        	sql.append(owner.roleFlag);
+        	sql.append("_DATABASES WHERE DB_NAME='");
+        	sql.append(owner.getDataSource().connection.getCatalog());
+        	sql.append("')");
             if (forTable != null) {
-                sql.append(" where TABLE_ID=(SELECT TABLE_ID FROM ");
+                sql.append(" AND TABLE_ID=(SELECT TABLE_ID FROM ");
                 sql.append(owner.roleFlag);
                 sql.append("_TABLES WHERE TABLE_NAME='");
                 sql.append(forTable.getName());
-                sql.append("')");
+                sql.append("'");
+                sql.append(" AND DB_ID=(SELECT DB_ID FROM ");
+            	sql.append(owner.roleFlag);
+            	sql.append("_DATABASES WHERE DB_NAME='");
+            	sql.append(owner.getDataSource().connection.getCatalog());
+                sql.append("'))");
             }
             System.out.println("sql... "+sql.toString());
             JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
@@ -692,7 +702,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         {
         	//xfc 修改了获取约束信息的sql
             StringBuilder sql = new StringBuilder(500);
-            sql.append("SELECT *, DEFINE AS COL_NAME FROM ");
+            sql.append("SELECT DISTINCT *, DEFINE AS COL_NAME FROM ");
         	sql.append(owner.roleFlag);
         	sql.append("_CONSTRAINTS INNER JOIN (SELECT s.SCHEMA_NAME, t.TABLE_ID FROM ");
             sql.append(owner.roleFlag);
@@ -754,6 +764,15 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
                 else if(colName.indexOf("(")!=-1) {
                 	String realColName = colName.substring(colName.indexOf("(")+1, colName.indexOf(")"));
                 	XuguTableColumn tableColumn = getTableColumn(session, parent, realColName);
+                	return tableColumn == null ? null : new XuguTableConstraintColumn[] { new XuguTableConstraintColumn(
+                            object,
+                            tableColumn,
+                            tableColumn.getOrdinalPosition()) };
+                }
+                //正常的单列情况
+                else {
+                	colName = colName.replaceAll("\"", "");
+                	XuguTableColumn tableColumn = getTableColumn(session, parent, colName);
                 	return tableColumn == null ? null : new XuguTableConstraintColumn[] { new XuguTableConstraintColumn(
                             object,
                             tableColumn,
