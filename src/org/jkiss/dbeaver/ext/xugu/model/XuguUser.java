@@ -19,12 +19,15 @@ package org.jkiss.dbeaver.ext.xugu.model;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.ext.xugu.model.XuguSchema.TableCache;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPRefreshableObject;
 import org.jkiss.dbeaver.model.DBPSaveableObject;
+import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.access.DBAUser;
 import org.jkiss.dbeaver.model.impl.DBObjectNameCaseTransformer;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
+import org.jkiss.dbeaver.model.impl.jdbc.cache.JDBCStructLookupCache;
 import org.jkiss.dbeaver.model.meta.Association;
 import org.jkiss.dbeaver.model.meta.Property;
 //import org.jkiss.dbeaver.model.meta.IPropertyCacheValidator;
@@ -32,12 +35,16 @@ import org.jkiss.dbeaver.model.meta.Property;
 //import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSObject;
+
+import com.xugu.permission.LoadPermission;
+
 //import org.jkiss.dbeaver.model.struct.DBSObjectLazy;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Vector;
 
 /**
@@ -47,6 +54,11 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
 {
     private static final Log log = Log.getLog(XuguUser.class);
     
+    private Vector<Object> authorityList;
+	private Vector<String> authorityKey;
+	private Vector<String> authorityValue;
+    
+	private XuguUserAuthority authority;
     //xfc 修改了用户信息的字段
     private int db_id;
 	private int user_id;
@@ -107,6 +119,23 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
             this.io_quota = JDBCUtils.safeGetInt(resultSet, "IO_QUOTA");
             this.create_time = JDBCUtils.safeGetTimestamp(resultSet, "CREATE_TIME");
             this.last_modi_time = JDBCUtils.safeGetTimestamp(resultSet, "LAST_MODI_TIME");
+            
+            //加载授权信息
+            this.authority = new XuguUserAuthority(this, this.user_name, false);
+            this.authorityList = new LoadPermission().loadPermission(conn, this.user_name);
+            authorityKey = new Vector<>();
+            authorityValue = new Vector<>();
+            Iterator<Object> it = authorityList.iterator();
+    		while(it.hasNext()) {
+    			String temp = it.next().toString();
+    			if(temp.indexOf("\"")!=-1) {
+    				authorityKey.add(temp.substring(0, temp.indexOf("\"")));
+    				authorityValue.add(temp.substring(temp.indexOf("\"")-1));
+    			}else {
+    				authorityKey.add(temp);
+    				authorityValue.add("");
+    			}
+    		}
         }
     }
 
@@ -229,7 +258,21 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
 	public Timestamp getLast_modi_time() {
 		return last_modi_time;
 	}
-
+	
+	@Property(viewable = true, order = 6)
+	public Vector<String> getAuthorityKey(){
+		return authorityKey;
+	}
+	
+	@Property(viewable = true, order = 7)
+	public Vector<String> getAuthorityValue(){
+		return authorityValue;
+	}
+	
+	public XuguUserAuthority getAuthority() {
+		return authority;
+	}
+	
 	@Override
 	public DBSObject refreshObject(DBRProgressMonitor monitor) throws DBException {
 		return this.getDataSource().userCache.refreshObject(monitor, this.getDataSource(), this);
