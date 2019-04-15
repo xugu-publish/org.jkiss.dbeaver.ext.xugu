@@ -31,6 +31,7 @@ import org.jkiss.dbeaver.model.edit.DBEPersistAction;
 import org.jkiss.dbeaver.model.impl.DBSObjectCache;
 import org.jkiss.dbeaver.model.impl.edit.SQLDatabasePersistAction;
 import org.jkiss.dbeaver.model.impl.sql.edit.struct.SQLTableColumnManager;
+import org.jkiss.dbeaver.model.messages.ModelMessages;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSDataType;
@@ -73,6 +74,20 @@ public class XuguTableColumnManager extends SQLTableColumnManager<XuguTableColum
         return column;
     }
 
+    @Override
+    protected void addObjectCreateActions(DBRProgressMonitor monitor, List<DBEPersistAction> actions, ObjectCreateCommand command, Map<String, Object> options)
+    {
+    	 final XuguTableBase table = command.getObject().getTable();
+    	 String query = "ALTER TABLE " + table.getFullyQualifiedName(DBPEvaluationContext.DDL) + " ADD "  + getNestedDeclaration(monitor, table, command, options);
+         if(command.getProperty("comment")!=null) {
+        	 query += " comment '"+command.getObject().getComment(monitor)+"'";
+         }
+    	 actions.add(
+             new SQLDatabasePersistAction(
+                 ModelMessages.model_jdbc_create_new_table_column,
+                 query ));
+    }
+    
     //修改了表结构修改的sql语句
     @Override
     protected void addObjectModifyActions(DBRProgressMonitor monitor, List<DBEPersistAction> actionList, ObjectChangeCommand command, Map<String, Object> options)
