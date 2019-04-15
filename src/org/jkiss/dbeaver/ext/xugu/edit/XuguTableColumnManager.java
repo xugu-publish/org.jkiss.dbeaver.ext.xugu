@@ -79,7 +79,7 @@ public class XuguTableColumnManager extends SQLTableColumnManager<XuguTableColum
     {
     	 final XuguTableBase table = command.getObject().getTable();
     	 String query = "ALTER TABLE " + table.getFullyQualifiedName(DBPEvaluationContext.DDL) + " ADD "  + getNestedDeclaration(monitor, table, command, options);
-         if(command.getProperty("comment")!=null) {
+         if(command.getProperty("comment")!=null && !"".equals(command.getProperty("comment"))) {
         	 query += " comment '"+command.getObject().getComment(monitor)+"'";
          }
     	 actions.add(
@@ -94,7 +94,9 @@ public class XuguTableColumnManager extends SQLTableColumnManager<XuguTableColum
     {
         final XuguTableColumn column = command.getObject();
         boolean hasComment = command.getProperty("comment") != null;
-        if (!hasComment || command.getProperties().size() > 1) {
+        boolean flag = true;
+        
+        if (!hasComment && command.getProperties().size() > 1) {
             actionList.add(new SQLDatabasePersistAction(
                 "Modify column",
                 "ALTER TABLE " + column.getTable().getFullyQualifiedName(DBPEvaluationContext.DDL) + //$NON-NLS-1$
