@@ -127,7 +127,7 @@ public class XuguDatabaseManager extends SQLObjectEditor<XuguDatabase, XuguDataS
 
         @Override
         protected Point getInitialSize() {
-        	return new Point(300, 300);
+        	return new Point(300, 250);
         }
         
         @Override
