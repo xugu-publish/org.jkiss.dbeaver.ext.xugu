@@ -8,20 +8,29 @@ import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 
 public class XuguUserAuthority extends XuguAuthorityBase{
+	private XuguUser parent;
 	
-	protected XuguUserAuthority(DBSObject parent, String name, boolean persisted) {
-		super(parent, name, persisted);
-	}
-
-	@Override
-	@Property(viewable = true, editable = true, valueTransformer = DBObjectNameCaseTransformer.class, order = 1)
-	public Vector<String> getDatabaseAuthority(){
-		return super.getDatabaseAuthority();
+	public XuguUserAuthority(XuguUser parent, String name, String targetName, boolean persisted) {
+		super(parent, name, targetName, persisted);
+		this.parent = parent;
 	}
 	
-	@Override
-	@Property(viewable = true, editable = true, valueTransformer = DBObjectNameCaseTransformer.class, order = 2)
-	public Vector<String> getObjectAuthority(){
-		return super.getObjectAuthority();
+	public XuguUser getUser() {
+		return this.parent;
+	}
+	
+	@Property(viewable = true, editable = false, valueTransformer = DBObjectNameCaseTransformer.class, order = 1)
+	public String getUserName() {
+		return this.parent.getName();
+	}
+	
+	@Property(viewable = true, editable = false, valueTransformer = DBObjectNameCaseTransformer.class, order = 2)
+	public String getName() {
+		return this.name;
+	}
+	
+	@Property(viewable = true, editable = false, valueTransformer = DBObjectNameCaseTransformer.class, order = 3)
+	public String getTargetName() {
+		return this.targetName;
 	}
 }

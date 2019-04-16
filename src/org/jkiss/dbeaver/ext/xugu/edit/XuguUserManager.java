@@ -90,22 +90,32 @@ public class XuguUserManager extends SQLObjectEditor<XuguUser, XuguDataSource> i
                                                Object copyFrom) {
     	context.getUserParams();
     	XuguUser newUser = new XuguUser(source, null, monitor);
-    	//加载roleList
-    	try {
-			Collection<XuguRole> roleList = source.roleCache.getAllObjects(monitor, source);
-			if(roleList!=null && roleList.size()!=0) {
-				Iterator<XuguRole> it = roleList.iterator();
-				String text = "";
-				while(it.hasNext()) {
-					text += it.next().getName()+",";
-				}
-				text = text.substring(0, text.length()-1);
-				newUser.setRoleList(text);
-			}
-		} catch (DBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//    	//加载roleList和schemaList
+//    	try {
+//			Collection<XuguRole> roleList = source.roleCache.getAllObjects(monitor, source);
+//			if(roleList!=null && roleList.size()!=0) {
+//				Iterator<XuguRole> it = roleList.iterator();
+//				String text = "";
+//				while(it.hasNext()) {
+//					text += it.next().getName()+",";
+//				}
+//				text = text.substring(0, text.length()-1);
+//				newUser.setRoleList(text);
+//			}
+//			Collection<XuguSchema> schemaList = source.getSchemas(monitor);
+//			if(schemaList!=null && schemaList.size()!=0) {
+//				Iterator<XuguSchema> it = schemaList.iterator();
+//				String text = "";
+//				while(it.hasNext()) {
+//					text += it.next().getName()+",";
+//				}
+//				text = text.substring(0, text.length()-1);
+//				newUser.setSchemaList(text);
+//			}
+//		} catch (DBException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
     	        
         //修改已存在用户
         if (copyFrom instanceof XuguUser) {
@@ -144,8 +154,6 @@ public class XuguUserManager extends SQLObjectEditor<XuguUser, XuguDataSource> i
         	else {
         		user.setName(name);
         		user.setPassword(key1);
-//        		user.setLocked(locked);
-//        		user.setExpired(expired);
         		user.setRoleList(roleList);
         		user.setUntil_time(command.getProperties().get(UserPropertyHandler.UNTIL_TIME.toString()).toString());
         		user.setPersisted(true);
@@ -198,59 +206,11 @@ public class XuguUserManager extends SQLObjectEditor<XuguUser, XuguDataSource> i
         actionList.add(action);
     }
 
-//    @Override
-//    public void deleteObject(DBECommandContext commandContext, XuguUser user, Map<String, Object> options)
-//    {
-//        commandContext.addCommand(new CommandDropUser(user), new DeleteObjectReflector<>(this), true);
-//    }
-
     @Override
     public void filterCommands(DBECommandQueue<XuguUser> queue)
     {
     	System.out.println("Create3 ??"+queue.toString());
     }
 
-//    private static class CommandCreateUser extends DBECommandAbstract<XuguUser> {
-//        protected CommandCreateUser(XuguUser user)
-//        {
-//            super(user, XuguMessages.edit_user_manager_command_create_user);
-//            System.out.println("Create2 ??");
-//        }
-//        @Override
-//        public DBEPersistAction[] getPersistActions(DBRProgressMonitor monitor, Map<String, Object> options)
-//        {
-//            return new DBEPersistAction[] {
-//                new SQLDatabasePersistAction(XuguMessages.edit_user_manager_command_create_user, "CREATE USER " + getObject().getName()) { //$NON-NLS-2$
-//                    @Override
-//                    public void afterExecute(DBCSession session, Throwable error)
-//                    {
-//                        if (error == null) {
-//                            getObject().setPersisted(true);
-//                        }
-//                    }
-//                }};
-//        }
-//    }
-
-//    private static class CommandDropUser extends DBECommandComposite<XuguUser, UserPropertyHandler> {
-//        protected CommandDropUser(XuguUser user)
-//        {
-//            super(user, XuguMessages.edit_user_manager_command_drop_user);
-//        }
-//        @Override
-//        public DBEPersistAction[] getPersistActions(DBRProgressMonitor monitor, Map<String, Object> options)
-//        {
-//            return new DBEPersistAction[] {
-//                new SQLDatabasePersistAction(XuguMessages.edit_user_manager_command_drop_user, "DROP USER " + getObject().getName()) { //$NON-NLS-2$
-//                    @Override
-//                    public void afterExecute(DBCSession session, Throwable error)
-//                    {
-//                        if (error == null) {
-//                            getObject().setPersisted(false);
-//                        }
-//                    }
-//                }};
-//        }
-//    }
 }
 

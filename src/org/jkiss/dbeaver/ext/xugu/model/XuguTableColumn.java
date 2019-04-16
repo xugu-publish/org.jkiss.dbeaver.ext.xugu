@@ -115,7 +115,9 @@ public class XuguTableColumn extends JDBCTableColumn<XuguTableBase> implements D
                 this.maxVal = JDBCUtils.safeGetString(dbResult, "MAX_VAL");
                 this.minVal = JDBCUtils.safeGetString(dbResult, "MIN_VAL");
                 
-                setDefaultValue(this.defVal.replaceAll("'", ""));
+                if(this.defVal!=null) {
+                	setDefaultValue(this.defVal.replaceAll("'", ""));
+                }
                 setName(this.colName);
                 setOrdinalPosition(this.colNo);
         	}else {

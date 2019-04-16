@@ -18,6 +18,7 @@
 package org.jkiss.dbeaver.ext.xugu.editors;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.SelectionEvent;
@@ -55,7 +56,6 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
     //static final Log log = Log.getLog(MySQLUserEditorGeneral.class);
     public static final String DEF_PASSWORD_VALUE = "**********"; //$NON-NLS-1$
     public static final String DEF_UNTIL_TIME = "1970-1-1 07:00:00.933";
-
     private PageControl pageControl;
     private boolean isLoaded;
     //private PrivilegeTableControl privTable;
@@ -65,6 +65,12 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
     private Text confirmText;
     private org.eclipse.swt.widgets.List databaseAuthorityList;
     private org.eclipse.swt.widgets.List objectAuthorityList;
+    private Combo databaseAuthorityCombo;
+    private Combo schemaCombo;
+    private Combo objectTypeCombo;
+    private Combo objectCombo;
+    private Combo objectAuthorityCombo;
+    
     private Text roleText;
     private Combo roleCombo;
     private Button addRole;
@@ -84,15 +90,15 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
     public void createPartControl(Composite parent) 
     {
         pageControl = new PageControl(parent);
-
         Composite container = UIUtils.createPlaceholder(pageControl, 4, 5);
         GridData gd = new GridData(GridData.FILL_BOTH);
         container.setLayoutData(gd);
 
         newUser = !getDatabaseObject().isPersisted();
         
-        Composite loginGroup = UIUtils.createControlGroup(container, "User Properties", 2, GridData.HORIZONTAL_ALIGN_BEGINNING, 300);
-        Composite loginGroup2 = UIUtils.createControlGroup(container, "Grant Properties", 2, GridData.VERTICAL_ALIGN_BEGINNING, 300);
+        Composite loginGroup = UIUtils.createControlGroup(container, "User Properties", 2, GridData.VERTICAL_ALIGN_BEGINNING, 200);
+        Composite loginGroup2 = UIUtils.createControlGroup(container, "Database Properties", 1, GridData.VERTICAL_ALIGN_BEGINNING|GridData.FILL_BOTH, 250);
+        Composite loginGroup3 = UIUtils.createControlGroup(container, "Object Properties", 1, GridData.VERTICAL_ALIGN_BEGINNING, 250);
         //创建新用户时使用默认数据 修改用户时则使用当前用户数据 对密码做特殊处理 
         password = newUser ? "" : DEF_PASSWORD_VALUE;
         userName = newUser ? "" : getDatabaseObject().getName();
@@ -100,8 +106,6 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
         lockFlag = newUser ? false:getDatabaseObject().isLocked();
         expireFlag = newUser ? false:getDatabaseObject().isExpired();
         XuguUserAuthority authority = newUser? null:getDatabaseObject().getAuthority();
-        Vector<String> databaseAuthority = authority == null? null:authority.getDatabaseAuthority();
-        Vector<String> objectAuthority = authority == null? null:authority.getObjectAuthority();
         
         userNameText = UIUtils.createLabelText(loginGroup, XuguMessages.editors_user_editor_general_label_user_name, userName);
         ControlPropertyCommandListener.create(this, userNameText, UserPropertyHandler.NAME);
@@ -130,28 +134,6 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
         ControlPropertyCommandListener.create(this, roleText, UserPropertyHandler.ROLE_LIST);
         roleText.setEnabled(false);
         
-        databaseAuthorityList = new org.eclipse.swt.widgets.List(parent.getShell(), SWT.MULTI|SWT.V_SCROLL);
-        ControlPropertyCommandListener.create(this, databaseAuthorityList, UserPropertyHandler.AUTHORITY_KEY_LIST);
-        if(databaseAuthority!=null) {
-        	Iterator<String> it = databaseAuthority.iterator();
-        	while(it.hasNext()) {
-        		databaseAuthorityList.add(it.next());
-        	}
-        }
-        databaseAuthorityList.setToolTipText("Database Authority");
-        databaseAuthorityList.setParent(loginGroup2);
-        databaseAuthorityList.setSize(300, 150);
-        objectAuthorityList = new org.eclipse.swt.widgets.List(parent.getShell(), SWT.MULTI|SWT.V_SCROLL);
-        ControlPropertyCommandListener.create(this, objectAuthorityList, UserPropertyHandler.AUTHORITY_VALUE_LIST);
-        if(objectAuthority!=null) {
-        	Iterator<String> it = objectAuthority.iterator();
-        	while(it.hasNext()) {
-        		objectAuthorityList.add(it.next());
-        	}
-        }
-        objectAuthorityList.setToolTipText("Object Authority");
-        objectAuthorityList.setParent(loginGroup2);
-        objectAuthorityList.setSize(300,150);
         if(newUser) {
         	//无角色信息则禁用角色组件
         	if(getDatabaseObject().getRoleList()!=null) {

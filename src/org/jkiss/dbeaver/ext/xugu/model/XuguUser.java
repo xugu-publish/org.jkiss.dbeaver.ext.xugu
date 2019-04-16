@@ -25,6 +25,7 @@ import org.jkiss.dbeaver.model.DBPRefreshableObject;
 import org.jkiss.dbeaver.model.DBPSaveableObject;
 import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.access.DBAUser;
+import org.jkiss.dbeaver.model.impl.AbstractObjectCache;
 import org.jkiss.dbeaver.model.impl.DBObjectNameCaseTransformer;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
 import org.jkiss.dbeaver.model.impl.jdbc.cache.JDBCStructLookupCache;
@@ -43,8 +44,10 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Vector;
 
 /**
@@ -57,7 +60,7 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
     private Vector<Object> authorityList;
 	private Vector<String> authorityKey;
 	private Vector<String> authorityValue;
-    
+	
 	private XuguUserAuthority authority;
     //xfc 修改了用户信息的字段
     private int db_id;
@@ -84,7 +87,9 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
     private Timestamp last_modi_time;
     private Connection conn;
     private String role_list;
-
+    private String schema_list;
+    private Map<String, ArrayList<String>> table_list;
+    private Map<String, ArrayList<String>> view_List;
     public XuguUser(XuguDataSource dataSource, ResultSet resultSet, DBRProgressMonitor monitor) {
         super(dataSource, true);
         if(resultSet!=null) {
@@ -120,23 +125,38 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
             this.create_time = JDBCUtils.safeGetTimestamp(resultSet, "CREATE_TIME");
             this.last_modi_time = JDBCUtils.safeGetTimestamp(resultSet, "LAST_MODI_TIME");
             
-            //加载授权信息
-            this.authority = new XuguUserAuthority(this, this.user_name, false);
-            this.authorityList = new LoadPermission().loadPermission(conn, this.user_name);
-            authorityKey = new Vector<>();
-            authorityValue = new Vector<>();
-            Iterator<Object> it = authorityList.iterator();
-    		while(it.hasNext()) {
-    			String temp = it.next().toString();
-    			if(temp.indexOf("\"")!=-1) {
-    				authorityKey.add(temp.substring(0, temp.indexOf("\"")));
-    				authorityValue.add(temp.substring(temp.indexOf("\"")-1));
-    			}else {
-    				authorityKey.add(temp);
-    				authorityValue.add("");
-    			}
-    		}
         }
+        //加载roleList和schemaList
+        Collection<XuguRole> roleList;
+		try {
+			roleList = dataSource.roleCache.getAllObjects(monitor, dataSource);
+		
+			if(roleList!=null && roleList.size()!=0) {
+				Iterator<XuguRole> it = roleList.iterator();
+				String text = "";
+				while(it.hasNext()) {
+					text += it.next().getName()+",";
+				}
+				text = text.substring(0, text.length()-1);
+				this.setRoleList(text);
+			}
+			Collection<XuguSchema> schemaList = dataSource.getSchemas(monitor);
+			if(schemaList!=null && schemaList.size()!=0) {
+				Iterator<XuguSchema> it = schemaList.iterator();
+				String text = "";
+				
+				while(it.hasNext()) {
+					XuguSchema tempSchema = it.next();
+					//构造schemalist
+					text += tempSchema.getName()+",";
+				}
+				text = text.substring(0, text.length()-1);
+				this.setSchemaList(text);
+			}
+		} catch (DBException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 
     public static Log getLog() {
@@ -215,6 +235,15 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
 		this.role_list = list;
 	}
 	
+	@Property(viewable=false, editable = true)
+	public String getSchemaList() {
+		return this.schema_list;
+	}
+	
+	public void setSchemaList(String list) {
+		this.schema_list = list;
+	}
+	
 	public Timestamp getPass_set_time() {
 		return pass_set_time;
 	}
@@ -276,6 +305,24 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
 	@Override
 	public DBSObject refreshObject(DBRProgressMonitor monitor) throws DBException {
 		return this.getDataSource().userCache.refreshObject(monitor, this.getDataSource(), this);
+	}
+
+	public Collection<XuguUserAuthority> getUserAuthorities(){
+		Vector<Object> authorities = new LoadPermission().loadPermission(conn, this.user_name);
+		Collection<XuguUserAuthority> res = new ArrayList<>();
+		Iterator<Object> it = authorities.iterator();
+		while(it.hasNext()) {
+			String temp = it.next().toString();
+			if(temp.indexOf("\"")!=-1) {
+				String targetName = temp.substring(temp.indexOf("\"")-1);
+				XuguUserAuthority one = new XuguUserAuthority(this, temp, targetName, expired);
+				res.add(one);
+			}else {
+				XuguUserAuthority one = new XuguUserAuthority(this, temp, null, expired);
+				res.add(one);
+			}
+		}
+		return res;
 	}
 	
 //	public void loadGrants() {
