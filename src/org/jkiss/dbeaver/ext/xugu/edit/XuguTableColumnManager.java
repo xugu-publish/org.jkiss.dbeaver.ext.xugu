@@ -17,11 +17,15 @@
  */
 package org.jkiss.dbeaver.ext.xugu.edit;
 
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.ext.xugu.edit.XuguSynonymManager.NewSynonymDialog;
 import org.jkiss.dbeaver.ext.xugu.model.XuguDataType;
+import org.jkiss.dbeaver.ext.xugu.model.XuguSynonym;
 import org.jkiss.dbeaver.ext.xugu.model.XuguTableBase;
 import org.jkiss.dbeaver.ext.xugu.model.XuguTableColumn;
+import org.jkiss.dbeaver.ext.xugu.views.XuguWarningDialog;
 import org.jkiss.dbeaver.model.DBPDataKind;
 import org.jkiss.dbeaver.model.DBPEvaluationContext;
 import org.jkiss.dbeaver.model.DBUtils;
@@ -36,8 +40,13 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSDataType;
 import org.jkiss.dbeaver.model.struct.DBSObject;
+import org.jkiss.dbeaver.ui.UITask;
+import org.jkiss.dbeaver.ui.UIUtils;
 
 import java.sql.Types;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -94,19 +103,44 @@ public class XuguTableColumnManager extends SQLTableColumnManager<XuguTableColum
     {
         final XuguTableColumn column = command.getObject();
         boolean hasComment = command.getProperty("comment") != null;
+        //遍历properties 确定每一项新更改均不为空才进行action添加
         boolean flag = true;
-        
-        if (!hasComment && command.getProperties().size() > 1) {
-            actionList.add(new SQLDatabasePersistAction(
-                "Modify column",
-                "ALTER TABLE " + column.getTable().getFullyQualifiedName(DBPEvaluationContext.DDL) + //$NON-NLS-1$
-                " ALTER COLUMN " + getNestedDeclaration(monitor, column.getTable(), command, options))); //$NON-NLS-1$
+        if (!hasComment && command.getProperties().size() > 0) {
+        	Map<Object, Object> props = command.getProperties();
+        	Collection<Object> propValues = props.values();
+        	Iterator<Object> it = propValues.iterator();
+        	while(it.hasNext()) {
+        		if(it.next()==null || "".equals(it.toString())) {
+        			flag = false;
+        			break;
+        		}
+        	}
+        	if(flag) {
+        		//修改仅包含默认值做特殊处理(加上set关键字)
+            	if(command.getProperties().size()==1 && command.getProperty("defaultValue")!=null) {
+            		actionList.add(new SQLDatabasePersistAction(
+                            "Modify column",
+                            "ALTER TABLE " + column.getTable().getFullyQualifiedName(DBPEvaluationContext.DDL) + //$NON-NLS-1$
+                            " ALTER COLUMN "+ column.getName() +" SET DEFAULT '" + command.getProperty("defaultValue")+"'" )); //$NON-NLS-1$
+            	}else {
+            		actionList.add(new SQLDatabasePersistAction(
+                            "Modify column",
+                            "ALTER TABLE " + column.getTable().getFullyQualifiedName(DBPEvaluationContext.DDL) + //$NON-NLS-1$
+                            " ALTER COLUMN " + getNestedDeclaration(monitor, column.getTable(), command, options))); //$NON-NLS-1$
+            	}
+        	}else {
+        		// do nothing
+        	}
         }
-        if (hasComment) {
+        //对注释做特殊处理
+        else if (hasComment) {
             actionList.add(new SQLDatabasePersistAction(
                 "Comment column",
                 "COMMENT ON COLUMN " + column.getTable().getFullyQualifiedName(DBPEvaluationContext.DDL) + "." + DBUtils.getQuotedIdentifier(column) +
                     " IS '" + column.getComment(new VoidProgressMonitor()) + "'"));
+        }
+        else {
+        	// do nothing
         }
     }
 
