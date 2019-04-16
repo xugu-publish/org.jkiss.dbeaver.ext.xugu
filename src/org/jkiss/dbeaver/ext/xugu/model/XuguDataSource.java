@@ -836,7 +836,7 @@ public class XuguDataSource extends JDBCDataSource
 		}
     }
     
-    static class SchemaCache extends JDBCStructLookupCache<XuguDataSource, XuguSchema, XuguSchema> {
+    public static class SchemaCache extends JDBCStructLookupCache<XuguDataSource, XuguSchema, XuguSchema> {
         SchemaCache() {
         	super("SCHEMA_NAME");
             setListOrderComparator(DBUtils.<XuguSchema>nameComparator());
@@ -850,7 +850,11 @@ public class XuguDataSource extends JDBCDataSource
             String dbName = owner.connection.getCatalog();
         	//xfc 根据owner的用户角色选取不同的语句来查询schema
         	schemasQuery.append("SELECT * FROM ");
-        	schemasQuery.append(owner.getRoleFlag());
+        	if(owner.getRoleFlag()!=null && !"NULL".equals(owner.getRoleFlag())) {
+        		schemasQuery.append(owner.getRoleFlag());
+        	}else {
+        		schemasQuery.append("ALL");
+        	}
         	schemasQuery.append("_SCHEMAS");
         	schemasQuery.append(" WHERE DB_ID=(SELECT DB_ID FROM ");
         	schemasQuery.append(owner.getRoleFlag());
