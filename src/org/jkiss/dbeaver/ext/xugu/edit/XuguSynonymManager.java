@@ -7,6 +7,7 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
@@ -57,17 +58,26 @@ public class XuguSynonymManager extends SQLObjectEditor<XuguSynonym, XuguSchema>
 	@Override
 	protected void addObjectCreateActions(DBRProgressMonitor monitor, List<DBEPersistAction> actions, ObjectCreateCommand command, Map<String, Object> options) {
 		XuguSynonym synonym = command.getObject();
-		String sql = "CREATE SYNONYM " + synonym.getName() + " FOR " + synonym.getTargetName();
+		String sql = "CREATE ";
+		if(synonym.isPublic()) {
+			sql += "PUBLIC ";
+		}
+		sql += "SYNONYM " + synonym.getName() + " FOR " + synonym.getTargetName();
 		actions.add(new SQLDatabasePersistAction("Create synonym", sql));
 	}
 	
 	@Override
 	protected void addObjectDeleteActions(List<DBEPersistAction> actions,
 			SQLObjectEditor<XuguSynonym, XuguSchema>.ObjectDeleteCommand command, Map<String, Object> options) {
+		XuguSynonym synonym = command.getObject();
+		String sql = "DROP ";
+		if(synonym.isPublic()) {
+			sql += "PUBLIC ";
+		}
+		sql+="SYNONYM " + DBUtils.getQuotedIdentifier(synonym);
 		actions.add(
             new SQLDatabasePersistAction("Drop synonym",
-                "DROP SYNONYM " + DBUtils.getQuotedIdentifier(command.getObject())) //$NON-NLS-2$
-        );
+                sql));
 	}
 
 	@Override
@@ -87,7 +97,7 @@ public class XuguSynonymManager extends SQLObjectEditor<XuguSynonym, XuguSchema>
     	private XuguSynonym synonym;
         private Text nameText;
         private Text tarNameText;
-		
+		private Button isPublicButton;
 
         public NewSynonymDialog(Shell parentShell, XuguSchema dataSource)
         {
@@ -126,6 +136,8 @@ public class XuguSynonymManager extends SQLObjectEditor<XuguSynonym, XuguSchema>
             tarNameText = UIUtils.createLabelText(composite, XuguMessages.dialog_synonym_target, null);
             tarNameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
+            isPublicButton = UIUtils.createCheckbox(composite, "Is Public", false);
+            
             UIUtils.createInfoLabel(composite, XuguMessages.dialog_synonym_create_info, GridData.FILL_HORIZONTAL, 2);
 
             return parent;
@@ -136,6 +148,7 @@ public class XuguSynonymManager extends SQLObjectEditor<XuguSynonym, XuguSchema>
         {
             synonym.setName(DBObjectNameCaseTransformer.transformObjectName(synonym, nameText.getText()));
             synonym.setTargetName(DBObjectNameCaseTransformer.transformObjectName(synonym, tarNameText.getText()));
+            synonym.setPublic(isPublicButton.getSelection());
             super.okPressed();
         }
 

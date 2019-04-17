@@ -77,6 +77,11 @@ public class XuguSynonym extends XuguSchemaObject implements DBSAlias {
     	return targetName;
     }
 
+    @Property(viewable = true, editable = false, updatable=false, valueTransformer = DBObjectNameCaseTransformer.class, order = 3)
+    public boolean isPublic() {
+    	return is_pub;
+    }
+    
     public Object getObjectOwner()
     {
         final XuguSchema schema = getDataSource().schemaCache.getCachedObject(objectSchemaName);
@@ -100,6 +105,10 @@ public class XuguSynonym extends XuguSchemaObject implements DBSAlias {
     
     public void setTargetName(String name) {
     	targetName = name;
+    }
+    
+    public void setPublic(boolean is_pub) {
+    	this.is_pub = is_pub;
     }
 
 	public Object getObject(DBRProgressMonitor monitor) throws DBException {

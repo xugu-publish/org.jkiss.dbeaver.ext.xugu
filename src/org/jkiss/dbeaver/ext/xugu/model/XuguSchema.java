@@ -1119,6 +1119,8 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         	sql.append(owner.roleFlag);
         	sql.append("_SYNONYMS WHERE SCHEMA_ID=");
         	sql.append(owner.id);
+        	//加上公有的同义词
+        	sql.append(" OR SCHEMA_ID=0");
         	sql.append(" AND DB_ID=(SELECT DB_ID FROM ");
         	sql.append(owner.roleFlag);
         	sql.append("_DATABASES WHERE DB_NAME='");
