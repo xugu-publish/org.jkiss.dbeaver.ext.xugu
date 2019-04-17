@@ -62,6 +62,7 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
 	private Vector<String> authorityValue;
 	
 	private XuguUserAuthority authority;
+	DBRProgressMonitor monitor;
     //xfc 修改了用户信息的字段
     private int db_id;
 	private int user_id;
@@ -89,10 +90,9 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
     private String role_list;
     private Collection<XuguUserAuthority> userAuthorities;
     private String schema_list;
-    private Map<String, ArrayList<String>> table_list;
-    private Map<String, ArrayList<String>> view_List;
     public XuguUser(XuguDataSource dataSource, ResultSet resultSet, DBRProgressMonitor monitor) {
         super(dataSource, true);
+        this.monitor = monitor;
         if(resultSet!=null) {
         	try {
 				conn = resultSet.getStatement().getConnection();
@@ -348,6 +348,25 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
 	
 	public void removeAuthority(XuguUserAuthority authority) {
 		userAuthorities.remove(authority);
+	}
+	
+	public String getTableList(String schema) {
+		try {
+			Collection<XuguTable> tableList = this.getDataSource().schemaCache.getCachedObject(schema).getTables(monitor);
+			if(tableList!=null) {
+				String res = "";
+				Iterator<XuguTable> it = tableList.iterator();
+				while(it.hasNext()) {
+					res += it.next().getName()+",";
+				}
+				res = res.substring(0, res.length()-1);
+				return res;
+			}
+		} catch (DBException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return "";
 	}
 	
 //	public void loadGrants() {

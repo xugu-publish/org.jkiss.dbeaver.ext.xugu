@@ -137,8 +137,73 @@ public class XuguUtils {
     }
     
     public static String transformAuthority(String authority) {
-    	if("可创建表".equals(authority)) {
-    		return "CREATE TABLE";
+    	String action ="";
+    	String type = "";
+    	String any ="ANY";
+    	if(authority!=null) {
+    		//处理动词
+        	if(authority.contains("创建")) {
+        		action = "CREATE";
+        	}else if(authority.contains("修改")){
+        		action = "ALTER";
+        	}else if(authority.contains("删除")) {
+        		action = "DROP";
+        	}else if(authority.contains("查询")) {
+    			action = "SELECT";
+    		}else if(authority.contains("读")) {
+    			action = "SELECT";
+    		}else if(authority.contains("插入")) {
+    			action = "INSERT";
+    		}else if(authority.contains("删除")) {
+    			action = "DELETE";
+    		}else if(authority.contains("更新")) {
+    			action = "UPDATE";
+    		}else if(authority.contains("更改")) {
+    			action = "UPDATE";
+    		}else if(authority.contains("引用")) {
+    			action = "REFERENCES";
+    		}
+        	
+        	//处理名词
+        	if(authority.contains("数据库")) {
+        		type = "DATABASE";
+        	}else if(authority.contains("模式")) {
+        	    type = "SCHEMA";
+        	}else if(authority.contains("表")) {
+        		type = "TABLE";
+        	}else if(authority.contains("视图")) {
+        		type = "VIEW";
+        	}else if(authority.contains("序列值")) {
+        		type = "SEQUENCE";
+        	}else if(authority.contains("包")) {
+        		type = "PACKAGE";
+        	}else if(authority.contains("存储过程")) {
+        		type = "PROCEDURE";
+        	}else if(authority.contains("触发器")) {
+        		type = "TRIGGER";
+        	}else if(authority.contains("索引")) {
+        		type = "INDEX";
+        	}else if(authority.contains("回滚段")) {
+        		type = "UNDO SEGMENT";
+        	}else if(authority.contains("同义词")) {
+        		type = "SYNONYM";
+        	}else if(authority.contains("快照")) {
+        		type = "SNAPSHOT";
+        	}else if(authority.contains("用户")) {
+        		type = "USER";
+        	}else if(authority.contains("作业")) {
+        		type = "JOB";
+        	}else if(authority.contains("角色")) {
+        		type = "ROLE";
+        	}else if(authority.contains("数据库路径")) {
+        		type = "DIR";
+        	}else if(authority.contains("UDT")) {
+        		type = "OBJECT";
+        	}
+        	if(!authority.contains("任何")) {
+        		any = "";
+        	}
+        	return action+" "+any+" "+type;
     	}
     	return "";
     }
