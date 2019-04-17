@@ -32,23 +32,26 @@ public class XuguUserAuthorityManager extends SQLObjectEditor<XuguUserAuthority,
 	@Override
 	public DBSObjectCache<? extends DBSObject, XuguUserAuthority> getObjectsCache(XuguUserAuthority object) {
 		// TODO Auto-generated method stub
+		System.out.println("Do something in here?");
 		return null;
 	}
 
 	@Override
 	protected XuguUserAuthority createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context,
 			XuguUser parent, Object copyFrom) throws DBException {
-		return new UITask<XuguUserAuthority>() {
-            @Override
-            protected XuguUserAuthority runTask() {
-            	EntityEditPage page = new EntityEditPage(parent.getDataSource(), DBSEntityType.TYPE);
-                if (!page.edit()) {
-                    return null;
-                }
-                final XuguUserAuthority userAuthority = new XuguUserAuthority(parent, "", "", false);
-                return userAuthority;
-            }
-        }.execute();
+//		return new UITask<XuguUserAuthority>() {
+//            @Override
+//            protected XuguUserAuthority runTask() {
+//            	EntityEditPage page = new EntityEditPage(parent.getDataSource(), DBSEntityType.TYPE);
+//                if (!page.edit()) {
+//                    return null;
+//                }
+//                final XuguUserAuthority userAuthority = new XuguUserAuthority(parent, "", "", false);
+//                return userAuthority;
+//            }
+//        }.execute();
+        XuguUserAuthority userAuthority = new XuguUserAuthority(parent, "", "", false, false);
+        return userAuthority;
 	}
 
 	@Override

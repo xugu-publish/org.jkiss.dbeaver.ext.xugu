@@ -13,11 +13,13 @@ public abstract class XuguAuthorityBase<PARENT extends DBSObject> extends XuguOb
 
 	private String parentName;
 	protected String targetName;
+	protected boolean isDatabase;
 	
-	protected XuguAuthorityBase(PARENT parent, String name, String targetName, boolean persisted) {
+	protected XuguAuthorityBase(PARENT parent, String name, String targetName, boolean isDatabase, boolean persisted) {
 		super(parent, name, persisted);
 		this.parentName = parent.getName();
 		this.targetName = targetName;
+		this.isDatabase = isDatabase;
 	}
 
 }

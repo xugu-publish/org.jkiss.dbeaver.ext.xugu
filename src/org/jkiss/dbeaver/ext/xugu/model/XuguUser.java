@@ -87,6 +87,7 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
     private Timestamp last_modi_time;
     private Connection conn;
     private String role_list;
+    private Collection<XuguUserAuthority> userAuthorities;
     private String schema_list;
     private Map<String, ArrayList<String>> table_list;
     private Map<String, ArrayList<String>> view_List;
@@ -156,6 +157,24 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
 		} catch (DBException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+		//加载权限
+		Vector<Object> authorities = new LoadPermission().loadPermission(conn, this.user_name);
+		userAuthorities = new ArrayList<>();
+		Iterator<Object> it = authorities.iterator();
+		while(it.hasNext()) {
+			String temp = it.next().toString();
+			//对象级权限
+			if(temp.indexOf("\"")!=-1) {
+				String targetName = temp.substring(temp.indexOf("\"")-1);
+				XuguUserAuthority one = new XuguUserAuthority(this, temp, targetName, false, expired);
+				userAuthorities.add(one);
+			}
+			//库级权限
+			else {
+				XuguUserAuthority one = new XuguUserAuthority(this, temp, null, true, expired);
+				userAuthorities.add(one);
+			}
 		}
     }
 
@@ -308,21 +327,27 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
 	}
 
 	public Collection<XuguUserAuthority> getUserAuthorities(){
-		Vector<Object> authorities = new LoadPermission().loadPermission(conn, this.user_name);
+		return userAuthorities;
+	}
+	
+	public Collection<XuguUserAuthority> getUserDatabaseAuthorities(){
 		Collection<XuguUserAuthority> res = new ArrayList<>();
-		Iterator<Object> it = authorities.iterator();
+		Iterator<XuguUserAuthority> it = userAuthorities.iterator();
 		while(it.hasNext()) {
-			String temp = it.next().toString();
-			if(temp.indexOf("\"")!=-1) {
-				String targetName = temp.substring(temp.indexOf("\"")-1);
-				XuguUserAuthority one = new XuguUserAuthority(this, temp, targetName, expired);
-				res.add(one);
-			}else {
-				XuguUserAuthority one = new XuguUserAuthority(this, temp, null, expired);
-				res.add(one);
+			XuguUserAuthority authority = it.next();
+			if(authority.isDatabase) {
+				res.add(authority);
 			}
 		}
 		return res;
+	}
+	
+	public void addUserAuthority(XuguUserAuthority authority) {
+		userAuthorities.add(authority);
+	}
+	
+	public void removeAuthority(XuguUserAuthority authority) {
+		userAuthorities.remove(authority);
 	}
 	
 //	public void loadGrants() {

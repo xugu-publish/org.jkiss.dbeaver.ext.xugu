@@ -44,6 +44,8 @@ import org.jkiss.dbeaver.model.runtime.load.DatabaseLoadService;
 import org.jkiss.dbeaver.ui.UIUtils;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
@@ -56,6 +58,20 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
     //static final Log log = Log.getLog(MySQLUserEditorGeneral.class);
     public static final String DEF_PASSWORD_VALUE = "**********"; //$NON-NLS-1$
     public static final String DEF_UNTIL_TIME = "1970-1-1 07:00:00.933";
+    
+    public static final String[] DEF_DATABASE_AUTHORITY_LIST = {
+    		"可创建表",
+    		"可删除表"
+    };
+    public static final String[] DEF_OBJECT_TYPE_LIST = {
+    		"TABLE",
+    		"VIEW",
+    		"SEQUENCE",
+    		"TRIGGER",
+    		"PACKAGE",
+    		"PROCEDURE"
+    };
+    
     private PageControl pageControl;
     private boolean isLoaded;
     //private PrivilegeTableControl privTable;
@@ -65,11 +81,17 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
     private Text confirmText;
     private org.eclipse.swt.widgets.List databaseAuthorityList;
     private org.eclipse.swt.widgets.List objectAuthorityList;
+    
     private Combo databaseAuthorityCombo;
+    
     private Combo schemaCombo;
     private Combo objectTypeCombo;
     private Combo objectCombo;
     private Combo objectAuthorityCombo;
+    
+    Collection<XuguUserAuthority> authorities;
+	ArrayList<String> databaseAuthorities;
+	ArrayList<String> objectAuthorities;
     
     private Text roleText;
     private Combo roleCombo;
@@ -97,6 +119,7 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
         newUser = !getDatabaseObject().isPersisted();
         
         Composite loginGroup = UIUtils.createControlGroup(container, "User Properties", 2, GridData.VERTICAL_ALIGN_BEGINNING, 200);
+        loginGroup.setLayoutData(new GridData(GridData.FILL_VERTICAL));
         Composite loginGroup2 = UIUtils.createControlGroup(container, "Database Properties", 1, GridData.VERTICAL_ALIGN_BEGINNING|GridData.FILL_BOTH, 250);
         Composite loginGroup3 = UIUtils.createControlGroup(container, "Object Properties", 1, GridData.VERTICAL_ALIGN_BEGINNING, 250);
         //创建新用户时使用默认数据 修改用户时则使用当前用户数据 对密码做特殊处理 
@@ -105,7 +128,6 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
         untilTime = newUser ? DEF_UNTIL_TIME:getDatabaseObject().getUntil_time().toString();
         lockFlag = newUser ? false:getDatabaseObject().isLocked();
         expireFlag = newUser ? false:getDatabaseObject().isExpired();
-        XuguUserAuthority authority = newUser? null:getDatabaseObject().getAuthority();
         
         userNameText = UIUtils.createLabelText(loginGroup, XuguMessages.editors_user_editor_general_label_user_name, userName);
         ControlPropertyCommandListener.create(this, userNameText, UserPropertyHandler.NAME);
@@ -223,6 +245,90 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
     		removeRole.setVisible(false);
     	}
     	
+    	//权限处理
+    	{
+    		//加载用户中的权限信息
+    		authorities = getDatabaseObject().getUserAuthorities();
+    		databaseAuthorities = new ArrayList<>();
+    		objectAuthorities = new ArrayList<>();
+    		if(authorities!=null) {
+    			Iterator<XuguUserAuthority> it = authorities.iterator();
+    			XuguUserAuthority authority;
+    			while(it.hasNext()) {
+    				authority = it.next();
+    				if(authority.isDatabase()) {
+    					databaseAuthorities.add(authority.getName());
+    				}else {
+    					objectAuthorities.add(authority.getName());
+    				}
+    			}
+    		}
+    		databaseAuthorityCombo = UIUtils.createLabelCombo(loginGroup2, "Database Authority", 0);
+    		for(int i=0; i<DEF_DATABASE_AUTHORITY_LIST.length; i++) {
+    			databaseAuthorityCombo.add(DEF_DATABASE_AUTHORITY_LIST[i]);
+    		}
+    		databaseAuthorityList = new org.eclipse.swt.widgets.List(loginGroup2, SWT.V_SCROLL|SWT.MULTI);
+    		databaseAuthorityList.setLayoutData(gd);
+    		if(databaseAuthorities!=null) {
+    			for(int i=0, l=databaseAuthorities.size(); i<l; i++) {
+    				databaseAuthorityList.add(databaseAuthorities.get(i));
+    			}
+    		}
+    		databaseAuthorityList.setParent(loginGroup2);
+    		ControlPropertyCommandListener.create(this, databaseAuthorityList, UserPropertyHandler.DATABASE_AUTHORITY);
+    		Button addDatabaseAuthority = UIUtils.createPushButton(loginGroup2, "Grant", null);
+    		addDatabaseAuthority.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+    		Button removeDatabaseAuthority = UIUtils.createPushButton(loginGroup2, "Revoke", null);
+    		removeDatabaseAuthority.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+    		addDatabaseAuthority.addSelectionListener(new SelectionListener() {
+    			@Override
+				public void widgetSelected(SelectionEvent e) {
+    				String authority = databaseAuthorityCombo.getText();
+    				//先判断list文本框中是否已有，已有则不添加
+    				String[] nowItems = databaseAuthorityList.getItems();
+    				boolean hasItem = false;
+    				for(int i=0, l=nowItems.length; i<l; i++) {
+    					if(nowItems[i].equals(authority)) {
+    						hasItem = true;
+    						break;
+    					}
+    				}
+    				if(!hasItem) {
+    					databaseAuthorityList.add(authority);
+    				}
+    				//全部选中
+    	        	databaseAuthorityList.selectAll();
+    	        	//激活修改监听
+    				databaseAuthorityList.notifyListeners(SWT.Modify, null);
+    				databaseAuthorityList.deselectAll();
+				}
+				@Override
+				public void widgetDefaultSelected(SelectionEvent e) {
+					// do nothing
+				}
+    		});
+    		removeDatabaseAuthority.addSelectionListener(new SelectionListener() {
+    			@Override
+				public void widgetSelected(SelectionEvent e) {
+    				String authority = databaseAuthorityCombo.getText();
+    				//将下拉框中选中的权限从列表框中删除
+    				int index=databaseAuthorityList.indexOf(authority);
+    				if(index!=-1) {
+    					databaseAuthorityList.remove(index);
+    				}
+    				//全部选中
+    	        	databaseAuthorityList.selectAll();
+    	        	//激活修改监听
+    				databaseAuthorityList.notifyListeners(SWT.Modify, null);
+    				databaseAuthorityList.deselectAll();
+				}
+				@Override
+				public void widgetDefaultSelected(SelectionEvent e) {
+					// do nothing
+				}
+    		});
+    	}
+    	
         pageControl.createProgressPanel();
 
         commandlistener = new CommandListener();
@@ -295,6 +401,8 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
         {
         	System.out.println("save and out?");
         	//绑定用户在界面上的设置
+        	
+        	
 //        	getDatabaseObject().setRoleList(roleText.getText());
 //        	getDatabaseObject().setExpired(expireCheck.getSelection());
 //        	getDatabaseObject().setLocked(lockCheck.getSelection());

@@ -135,5 +135,11 @@ public class XuguUtils {
             throw new DBCException(e, session.getDataSource());
         }
     }
-
+    
+    public static String transformAuthority(String authority) {
+    	if("可创建表".equals(authority)) {
+    		return "CREATE TABLE";
+    	}
+    	return "";
+    }
 }

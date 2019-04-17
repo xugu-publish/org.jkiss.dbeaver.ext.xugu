@@ -10,8 +10,8 @@ import org.jkiss.dbeaver.model.struct.DBSObject;
 public class XuguUserAuthority extends XuguAuthorityBase{
 	private XuguUser parent;
 	
-	public XuguUserAuthority(XuguUser parent, String name, String targetName, boolean persisted) {
-		super(parent, name, targetName, persisted);
+	public XuguUserAuthority(XuguUser parent, String name, String targetName, boolean isDatabase, boolean persisted) {
+		super(parent, name, targetName, isDatabase ,persisted);
 		this.parent = parent;
 	}
 	
@@ -32,5 +32,9 @@ public class XuguUserAuthority extends XuguAuthorityBase{
 	@Property(viewable = true, editable = false, valueTransformer = DBObjectNameCaseTransformer.class, order = 3)
 	public String getTargetName() {
 		return this.targetName;
+	}
+	
+	public boolean isDatabase() {
+		return this.isDatabase;
 	}
 }

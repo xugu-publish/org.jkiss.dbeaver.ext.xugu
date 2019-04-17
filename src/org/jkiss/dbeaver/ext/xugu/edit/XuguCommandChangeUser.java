@@ -19,8 +19,10 @@ package org.jkiss.dbeaver.ext.xugu.edit;
 
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.ext.xugu.XuguMessages;
+import org.jkiss.dbeaver.ext.xugu.XuguUtils;
 //import org.jkiss.dbeaver.ext.xugu.model.XuguDataSource;
 import org.jkiss.dbeaver.ext.xugu.model.XuguUser;
+import org.jkiss.dbeaver.ext.xugu.model.XuguUserAuthority;
 import org.jkiss.dbeaver.model.edit.DBEPersistAction;
 import org.jkiss.dbeaver.model.edit.prop.DBECommandComposite;
 import org.jkiss.dbeaver.model.exec.DBCSession;
@@ -31,6 +33,8 @@ import org.jkiss.utils.CommonUtils;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -94,9 +98,54 @@ public class XuguCommandChangeUser extends DBECommandComposite<XuguUser, UserPro
         	StringBuilder script = new StringBuilder();
             boolean hasSet;
             hasSet = generateAlterScript(script);
-
             if (hasSet) {
                 actions.add(new SQLDatabasePersistAction(XuguMessages.edit_command_change_user_action_update_user_record, script.toString()));
+            }
+            //对权限做额外处理
+            Collection<XuguUserAuthority> oldAuthorities = getObject().getUserDatabaseAuthorities();
+			Iterator<XuguUserAuthority> it;
+			
+            for(Map.Entry<Object, Object> entry:getProperties().entrySet()) {
+            	switch(UserPropertyHandler.valueOf((String)entry.getKey())) {
+            		case DATABASE_AUTHORITY:
+            			//遍历新权限列表，若旧权限不存在于其中，则做revoke操作
+            			it = oldAuthorities.iterator();
+            			XuguUserAuthority authority = null;
+            			String[] newAuthorities = (String[]) entry.getValue();
+            			while(it.hasNext()) {
+            				authority = it.next();
+            				boolean inListFlag = false;
+            				for(int i=0, l=newAuthorities.length; i<l; i++) {
+            					if(authority.getName().equals(newAuthorities[i])) {
+                					inListFlag = true;
+                					break;
+                				}
+            				}
+            				//旧权限不在列表中则revoke
+                			if(!inListFlag && authority!=null) {
+                				actions.add(new SQLDatabasePersistAction("Revoke user", 
+                						"REVOKE "+XuguUtils.transformAuthority(authority.getName())+" FROM "+getObject().getName()));
+                			}
+            			}
+            			//遍历旧权限列表，若新权限不存在于其中，则做grant操作
+            			it = oldAuthorities.iterator();
+            			for(int i=0, l=newAuthorities.length; i<l; i++) {
+            				boolean inListFlag = false;
+            				while(it.hasNext()) {
+            					authority = it.next();
+            					if(authority.getName().equals(newAuthorities[i])) {
+                					inListFlag = true;
+                					break;
+                				}
+            				}
+            				//新权限不在列表中则grant
+                			if(!inListFlag) {
+                				actions.add(new SQLDatabasePersistAction("Grant user", 
+                						"GRANT "+XuguUtils.transformAuthority(newAuthorities[i])+" TO "+getObject().getName()));
+                			}
+            			}
+            			break;
+            	}
             }
         }
         return actions.toArray(new DBEPersistAction[actions.size()]);
