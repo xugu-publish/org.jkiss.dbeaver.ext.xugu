@@ -374,6 +374,7 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
     		}
     		objectCombo = UIUtils.createLabelCombo(loginGroup3, "Object List", 0);
     		objectAuthorityCombo = UIUtils.createLabelCombo(loginGroup3, "Authority", 0);
+    		objectAuthorityList = new org.eclipse.swt.widgets.List(loginGroup3, SWT.V_SCROLL|GridData.FILL_VERTICAL);
     		SelectionListener itemChangeListener = new SelectionListener() {
     			@Override
 				public void widgetSelected(SelectionEvent e) {
@@ -388,24 +389,31 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
 					}
 					//加载权限信息
 					String[] authorityList=null;
+					String keyWord="";
 					switch(type) {
 					case "TABLE":
 						authorityList = DEF_TABLE_AUTHORITY_LIST;
+						keyWord = "表";
 						break;
 					case "VIEW":
 						authorityList = DEF_VIEW_AUTHORITY_LIST;
+						keyWord = "视图";
 						break;
 					case "SEQUENCE":
 						authorityList = DEF_SEQUENCE_AUTHORITY_LIST;
+						keyWord = "序列值";
 						break;
 					case "PACKAGE":
 						authorityList = DEF_PACKAGE_AUTHORITY_LIST;
+						keyWord = "包";
 						break;
 					case "PROCEDURE":
 						authorityList = DEF_PROCEDURE_AUTHORITY_LIST;
+						keyWord = "存储过程或函数";
 						break;
 					case "TRIGGER":
 						authorityList = DEF_TRIGGER_AUTHORITY_LIST;
+						keyWord = "触发器";
 						break;
 					}
 					if(authorityList!=null) {
@@ -423,6 +431,48 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
     		};
     		objectTypeCombo.addSelectionListener(itemChangeListener);
     		schemaCombo.addSelectionListener(itemChangeListener);
+    		objectCombo.addSelectionListener(new SelectionListener() {
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					String type = objectTypeCombo.getText();
+					String schema = schemaCombo.getText();
+					String object = objectCombo.getText();
+					String keyWord="";
+					switch(type) {
+					case "TABLE":
+						keyWord = "表";
+						break;
+					case "VIEW":
+						keyWord = "视图";
+						break;
+					case "SEQUENCE":
+						keyWord = "序列值";
+						break;
+					case "PACKAGE":
+						keyWord = "包";
+						break;
+					case "PROCEDURE":
+						keyWord = "存储过程或函数";
+						break;
+					case "TRIGGER":
+						keyWord = "触发器";
+						break;
+					}
+					//加载符合条件的已有权限
+					Iterator<String> it = objectAuthorities.iterator();
+					while(it.hasNext()) {
+						String temp = it.next();
+						if(temp.contains(keyWord) && temp.contains("\""+schema+"\".\""+object+"\"")) {
+							objectAuthorityList.add(temp);
+						}
+					}
+				}
+
+				@Override
+				public void widgetDefaultSelected(SelectionEvent e) {
+					// do nothing
+				}
+    		});
     	}
     	
         pageControl.createProgressPanel();
