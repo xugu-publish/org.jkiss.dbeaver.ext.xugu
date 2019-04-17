@@ -349,17 +349,110 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
 	public void removeAuthority(XuguUserAuthority authority) {
 		userAuthorities.remove(authority);
 	}
-	
-	public String getTableList(String schema) {
+
+	public String getObjectList(String schema, String Type) {
 		try {
-			Collection<XuguTable> tableList = this.getDataSource().schemaCache.getCachedObject(schema).getTables(monitor);
-			if(tableList!=null) {
+			Collection<XuguTable> tableList = null;
+			Collection<XuguView> viewList = null;
+			Collection<XuguSequence> seqList = null;
+			Collection<XuguPackage> pacList = null;
+			Collection<XuguProcedureStandalone> procList = null;
+			Collection<XuguTableTrigger> triList = null;
+			switch(Type) {
+			case "TABLE":
+				tableList = this.getDataSource().schemaCache.getCachedObject(schema).getTables(monitor);
+				break;
+			case "VIEW":
+				viewList = this.getDataSource().schemaCache.getCachedObject(schema).getViews(monitor);
+				break;
+			case "SEQUENCE":
+				seqList = this.getDataSource().schemaCache.getCachedObject(schema).getSequences(monitor);
+				break;
+			case "PACKAGE":
+				pacList = this.getDataSource().schemaCache.getCachedObject(schema).getPackages(monitor);
+				break;
+			case "PROCEDURE":
+				procList = this.getDataSource().schemaCache.getCachedObject(schema).getProcedures(monitor);
+				break;
+			case "TRIGGER":
+				tableList = this.getDataSource().schemaCache.getCachedObject(schema).getTables(monitor);
+				Iterator<XuguTable> it = tableList.iterator();
+				while(it.hasNext()) {
+					XuguTable table = it.next();
+					if(triList==null) {
+						triList = table.getTriggers(monitor);
+					}else {
+						triList.addAll(table.getTriggers(monitor));
+					}
+					
+				}
+			}
+				
+			if(tableList!=null && "TABLE".equals(Type)) {
 				String res = "";
 				Iterator<XuguTable> it = tableList.iterator();
 				while(it.hasNext()) {
 					res += it.next().getName()+",";
 				}
-				res = res.substring(0, res.length()-1);
+				if(res.length()>0) {
+					res = res.substring(0, res.length()-1);
+				}
+				return res;
+			}
+			if(viewList!=null) {
+				String res = "";
+				Iterator<XuguView> it = viewList.iterator();
+				while(it.hasNext()) {
+					res += it.next().getName()+",";
+				}
+				if(res.length()>0) {
+					res = res.substring(0, res.length()-1);
+				}
+				return res;
+			}
+			if(seqList!=null) {
+				String res = "";
+				Iterator<XuguSequence> it = seqList.iterator();
+				while(it.hasNext()) {
+					res += it.next().getName()+",";
+				}
+				if(res.length()>0) {
+					res = res.substring(0, res.length()-1);
+				}
+				return res;
+			}
+			if(pacList!=null) {
+				String res = "";
+				Iterator<XuguPackage> it = pacList.iterator();
+				while(it.hasNext()) {
+					res += it.next().getName()+",";
+				}
+				if(res.length()>0) {
+					res = res.substring(0, res.length()-1);
+				}
+				return res;
+			}
+			if(procList!=null) {
+				String res = "";
+				Iterator<XuguProcedureStandalone> it = procList.iterator();
+				while(it.hasNext()) {
+					res += it.next().getName()+",";
+				}
+				if(res.length()>0) {
+					res = res.substring(0, res.length()-1);
+				}
+				return res;
+			}
+			if(triList!=null && triList.size()>0) {
+				String res = "";
+				Iterator<XuguTableTrigger> it = triList.iterator();
+				XuguTableTrigger trigger = it.next();
+				while(it.hasNext()) {
+					res += trigger.getTable().getName()+"."+trigger.getName()+",";
+				}
+				if(res.length()>0) {
+					res = res.substring(0, res.length()-1);
+				}
 				return res;
 			}
 		} catch (DBException e) {

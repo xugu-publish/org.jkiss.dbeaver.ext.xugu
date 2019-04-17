@@ -30,6 +30,7 @@ import org.jkiss.dbeaver.ext.xugu.XuguMessages;
 //import org.jkiss.dbeaver.ext.xugu.controls.PrivilegeTableControl;
 //import org.jkiss.dbeaver.ext.xugu.edit.XuguCommandGrantPrivilege;
 import org.jkiss.dbeaver.ext.xugu.edit.UserPropertyHandler;
+import org.jkiss.dbeaver.ext.xugu.model.XuguSchema;
 //import org.jkiss.dbeaver.ext.xugu.model.XuguGrant;
 //import org.jkiss.dbeaver.ext.xugu.model.XuguPrivilege;
 import org.jkiss.dbeaver.ext.xugu.model.XuguUser;
@@ -76,6 +77,25 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
     		"可创建任何UDT","可修改任何UDT","可删除任何UDT",
     		"可创建表","可创建视图","可创建序列值","可创建包","可创建存储过程或函数","可创建触发器","可创建索引","可创建同义词","可创建UDT"
     };
+    public static final String[] DEF_TABLE_AUTHORITY_LIST= {
+    		"可创建表","可修改表结构","可删除表","可引用表","可查询表","可插入记录，在表","可删除记录，在表","可更新记录，在表"
+    };
+    public static final String[] DEF_VIEW_AUTHORITY_LIST= {
+    		"可创建视图","可修改视图结构","可删除视图","可查询视图","可插入记录，在视图","可删除记录，在视图","可更新记录，在视图"
+    };
+    public static final String[] DEF_SEQUENCE_AUTHORITY_LIST= {
+    		"可创建序列值","可修改序列值","可删除序列值","可读序列值","可更新序列值","可引用序列值"
+    };
+    public static final String[] DEF_PACKAGE_AUTHORITY_LIST= {
+    		"可创建包","可修改包","可删除包","可执行包"
+    };
+    public static final String[] DEF_PROCEDURE_AUTHORITY_LIST= {
+    		"可创建存储过程或函数","可修改存储过程或函数","可删除存储过程或函数","可执行存储过程或函数"
+    };
+    public static final String[] DEF_TRIGGER_AUTHORITY_LIST= {
+    		"可创建触发器","可修改触发器","可删除触发器"
+    };
+    
     public static final String[] DEF_OBJECT_TYPE_LIST = {
     		"TABLE",
     		"VIEW",
@@ -342,20 +362,57 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
     		});
     		
     		//对象级权限处理
-    		objectTypeCombo = UIUtils.createLabelCombo(loginGroup3, "Object Authority", 0);
+    		objectTypeCombo = UIUtils.createLabelCombo(loginGroup3, "Object Type", 0);
     		for(int i=0, l=DEF_OBJECT_TYPE_LIST.length; i<l; i++) {
     			objectTypeCombo.add(DEF_OBJECT_TYPE_LIST[i]);
     		}
     		schemaCombo = UIUtils.createLabelCombo(loginGroup3, "Schema List", 0);
+    		Collection<XuguSchema> schemaList = getDatabaseObject().getDataSource().schemaCache.getCachedObjects();
+    		Iterator<XuguSchema> it = schemaList.iterator();
+    		while(it.hasNext()) {
+    			schemaCombo.add(it.next().getName());
+    		}
     		objectCombo = UIUtils.createLabelCombo(loginGroup3, "Object List", 0);
-    		objectTypeCombo.addSelectionListener(new SelectionListener() {
-				@Override
+    		objectAuthorityCombo = UIUtils.createLabelCombo(loginGroup3, "Authority", 0);
+    		SelectionListener itemChangeListener = new SelectionListener() {
+    			@Override
 				public void widgetSelected(SelectionEvent e) {
-					String type = objectCombo.getText();
+					String type = objectTypeCombo.getText();
+					String schema = schemaCombo.getText();
+					//加载对象信息
+					objectCombo.removeAll();
+					String objectList = getDatabaseObject().getObjectList(schema, type);
+					String[] objects = objectList.split(",");
+					for(int i=0, l=objects.length; i<l; i++) {
+						objectCombo.add(objects[i]);
+					}
+					//加载权限信息
+					String[] authorityList=null;
 					switch(type) {
 					case "TABLE":
-						
+						authorityList = DEF_TABLE_AUTHORITY_LIST;
 						break;
+					case "VIEW":
+						authorityList = DEF_VIEW_AUTHORITY_LIST;
+						break;
+					case "SEQUENCE":
+						authorityList = DEF_SEQUENCE_AUTHORITY_LIST;
+						break;
+					case "PACKAGE":
+						authorityList = DEF_PACKAGE_AUTHORITY_LIST;
+						break;
+					case "PROCEDURE":
+						authorityList = DEF_PROCEDURE_AUTHORITY_LIST;
+						break;
+					case "TRIGGER":
+						authorityList = DEF_TRIGGER_AUTHORITY_LIST;
+						break;
+					}
+					if(authorityList!=null) {
+						objectAuthorityCombo.removeAll();
+						for(int i=0, l=authorityList.length; i<l; i++) {
+							objectAuthorityCombo.add(authorityList[i]);
+						}
 					}
 				}
 
@@ -363,7 +420,9 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
 				public void widgetDefaultSelected(SelectionEvent e) {
 					// do nothing
 				}
-    		});
+    		};
+    		objectTypeCombo.addSelectionListener(itemChangeListener);
+    		schemaCombo.addSelectionListener(itemChangeListener);
     	}
     	
         pageControl.createProgressPanel();
