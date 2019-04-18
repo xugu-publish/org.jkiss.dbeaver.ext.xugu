@@ -166,7 +166,7 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
 			String temp = it.next().toString();
 			//对象级权限
 			if(temp.indexOf("\"")!=-1) {
-				String targetName = temp.substring(temp.indexOf("\"")-1);
+				String targetName = temp.substring(temp.indexOf("\""));
 				XuguUserAuthority one = new XuguUserAuthority(this, temp, targetName, false, expired);
 				userAuthorities.add(one);
 			}
@@ -244,7 +244,7 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
 	public void setExpired(boolean expired) {
 		this.expired = expired;
 	}
-
+	
 	@Property(viewable=false, editable = true)
 	public String getRoleList() {
 		return this.role_list;
@@ -336,6 +336,18 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
 		while(it.hasNext()) {
 			XuguUserAuthority authority = it.next();
 			if(authority.isDatabase) {
+				res.add(authority);
+			}
+		}
+		return res;
+	}
+	
+	public Collection<XuguUserAuthority> getUserObjectAuthorities(){
+		Collection<XuguUserAuthority> res = new ArrayList<>();
+		Iterator<XuguUserAuthority> it = userAuthorities.iterator();
+		while(it.hasNext()) {
+			XuguUserAuthority authority = it.next();
+			if(!authority.isDatabase) {
 				res.add(authority);
 			}
 		}

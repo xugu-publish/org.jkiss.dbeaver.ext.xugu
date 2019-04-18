@@ -136,7 +136,7 @@ public class XuguUtils {
         }
     }
     
-    public static String transformAuthority(String authority) {
+    public static String transformAuthority(String authority, boolean isDatabase) {
     	String action ="";
     	String type = "";
     	String any ="ANY";
@@ -203,7 +203,11 @@ public class XuguUtils {
         	if(!authority.contains("任何")) {
         		any = "";
         	}
-        	return action+" "+any+" "+type;
+        	if(isDatabase) {
+        		return action+" "+any+" "+type;
+        	}else {
+        		return action+" ON";
+        	}
     	}
     	return "";
     }

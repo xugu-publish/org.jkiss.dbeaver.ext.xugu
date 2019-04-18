@@ -103,6 +103,7 @@ public class XuguCommandChangeUser extends DBECommandComposite<XuguUser, UserPro
             }
             //对权限做额外处理
             Collection<XuguUserAuthority> oldAuthorities = getObject().getUserDatabaseAuthorities();
+            Collection<XuguUserAuthority> oldAuthorities2 = getObject().getUserObjectAuthorities();
 			Iterator<XuguUserAuthority> it;
 			
             for(Map.Entry<Object, Object> entry:getProperties().entrySet()) {
@@ -114,7 +115,7 @@ public class XuguCommandChangeUser extends DBECommandComposite<XuguUser, UserPro
             			String[] newAuthorities = (String[]) entry.getValue();
             			while(it.hasNext()) {
             				authority = it.next();
-            				boolean inListFlag = false;
+        					boolean inListFlag = false;
             				for(int i=0, l=newAuthorities.length; i<l; i++) {
             					if(authority.getName().equals(newAuthorities[i])) {
                 					inListFlag = true;
@@ -124,7 +125,7 @@ public class XuguCommandChangeUser extends DBECommandComposite<XuguUser, UserPro
             				//旧权限不在列表中则revoke
                 			if(!inListFlag && authority!=null) {
                 				actions.add(new SQLDatabasePersistAction("Revoke user", 
-                						"REVOKE "+XuguUtils.transformAuthority(authority.getName())+" FROM "+getObject().getName()));
+                						"REVOKE "+XuguUtils.transformAuthority(authority.getName(), true)+" FROM "+getObject().getName()));
                 			}
             			}
             			//遍历旧权限列表，若新权限不存在于其中，则做grant操作
@@ -133,7 +134,7 @@ public class XuguCommandChangeUser extends DBECommandComposite<XuguUser, UserPro
             				boolean inListFlag = false;
             				while(it.hasNext()) {
             					authority = it.next();
-            					if(authority.getName().equals(newAuthorities[i])) {
+        						if(authority.getName().equals(newAuthorities[i])) {
                 					inListFlag = true;
                 					break;
                 				}
@@ -141,7 +142,49 @@ public class XuguCommandChangeUser extends DBECommandComposite<XuguUser, UserPro
             				//新权限不在列表中则grant
                 			if(!inListFlag) {
                 				actions.add(new SQLDatabasePersistAction("Grant user", 
-                						"GRANT "+XuguUtils.transformAuthority(newAuthorities[i])+" TO "+getObject().getName()));
+                						"GRANT "+XuguUtils.transformAuthority(newAuthorities[i], true)+" TO "+getObject().getName()));
+                			}
+            			}
+            			break;
+            		case OBJECT_AUTHORITY:
+            			it = oldAuthorities2.iterator();
+            			String[] newAuthorities2 = (String[]) entry.getValue();
+            			String schema = getProperties().get("TARGET_SCHEMA").toString();
+            			String objectType = getProperties().get("TARGET_TYPE").toString();
+            			String object = getProperties().get("TARGET_OBJECT").toString();
+            			String realTargetName = "\""+schema+"\".\""+object+"\"";
+            			//遍历新权限列表，若旧权限不存在于其中，则做revoke操作
+            			XuguUserAuthority authority2 = null;
+            			while(it.hasNext()) {
+            				authority2 = it.next();
+        					boolean inListFlag = false;
+            				for(int i=0, l=newAuthorities2.length; i<l; i++) {
+            					if(authority2.getName().contains(newAuthorities2[i]) && authority2.getTargetName().equals(realTargetName)) {
+                					inListFlag = true;
+                					break;
+                				}
+            				}
+            				//旧权限不在列表中则revoke
+                			if(!inListFlag && authority2!=null) {
+                				actions.add(new SQLDatabasePersistAction("Revoke user", 
+                						"REVOKE "+XuguUtils.transformAuthority(authority2.getName(), false)+" "+realTargetName+" FROM "+getObject().getName()));
+                			}
+            			}
+            			//遍历旧权限列表，若新权限不存在于其中，则做grant操作
+            			it = oldAuthorities2.iterator();
+            			for(int i=0, l=newAuthorities2.length; i<l; i++) {
+            				boolean inListFlag = false;
+            				while(it.hasNext()) {
+            					authority2 = it.next();
+        						if(authority2.getName().contains(newAuthorities2[i]) && authority2.getTargetName().equals(realTargetName)) {
+                					inListFlag = true;
+                					break;
+                				}
+            				}
+            				//新权限不在列表中则grant
+                			if(!inListFlag) {
+                				actions.add(new SQLDatabasePersistAction("Grant user", 
+                						"GRANT "+XuguUtils.transformAuthority(newAuthorities2[i], false)+" "+realTargetName+" TO "+getObject().getName()));
                 			}
             			}
             			break;
