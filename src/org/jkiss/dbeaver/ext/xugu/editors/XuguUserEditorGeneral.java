@@ -317,7 +317,7 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
     			databaseAuthorityCombo.add(DEF_DATABASE_AUTHORITY_LIST[i]);
     		}
     		databaseAuthorityList = new org.eclipse.swt.widgets.List(loginGroup2, SWT.V_SCROLL|SWT.MULTI);
-    		databaseAuthorityList.setLayoutData(new RowData(300,300));
+    		databaseAuthorityList.setLayoutData(new GridData(400,180));
     		if(databaseAuthorities!=null) {
     			for(int i=0, l=databaseAuthorities.size(); i<l; i++) {
     				databaseAuthorityList.add(databaseAuthorities.get(i));
@@ -378,7 +378,7 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
     		});
     		
     		//对象级权限处理
-    		Composite subGroup = UIUtils.createControlGroup(loginGroup3, "", 2, GridData.VERTICAL_ALIGN_BEGINNING, 400);
+    		Composite subGroup = UIUtils.createControlGroup(loginGroup3, "", 2, SWT.NO_TRIM, 400);
     		//模式下拉框
     		schemaCombo = UIUtils.createLabelCombo(subGroup, "Schema List", 0);
     		Collection<XuguSchema> schemaList = getDatabaseObject().getDataSource().schemaCache.getCachedObjects();
@@ -397,7 +397,7 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
     		objectAuthorityCombo = UIUtils.createLabelCombo(subGroup, "Authority", 0);
     		//已选对象权限列表框
     		objectAuthorityList = new org.eclipse.swt.widgets.List(loginGroup3, SWT.V_SCROLL|SWT.MULTI);
-    		objectAuthorityList.setLayoutData(gd);
+    		objectAuthorityList.setLayoutData(new GridData(400,80));
     		ControlPropertyCommandListener.create(this, objectAuthorityList, UserPropertyHandler.OBJECT_AUTHORITY);
     		ControlPropertyCommandListener.create(this, schemaCombo, UserPropertyHandler.TARGET_SCHEMA);
     		ControlPropertyCommandListener.create(this, objectCombo, UserPropertyHandler.TARGET_OBJECT);
