@@ -100,7 +100,7 @@ public class XuguDatabaseManager extends SQLObjectEditor<XuguDatabase, XuguDataS
     @Override
     public void renameObject(DBECommandContext commandContext, XuguDatabase database, String newName) throws DBException
     {
-        throw new DBException("Direct database rename is not yet implemented in XuguDB. You should use export/import functions for that.");
+        throw new DBException("Direct database rename is not implemented in XuguDB. You should use export/import functions for that.");
     }
     
     static class NewDBDialog extends Dialog {

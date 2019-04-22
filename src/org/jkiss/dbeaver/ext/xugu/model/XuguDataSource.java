@@ -802,7 +802,7 @@ public class XuguDataSource extends JDBCDataSource
 		public JDBCStatement prepareLookupStatement(JDBCSession session, XuguDataSource owner, XuguDatabase object,
 				String objectName) throws SQLException {
 			return session.prepareStatement(
-	                "SELECT * FROM "+owner.roleFlag+"_DATABASES");
+	                "SELECT * FROM "+owner.roleFlag+"_DATABASES" + " WHERE DB_NAME='"+owner.getConnection().getCatalog()+"'");
 		}
         
         @Override
