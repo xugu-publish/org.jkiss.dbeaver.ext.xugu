@@ -47,6 +47,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
@@ -354,6 +355,18 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
 		return res;
 	}
 	
+	public Collection<XuguUserAuthority> getUserSubObjectAuthorities(){
+		Collection<XuguUserAuthority> res = new ArrayList<>();
+		Iterator<XuguUserAuthority> it = userAuthorities.iterator();
+		while(it.hasNext()) {
+			XuguUserAuthority authority = it.next();
+			if(!authority.isDatabase && (authority.getName().contains("列")||authority.getName().contains("触发器"))) {
+				res.add(authority);
+			}
+		}
+		return res;
+	}
+	
 	public void addUserAuthority(XuguUserAuthority authority) {
 		userAuthorities.add(authority);
 	}
@@ -362,7 +375,7 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
 		userAuthorities.remove(authority);
 	}
 
-	public String getObjectList(String schema, String Type) {
+	public String getObjectList(String schemaName, String Type, String tableName) {
 		try {
 			Collection<XuguTable> tableList = null;
 			Collection<XuguView> viewList = null;
@@ -370,34 +383,31 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
 			Collection<XuguPackage> pacList = null;
 			Collection<XuguProcedureStandalone> procList = null;
 			Collection<XuguTableTrigger> triList = null;
+			List<XuguTableColumn> colList = null;
 			switch(Type) {
 			case "TABLE":
-				tableList = this.getDataSource().schemaCache.getCachedObject(schema).getTables(monitor);
+				tableList = this.getDataSource().schemaCache.getCachedObject(schemaName).getTables(monitor);
 				break;
 			case "VIEW":
-				viewList = this.getDataSource().schemaCache.getCachedObject(schema).getViews(monitor);
+				viewList = this.getDataSource().schemaCache.getCachedObject(schemaName).getViews(monitor);
 				break;
 			case "SEQUENCE":
-				seqList = this.getDataSource().schemaCache.getCachedObject(schema).getSequences(monitor);
+				seqList = this.getDataSource().schemaCache.getCachedObject(schemaName).getSequences(monitor);
 				break;
 			case "PACKAGE":
-				pacList = this.getDataSource().schemaCache.getCachedObject(schema).getPackages(monitor);
+				pacList = this.getDataSource().schemaCache.getCachedObject(schemaName).getPackages(monitor);
 				break;
 			case "PROCEDURE":
-				procList = this.getDataSource().schemaCache.getCachedObject(schema).getProcedures(monitor);
+				procList = this.getDataSource().schemaCache.getCachedObject(schemaName).getProcedures(monitor);
 				break;
 			case "TRIGGER":
-				tableList = this.getDataSource().schemaCache.getCachedObject(schema).getTables(monitor);
-				Iterator<XuguTable> it = tableList.iterator();
-				while(it.hasNext()) {
-					XuguTable table = it.next();
-					if(triList==null) {
-						triList = table.getTriggers(monitor);
-					}else {
-						triList.addAll(table.getTriggers(monitor));
-					}
-					
-				}
+				triList = this.getDataSource().schemaCache.getCachedObject(schemaName).getTable(monitor, tableName).getTriggers(monitor);
+				break;
+			case "COLUMN":
+				XuguSchema schema = this.getDataSource().getSchema(monitor, schemaName);
+				XuguTable table = this.getDataSource().schemaCache.getCachedObject(schemaName).getTable(monitor, tableName);
+				colList = this.getDataSource().schemaCache.getCachedObject(schemaName).tableCache.getChildren(monitor, schema, table);
+				break;
 			}
 				
 			if(tableList!=null && "TABLE".equals(Type)) {
@@ -461,6 +471,17 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
 				XuguTableTrigger trigger = it.next();
 				while(it.hasNext()) {
 					res += trigger.getTable().getName()+"."+trigger.getName()+",";
+				}
+				if(res.length()>0) {
+					res = res.substring(0, res.length()-1);
+				}
+				return res;
+			}
+			if(colList!=null && colList.size()>0) {
+				String res="";
+				Iterator<XuguTableColumn> it = colList.iterator();
+				while(it.hasNext()) {
+					res += it.next().getName()+",";
 				}
 				if(res.length()>0) {
 					res = res.substring(0, res.length()-1);

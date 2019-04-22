@@ -98,6 +98,9 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
     public static final String[] DEF_TRIGGER_AUTHORITY_LIST= {
     		"可修改触发器","可删除触发器"
     };
+    public static final String[] DEF_COLUMN_AUTHORITY_LIST= {
+    		"可读列","可更新列"
+    };
     
     public static final String[] DEF_OBJECT_TYPE_LIST = {
     		"TABLE",
@@ -105,7 +108,8 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
     		"SEQUENCE",
     		"TRIGGER",
     		"PACKAGE",
-    		"PROCEDURE"
+    		"PROCEDURE",
+    		"COLUMN"
     };
     
     private PageControl pageControl;
@@ -117,6 +121,7 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
     private Text confirmText;
     private org.eclipse.swt.widgets.List databaseAuthorityList;
     private org.eclipse.swt.widgets.List objectAuthorityList;
+    private org.eclipse.swt.widgets.List subObjectAuthorityList;
     
     private Combo databaseAuthorityCombo;
     
@@ -124,6 +129,8 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
     private Combo schemaCombo;
     private Combo objectCombo;
     private Combo objectAuthorityCombo;
+    private Combo subObjectTypeCombo;
+    private Combo subObjectCombo;
     
     Collection<XuguUserAuthority> authorities;
 	ArrayList<String> databaseAuthorities;
@@ -158,12 +165,14 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
         CTabItem ti1 = new CTabItem(cf1, 1);
         CTabItem ti2 = new CTabItem(cf1, 2);
         CTabItem ti3 = new CTabItem(cf1, 3);
-        Composite loginGroup = UIUtils.createControlGroup(cf1, "User Properties", 2, GridData.VERTICAL_ALIGN_BEGINNING|GridData.FILL_HORIZONTAL, 400);
-        loginGroup.setSize(400, 200);
-        Composite loginGroup2 = UIUtils.createControlGroup(cf1, "Database Properties", 1, GridData.VERTICAL_ALIGN_BEGINNING|GridData.FILL_HORIZONTAL, 400);
-        loginGroup2.setSize(400, 200);
-        Composite loginGroup3 = UIUtils.createControlGroup(cf1, "Object Properties", 1, GridData.VERTICAL_ALIGN_BEGINNING|GridData.FILL_HORIZONTAL, 400);
-        loginGroup3.setSize(400, 200);
+        Composite loginGroup = UIUtils.createControlGroup(cf1, "User Authorities", 2, GridData.VERTICAL_ALIGN_BEGINNING|GridData.FILL_HORIZONTAL, 400);
+        loginGroup.setSize(200, 200);
+        Composite loginGroup2 = UIUtils.createControlGroup(cf1, "Database Authorities", 1, GridData.VERTICAL_ALIGN_BEGINNING|GridData.FILL_HORIZONTAL, 400);
+        loginGroup2.setSize(200, 200);
+        Composite loginGroup3 = UIUtils.createControlGroup(cf1, "Object Authorities", 2, GridData.VERTICAL_ALIGN_BEGINNING|GridData.FILL_HORIZONTAL, 400);
+        Composite subloginGroupLeft = UIUtils.createControlGroup(loginGroup3, "First Level", 2, GridData.VERTICAL_ALIGN_BEGINNING|GridData.FILL_HORIZONTAL, 400);
+        Composite subloginGroupRight = UIUtils.createControlGroup(loginGroup3, "Second Level", 2, GridData.VERTICAL_ALIGN_BEGINNING|GridData.FILL_HORIZONTAL, 400);
+        loginGroup3.setSize(200, 200);
         ti1.setControl(loginGroup);
         ti1.setText("User Properties");
         ti2.setControl(loginGroup2);
@@ -296,7 +305,7 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
     	
     	//权限处理
     	{
-    		//加载用户中的权限信息并分为库级权限和对象级权限两类
+    		//加载用户中的权限信息并分为库级权限和对象级权限两类 对象权限又分为两个级别
     		authorities = getDatabaseObject().getUserAuthorities();
     		databaseAuthorities = new ArrayList<>();
     		objectAuthorities = new ArrayList<>();
@@ -317,7 +326,7 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
     			databaseAuthorityCombo.add(DEF_DATABASE_AUTHORITY_LIST[i]);
     		}
     		databaseAuthorityList = new org.eclipse.swt.widgets.List(loginGroup2, SWT.V_SCROLL|SWT.MULTI);
-    		databaseAuthorityList.setLayoutData(new GridData(400,180));
+    		databaseAuthorityList.setLayoutData(new GridData(200,180));
     		if(databaseAuthorities!=null) {
     			for(int i=0, l=databaseAuthorities.size(); i<l; i++) {
     				databaseAuthorityList.add(databaseAuthorities.get(i));
@@ -377,8 +386,91 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
 				}
     		});
     		
-    		//对象级权限处理
-    		Composite subGroup = UIUtils.createControlGroup(loginGroup3, "", 2, SWT.NO_TRIM, 400);
+    		//二级对象处理
+    		Composite subGroup2 = UIUtils.createControlGroup(subloginGroupRight, "", 2, SWT.NO_TRIM, 200);
+    		GridData griddata = new GridData(SWT.LEFT, SWT.TOP, false, false, 1, 1);
+    		subGroup2.setLayoutData(griddata);
+    		subObjectTypeCombo = UIUtils.createLabelCombo(subGroup2, "SubObject Type", 0);
+    		subObjectCombo = UIUtils.createLabelCombo(subGroup2, "SubObject List", 0);
+    		subObjectAuthorityList = new org.eclipse.swt.widgets.List(loginGroup3, SWT.V_SCROLL|SWT.MULTI);
+    		subObjectAuthorityList.setLayoutData(new GridData(150,200));
+    		subObjectAuthorityList.setParent(subloginGroupRight);
+    		ControlPropertyCommandListener.create(this, subObjectTypeCombo, UserPropertyHandler.SUB_TARGET_TYPE);
+    		ControlPropertyCommandListener.create(this, subObjectCombo, UserPropertyHandler.SUB_TARGET_OBJECT);
+    		ControlPropertyCommandListener.create(this, subObjectAuthorityList, UserPropertyHandler.SUB_OBJECT_AUTHORITY);
+    		subObjectTypeCombo.addSelectionListener(new SelectionListener() {
+    			@Override
+				public void widgetSelected(SelectionEvent e) {
+					String schema = schemaCombo.getText();
+    				String type = subObjectTypeCombo.getText();
+    				String object = objectCombo.getText();
+    				String[] authorityList=null;
+    				//加载对象信息
+					subObjectCombo.removeAll();
+					String objectList = getDatabaseObject().getObjectList(schema, type, object);
+					String[] objects = objectList.split(",");
+					for(int i=0, l=objects.length; i<l; i++) {
+						subObjectCombo.add(objects[i]);
+					}
+    				switch(type) {
+    				case "TRIGGER":
+						authorityList = DEF_TRIGGER_AUTHORITY_LIST;
+						break;
+					case "COLUMN":
+						authorityList = DEF_COLUMN_AUTHORITY_LIST;
+						break;
+    				}
+    				if(authorityList!=null) {
+						objectAuthorityCombo.removeAll();
+						for(int i=0, l=authorityList.length; i<l; i++) {
+							objectAuthorityCombo.add(authorityList[i]);
+						}
+					}
+    				//清空二级权限列表
+    				subObjectAuthorityList.removeAll();
+    			}
+				@Override
+				public void widgetDefaultSelected(SelectionEvent e) {
+					// do nothing
+				}
+    		});
+    		//二级对象权限监听
+    		subObjectCombo.addSelectionListener(new SelectionListener() {
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					String subType = subObjectTypeCombo.getText();
+					String schema = schemaCombo.getText();
+					String object = objectCombo.getText();
+					String subObject = subObjectCombo.getText();
+					String keyWord="";
+					switch(subType) {
+					case "TRIGGER":
+						keyWord = "触发器";
+						break;
+					case "COLUMN":
+						keyWord = "列";
+						break;
+					}
+					//从全部对象权限中加载符合条件的已有二级对象权限
+					subObjectAuthorityList.removeAll();
+					Iterator<String> it = objectAuthorities.iterator();
+					while(it.hasNext()) {
+						String temp = it.next();
+						if(temp.contains(keyWord) && temp.contains("\""+schema+"\".\""+object+"\".\""+subObject+"\"")) {
+							subObjectAuthorityList.add(temp.substring(0, temp.indexOf(":")));
+						}
+					}
+				}
+
+				@Override
+				public void widgetDefaultSelected(SelectionEvent e) {
+					// do nothing
+				}
+    		});
+    		
+    		//一级对象级权限处理
+    		Composite subGroup = UIUtils.createControlGroup(subloginGroupLeft, "", 2, SWT.NO_TRIM, 200);
+    		subGroup.setLayoutData(griddata);
     		//模式下拉框
     		schemaCombo = UIUtils.createLabelCombo(subGroup, "Schema List", 0);
     		Collection<XuguSchema> schemaList = getDatabaseObject().getDataSource().schemaCache.getCachedObjects();
@@ -393,16 +485,18 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
     		}
     		//对象下拉框
     		objectCombo = UIUtils.createLabelCombo(subGroup, "Object List", 0);
-    		//可选对象权限下拉框
-    		objectAuthorityCombo = UIUtils.createLabelCombo(subGroup, "Authority", 0);
+    		//可选对象权限下拉框(包括全部一二级权限)
+    		objectAuthorityCombo = UIUtils.createLabelCombo(loginGroup3, "Authority", 0);
+    		
     		//已选对象权限列表框
-    		objectAuthorityList = new org.eclipse.swt.widgets.List(loginGroup3, SWT.V_SCROLL|SWT.MULTI);
-    		objectAuthorityList.setLayoutData(new GridData(400,80));
+    		objectAuthorityList = new org.eclipse.swt.widgets.List(subloginGroupLeft, SWT.V_SCROLL|SWT.MULTI);
+    		objectAuthorityList.setLayoutData(new GridData(150,200));
     		ControlPropertyCommandListener.create(this, objectAuthorityList, UserPropertyHandler.OBJECT_AUTHORITY);
     		ControlPropertyCommandListener.create(this, schemaCombo, UserPropertyHandler.TARGET_SCHEMA);
     		ControlPropertyCommandListener.create(this, objectCombo, UserPropertyHandler.TARGET_OBJECT);
     		ControlPropertyCommandListener.create(this, objectTypeCombo, UserPropertyHandler.TARGET_TYPE);
-    		Button addObjectAuthority = UIUtils.createPushButton(loginGroup3, "Grant2", null);
+    		
+    		Button addObjectAuthority = UIUtils.createPushButton(loginGroup3, "Grant", null);
     		addObjectAuthority.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
     		Button removeObjectAuthority = UIUtils.createPushButton(loginGroup3, "Revoke", null);
     		removeObjectAuthority.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -413,8 +507,9 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
 					String schema = schemaCombo.getText();
 					//加载对象信息
 					objectCombo.removeAll();
-					String objectList = getDatabaseObject().getObjectList(schema, type);
+					String objectList = getDatabaseObject().getObjectList(schema, type, "");
 					String[] objects = objectList.split(",");
+					
 					for(int i=0, l=objects.length; i<l; i++) {
 						objectCombo.add(objects[i]);
 					}
@@ -436,15 +531,23 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
 					case "PROCEDURE":
 						authorityList = DEF_PROCEDURE_AUTHORITY_LIST;
 						break;
-					case "TRIGGER":
-						authorityList = DEF_TRIGGER_AUTHORITY_LIST;
-						break;
 					}
 					if(authorityList!=null) {
 						objectAuthorityCombo.removeAll();
 						for(int i=0, l=authorityList.length; i<l; i++) {
 							objectAuthorityCombo.add(authorityList[i]);
 						}
+					}
+					//清空一级权限列表
+					objectAuthorityList.removeAll();
+					//当一级对象改变时二级对象权限随之清空
+					subObjectCombo.removeAll();
+					subObjectTypeCombo.removeAll();
+					subObjectAuthorityList.removeAll();
+					//然后根据一级对象类型重新加载二级对象权限类型
+					if(type.equals("TABLE") || type.equals("VIEW")) {
+						subObjectTypeCombo.add("COLUMN");
+						subObjectTypeCombo.add("TRIGGER");
 					}
 				}
 
@@ -455,6 +558,7 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
     		};
     		objectTypeCombo.addSelectionListener(itemChangeListener);
     		schemaCombo.addSelectionListener(itemChangeListener);
+    		//一级对象权限监听
     		objectCombo.addSelectionListener(new SelectionListener() {
 				@Override
 				public void widgetSelected(SelectionEvent e) {
@@ -478,9 +582,6 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
 					case "PROCEDURE":
 						keyWord = "存储过程或函数";
 						break;
-					case "TRIGGER":
-						keyWord = "触发器";
-						break;
 					}
 					//加载符合条件的已有权限
 					objectAuthorityList.removeAll();
@@ -490,6 +591,16 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
 						if(temp.contains(keyWord) && temp.contains("\""+schema+"\".\""+object+"\"")) {
 							objectAuthorityList.add(temp.substring(0, temp.indexOf(":")));
 						}
+						
+					}
+					//当一级对象改变时二级对象权限随之清空
+					subObjectCombo.removeAll();
+					subObjectTypeCombo.removeAll();
+					subObjectAuthorityList.removeAll();
+					//然后根据一级对象重新加载二级对象权限类型
+					if(type.equals("TABLE") || type.equals("VIEW")) {
+						subObjectTypeCombo.add("COLUMN");
+						subObjectTypeCombo.add("TRIGGER");
 					}
 				}
 
@@ -502,7 +613,15 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
 				@Override
 				public void widgetSelected(SelectionEvent e) {
 					String authority = objectAuthorityCombo.getText();
-					String[] authorityList = objectAuthorityList.getItems();
+					String[] authorityList = null;
+					//区分一级对象还是二级对象
+					boolean isFirstLevel = true;
+					if(authority!=null && (authority.contains("列")||authority.contains("触发器"))){
+						authorityList = subObjectAuthorityList.getItems();
+						isFirstLevel = false;
+					}else {
+						authorityList = objectAuthorityList.getItems();
+					}
 					boolean hasAuthority = false;
 					for(int i=0, l=authorityList.length; i<l; i++) {
 						if(authority.equals(authorityList[i])) {
@@ -510,12 +629,21 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
 							break;
 						}
 					}
-					if(!hasAuthority) {
-						objectAuthorityList.add(authority);
+					if(isFirstLevel) {
+						if(!hasAuthority) {
+							objectAuthorityList.add(authority);
+						}
+						objectAuthorityList.selectAll();
+						objectAuthorityList.notifyListeners(SWT.Modify, null);
+						objectAuthorityList.deselectAll();
+					}else {
+						if(!hasAuthority) {
+							subObjectAuthorityList.add(authority);
+						}
+						subObjectAuthorityList.selectAll();
+						subObjectAuthorityList.notifyListeners(SWT.Modify, null);
+						subObjectAuthorityList.deselectAll();
 					}
-					objectAuthorityList.selectAll();
-					objectAuthorityList.notifyListeners(SWT.Modify, null);
-					objectAuthorityList.deselectAll();
 				}
 
 				@Override
@@ -527,20 +655,44 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
 				@Override
 				public void widgetSelected(SelectionEvent e) {
 					String authority = objectAuthorityCombo.getText();
-					String[] authorityList = objectAuthorityList.getItems();
-					boolean hasAuthority = false;
-					for(int i=0, l=authorityList.length; i<l; i++) {
-						if(authority.equals(authorityList[i])) {
-							hasAuthority = true;
-							break;
+					String[] authorityList = null;
+					//区分一级对象还是二级对象
+					boolean isFirstLevel = true;
+					if(authority!=null && (authority.contains("列")||authority.contains("触发器"))){
+						authorityList = subObjectAuthorityList.getItems();
+						isFirstLevel = false;
+					}else {
+						authorityList = objectAuthorityList.getItems();
+					}
+					if(isFirstLevel) {
+						boolean hasAuthority = false;
+						for(int i=0, l=authorityList.length; i<l; i++) {
+							if(authority.equals(authorityList[i])) {
+								hasAuthority = true;
+								break;
+							}
 						}
+						if(hasAuthority) {
+							objectAuthorityList.remove(authority);
+						}
+						objectAuthorityList.selectAll();
+						objectAuthorityList.notifyListeners(SWT.Modify, null);
+						objectAuthorityList.deselectAll();
+					}else {
+						boolean hasAuthority = false;
+						for(int i=0, l=authorityList.length; i<l; i++) {
+							if(authority.equals(authorityList[i])) {
+								hasAuthority = true;
+								break;
+							}
+						}
+						if(hasAuthority) {
+							subObjectAuthorityList.remove(authority);
+						}
+						subObjectAuthorityList.selectAll();
+						subObjectAuthorityList.notifyListeners(SWT.Modify, null);
+						subObjectAuthorityList.deselectAll();
 					}
-					if(hasAuthority) {
-						objectAuthorityList.remove(authority);
-					}
-					objectAuthorityList.selectAll();
-					objectAuthorityList.notifyListeners(SWT.Modify, null);
-					objectAuthorityList.deselectAll();
 				}
 
 				@Override

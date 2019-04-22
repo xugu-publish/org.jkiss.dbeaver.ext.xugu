@@ -102,17 +102,32 @@ public class XuguCommandChangeUser extends DBECommandComposite<XuguUser, UserPro
                 actions.add(new SQLDatabasePersistAction(XuguMessages.edit_command_change_user_action_update_user_record, script.toString()));
             }
             //对权限做额外处理
+            //库级权限
             Collection<XuguUserAuthority> oldAuthorities = getObject().getUserDatabaseAuthorities();
+            //对象级权限
             Collection<XuguUserAuthority> oldAuthorities2 = getObject().getUserObjectAuthorities();
+            //二级对象权限
+            Collection<XuguUserAuthority> oldAuthorities3 = getObject().getUserSubObjectAuthorities();
 			Iterator<XuguUserAuthority> it;
-			
+			it = oldAuthorities3.iterator();
+			while(it.hasNext()) {
+				XuguUserAuthority authority = it.next();
+				if(!(authority.getName().contains("列")||authority.getName().contains("触发器"))) {
+					oldAuthorities3.remove(authority);
+				}
+			}
+			String schema = "";
+			String objectType = "";
+			String object = "";
+			String realTargetName = "";
+			String[] newAuthorities = null;
+			XuguUserAuthority authority = null;
             for(Map.Entry<Object, Object> entry:getProperties().entrySet()) {
             	switch(UserPropertyHandler.valueOf((String)entry.getKey())) {
             		case DATABASE_AUTHORITY:
             			//遍历新权限列表，若旧权限不存在于其中，则做revoke操作
             			it = oldAuthorities.iterator();
-            			XuguUserAuthority authority = null;
-            			String[] newAuthorities = (String[]) entry.getValue();
+            			newAuthorities = (String[]) entry.getValue();
             			while(it.hasNext()) {
             				authority = it.next();
         					boolean inListFlag = false;
@@ -148,43 +163,100 @@ public class XuguCommandChangeUser extends DBECommandComposite<XuguUser, UserPro
             			break;
             		case OBJECT_AUTHORITY:
             			it = oldAuthorities2.iterator();
-            			String[] newAuthorities2 = (String[]) entry.getValue();
-            			String schema = getProperties().get("TARGET_SCHEMA").toString();
-            			String objectType = getProperties().get("TARGET_TYPE").toString();
-            			String object = getProperties().get("TARGET_OBJECT").toString();
-            			String realTargetName = "\""+schema+"\".\""+object+"\"";
+            			newAuthorities = (String[]) entry.getValue();
+            			schema = getProperties().get("TARGET_SCHEMA").toString();
+            			objectType = getProperties().get("TARGET_TYPE").toString();
+            			object = getProperties().get("TARGET_OBJECT").toString();
+            			realTargetName = "\""+schema+"\".\""+object+"\"";
             			//遍历新权限列表，若旧权限不存在于其中，则做revoke操作
-            			XuguUserAuthority authority2 = null;
             			while(it.hasNext()) {
-            				authority2 = it.next();
+            				authority = it.next();
         					boolean inListFlag = false;
-            				for(int i=0, l=newAuthorities2.length; i<l; i++) {
-            					if(authority2.getName().contains(newAuthorities2[i]) && authority2.getTargetName().equals(realTargetName)) {
+            				for(int i=0, l=newAuthorities.length; i<l; i++) {
+            					if(authority.getName().contains(newAuthorities[i]) && authority.getTargetName().equals(realTargetName)) {
                 					inListFlag = true;
                 					break;
                 				}
             				}
             				//旧权限不在列表中则revoke
-                			if(!inListFlag && authority2!=null) {
-                				actions.add(new SQLDatabasePersistAction("Revoke user", 
-                						"REVOKE "+XuguUtils.transformAuthority(authority2.getName(), false)+" "+realTargetName+" FROM "+getObject().getName()));
+                			if(!inListFlag && authority!=null) {
+            					actions.add(new SQLDatabasePersistAction("Revoke user", 
+                						"REVOKE "+XuguUtils.transformAuthority(authority.getName(), false)+" "+"\""+schema+"\".\""+object+"\""+" FROM "+getObject().getName()));	
                 			}
             			}
             			//遍历旧权限列表，若新权限不存在于其中，则做grant操作
             			it = oldAuthorities2.iterator();
-            			for(int i=0, l=newAuthorities2.length; i<l; i++) {
+            			for(int i=0, l=newAuthorities.length; i<l; i++) {
             				boolean inListFlag = false;
             				while(it.hasNext()) {
-            					authority2 = it.next();
-        						if(authority2.getName().contains(newAuthorities2[i]) && authority2.getTargetName().equals(realTargetName)) {
+            					authority = it.next();
+        						if(authority.getName().contains(newAuthorities[i]) && authority.getTargetName().equals(realTargetName)) {
                 					inListFlag = true;
                 					break;
                 				}
             				}
             				//新权限不在列表中则grant
                 			if(!inListFlag) {
-                				actions.add(new SQLDatabasePersistAction("Grant user", 
-                						"GRANT "+XuguUtils.transformAuthority(newAuthorities2[i], false)+" "+realTargetName+" TO "+getObject().getName()));
+            					actions.add(new SQLDatabasePersistAction("Grant user", 
+                						"GRANT "+XuguUtils.transformAuthority(newAuthorities[i], false)+" "+realTargetName+" TO "+getObject().getName()));	
+                			}
+            			}
+            			break;
+            		case SUB_OBJECT_AUTHORITY:
+            			it = oldAuthorities3.iterator();
+            			newAuthorities = (String[]) entry.getValue();
+            			schema = getProperties().get("TARGET_SCHEMA").toString();
+            			object = getProperties().get("TARGET_OBJECT").toString();
+            			objectType = getProperties().get("TARGET_TYPE").toString();
+            			String subObject = getProperties().get("SUB_TARGET_OBJECT").toString();
+            			String subObjectType = getProperties().get("SUB_TARGET_TYPE").toString();
+            			realTargetName = "\""+schema+"\".\""+object+"\""+".\""+subObject+"\"";
+            			
+            			//遍历新权限列表，若旧权限不存在于其中，则做revoke操作
+            			while(it.hasNext()) {
+            				authority = it.next();
+        					boolean inListFlag = false;
+            				for(int i=0, l=newAuthorities.length; i<l; i++) {
+            					if(authority.getName().contains(newAuthorities[i]) && authority.getTargetName().equals(realTargetName)) {
+                					inListFlag = true;
+                					break;
+                				}
+            				}
+            				//旧权限不在列表中则revoke
+                			if(!inListFlag && authority!=null) {
+                				if(!"COLUMN".equals(subObjectType)) {
+                					actions.add(new SQLDatabasePersistAction("Revoke user", 
+                    						"REVOKE "+XuguUtils.transformAuthority(authority.getName(), false)+" "+"\""+schema+"\".\""+object+"\""+" FROM "+getObject().getName()));	
+                				}
+                				//对列对象做特殊处理
+                				else {
+                					actions.add(new SQLDatabasePersistAction("Revoke user", 
+                    						"REVOKE "+XuguUtils.transformColumnAuthority(authority.getName())+"("+subObject+") ON "+"\""+schema+"\".\""+object+"\""+" FROM "+getObject().getName()));
+                				}
+                			}
+            			}
+            			//遍历旧权限列表，若新权限不存在于其中，则做grant操作
+            			it = oldAuthorities3.iterator();
+            			for(int i=0, l=newAuthorities.length; i<l; i++) {
+            				boolean inListFlag = false;
+            				while(it.hasNext()) {
+            					authority = it.next();
+        						if(authority.getName().contains(newAuthorities[i]) && authority.getTargetName().equals(realTargetName)) {
+                					inListFlag = true;
+                					break;
+                				}
+            				}
+            				//新权限不在列表中则grant
+                			if(!inListFlag) {
+                				if(!"COLUMN".equals(subObjectType)) {
+                					actions.add(new SQLDatabasePersistAction("Grant user", 
+                    						"GRANT "+XuguUtils.transformAuthority(newAuthorities[i], false)+" "+realTargetName+" TO "+getObject().getName()));	
+                				}
+                				//对列类型做特殊处理
+                				else {
+                					actions.add(new SQLDatabasePersistAction("Grant user", 
+                    						"GRANT "+XuguUtils.transformColumnAuthority(newAuthorities[i])+"("+subObject+") ON "+"\""+schema+"\".\""+object+"\""+" TO "+getObject().getName()));
+                				}
                 			}
             			}
             			break;

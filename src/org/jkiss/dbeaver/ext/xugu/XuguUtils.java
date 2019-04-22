@@ -136,6 +136,19 @@ public class XuguUtils {
         }
     }
     
+    public static String transformColumnAuthority(String authority) {
+    	String action ="";
+    	if(authority!=null) {
+    		//处理动词
+        	if(authority.contains("读")) {
+        		action = "SELECT";
+        	}else if(authority.contains("更新")){
+        		action = "UPDATE";
+        	}
+    	}
+    	return action;
+    }
+    
     public static String transformAuthority(String authority, boolean isDatabase) {
     	String action ="";
     	String type = "";
@@ -181,6 +194,8 @@ public class XuguUtils {
         		type = "PROCEDURE";
         	}else if(authority.contains("触发器")) {
         		type = "TRIGGER";
+        	}else if(authority.contains("列")){
+        		type = "COLUMN";
         	}else if(authority.contains("索引")) {
         		type = "INDEX";
         	}else if(authority.contains("回滚段")) {
