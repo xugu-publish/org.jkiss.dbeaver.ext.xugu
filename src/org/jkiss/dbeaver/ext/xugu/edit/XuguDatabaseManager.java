@@ -19,9 +19,13 @@ package org.jkiss.dbeaver.ext.xugu.edit;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.RowData;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
@@ -77,7 +81,7 @@ public class XuguDatabaseManager extends SQLObjectEditor<XuguDatabase, XuguDataS
                 if (dialog.open() != IDialogConstants.OK_ID) {
                     return null;
                 }
-                XuguDatabase newDB = new XuguDatabase(parent, dialog.getDatabase().getName());
+                XuguDatabase newDB = dialog.getDB();
                 return newDB;
             }
         }.execute();
@@ -88,13 +92,19 @@ public class XuguDatabaseManager extends SQLObjectEditor<XuguDatabase, XuguDataS
     {
         XuguDatabase database = command.getObject();
         String sql = "CREATE DATABASE " + database.getName();
+        if(database.getCharset()!=null) {
+        	sql +=" CHARACTER SET '"+database.getCharset()+"'";
+        }
+        if(database.getTimeZone()!=null) {
+        	sql +=" TIME ZONE '"+database.getTimeZone()+"'";
+        }
         actions.add(new SQLDatabasePersistAction("Create database", sql));
     }
 
     @Override
     protected void addObjectDeleteActions(List<DBEPersistAction> actions, ObjectDeleteCommand command, Map<String, Object> options)
     {
-        actions.add(new SQLDatabasePersistAction("Drop database", "DROP DATABASE `" + command.getObject().getName() + "`")); //$NON-NLS-2$
+        actions.add(new SQLDatabasePersistAction("Drop database", "DROP DATABASE '" + command.getObject().getName() + "'")); //$NON-NLS-2$
     }
 
     @Override
@@ -107,16 +117,15 @@ public class XuguDatabaseManager extends SQLObjectEditor<XuguDatabase, XuguDataS
     	
     	private XuguDatabase database;
         private Text nameText;
-		
+		private Combo charsetCombo;
+		private Combo isAddCombo;
+		private Combo hourCombo;
+		private Combo minuteCombo;
 
         public NewDBDialog(Shell parentShell, XuguDataSource dataSource)
         {
             super(parentShell);
             this.database = new XuguDatabase(dataSource, "");
-        }
-
-        public XuguDatabase getDatabase() {
-        	return database;
         }
         
         @Override
@@ -130,6 +139,10 @@ public class XuguDatabaseManager extends SQLObjectEditor<XuguDatabase, XuguDataS
         	return new Point(300, 250);
         }
         
+        private XuguDatabase getDB() {
+        	return database;
+        }
+        
         @Override
         protected Control createDialogArea(Composite parent)
         {
@@ -141,6 +154,33 @@ public class XuguDatabaseManager extends SQLObjectEditor<XuguDatabase, XuguDataS
 
             nameText = UIUtils.createLabelText(composite, XuguMessages.dialog_database_name, null);
             nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+            
+            charsetCombo = UIUtils.createLabelCombo(composite, "Charset", 0);
+            charsetCombo.add("UTF-8");
+            charsetCombo.add("GB2312");
+            charsetCombo.add("GBK");
+            
+            isAddCombo = UIUtils.createLabelCombo(composite, "Add", 0);
+            isAddCombo.add("+");
+            isAddCombo.add("-");
+            
+            hourCombo = UIUtils.createLabelCombo(composite, "Hour", 0);
+            for(int i=0; i<24; i++) {
+            	if(i<10) {
+            		hourCombo.add("0"+i);
+            	}else {
+            		hourCombo.add(i+"");
+            	}
+            }
+            
+            minuteCombo = UIUtils.createLabelCombo(composite, "Minute", 0);
+            for(int i=0; i<60; i++) {
+            	if(i<10) {
+            		minuteCombo.add("0"+i);
+            	}else {
+            		minuteCombo.add(i+"");
+            	}
+            }
 
             UIUtils.createInfoLabel(composite, XuguMessages.dialog_database_create_info, GridData.FILL_HORIZONTAL, 3);
 
@@ -151,6 +191,9 @@ public class XuguDatabaseManager extends SQLObjectEditor<XuguDatabase, XuguDataS
         protected void okPressed()
         {
             database.setName(DBObjectNameCaseTransformer.transformObjectName(database, nameText.getText()));
+            database.setCharset(DBObjectNameCaseTransformer.transformObjectName(database, charsetCombo.getText()));
+            String timeZone = "GMT"+isAddCombo.getText()+hourCombo.getText()+":"+minuteCombo.getText();
+            database.setTimeZone(DBObjectNameCaseTransformer.transformObjectName(database, timeZone));
             super.okPressed();
         }
 

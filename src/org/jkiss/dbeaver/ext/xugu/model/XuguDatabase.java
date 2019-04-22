@@ -61,6 +61,8 @@ public class XuguDatabase extends XuguGlobalObject
     private XuguDataSource dataSource;
     private String name;
     private Integer databaseSize;
+    private String charset;
+    private String timeZone;
     private boolean persisted;
 
     public XuguDatabase(XuguDataSource dataSource, String name)
@@ -77,83 +79,15 @@ public class XuguDatabase extends XuguGlobalObject
         this.dataSource = dataSource;
         if (dbResult != null) {
             this.name = JDBCUtils.safeGetString(dbResult, "DB_NAME");
+            this.charset = JDBCUtils.safeGetString(dbResult, "CHAR_SET");
+            this.timeZone = JDBCUtils.safeGetString(dbResult, "TIME_ZONE");
             System.out.println("DB name "+name);
             persisted = true;
         } else {
-            this.additionalInfo.loaded = true;
-            this.additionalInfo.defaultCharset = dataSource.getCharset("utf8");
             persisted = false;
         }
     }
-
     
-    public static class AdditionalInfo {
-        private volatile boolean loaded = false;
-        private XuguCharset defaultCharset;
-//        private MySQLCollation defaultCollation;
-        private String sqlPath;
-
-        public XuguCharset getDefaultCharset()
-        {
-            return defaultCharset;
-        }
-
-        public void setDefaultCharset(XuguCharset defaultCharset)
-        {
-            this.defaultCharset = defaultCharset;
-        }
-
-    }
-
-    public static class AdditionalInfoValidator implements IPropertyCacheValidator<XuguDatabase> {
-        @Override
-        public boolean isPropertyCached(XuguDatabase object, Object propertyId)
-        {
-            return object.additionalInfo.loaded;
-        }
-    }
-
-    private final AdditionalInfo additionalInfo = new AdditionalInfo();
-
-    @PropertyGroup()
-    @LazyProperty(cacheValidator = AdditionalInfoValidator.class)
-    public AdditionalInfo getAdditionalInfo(DBRProgressMonitor monitor) throws DBCException {
-        synchronized (additionalInfo) {
-            if (!additionalInfo.loaded) {
-                loadAdditionalInfo(monitor);
-            }
-            return additionalInfo;
-        }
-    }
-
-    // for internal use only
-    public AdditionalInfo getAdditionalInfo() {
-        return additionalInfo;
-    }
-
-    private void loadAdditionalInfo(DBRProgressMonitor monitor) throws DBCException
-    {
-        if (!isPersisted()) {
-            additionalInfo.loaded = true;
-            return;
-        }
-        XuguDataSource dataSource = getDataSource();
-        try (JDBCSession session = DBUtils.openMetaSession(monitor, this, "Load table status")) {
-            try (JDBCPreparedStatement dbStat = session.prepareStatement(
-                "SELECT * FROM ALL_DATABASES WHERE DB_NAME=?")) {
-                dbStat.setString(1, getName());
-                try (JDBCResultSet dbResult = dbStat.executeQuery()) {
-                    if (dbResult.next()) {
-                        additionalInfo.defaultCharset = dataSource.getCharset(JDBCUtils.safeGetString(dbResult, XuguConstants.COL_DEFAULT_CHARACTER_SET_NAME));
-                    }
-                    additionalInfo.loaded = true;
-                }
-            }
-        } catch (SQLException e) {
-            throw new DBCException(e, dataSource);
-        }
-    }
-
     @Association
     public Collection<XuguSchema> getSchemas(DBRProgressMonitor monitor) throws DBException {
         return dataSource.getSchemas(monitor);
@@ -188,6 +122,24 @@ public class XuguDatabase extends XuguGlobalObject
     public void setName(String name)
     {
         this.name = name;
+    }
+    
+    @Property(viewable = true, editable=true, order=2)
+    public String getCharset() {
+    	return charset;
+    }
+    
+    public void setCharset(String charset) {
+    	this.charset = charset;
+    }
+    
+    @Property(viewable = true, editable=true, order=3)
+    public String getTimeZone(){
+    	return timeZone;
+    }
+    
+    public void setTimeZone(String timeZone) {
+    	this.timeZone = timeZone;
     }
 
     @Override
