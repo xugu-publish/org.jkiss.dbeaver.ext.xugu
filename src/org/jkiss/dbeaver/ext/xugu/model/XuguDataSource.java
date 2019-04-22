@@ -997,7 +997,7 @@ public class XuguDataSource extends JDBCDataSource
         @Override
         protected XuguRole fetchObject(@NotNull JDBCSession session, @NotNull XuguDataSource owner, @NotNull JDBCResultSet resultSet) throws SQLException, DBException {
             if(resultSet!=null) {
-            	return new XuguRole(owner, resultSet);
+            	return new XuguRole(owner, session.getProgressMonitor(), resultSet);
             }else {
             	return null;
             }

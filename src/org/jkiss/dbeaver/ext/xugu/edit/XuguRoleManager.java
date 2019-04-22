@@ -32,6 +32,7 @@ import org.eclipse.swt.widgets.Text;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.ext.xugu.XuguMessages;
+import org.jkiss.dbeaver.ext.xugu.editors.XuguRoleEditor;
 import org.jkiss.dbeaver.ext.xugu.model.XuguDataSource;
 import org.jkiss.dbeaver.ext.xugu.model.XuguDatabase;
 import org.jkiss.dbeaver.ext.xugu.model.XuguRole;
@@ -67,27 +68,52 @@ public class XuguRoleManager extends SQLObjectEditor<XuguRole, XuguDataSource> i
         return FEATURE_SAVE_IMMEDIATELY;
     }
 
+    @Override
+    public boolean canCreateObject(XuguDataSource parent)
+    {
+        return true;
+    }
+
+    @Override
+    public boolean canDeleteObject(XuguRole object)
+    {
+        return true;
+    }
+    
     @Nullable
     @Override
     public DBSObjectCache<? extends DBSObject, XuguRole> getObjectsCache(XuguRole object)
     {
         return object.getDataSource().roleCache;
     }
-
+    
     @Override
     protected XuguRole createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final XuguDataSource parent, Object copyFrom)
     {
-		return new UITask<XuguRole>() {
-            @Override
-            protected XuguRole runTask() {
-                NewRoleDialog dialog = new NewRoleDialog(UIUtils.getActiveWorkbenchShell(), parent);
-                if (dialog.open() != IDialogConstants.OK_ID) {
-                    return null;
-                }
-                XuguRole newRole = dialog.getRole();
-                return newRole;
-            }
-        }.execute();
+    	XuguRole newRole = new XuguRole(parent, monitor, null);
+    	//修改已存在用户
+        if (copyFrom instanceof XuguRole) {
+            XuguRole tplRole = (XuguRole)copyFrom;
+            newRole.setName(tplRole.getName());
+        }
+        //创建新用户
+        else {
+        	return new UITask<XuguRole>() {
+			  @Override
+			  protected XuguRole runTask() {
+			  	innerDialog dialog = new innerDialog(UIUtils.getActiveWorkbenchShell(), monitor, parent);
+			      if (dialog.open() != IDialogConstants.OK_ID) {
+			          return null;
+			      }
+			      XuguRole newRole = dialog.getRole();
+			      return newRole;
+			  }
+        	}.execute();
+        }
+        System.out.println("Create1 ??");
+//        commandContext.addCommand(new CommandCreateUser(newUser), new CreateObjectReflector<>(this), true);
+        return newRole;
+//		
     }
 
     @Override
@@ -111,6 +137,13 @@ public class XuguRoleManager extends SQLObjectEditor<XuguRole, XuguDataSource> i
                 "DROP ROLE " + DBUtils.getQuotedIdentifier(command.getObject())) //$NON-NLS-2$
         );
     }
+
+    @Override
+    protected void addObjectModifyActions(DBRProgressMonitor monitor, List<DBEPersistAction> actionList, ObjectChangeCommand command, Map<String, Object> options)
+    {
+    	// do nothing
+    	System.out.println("alter role in here?");
+    }
     
     @Override
     public void renameObject(DBECommandContext commandContext, XuguRole role, String newName) throws DBException
@@ -118,17 +151,16 @@ public class XuguRoleManager extends SQLObjectEditor<XuguRole, XuguDataSource> i
         throw new DBException("Direct database rename is not yet implemented in Xugu. You should use export/import functions for that.");
     }
     
-    static class NewRoleDialog extends Dialog {
-    	
+    static class innerDialog extends Dialog{
     	private XuguRole role;
         private Text roleText;
         private Text userNameText;
-		
+    	
 
-        public NewRoleDialog(Shell parentShell, XuguDataSource dataSource)
+        public innerDialog(Shell parentShell, DBRProgressMonitor monitor, XuguDataSource dataSource)
         {
             super(parentShell);
-            this.role = new XuguRole(dataSource, null);  
+            this.role = new XuguRole(dataSource, monitor, null);  
         }
 
         public XuguRole getRole() {
@@ -160,9 +192,7 @@ public class XuguRoleManager extends SQLObjectEditor<XuguRole, XuguDataSource> i
             
             userNameText = UIUtils.createLabelText(composite, XuguMessages.dialog_role_user, null);
             userNameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-            UIUtils.createInfoLabel(composite, XuguMessages.dialog_role_create_info, GridData.FILL_HORIZONTAL, 2);
-
+            
             return parent;
         }
 

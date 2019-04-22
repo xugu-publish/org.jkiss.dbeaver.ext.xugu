@@ -46,6 +46,7 @@ public class XuguCommandChangeUser extends DBECommandComposite<XuguUser, UserPro
     protected XuguCommandChangeUser(XuguUser user)
     {
         super(user, XuguMessages.edit_command_change_user_name);
+        System.out.println("in user command change");
     }
 
     @Override

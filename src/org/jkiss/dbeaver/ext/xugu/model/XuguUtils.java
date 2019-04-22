@@ -49,6 +49,8 @@ import com.xugu.ddl.Parsing;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -287,5 +289,125 @@ public class XuguUtils {
                 source.substring(matcher.end());
         }
         return source;
+    }
+    
+    public static String getObjectList(XuguDataSource source, DBRProgressMonitor monitor,  String schemaName, String Type, String tableName) {
+    	try {
+			Collection<XuguTable> tableList = null;
+			Collection<XuguView> viewList = null;
+			Collection<XuguSequence> seqList = null;
+			Collection<XuguPackage> pacList = null;
+			Collection<XuguProcedureStandalone> procList = null;
+			Collection<XuguTableTrigger> triList = null;
+			List<XuguTableColumn> colList = null;
+			switch(Type) {
+			case "TABLE":
+				tableList = source.schemaCache.getCachedObject(schemaName).getTables(monitor);
+				break;
+			case "VIEW":
+				viewList = source.schemaCache.getCachedObject(schemaName).getViews(monitor);
+				break;
+			case "SEQUENCE":
+				seqList = source.schemaCache.getCachedObject(schemaName).getSequences(monitor);
+				break;
+			case "PACKAGE":
+				pacList = source.schemaCache.getCachedObject(schemaName).getPackages(monitor);
+				break;
+			case "PROCEDURE":
+				procList = source.schemaCache.getCachedObject(schemaName).getProcedures(monitor);
+				break;
+			case "TRIGGER":
+				triList = source.schemaCache.getCachedObject(schemaName).getTable(monitor, tableName).getTriggers(monitor);
+				break;
+			case "COLUMN":
+				XuguSchema schema = source.getSchema(monitor, schemaName);
+				XuguTable table = source.schemaCache.getCachedObject(schemaName).getTable(monitor, tableName);
+				colList = source.schemaCache.getCachedObject(schemaName).tableCache.getChildren(monitor, schema, table);
+				break;
+			}
+				
+			if(tableList!=null && "TABLE".equals(Type)) {
+				String res = "";
+				Iterator<XuguTable> it = tableList.iterator();
+				while(it.hasNext()) {
+					res += it.next().getName()+",";
+				}
+				if(res.length()>0) {
+					res = res.substring(0, res.length()-1);
+				}
+				return res;
+			}
+			if(viewList!=null) {
+				String res = "";
+				Iterator<XuguView> it = viewList.iterator();
+				while(it.hasNext()) {
+					res += it.next().getName()+",";
+				}
+				if(res.length()>0) {
+					res = res.substring(0, res.length()-1);
+				}
+				return res;
+			}
+			if(seqList!=null) {
+				String res = "";
+				Iterator<XuguSequence> it = seqList.iterator();
+				while(it.hasNext()) {
+					res += it.next().getName()+",";
+				}
+				if(res.length()>0) {
+					res = res.substring(0, res.length()-1);
+				}
+				return res;
+			}
+			if(pacList!=null) {
+				String res = "";
+				Iterator<XuguPackage> it = pacList.iterator();
+				while(it.hasNext()) {
+					res += it.next().getName()+",";
+				}
+				if(res.length()>0) {
+					res = res.substring(0, res.length()-1);
+				}
+				return res;
+			}
+			if(procList!=null) {
+				String res = "";
+				Iterator<XuguProcedureStandalone> it = procList.iterator();
+				while(it.hasNext()) {
+					res += it.next().getName()+",";
+				}
+				if(res.length()>0) {
+					res = res.substring(0, res.length()-1);
+				}
+				return res;
+			}
+			if(triList!=null && triList.size()>0) {
+				String res = "";
+				Iterator<XuguTableTrigger> it = triList.iterator();
+				XuguTableTrigger trigger = it.next();
+				while(it.hasNext()) {
+					res += trigger.getTable().getName()+"."+trigger.getName()+",";
+				}
+				if(res.length()>0) {
+					res = res.substring(0, res.length()-1);
+				}
+				return res;
+			}
+			if(colList!=null && colList.size()>0) {
+				String res="";
+				Iterator<XuguTableColumn> it = colList.iterator();
+				while(it.hasNext()) {
+					res += it.next().getName()+",";
+				}
+				if(res.length()>0) {
+					res = res.substring(0, res.length()-1);
+				}
+				return res;
+			}
+		} catch (DBException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return "";
     }
 }

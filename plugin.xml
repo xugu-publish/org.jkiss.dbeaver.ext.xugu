@@ -150,23 +150,24 @@
                     	</items>
                 	</folder>
                     <!--用户-->
-	                    <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguUser" label="%tree.users.node.name" icon="#folder_user" description="Users">
-	                    	<items label="%tree.user.node.name" path="user" property="users" icon="#user">
-		                    	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguUserAuthority" label="%tree.user.authorities.node.name" icon="#files" description="Data Files">
-	                            	<items label="%tree.user.authority.node.name" path="userAuthority" property="userAuthorities" icon="#file"/>
-	                        	</folder>
-	                    	</items>
-	                    </folder>
+                    <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguUser" label="%tree.users.node.name" icon="#folder_user" description="Users">
+                    	<items label="%tree.user.node.name" path="user" property="users" icon="#user">
+	                    	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguUserAuthority" label="%tree.user.authorities.node.name" icon="#files" description="Data Files">
+                            	<items label="%tree.user.authority.node.name" path="userAuthority" property="userAuthorities" icon="#file"/>
+                        	</folder>
+                    	</items>
+                    </folder>
+                    <!--角色-->
+                	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguRole" label="%tree.roles.node.name" icon="#folder_role" description="Roles">
+                    	<items label="%tree.role.node.name" path="role" property="roles" icon="#user_group">
+                    	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguRoleAuthority" label="%tree.user.authorities.node.name" icon="#files" description="Data Files">
+                            	<items label="%tree.user.authority.node.name" path="roleAuthority" property="roleAuthorities" icon="#file"/>
+                        	</folder>
+                    	</items>
+                	</folder>        
                     <!--安全管理-->
                 	<folder type="org.jkiss.dbeaver.model.struct.DBSObject" label="%tree.security.node.name" icon="#security" description="Security management">                    	
-                    	<!--角色-->
-	                	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguRole" label="%tree.roles.node.name" icon="#folder_role" description="Roles">
-	                    	<items label="%tree.role.node.name" path="role" property="roles" icon="#user_group">
-	                    		<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguUserAuthority" label="%tree.files.node.name" icon="#files" description="User Authorities">
-                            		<items label="%tree.file.node.name" path="file" property="files" icon="#file"/>
-                        		</folder>
-	                    	</items>
-	                	</folder>                          
+                    	                  
                 	</folder> 
                     <!--全局元信息-->
 		       		<folder type="org.jkiss.dbeaver.model.struct.DBSObject" label="%tree.global_metadata.node.name" icon="#logical" description="Global metadata objects">
@@ -271,6 +272,7 @@
     	<manager class="org.jkiss.dbeaver.ext.xugu.edit.XuguTablePartitionManager" objectType="org.jkiss.dbeaver.ext.xugu.model.XuguTablePartition"/>
     	<manager class="org.jkiss.dbeaver.ext.xugu.edit.XuguTableSubPartitionManager" objectType="org.jkiss.dbeaver.ext.xugu.model.XuguTableSubPartition"/>
     	<manager class="org.jkiss.dbeaver.ext.xugu.edit.XuguUserAuthorityManager" objectType="org.jkiss.dbeaver.ext.xugu.model.XuguUserAuthority"/>
+    	<manager class="org.jkiss.dbeaver.ext.xugu.edit.XuguRoleAuthorityManager" objectType="org.jkiss.dbeaver.ext.xugu.model.XuguRoleAuthority"/>
     </extension>
     
     <extension point="org.jkiss.dbeaver.databaseEditor">
@@ -310,6 +312,17 @@
             description="General user settings"
             icon="#user">
         </editor>
+        
+        <editor
+            id="org.jkiss.dbeaver.ext.xugu.editors.XuguRoleEditor"
+            class="org.jkiss.dbeaver.ext.xugu.editors.XuguRoleEditor"
+            objectType="org.jkiss.dbeaver.ext.xugu.model.XuguRole"
+            main="true"
+            label="%editor.general.name"
+            description="General role settings"
+            icon="#role">
+        </editor>
+        
     </extension>
 
     <extension point="org.jkiss.dbeaver.dataTypeProvider">

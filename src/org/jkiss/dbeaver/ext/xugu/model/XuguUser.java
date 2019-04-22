@@ -159,22 +159,24 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		//加载权限
-		Vector<Object> authorities = new LoadPermission().loadPermission(conn, this.user_name);
-		userAuthorities = new ArrayList<>();
-		Iterator<Object> it = authorities.iterator();
-		while(it.hasNext()) {
-			String temp = it.next().toString();
-			//对象级权限
-			if(temp.indexOf("\"")!=-1) {
-				String targetName = temp.substring(temp.indexOf("\""));
-				XuguUserAuthority one = new XuguUserAuthority(this, temp, targetName, false, expired);
-				userAuthorities.add(one);
-			}
-			//库级权限
-			else {
-				XuguUserAuthority one = new XuguUserAuthority(this, temp, null, true, expired);
-				userAuthorities.add(one);
+		if(resultSet!=null) {
+			//加载权限
+			Vector<Object> authorities = new LoadPermission().loadPermission(conn, this.user_name);
+			userAuthorities = new ArrayList<>();
+			Iterator<Object> it = authorities.iterator();
+			while(it.hasNext()) {
+				String temp = it.next().toString();
+				//对象级权限
+				if(temp.indexOf("\"")!=-1) {
+					String targetName = temp.substring(temp.indexOf("\""));
+					XuguUserAuthority one = new XuguUserAuthority(this, temp, targetName, false, expired);
+					userAuthorities.add(one);
+				}
+				//库级权限
+				else {
+					XuguUserAuthority one = new XuguUserAuthority(this, temp, null, true, expired);
+					userAuthorities.add(one);
+				}
 			}
 		}
     }

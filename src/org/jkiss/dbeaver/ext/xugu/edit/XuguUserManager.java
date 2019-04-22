@@ -90,32 +90,6 @@ public class XuguUserManager extends SQLObjectEditor<XuguUser, XuguDataSource> i
                                                Object copyFrom) {
     	context.getUserParams();
     	XuguUser newUser = new XuguUser(source, null, monitor);
-//    	//加载roleList和schemaList
-//    	try {
-//			Collection<XuguRole> roleList = source.roleCache.getAllObjects(monitor, source);
-//			if(roleList!=null && roleList.size()!=0) {
-//				Iterator<XuguRole> it = roleList.iterator();
-//				String text = "";
-//				while(it.hasNext()) {
-//					text += it.next().getName()+",";
-//				}
-//				text = text.substring(0, text.length()-1);
-//				newUser.setRoleList(text);
-//			}
-//			Collection<XuguSchema> schemaList = source.getSchemas(monitor);
-//			if(schemaList!=null && schemaList.size()!=0) {
-//				Iterator<XuguSchema> it = schemaList.iterator();
-//				String text = "";
-//				while(it.hasNext()) {
-//					text += it.next().getName()+",";
-//				}
-//				text = text.substring(0, text.length()-1);
-//				newUser.setSchemaList(text);
-//			}
-//		} catch (DBException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
     	        
         //修改已存在用户
         if (copyFrom instanceof XuguUser) {
