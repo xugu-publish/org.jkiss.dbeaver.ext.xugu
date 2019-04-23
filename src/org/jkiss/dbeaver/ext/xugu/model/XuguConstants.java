@@ -189,4 +189,5 @@ public class XuguConstants {
     public static final String COL_DEFAULT_CHARACTER_SET_NAME = "UTF-8";
 
 	public static final int DEFAULT_SLEEP_TIME = 60000;	
+	public static final String[] DEFAULT_CHAR_SET = {"GBK", "GB2312", "UTF-8"};
 }

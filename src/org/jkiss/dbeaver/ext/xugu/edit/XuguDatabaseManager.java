@@ -34,6 +34,7 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.ext.xugu.XuguMessages;
 import org.jkiss.dbeaver.ext.xugu.edit.XuguSchemaManager.NewUserDialog;
+import org.jkiss.dbeaver.ext.xugu.model.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.model.XuguDataSource;
 import org.jkiss.dbeaver.ext.xugu.model.XuguDatabase;
 import org.jkiss.dbeaver.ext.xugu.model.XuguSchema;
@@ -156,9 +157,9 @@ public class XuguDatabaseManager extends SQLObjectEditor<XuguDatabase, XuguDataS
             nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             
             charsetCombo = UIUtils.createLabelCombo(composite, "Charset", 0);
-            charsetCombo.add("UTF-8");
-            charsetCombo.add("GB2312");
-            charsetCombo.add("GBK");
+            for(int i=0; i<XuguConstants.DEFAULT_CHAR_SET.length; i++) {
+            	charsetCombo.add(XuguConstants.DEFAULT_CHAR_SET[i]);
+            }
             
             isAddCombo = UIUtils.createLabelCombo(composite, "Add", 0);
             isAddCombo.add("+");
