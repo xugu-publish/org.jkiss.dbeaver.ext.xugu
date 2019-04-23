@@ -38,7 +38,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * OracleMaterializedViewManager
+ * XuguMaterializedViewManager
  */
 public class XuguMaterializedViewManager extends SQLObjectEditor<XuguMaterializedView, XuguSchema> {
 

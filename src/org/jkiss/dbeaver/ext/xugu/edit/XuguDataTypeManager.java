@@ -39,7 +39,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * OracleDataTypeManager
+ * XuguDataTypeManager
  */
 public class XuguDataTypeManager extends SQLObjectEditor<XuguDataType, XuguSchema> {
 

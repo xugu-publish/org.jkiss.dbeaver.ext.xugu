@@ -37,7 +37,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * OracleProcedureManager
+ * XuguProcedureManager
  */
 public class XuguProcedureManager extends SQLObjectEditor<XuguProcedureStandalone, XuguSchema> {
 
