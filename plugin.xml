@@ -152,17 +152,11 @@
                     <!--用户-->
                     <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguUser" label="%tree.users.node.name" icon="#folder_user" description="Users">
                     	<items label="%tree.user.node.name" path="user" property="users" icon="#user">
-	                    	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguUserAuthority" label="%tree.user.authorities.node.name" icon="#files" description="Data Files">
-                            	<items label="%tree.user.authority.node.name" path="userAuthority" property="userAuthorities" icon="#file"/>
-                        	</folder>
                     	</items>
                     </folder>
                     <!--角色-->
                 	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguRole" label="%tree.roles.node.name" icon="#folder_role" description="Roles">
                     	<items label="%tree.role.node.name" path="role" property="roles" icon="#user_group">
-                    	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguRoleAuthority" label="%tree.user.authorities.node.name" icon="#files" description="Data Files">
-                            	<items label="%tree.user.authority.node.name" path="roleAuthority" property="roleAuthorities" icon="#file"/>
-                        	</folder>
                     	</items>
                 	</folder>
                     <!--全局元信息-->
