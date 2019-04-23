@@ -18,18 +18,31 @@ public class ConnectionDaemon implements Runnable {
 	private Driver driver;
 	private String url;
 	private int sleepTime;
+	private int dbTime;
 	
-	public ConnectionDaemon(Connection conn, DBPConnectionConfiguration conf,  Properties props, Driver driver, String url) {
+	public ConnectionDaemon(Connection conn, DBPConnectionConfiguration conf,  Properties props, Driver driver, String url, int dbTime) {
 		this.conn = conn;
 		this.conf = conf;
 		this.props = props;
 		this.driver = driver;
 		this.url = url;
-		this.sleepTime = XuguConstants.DEFAULT_SLEEP_TIME;
+		this.dbTime = dbTime;
+		this.sleepTime = checkSleepTime(XuguConstants.DEFAULT_SLEEP_TIME);
+	}
+	
+	public int checkSleepTime(int sleepTime) {
+		if(this.dbTime!=0) {
+			//若默认间隔时间大于连接最大空闲时间则将间隔时间设为空闲时间的1/3
+			if(sleepTime > this.dbTime) {
+				sleepTime = this.dbTime/3;
+			}
+			//否则直接返回设置的sleepTime
+		}
+		return sleepTime;
 	}
 	
 	public void setSleepTime(int time) {
-		this.sleepTime = time;
+		this.sleepTime = checkSleepTime(time);
 	}
 	
 	@Override
@@ -39,7 +52,7 @@ public class ConnectionDaemon implements Runnable {
 				Statement stmt = conn.createStatement();
 				stmt.executeQuery("select 1 from dual");
 				Thread.sleep(sleepTime);
-				System.out.println("Daemon task running");
+				System.out.println("Daemon task running "+sleepTime+" "+dbTime);
 			} catch (InterruptedException | SQLException e) {
 				e.printStackTrace();
 				System.out.println("Connect time out! Do reconnect!");

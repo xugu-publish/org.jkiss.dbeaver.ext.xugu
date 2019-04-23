@@ -154,7 +154,18 @@ public class XuguDataSource extends JDBCDataSource
         		Properties connectProps = getAllConnectionProperties(monitor, purpose, connectionInfo);
         		Driver driverInstance = getDriverInstance(monitor);
         		String url = getConnectionURL(connectionInfo);
-            	Thread daemon = new Thread(new ConnectionDaemon(this.connection, connectionInfo, connectProps, driverInstance, url));
+        		int max_idle_time = 0;
+        		try {
+        			Statement stmt = this.connection.createStatement();
+        			ResultSet res = stmt.executeQuery("SHOW MAX_IDLE_TIME");
+        			if(res.next()) {
+        				max_idle_time = res.getInt(1)*1000;
+        			}
+        			System.out.println(max_idle_time);
+        		}catch(SQLException e) {
+        			e.printStackTrace();
+        		}
+            	Thread daemon = new Thread(new ConnectionDaemon(this.connection, connectionInfo, connectProps, driverInstance, url, max_idle_time));
             	daemon.start();
             }
             return this.connection;
