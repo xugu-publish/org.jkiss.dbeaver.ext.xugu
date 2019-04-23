@@ -190,4 +190,55 @@ public class XuguConstants {
 
 	public static final int DEFAULT_SLEEP_TIME = 60000;	
 	public static final String[] DEFAULT_CHAR_SET = {"GBK", "GB2312", "UTF-8"};
+	public static final String DEF_PASSWORD_VALUE = "**********"; //$NON-NLS-1$
+    public static final String DEF_UNTIL_TIME = "1970-1-1 07:00:00.933";
+    
+    public static final String[] DEF_DATABASE_AUTHORITY_LIST = {
+    		"可创建任何数据库","可修改任何数据库","可删除任何数据库",
+    		"可创建任何模式","可修改任何模式","可删除任何模式",
+    		"可创建任何表","可修改任何表结构","可删除任何表","可引用任何表","可查询任何表","可插入记录，在任何表","可删除记录，在任何表","可更新记录，在任何表",
+    		"可创建任何视图","可修改任何视图结构","可删除任何视图","可查询任何视图","可插入记录，在任何视图","可删除记录，在任何视图","可更新记录，在任何视图",
+    		"可创建任何序列值","可修改任何序列值","可删除任何序列值","可读任何序列值","可更新任何序列值","可引用任何序列值",
+    		"可创建任何包","可修改任何包","可删除任何包","可执行任何包",
+    		"可创建任何存储过程或函数","可修改任何存储过程或函数","可删除任何存储过程或函数","可执行任何存储过程或函数",
+    		"可创建任何触发器","可修改任何触发器","可删除任何触发器",
+    		"可创建任何索引","可修改任何索引","可删除任何索引",
+    		"可创建任何同义词","可修改任何同义词","可删除任何同义词",
+    		"可创建任何用户","可修改任何用户","可删除任何用户",
+    		"可创建任何定时作业","可修改任何定时作业","可删除任何定时作业",
+    		"可创建任何角色","可修改任何角色","可删除任何角色",
+    		"可创建任何UDT","可修改任何UDT","可删除任何UDT",
+    		"可创建表","可创建视图","可创建序列值","可创建包","可创建存储过程或函数","可创建触发器","可创建索引","可创建同义词","可创建UDT"
+    };
+    public static final String[] DEF_TABLE_AUTHORITY_LIST= {
+    		"可修改表结构","可删除表","可引用表","可读表","可插入记录，在表","可删除记录，在表","可更新记录，在表"
+    };
+    public static final String[] DEF_VIEW_AUTHORITY_LIST= {
+    		"可修改视图结构","可删除视图","可读视图","可插入记录，在视图","可删除记录，在视图","可更新记录，在视图"
+    };
+    public static final String[] DEF_SEQUENCE_AUTHORITY_LIST= {
+    		"可修改序列值","可删除序列值","可读序列值","可更新序列值","可引用序列值"
+    };
+    public static final String[] DEF_PACKAGE_AUTHORITY_LIST= {
+    		"可修改包","可删除包","可执行包"
+    };
+    public static final String[] DEF_PROCEDURE_AUTHORITY_LIST= {
+    		"可修改存储过程或函数","可删除存储过程或函数","可执行存储过程或函数"
+    };
+    public static final String[] DEF_TRIGGER_AUTHORITY_LIST= {
+    		"可修改触发器","可删除触发器"
+    };
+    public static final String[] DEF_COLUMN_AUTHORITY_LIST= {
+    		"可读列","可更新列"
+    };
+    
+    public static final String[] DEF_OBJECT_TYPE_LIST = {
+    		"TABLE",
+    		"VIEW",
+    		"SEQUENCE",
+    		"TRIGGER",
+    		"PACKAGE",
+    		"PROCEDURE",
+    		"COLUMN"
+    };
 }
