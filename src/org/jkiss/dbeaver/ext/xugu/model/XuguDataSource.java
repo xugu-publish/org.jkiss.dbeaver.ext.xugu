@@ -161,7 +161,6 @@ public class XuguDataSource extends JDBCDataSource
         			if(res.next()) {
         				max_idle_time = res.getInt(1)*1000;
         			}
-        			System.out.println(max_idle_time);
         		}catch(SQLException e) {
         			e.printStackTrace();
         		}
