@@ -7,12 +7,6 @@ import org.jkiss.dbeaver.model.edit.prop.DBEPropertyReflector;
 
 public enum RolePropertyHandler implements DBEPropertyHandler<XuguRole>, DBEPropertyReflector<XuguRole> {
     NAME,
-    HOST,
-    PASSWORD,
-    PASSWORD_CONFIRM,
-    LOCKED,
-    EXPIRED,
-    UNTIL_TIME,
     ROLE_LIST,
     DATABASE_AUTHORITY,
     OBJECT_AUTHORITY,
@@ -21,11 +15,7 @@ public enum RolePropertyHandler implements DBEPropertyHandler<XuguRole>, DBEProp
     TARGET_TYPE,
     TARGET_OBJECT,
     SUB_TARGET_TYPE,
-    SUB_TARGET_OBJECT,
-    MAX_QUERIES,
-    MAX_UPDATES,
-    MAX_CONNECTIONS,
-    MAX_USER_CONNECTIONS;
+    SUB_TARGET_OBJECT;
 
 
     @Override
