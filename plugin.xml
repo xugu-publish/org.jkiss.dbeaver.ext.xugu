@@ -164,11 +164,7 @@
                             	<items label="%tree.user.authority.node.name" path="roleAuthority" property="roleAuthorities" icon="#file"/>
                         	</folder>
                     	</items>
-                	</folder>        
-                    <!--安全管理-->
-                	<folder type="org.jkiss.dbeaver.model.struct.DBSObject" label="%tree.security.node.name" icon="#security" description="Security management">                    	
-                    	                  
-                	</folder> 
+                	</folder>
                     <!--全局元信息-->
 		       		<folder type="org.jkiss.dbeaver.model.struct.DBSObject" label="%tree.global_metadata.node.name" icon="#logical" description="Global metadata objects">
                     	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguDataType" label="%tree.types.node.name" icon="#data_types" description="Types">
