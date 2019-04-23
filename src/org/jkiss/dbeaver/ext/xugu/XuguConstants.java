@@ -21,7 +21,7 @@ import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.struct.rdb.DBSIndexType;
 
 /**
- * MySQL constants
+ * Xugu constants
  */
 public class XuguConstants {
 
@@ -36,7 +36,8 @@ public class XuguConstants {
     
     public static final int DEFAULT_PORT = 3306;
     public static final String DEFAULT_HOST = "localhost";
-
+    //默认的连接守护进程休眠时间1分钟
+    public static final int DEFAULT_SLEEP_TIME = 60000;
 
     public static final String PROP_SERVER_TIMEZONE = DBConstants.INTERNAL_PROP_PREFIX + "serverTimezone@";
 

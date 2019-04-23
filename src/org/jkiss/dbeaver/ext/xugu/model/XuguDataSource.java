@@ -145,10 +145,20 @@ public class XuguDataSource extends JDBCDataSource
     }
 
     @Override
-    protected Connection openConnection(@NotNull DBRProgressMonitor monitor, JDBCRemoteInstance remoteInstance, @NotNull String purpose) throws DBCException {
+    protected Connection openConnection(@NotNull DBRProgressMonitor monitor, JDBCRemoteInstance remoteInstance, @NotNull String purpose) {
         try {
-            return this.connection = super.openConnection(monitor, remoteInstance, purpose);
-        } catch (DBCException e) {
+            this.connection = super.openConnection(monitor, remoteInstance, purpose);
+            if(this.connection!=null) {
+            	//获取构建连接所必需的变量
+            	DBPConnectionConfiguration connectionInfo = getContainer().getActualConnectionConfiguration();
+        		Properties connectProps = getAllConnectionProperties(monitor, purpose, connectionInfo);
+        		Driver driverInstance = getDriverInstance(monitor);
+        		String url = getConnectionURL(connectionInfo);
+            	Thread daemon = new Thread(new ConnectionDaemon(this.connection, connectionInfo, connectProps, driverInstance, url));
+            	daemon.start();
+            }
+            return this.connection;
+        } catch (DBException e) {
         	System.out.println("EEEERror code "+e.getErrorCode());
             if (e.getErrorCode() == XuguConstants.EC_PASSWORD_EXPIRED) {
                 if (changeExpiredPassword(monitor, purpose)) {
@@ -156,7 +166,7 @@ public class XuguDataSource extends JDBCDataSource
                     return this.connection = openConnection(monitor, remoteInstance, purpose);
                 }
             }
-            throw e;
+            return null;
         }
     }
 

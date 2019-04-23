@@ -186,5 +186,7 @@ public class XuguConstants {
             "qblock_name varchar2(30),\n" +
             "other_xml clob\n" +
             ") on commit preserve rows";
-    public static final String COL_DEFAULT_CHARACTER_SET_NAME = "UTF-8";	
+    public static final String COL_DEFAULT_CHARACTER_SET_NAME = "UTF-8";
+
+	public static final int DEFAULT_SLEEP_TIME = 60000;	
 }
