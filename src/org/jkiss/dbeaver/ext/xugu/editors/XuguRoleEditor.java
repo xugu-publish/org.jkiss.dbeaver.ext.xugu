@@ -52,8 +52,6 @@ public class XuguRoleEditor extends AbstractDatabaseObjectEditor<XuguRole>{
     //private PrivilegeTableControl privTable;
     private boolean newUser;
     private Text userNameText;
-    private Text passwordText;
-    private Text confirmText;
     private org.eclipse.swt.widgets.List databaseAuthorityList;
     private org.eclipse.swt.widgets.List objectAuthorityList;
     private org.eclipse.swt.widgets.List subObjectAuthorityList;
@@ -71,18 +69,6 @@ public class XuguRoleEditor extends AbstractDatabaseObjectEditor<XuguRole>{
 	ArrayList<String> databaseAuthorities;
 	ArrayList<String> objectAuthorities;
     
-    private Text roleText;
-    private Combo roleCombo;
-    private Button addRole;
-    private Button removeRole;
-    private Button lockCheck;
-    private Button expireCheck;
-    private Text timeText;
-    private String userName="";
-    private String password="";
-    private String untilTime="";
-    private boolean lockFlag;
-    private boolean expireFlag;
     //private Text hostText;
     private CommandListener commandlistener;
 
@@ -94,35 +80,29 @@ public class XuguRoleEditor extends AbstractDatabaseObjectEditor<XuguRole>{
         Composite container = UIUtils.createPlaceholder(pageControl, 4, 5);
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         container.setLayoutData(gd);
-        container.setSize(400, 200);
+        container.setSize(400, 300);
 
         newUser = !getDatabaseObject().isPersisted();
         CTabFolder cf1=new CTabFolder(container,0);
         CTabItem ti1 = new CTabItem(cf1, 1);
         CTabItem ti2 = new CTabItem(cf1, 2);
         CTabItem ti3 = new CTabItem(cf1, 3);
-        Composite loginGroup = UIUtils.createControlGroup(cf1, "User Authorities", 2, GridData.VERTICAL_ALIGN_BEGINNING|GridData.FILL_HORIZONTAL, 400);
+        Composite loginGroup = UIUtils.createControlGroup(cf1, "Role Properties", 2, GridData.VERTICAL_ALIGN_BEGINNING|GridData.FILL_HORIZONTAL, 400);
         loginGroup.setSize(200, 200);
         Composite loginGroup2 = UIUtils.createControlGroup(cf1, "Database Authorities", 1, GridData.VERTICAL_ALIGN_BEGINNING|GridData.FILL_HORIZONTAL, 400);
         loginGroup2.setSize(200, 200);
-        Composite loginGroup3 = UIUtils.createControlGroup(cf1, "Object Authorities", 2, GridData.VERTICAL_ALIGN_BEGINNING|GridData.FILL_HORIZONTAL, 400);
-        Composite subloginGroupLeft = UIUtils.createControlGroup(loginGroup3, "First Level", 2, GridData.VERTICAL_ALIGN_BEGINNING|GridData.FILL_HORIZONTAL, 400);
-        Composite subloginGroupRight = UIUtils.createControlGroup(loginGroup3, "Second Level", 2, GridData.VERTICAL_ALIGN_BEGINNING|GridData.FILL_HORIZONTAL, 400);
-        loginGroup3.setSize(200, 200);
+        Composite loginGroup3 = UIUtils.createControlGroup(cf1, "", 2, GridData.VERTICAL_ALIGN_BEGINNING|GridData.FILL_HORIZONTAL, 400);
+        Composite subloginGroupLeft = UIUtils.createControlGroup(loginGroup3, "First Level", 1, GridData.VERTICAL_ALIGN_BEGINNING|GridData.FILL_HORIZONTAL, 400);
+        Composite subloginGroupRight = UIUtils.createControlGroup(loginGroup3, "Second Level", 1, GridData.VERTICAL_ALIGN_BEGINNING|GridData.FILL_HORIZONTAL, 400);
+        subloginGroupLeft.setLayoutData(new GridData(400,250));
+        subloginGroupRight.setLayoutData(new GridData(400,250));
+        loginGroup3.setSize(860, 250);
         ti1.setControl(loginGroup);
-        ti1.setText("User Properties");
         ti2.setControl(loginGroup2);
         ti2.setText("Database Authorities");
         ti3.setControl(loginGroup3);
         ti3.setText("Object Authorities");
         cf1.setSelection(1);
-        //创建新用户时使用默认数据 修改用户时则使用当前用户数据 对密码做特殊处理 
-        password = newUser ? "" : XuguConstants.DEF_PASSWORD_VALUE;
-        userName = newUser ? "" : getDatabaseObject().getName();
-        
-        userNameText = UIUtils.createLabelText(loginGroup, XuguMessages.editors_user_editor_general_label_user_name, userName);
-        ControlPropertyCommandListener.create(this, userNameText, RolePropertyHandler.NAME);
-        
     	
     	//权限处理
     	{
@@ -146,8 +126,13 @@ public class XuguRoleEditor extends AbstractDatabaseObjectEditor<XuguRole>{
     		for(int i=0; i<XuguConstants.DEF_DATABASE_AUTHORITY_LIST.length; i++) {
     			databaseAuthorityCombo.add(XuguConstants.DEF_DATABASE_AUTHORITY_LIST[i]);
     		}
+    		databaseAuthorityCombo.setLayoutData(new GridData(400, 20));
+    		Button addDatabaseAuthority = UIUtils.createPushButton(loginGroup2, "Grant", null);
+    		addDatabaseAuthority.setLayoutData(new GridData(420, 30));
+    		Button removeDatabaseAuthority = UIUtils.createPushButton(loginGroup2, "Revoke", null);
+    		removeDatabaseAuthority.setLayoutData(new GridData(420, 30));
     		databaseAuthorityList = new org.eclipse.swt.widgets.List(loginGroup2, SWT.V_SCROLL|SWT.MULTI);
-    		databaseAuthorityList.setLayoutData(new GridData(200,180));
+    		databaseAuthorityList.setLayoutData(new GridData(400,180));
     		if(databaseAuthorities!=null) {
     			for(int i=0, l=databaseAuthorities.size(); i<l; i++) {
     				databaseAuthorityList.add(databaseAuthorities.get(i));
@@ -155,10 +140,6 @@ public class XuguRoleEditor extends AbstractDatabaseObjectEditor<XuguRole>{
     		}
     		databaseAuthorityList.setParent(loginGroup2);
     		ControlPropertyCommandListener.create(this, databaseAuthorityList, RolePropertyHandler.DATABASE_AUTHORITY);
-    		Button addDatabaseAuthority = UIUtils.createPushButton(loginGroup2, "Grant", null);
-    		addDatabaseAuthority.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-    		Button removeDatabaseAuthority = UIUtils.createPushButton(loginGroup2, "Revoke", null);
-    		removeDatabaseAuthority.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
     		addDatabaseAuthority.addSelectionListener(new SelectionListener() {
     			@Override
 				public void widgetSelected(SelectionEvent e) {
@@ -208,13 +189,12 @@ public class XuguRoleEditor extends AbstractDatabaseObjectEditor<XuguRole>{
     		});
     		
     		//二级对象处理
-    		Composite subGroup2 = UIUtils.createControlGroup(subloginGroupRight, "", 2, SWT.NO_TRIM, 200);
-    		GridData griddata = new GridData(SWT.LEFT, SWT.TOP, false, false, 1, 1);
-    		subGroup2.setLayoutData(griddata);
-    		subObjectTypeCombo = UIUtils.createLabelCombo(subGroup2, "SubObject Type", 0);
-    		subObjectCombo = UIUtils.createLabelCombo(subGroup2, "SubObject List", 0);
-    		subObjectAuthorityList = new org.eclipse.swt.widgets.List(loginGroup3, SWT.V_SCROLL|SWT.MULTI);
-    		subObjectAuthorityList.setLayoutData(new GridData(150,200));
+    		subObjectTypeCombo = UIUtils.createLabelCombo(subloginGroupRight, "SubObject Type", 0);
+    		subObjectTypeCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+    		subObjectCombo = UIUtils.createLabelCombo(subloginGroupRight, "SubObject List", 0);
+    		subObjectCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+    		subObjectAuthorityList = new org.eclipse.swt.widgets.List(subloginGroupRight, SWT.V_SCROLL|SWT.MULTI);
+    		subObjectAuthorityList.setLayoutData(new GridData(370,170));
     		subObjectAuthorityList.setParent(subloginGroupRight);
     		ControlPropertyCommandListener.create(this, subObjectTypeCombo, RolePropertyHandler.SUB_TARGET_TYPE);
     		ControlPropertyCommandListener.create(this, subObjectCombo, RolePropertyHandler.SUB_TARGET_OBJECT);
@@ -290,33 +270,33 @@ public class XuguRoleEditor extends AbstractDatabaseObjectEditor<XuguRole>{
     		});
     		
     		//一级对象级权限处理
-    		Composite subGroup = UIUtils.createControlGroup(subloginGroupLeft, "", 2, SWT.NO_TRIM, 200);
-    		subGroup.setLayoutData(griddata);
+//    		Composite subGroup = UIUtils.createControlGroup(subloginGroupLeft, "", 2, SWT.NO_TRIM, 400);
+//    		subGroup.setLayoutData(new GridData(400,200));
     		//模式下拉框
-    		schemaCombo = UIUtils.createLabelCombo(subGroup, "Schema List", 0);
+    		schemaCombo = UIUtils.createLabelCombo(subloginGroupLeft, "Schema List", 0);
     		Collection<XuguSchema> schemaList = getDatabaseObject().getDataSource().schemaCache.getCachedObjects();
     		Iterator<XuguSchema> it = schemaList.iterator();
     		while(it.hasNext()) {
     			schemaCombo.add(it.next().getName());
     		}
     		//对象类型下拉框
-    		objectTypeCombo = UIUtils.createLabelCombo(subGroup, "Object Type", 0);
+    		objectTypeCombo = UIUtils.createLabelCombo(subloginGroupLeft, "Object Type", 0);
     		for(int i=0, l=XuguConstants.DEF_OBJECT_TYPE_LIST.length; i<l; i++) {
     			objectTypeCombo.add(XuguConstants.DEF_OBJECT_TYPE_LIST[i]);
     		}
     		//对象下拉框
-    		objectCombo = UIUtils.createLabelCombo(subGroup, "Object List", 0);
+    		objectCombo = UIUtils.createLabelCombo(subloginGroupLeft, "Object List", 0);
     		//可选对象权限下拉框(包括全部一二级权限)
     		objectAuthorityCombo = UIUtils.createLabelCombo(loginGroup3, "Authority", 0);
-    		
     		//已选对象权限列表框
     		objectAuthorityList = new org.eclipse.swt.widgets.List(subloginGroupLeft, SWT.V_SCROLL|SWT.MULTI);
-    		objectAuthorityList.setLayoutData(new GridData(150,200));
+    		objectAuthorityList.setLayoutData(new GridData(370,150));
+    		objectAuthorityList.setParent(subloginGroupLeft);
     		ControlPropertyCommandListener.create(this, objectAuthorityList, RolePropertyHandler.OBJECT_AUTHORITY);
     		ControlPropertyCommandListener.create(this, schemaCombo, RolePropertyHandler.TARGET_SCHEMA);
     		ControlPropertyCommandListener.create(this, objectCombo, RolePropertyHandler.TARGET_OBJECT);
     		ControlPropertyCommandListener.create(this, objectTypeCombo, RolePropertyHandler.TARGET_TYPE);
-    		
+
     		Button addObjectAuthority = UIUtils.createPushButton(loginGroup3, "Grant", null);
     		addObjectAuthority.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
     		Button removeObjectAuthority = UIUtils.createPushButton(loginGroup3, "Revoke", null);
@@ -602,7 +582,6 @@ public class XuguRoleEditor extends AbstractDatabaseObjectEditor<XuguRole>{
                     @Override
                     public void run() {
                         userNameText.setEditable(true);
-                        passwordText.setEditable(true);
                     }
                 });
             }
