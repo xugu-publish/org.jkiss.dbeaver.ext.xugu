@@ -103,6 +103,7 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
     @Override
     public void createPartControl(Composite parent) 
     {
+    	//容器及布局
         pageControl = new PageControl(parent);
         Composite container = UIUtils.createPlaceholder(pageControl, 4, 5);
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
@@ -114,9 +115,11 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
         CTabItem ti1 = new CTabItem(cf1, 1);
         CTabItem ti2 = new CTabItem(cf1, 2);
         CTabItem ti3 = new CTabItem(cf1, 3);
-        Composite loginGroup = UIUtils.createControlGroup(cf1, "User Authorities", 2, GridData.VERTICAL_ALIGN_BEGINNING|GridData.FILL_HORIZONTAL, 400);
+        Composite loginGroup = UIUtils.createControlGroup(cf1, "", 2, GridData.VERTICAL_ALIGN_BEGINNING|GridData.FILL_HORIZONTAL, 400);
         loginGroup.setSize(200, 200);
-        Composite loginGroup2 = UIUtils.createControlGroup(cf1, "Database Authorities", 1, GridData.VERTICAL_ALIGN_BEGINNING|GridData.FILL_HORIZONTAL, 400);
+        Composite subUserGroupLeft = UIUtils.createControlGroup(loginGroup, "User Properties", 2, GridData.VERTICAL_ALIGN_BEGINNING|GridData.FILL_HORIZONTAL, 400);
+        Composite subUserGroupRight = UIUtils.createControlGroup(loginGroup, "Role Manage", 1, GridData.VERTICAL_ALIGN_BEGINNING|GridData.FILL_HORIZONTAL, 400);
+        Composite loginGroup2 = UIUtils.createControlGroup(cf1, "Database Authorities", 1, GridData.VERTICAL_ALIGN_BEGINNING|GridData.FILL_HORIZONTAL, 300);
         loginGroup2.setSize(200, 200);
         Composite loginGroup3 = UIUtils.createControlGroup(cf1, "Object Authorities", 2, GridData.VERTICAL_ALIGN_BEGINNING|GridData.FILL_HORIZONTAL, 400);
         Composite subloginGroupLeft = UIUtils.createControlGroup(loginGroup3, "First Level", 2, GridData.VERTICAL_ALIGN_BEGINNING|GridData.FILL_HORIZONTAL, 400);
@@ -136,31 +139,34 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
         lockFlag = newUser ? false:getDatabaseObject().isLocked();
         expireFlag = newUser ? false:getDatabaseObject().isExpired();
         
-        userNameText = UIUtils.createLabelText(loginGroup, XuguMessages.editors_user_editor_general_label_user_name, userName);
+        userNameText = UIUtils.createLabelText(subUserGroupLeft, XuguMessages.editors_user_editor_general_label_user_name, userName);
         ControlPropertyCommandListener.create(this, userNameText, UserPropertyHandler.NAME);
         
-        passwordText = UIUtils.createLabelText(loginGroup, XuguMessages.editors_user_editor_general_label_password, password, SWT.BORDER | SWT.PASSWORD);
+        passwordText = UIUtils.createLabelText(subUserGroupLeft, XuguMessages.editors_user_editor_general_label_password, password, SWT.BORDER | SWT.PASSWORD);
         ControlPropertyCommandListener.create(this, passwordText, UserPropertyHandler.PASSWORD);
 
-        confirmText = UIUtils.createLabelText(loginGroup, XuguMessages.editors_user_editor_general_label_confirm, password, SWT.BORDER | SWT.PASSWORD);
+        confirmText = UIUtils.createLabelText(subUserGroupLeft, XuguMessages.editors_user_editor_general_label_confirm, password, SWT.BORDER | SWT.PASSWORD);
         ControlPropertyCommandListener.create(this, confirmText, UserPropertyHandler.PASSWORD_CONFIRM);
         
-        lockCheck =  UIUtils.createLabelCheckbox(loginGroup, XuguMessages.editors_user_editor_general_label_locked, lockFlag);
+        lockCheck =  UIUtils.createLabelCheckbox(subUserGroupLeft, XuguMessages.editors_user_editor_general_label_locked, lockFlag);
         ControlPropertyCommandListener.create(this, lockCheck, UserPropertyHandler.LOCKED);
         
-        expireCheck = UIUtils.createLabelCheckbox(loginGroup, XuguMessages.editors_user_editor_general_label_pwd_expired, expireFlag);
+        expireCheck = UIUtils.createLabelCheckbox(subUserGroupLeft, XuguMessages.editors_user_editor_general_label_pwd_expired, expireFlag);
         ControlPropertyCommandListener.create(this, expireCheck, UserPropertyHandler.EXPIRED);
         
-        timeText = UIUtils.createLabelText(loginGroup, XuguMessages.editors_user_editor_general_label_valid_until, untilTime);
+        timeText = UIUtils.createLabelText(subUserGroupLeft, XuguMessages.editors_user_editor_general_label_valid_until, untilTime);
         ControlPropertyCommandListener.create(this, timeText, UserPropertyHandler.UNTIL_TIME);
         
-        roleCombo = UIUtils.createLabelCombo(loginGroup, XuguMessages.editors_user_editor_general_label_role_list, 0);
-        addRole = UIUtils.createPushButton(loginGroup, XuguMessages.editors_user_editor_general_label_add_role, null);
-        removeRole = UIUtils.createPushButton(loginGroup, XuguMessages.editors_user_editor_general_label_remove_role, null);
+        roleCombo = UIUtils.createLabelCombo(subUserGroupRight, XuguMessages.editors_user_editor_general_label_role_list, 0);
+        addRole = UIUtils.createPushButton(subUserGroupRight, XuguMessages.editors_user_editor_general_label_add_role, null);
+        addRole.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        removeRole = UIUtils.createPushButton(subUserGroupRight, XuguMessages.editors_user_editor_general_label_remove_role, null);
+        removeRole.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         
         //不允许手动修改角色列表文本框
-        roleList = new org.eclipse.swt.widgets.List(loginGroup, SWT.V_SCROLL|SWT.MULTI);;
+        roleList = new org.eclipse.swt.widgets.List(subUserGroupRight, SWT.V_SCROLL|SWT.MULTI);;
         ControlPropertyCommandListener.create(this, roleList, UserPropertyHandler.ROLE_LIST);
+        roleList.setLayoutData(new GridData(370,150));
         
         //加载用户当前的角色信息
         String[] choosenRoleList = getDatabaseObject().getRoleList().split(",");
@@ -269,19 +275,20 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
     		for(int i=0; i<XuguConstants.DEF_DATABASE_AUTHORITY_LIST.length; i++) {
     			databaseAuthorityCombo.add(XuguConstants.DEF_DATABASE_AUTHORITY_LIST[i]);
     		}
+    		databaseAuthorityCombo.setLayoutData(new GridData(400,20));  		
+    		Button addDatabaseAuthority = UIUtils.createPushButton(loginGroup2, "Grant", null);
+    		addDatabaseAuthority.setLayoutData(new GridData(420,30));
+    		Button removeDatabaseAuthority = UIUtils.createPushButton(loginGroup2, "Revoke", null);
+    		removeDatabaseAuthority.setLayoutData(new GridData(420, 30));
     		databaseAuthorityList = new org.eclipse.swt.widgets.List(loginGroup2, SWT.V_SCROLL|SWT.MULTI);
-    		databaseAuthorityList.setLayoutData(new GridData(200,180));
+    		databaseAuthorityList.setLayoutData(new GridData(400,180));
     		if(databaseAuthorities!=null) {
     			for(int i=0, l=databaseAuthorities.size(); i<l; i++) {
     				databaseAuthorityList.add(databaseAuthorities.get(i));
     			}
     		}
-    		databaseAuthorityList.setParent(loginGroup2);
     		ControlPropertyCommandListener.create(this, databaseAuthorityList, UserPropertyHandler.DATABASE_AUTHORITY);
-    		Button addDatabaseAuthority = UIUtils.createPushButton(loginGroup2, "Grant", null);
-    		addDatabaseAuthority.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-    		Button removeDatabaseAuthority = UIUtils.createPushButton(loginGroup2, "Revoke", null);
-    		removeDatabaseAuthority.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+    		databaseAuthorityList.setParent(loginGroup2);
     		addDatabaseAuthority.addSelectionListener(new SelectionListener() {
     			@Override
 				public void widgetSelected(SelectionEvent e) {
