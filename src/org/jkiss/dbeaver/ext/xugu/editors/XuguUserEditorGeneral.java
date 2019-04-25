@@ -182,23 +182,26 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				String newRole = roleCombo.getText();
-				//先判断list文本框中是否已有，已有则不添加
-				String[] nowItems = roleList.getItems();
-				boolean hasItem = false;
-				for(int i=0, l=nowItems.length; i<l; i++) {
-					if(nowItems[i].equals(newRole)) {
-						hasItem = true;
-						break;
+				//屏蔽空选项和空串情况
+				if(newRole!=null && newRole.length()!=0) {
+					//先判断list文本框中是否已有，已有则不添加
+					String[] nowItems = roleList.getItems();
+					boolean hasItem = false;
+					for(int i=0, l=nowItems.length; i<l; i++) {
+						if(nowItems[i].equals(newRole)) {
+							hasItem = true;
+							break;
+						}
 					}
+					if(!hasItem) {
+						roleList.add(newRole);
+					}
+					//全部选中
+					roleList.selectAll();
+		        	//激活修改监听
+					roleList.notifyListeners(SWT.Modify, null);
+					roleList.deselectAll();
 				}
-				if(!hasItem) {
-					roleList.add(newRole);
-				}
-				//全部选中
-				roleList.selectAll();
-	        	//激活修改监听
-				roleList.notifyListeners(SWT.Modify, null);
-				roleList.deselectAll();
 			}
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
@@ -209,16 +212,19 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				String oldRole = roleCombo.getText();
-				//先判断list文本框中是否已有，已有则不添加
-				int index=roleList.indexOf(oldRole);
-				if(index!=-1) {
-					roleList.remove(index);
+				//屏蔽空和空串情况
+				if(oldRole!=null && oldRole.length()!=0) {
+					//先判断list文本框中是否已有，已有则不添加
+					int index=roleList.indexOf(oldRole);
+					if(index!=-1) {
+						roleList.remove(index);
+					}
+					//全部选中
+					roleList.selectAll();
+		        	//激活修改监听
+					roleList.notifyListeners(SWT.Modify, null);
+					roleList.deselectAll();
 				}
-				//全部选中
-				roleList.selectAll();
-	        	//激活修改监听
-				roleList.notifyListeners(SWT.Modify, null);
-				roleList.deselectAll();
 			}
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
