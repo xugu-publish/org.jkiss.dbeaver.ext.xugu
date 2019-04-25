@@ -22,4 +22,7 @@ public abstract class XuguAuthorityBase<PARENT extends DBSObject> extends XuguOb
 		this.isDatabase = isDatabase;
 	}
 
+	public boolean isDatabase() {
+		return this.isDatabase;
+	}
 }

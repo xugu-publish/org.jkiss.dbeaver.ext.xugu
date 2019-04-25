@@ -106,52 +106,55 @@ public class XuguCommandChangeUser extends DBECommandComposite<XuguUser, UserPro
             String oldRole = getObject().getRoleList();
             String[] oldRoleList = oldRole==null?null:oldRole.split(",");
             String[] newRoleList = (String[]) getProperties().get("ROLE_LIST");
-            //对每一个新角色都去旧角色列表进行查找
-			for(int i=0, l=newRoleList.length; i<l; i++) {
-				boolean inRoleListFlag = false;
-				//没有已有角色则直接添加
-				if(oldRoleList==null || oldRoleList.length==0) {
-					actions.add(new SQLDatabasePersistAction("Grant new role to user", 
-							"GRANT ROLE "+newRoleList[i]+" TO "+getObject().getName()));
-				}
-				//否则需要先检查新角色是否已有
-				else{
-					for(int j=0, l2=oldRoleList.length; j<l2; j++) {
-						if(newRoleList[i].equals(oldRoleList[j])) {
-							inRoleListFlag = true;
-							break;
-						}
-					}
-					//新角色不在列表中则为用户添加角色
-					if(!inRoleListFlag) {
-						actions.add(new SQLDatabasePersistAction("Grant new role to user", 
-								"GRANT ROLE "+newRoleList[i]+" TO "+getObject().getName()));
-					}
-				}
-			}
-			for(int i=0, l=oldRoleList.length; i<l; i++) {
-				boolean inRoleListFlag = false;
-				//没有新角色则直接删除
-				if(newRoleList==null || newRoleList.length==0) {
-					actions.add(new SQLDatabasePersistAction("Revoke old role from user", 
-							"REVOKE ROLE "+oldRoleList[i]+" TO "+getObject().getName()));
-				}
-				//否则需要检查旧角色是否还保有
-				else {
-					for(int j=0, l2=newRoleList.length; j<l2; j++) {
-						if(oldRoleList[i].equals(newRoleList[j])) {
-							inRoleListFlag = true;
-							break;
-						}
-					}
-					//旧角色不在列表中则为用户删除角色
-					if(!inRoleListFlag) {
-						actions.add(new SQLDatabasePersistAction("Revoke old role from user",
-								"REVOKE ROLE "+oldRoleList[i]+" FROM "+getObject().getName()));
-					}
-				}
-			}
-            
+            //只有newRoleList不为空时才进行处理
+            if(newRoleList!=null) {
+            	//对每一个新角色都去旧角色列表进行查找
+    			for(int i=0, l=newRoleList.length; i<l; i++) {
+    				boolean inRoleListFlag = false;
+    				//没有已有角色则直接添加
+    				if(oldRoleList==null || oldRoleList.length==0) {
+    					actions.add(new SQLDatabasePersistAction("Grant new role to user", 
+    							"GRANT ROLE "+newRoleList[i]+" TO "+getObject().getName()));
+    				}
+    				//否则需要先检查新角色是否已有
+    				else{
+    					for(int j=0, l2=oldRoleList.length; j<l2; j++) {
+    						if(newRoleList[i].equals(oldRoleList[j])) {
+    							inRoleListFlag = true;
+    							break;
+    						}
+    					}
+    					//新角色不在列表中则为用户添加角色
+    					if(!inRoleListFlag) {
+    						actions.add(new SQLDatabasePersistAction("Grant new role to user", 
+    								"GRANT ROLE "+newRoleList[i]+" TO "+getObject().getName()));
+    					}
+    				}
+    			}
+    			for(int i=0, l=oldRoleList.length; i<l; i++) {
+    				boolean inRoleListFlag = false;
+    				//没有新角色则直接删除
+    				if(newRoleList==null || newRoleList.length==0) {
+    					actions.add(new SQLDatabasePersistAction("Revoke old role from user", 
+    							"REVOKE ROLE "+oldRoleList[i]+" TO "+getObject().getName()));
+    				}
+    				//否则需要检查旧角色是否还保有
+    				else {
+    					for(int j=0, l2=newRoleList.length; j<l2; j++) {
+    						if(oldRoleList[i].equals(newRoleList[j])) {
+    							inRoleListFlag = true;
+    							break;
+    						}
+    					}
+    					//旧角色不在列表中则为用户删除角色
+    					if(!inRoleListFlag) {
+    						actions.add(new SQLDatabasePersistAction("Revoke old role from user",
+    								"REVOKE ROLE "+oldRoleList[i]+" FROM "+getObject().getName()));
+    					}
+    				}
+    			}
+            }
+            	
             //对权限做额外处理
             //库级权限
             Collection<XuguUserAuthority> oldAuthorities = getObject().getUserDatabaseAuthorities();
