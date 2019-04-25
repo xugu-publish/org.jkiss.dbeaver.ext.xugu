@@ -37,6 +37,7 @@ import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 
+import java.sql.Statement;
 import com.xugu.permission.LoadPermission;
 
 //import org.jkiss.dbeaver.model.struct.DBSObjectLazy;
@@ -79,9 +80,7 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
     private String alias;
     private boolean is_sys;
     private String trust_ip;
-//    private int mem_quota;
     private int temp_space_quota;
-//    private int undo_space_quota;
     private int cursor_quota;
     private int session_quota;
     private int io_quota;
@@ -89,6 +88,7 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
     private Timestamp last_modi_time;
     private Connection conn;
     private String role_list;
+    private String all_role_list;
     private Collection<XuguUserAuthority> userAuthorities;
     private String schema_list;
     public XuguUser(XuguDataSource dataSource, ResultSet resultSet, DBRProgressMonitor monitor) {
@@ -128,34 +128,54 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
             this.last_modi_time = JDBCUtils.safeGetTimestamp(resultSet, "LAST_MODI_TIME");
             
         }
-        //加载roleList和schemaList
-        Collection<XuguRole> roleList;
+        //加载roleList和schemaList        
 		try {
-			roleList = dataSource.roleCache.getAllObjects(monitor, dataSource);
-		
-			if(roleList!=null && roleList.size()!=0) {
-				Iterator<XuguRole> it = roleList.iterator();
-				String text = "";
+			//获取SYSDBA连接,用来获取当前用户所包含的角色信息
+			Connection tempConn = dataSource.getSYSDBAConn(monitor);
+	        Statement stmt = tempConn.createStatement();
+	        String sql = "SELECT USER_NAME FROM ";
+	        sql += dataSource.getRoleFlag();
+	        sql += "_USERS WHERE USER_ID IN(SELECT ROLE_ID FROM SYS_ROLE_MEMBERS WHERE USER_ID=";
+	        sql += this.user_id;
+	        sql += ") AND DB_ID=";
+	        sql += this.db_id;
+	        ResultSet rs = stmt.executeQuery(sql);
+			//获取当前用户所含角色信息
+	        String text = "";
+	        while(rs.next()) {
+	        	String role = rs.getString(1);
+	        	text += role+",";
+	        }
+	        text = text.substring(0, text.length()-1);
+			this.setRoleList(text);
+			
+			//获取全部角色信息
+			Collection<XuguRole> allRoleList = dataSource.getRoles(monitor);
+			if(allRoleList!=null && allRoleList.size()!=0) {
+				Iterator<XuguRole> it = allRoleList.iterator();
+				String text2 = "";
 				while(it.hasNext()) {
-					text += it.next().getName()+",";
+					XuguRole tempRole = it.next();
+					text2 += tempRole.getName()+",";
 				}
-				text = text.substring(0, text.length()-1);
-				this.setRoleList(text);
+				text2 = text2.substring(0, text2.length()-1);
+				this.setAllRoleList(text2);
 			}
+			
+			//获取全部模式信息
 			Collection<XuguSchema> schemaList = dataSource.getSchemas(monitor);
 			if(schemaList!=null && schemaList.size()!=0) {
 				Iterator<XuguSchema> it = schemaList.iterator();
-				String text = "";
-				
+				String text2 = "";
 				while(it.hasNext()) {
 					XuguSchema tempSchema = it.next();
 					//构造schemalist
-					text += tempSchema.getName()+",";
+					text2 += tempSchema.getName()+",";
 				}
-				text = text.substring(0, text.length()-1);
-				this.setSchemaList(text);
+				text2 = text2.substring(0, text.length()-1);
+				this.setSchemaList(text2);
 			}
-		} catch (DBException e) {
+		} catch (DBException | SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -255,6 +275,15 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
 	
 	public void setRoleList(String list) {
 		this.role_list = list;
+	}
+	
+	@Property(viewable=false, editable = true)
+	public String getAllRoleList() {
+		return this.all_role_list;
+	}
+	
+	public void setAllRoleList(String list) {
+		this.all_role_list = list;
 	}
 	
 	@Property(viewable=false, editable = true)

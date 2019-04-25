@@ -34,6 +34,7 @@ import org.jkiss.dbeaver.ext.xugu.XuguMessages;
 //import org.jkiss.dbeaver.ext.xugu.edit.XuguCommandGrantPrivilege;
 import org.jkiss.dbeaver.ext.xugu.edit.UserPropertyHandler;
 import org.jkiss.dbeaver.ext.xugu.model.XuguConstants;
+import org.jkiss.dbeaver.ext.xugu.model.XuguRole;
 import org.jkiss.dbeaver.ext.xugu.model.XuguSchema;
 //import org.jkiss.dbeaver.ext.xugu.model.XuguGrant;
 //import org.jkiss.dbeaver.ext.xugu.model.XuguPrivilege;
@@ -84,7 +85,7 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
 	ArrayList<String> databaseAuthorities;
 	ArrayList<String> objectAuthorities;
     
-    private Text roleText;
+    private org.eclipse.swt.widgets.List roleList;
     private Combo roleCombo;
     private Button addRole;
     private Button removeRole;
@@ -158,81 +159,70 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
         removeRole = UIUtils.createPushButton(loginGroup, XuguMessages.editors_user_editor_general_label_remove_role, null);
         
         //不允许手动修改角色列表文本框
-        roleText = UIUtils.createLabelText(loginGroup, XuguMessages.editors_user_editor_general_label_role_choosen, "");
-        ControlPropertyCommandListener.create(this, roleText, UserPropertyHandler.ROLE_LIST);
-        roleText.setEnabled(false);
+        roleList = new org.eclipse.swt.widgets.List(loginGroup, SWT.V_SCROLL|SWT.MULTI);;
+        ControlPropertyCommandListener.create(this, roleList, UserPropertyHandler.ROLE_LIST);
         
-        if(newUser) {
-        	//无角色信息则禁用角色组件
-        	if(getDatabaseObject().getRoleList()!=null) {
-        		String[] roles = getDatabaseObject().getRoleList().split(",");
-                if(roles!=null && !"".equals(roles[0])) {
-                	for(int i=0; i<roles.length; i++) {
-                    	roleCombo.add(roles[i]);
-                    }
-                }else {
-                	roleCombo.setEnabled(false);
-                	roleText.setEnabled(false);
-                	addRole.setEnabled(false);
-                	removeRole.setEnabled(false);
-                }
-        	}else {
-            	roleCombo.setEnabled(false);
-            	roleText.setEnabled(false);
-            	addRole.setEnabled(false);
-            	removeRole.setEnabled(false);
-            }
+        //加载用户当前的角色信息
+        String[] choosenRoleList = getDatabaseObject().getRoleList().split(",");
+        for(int i=0; i<choosenRoleList.length; i++) {
+        	roleList.add(choosenRoleList[i]);
         }
+    	//加载全部可选的角色信息
+    	if(getDatabaseObject().getAllRoleList()!=null) {
+    		String[] roles = getDatabaseObject().getAllRoleList().split(",");
+            if(roles!=null && !"".equals(roles[0])) {
+            	for(int i=0; i<roles.length; i++) {
+                	roleCombo.add(roles[i]);
+                }
+            }
+    	}
+        //}
         
         addRole.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				// TODO Auto-generated method stub
-				String text = roleText.getText();
 				String newRole = roleCombo.getText();
-				//追加新的角色 前提是新角色名不存在于角色文本框内容中
-				if(text!=null && !"".equals(text)) {
-					if(text.indexOf(newRole)==-1) {
-						text += ","+roleCombo.getText();
+				//先判断list文本框中是否已有，已有则不添加
+				String[] nowItems = roleList.getItems();
+				boolean hasItem = false;
+				for(int i=0, l=nowItems.length; i<l; i++) {
+					if(nowItems[i].equals(newRole)) {
+						hasItem = true;
+						break;
 					}
-				}else {
-					text = roleCombo.getText();
 				}
-				roleText.setText(text);
+				if(!hasItem) {
+					roleList.add(newRole);
+				}
+				//全部选中
+				roleList.selectAll();
+	        	//激活修改监听
+				roleList.notifyListeners(SWT.Modify, null);
+				roleList.deselectAll();
 			}
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
-				// TODO Auto-generated method stub
-				System.out.println("in here?");
+				// do nothing
 			}	
         });
         removeRole.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				// TODO Auto-generated method stub
-				String text = roleText.getText();
-				String newRole = roleCombo.getText();
-				//删除已有角色 前提是新角色名存在于角色文本框内容中
-				if(text!=null && !"".equals(text)) {
-					int index;
-					if((index = text.indexOf(newRole))!=-1) {
-						text = text.substring(0, index)+text.substring(index+newRole.length());
-						//处理首尾逗号
-						if(text.indexOf(",")==0) {
-							text = text.substring(1);
-						}else if(text.lastIndexOf(",")==text.length()-1) {
-							text = text.substring(0, text.length()-1);
-						}
-						//处理位于中间的逗号
-						text.replaceAll(",,", ",");
-					}
+				String oldRole = roleCombo.getText();
+				//先判断list文本框中是否已有，已有则不添加
+				int index=roleList.indexOf(oldRole);
+				if(index!=-1) {
+					roleList.remove(index);
 				}
-				roleText.setText(text);
+				//全部选中
+				roleList.selectAll();
+	        	//激活修改监听
+				roleList.notifyListeners(SWT.Modify, null);
+				roleList.deselectAll();
 			}
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
-				// TODO Auto-generated method stub
-				System.out.println("in here?");
+				// do nothing
 			}	
         });
         
@@ -241,15 +231,15 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
         lockCheck.setEnabled(false);
     	expireCheck.setEnabled(false);
         
-    	if(!newUser) {
-    		roleCombo.setEnabled(false);
-    		addRole.setEnabled(false);
-    		removeRole.setEnabled(false);
-    		roleText.setVisible(false);
-    		roleCombo.setVisible(false);
-    		addRole.setVisible(false);
-    		removeRole.setVisible(false);
-    	}
+//    	if(!newUser) {
+//    		roleCombo.setEnabled(false);
+//    		addRole.setEnabled(false);
+//    		removeRole.setEnabled(false);
+//    		roleText.setVisible(false);
+//    		roleCombo.setVisible(false);
+//    		addRole.setVisible(false);
+//    		removeRole.setVisible(false);
+//    	}
     	
     	//权限处理
     	{

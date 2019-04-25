@@ -144,6 +144,25 @@ public class XuguDataSource extends JDBCDataSource
         return available;
     }
 
+    public Connection getSYSDBAConn(DBRProgressMonitor monitor) {
+    	try {
+	    	DBPConnectionConfiguration connectionInfo = getContainer().getActualConnectionConfiguration();
+			Driver driverInstance = getDriverInstance(monitor);
+			String url = getConnectionURL(connectionInfo)+"?user=SYSDBA&password=SYSDBA";
+	    	Connection conn = null;
+			if (driverInstance == null) {
+                conn = DriverManager.getConnection(url);
+            } else {
+				conn = driverInstance.connect(url, null);
+            }
+			return conn;
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			return null;
+		}
+    }
+    
     @Override
     protected Connection openConnection(@NotNull DBRProgressMonitor monitor, JDBCRemoteInstance remoteInstance, @NotNull String purpose) {
         try {
@@ -347,11 +366,7 @@ public class XuguDataSource extends JDBCDataSource
 
     @Association
     public Collection<XuguRole> getRoles(DBRProgressMonitor monitor) throws DBException {
-    	if("SYS".equals(this.roleFlag)){
-    		return roleCache.getAllObjects(monitor, this);
-    	}else {
-    		return null;
-    	}
+    	return roleCache.getAllObjects(monitor, this);
     }
 
     @Association
