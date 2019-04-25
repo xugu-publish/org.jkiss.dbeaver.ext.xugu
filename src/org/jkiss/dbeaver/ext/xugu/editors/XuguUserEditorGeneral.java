@@ -293,23 +293,25 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
     			@Override
 				public void widgetSelected(SelectionEvent e) {
     				String authority = databaseAuthorityCombo.getText();
-    				//先判断list文本框中是否已有，已有则不添加
-    				String[] nowItems = databaseAuthorityList.getItems();
-    				boolean hasItem = false;
-    				for(int i=0, l=nowItems.length; i<l; i++) {
-    					if(nowItems[i].equals(authority)) {
-    						hasItem = true;
-    						break;
-    					}
+    				if(authority!=null && authority.length()!=0) {
+    					//先判断list文本框中是否已有，已有则不添加
+        				String[] nowItems = databaseAuthorityList.getItems();
+        				boolean hasItem = false;
+        				for(int i=0, l=nowItems.length; i<l; i++) {
+        					if(nowItems[i].equals(authority)) {
+        						hasItem = true;
+        						break;
+        					}
+        				}
+        				if(!hasItem) {
+        					databaseAuthorityList.add(authority);
+        				}
+        				//全部选中
+        	        	databaseAuthorityList.selectAll();
+        	        	//激活修改监听
+        				databaseAuthorityList.notifyListeners(SWT.Modify, null);
+        				databaseAuthorityList.deselectAll();
     				}
-    				if(!hasItem) {
-    					databaseAuthorityList.add(authority);
-    				}
-    				//全部选中
-    	        	databaseAuthorityList.selectAll();
-    	        	//激活修改监听
-    				databaseAuthorityList.notifyListeners(SWT.Modify, null);
-    				databaseAuthorityList.deselectAll();
 				}
 				@Override
 				public void widgetDefaultSelected(SelectionEvent e) {
@@ -320,16 +322,18 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
     			@Override
 				public void widgetSelected(SelectionEvent e) {
     				String authority = databaseAuthorityCombo.getText();
-    				//将下拉框中选中的权限从列表框中删除
-    				int index=databaseAuthorityList.indexOf(authority);
-    				if(index!=-1) {
-    					databaseAuthorityList.remove(index);
+    				if(authority!=null && authority.length()!=0) {
+    					//将下拉框中选中的权限从列表框中删除
+        				int index=databaseAuthorityList.indexOf(authority);
+        				if(index!=-1) {
+        					databaseAuthorityList.remove(index);
+        				}
+        				//全部选中
+        	        	databaseAuthorityList.selectAll();
+        	        	//激活修改监听
+        				databaseAuthorityList.notifyListeners(SWT.Modify, null);
+        				databaseAuthorityList.deselectAll();
     				}
-    				//全部选中
-    	        	databaseAuthorityList.selectAll();
-    	        	//激活修改监听
-    				databaseAuthorityList.notifyListeners(SWT.Modify, null);
-    				databaseAuthorityList.deselectAll();
 				}
 				@Override
 				public void widgetDefaultSelected(SelectionEvent e) {
@@ -564,36 +568,38 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
 				@Override
 				public void widgetSelected(SelectionEvent e) {
 					String authority = objectAuthorityCombo.getText();
-					String[] authorityList = null;
-					//区分一级对象还是二级对象
-					boolean isFirstLevel = true;
-					if(authority!=null && (authority.contains("列")||authority.contains("触发器"))){
-						authorityList = subObjectAuthorityList.getItems();
-						isFirstLevel = false;
-					}else {
-						authorityList = objectAuthorityList.getItems();
-					}
-					boolean hasAuthority = false;
-					for(int i=0, l=authorityList.length; i<l; i++) {
-						if(authority.equals(authorityList[i])) {
-							hasAuthority = true;
-							break;
+					if(authority!=null && authority.length()!=0) {
+						String[] authorityList = null;
+						//区分一级对象还是二级对象
+						boolean isFirstLevel = true;
+						if(authority!=null && (authority.contains("列")||authority.contains("触发器"))){
+							authorityList = subObjectAuthorityList.getItems();
+							isFirstLevel = false;
+						}else {
+							authorityList = objectAuthorityList.getItems();
 						}
-					}
-					if(isFirstLevel) {
-						if(!hasAuthority) {
-							objectAuthorityList.add(authority);
+						boolean hasAuthority = false;
+						for(int i=0, l=authorityList.length; i<l; i++) {
+							if(authority.equals(authorityList[i])) {
+								hasAuthority = true;
+								break;
+							}
 						}
-						objectAuthorityList.selectAll();
-						objectAuthorityList.notifyListeners(SWT.Modify, null);
-						objectAuthorityList.deselectAll();
-					}else {
-						if(!hasAuthority) {
-							subObjectAuthorityList.add(authority);
+						if(isFirstLevel) {
+							if(!hasAuthority) {
+								objectAuthorityList.add(authority);
+							}
+							objectAuthorityList.selectAll();
+							objectAuthorityList.notifyListeners(SWT.Modify, null);
+							objectAuthorityList.deselectAll();
+						}else {
+							if(!hasAuthority) {
+								subObjectAuthorityList.add(authority);
+							}
+							subObjectAuthorityList.selectAll();
+							subObjectAuthorityList.notifyListeners(SWT.Modify, null);
+							subObjectAuthorityList.deselectAll();
 						}
-						subObjectAuthorityList.selectAll();
-						subObjectAuthorityList.notifyListeners(SWT.Modify, null);
-						subObjectAuthorityList.deselectAll();
 					}
 				}
 
@@ -606,43 +612,45 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
 				@Override
 				public void widgetSelected(SelectionEvent e) {
 					String authority = objectAuthorityCombo.getText();
-					String[] authorityList = null;
-					//区分一级对象还是二级对象
-					boolean isFirstLevel = true;
-					if(authority!=null && (authority.contains("列")||authority.contains("触发器"))){
-						authorityList = subObjectAuthorityList.getItems();
-						isFirstLevel = false;
-					}else {
-						authorityList = objectAuthorityList.getItems();
-					}
-					if(isFirstLevel) {
-						boolean hasAuthority = false;
-						for(int i=0, l=authorityList.length; i<l; i++) {
-							if(authority.equals(authorityList[i])) {
-								hasAuthority = true;
-								break;
+					if(authority!=null && authority.length()!=0) {
+						String[] authorityList = null;
+						//区分一级对象还是二级对象
+						boolean isFirstLevel = true;
+						if(authority!=null && (authority.contains("列")||authority.contains("触发器"))){
+							authorityList = subObjectAuthorityList.getItems();
+							isFirstLevel = false;
+						}else {
+							authorityList = objectAuthorityList.getItems();
+						}
+						if(isFirstLevel) {
+							boolean hasAuthority = false;
+							for(int i=0, l=authorityList.length; i<l; i++) {
+								if(authority.equals(authorityList[i])) {
+									hasAuthority = true;
+									break;
+								}
 							}
-						}
-						if(hasAuthority) {
-							objectAuthorityList.remove(authority);
-						}
-						objectAuthorityList.selectAll();
-						objectAuthorityList.notifyListeners(SWT.Modify, null);
-						objectAuthorityList.deselectAll();
-					}else {
-						boolean hasAuthority = false;
-						for(int i=0, l=authorityList.length; i<l; i++) {
-							if(authority.equals(authorityList[i])) {
-								hasAuthority = true;
-								break;
+							if(hasAuthority) {
+								objectAuthorityList.remove(authority);
 							}
+							objectAuthorityList.selectAll();
+							objectAuthorityList.notifyListeners(SWT.Modify, null);
+							objectAuthorityList.deselectAll();
+						}else {
+							boolean hasAuthority = false;
+							for(int i=0, l=authorityList.length; i<l; i++) {
+								if(authority.equals(authorityList[i])) {
+									hasAuthority = true;
+									break;
+								}
+							}
+							if(hasAuthority) {
+								subObjectAuthorityList.remove(authority);
+							}
+							subObjectAuthorityList.selectAll();
+							subObjectAuthorityList.notifyListeners(SWT.Modify, null);
+							subObjectAuthorityList.deselectAll();
 						}
-						if(hasAuthority) {
-							subObjectAuthorityList.remove(authority);
-						}
-						subObjectAuthorityList.selectAll();
-						subObjectAuthorityList.notifyListeners(SWT.Modify, null);
-						subObjectAuthorityList.deselectAll();
 					}
 				}
 
