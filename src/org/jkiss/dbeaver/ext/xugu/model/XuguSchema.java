@@ -920,11 +920,9 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
             StringBuilder sql = new StringBuilder();
             sql.append("SELECT DISTINCT *, KEYS AS COL_NAME FROM ");
             sql.append(owner.roleFlag);
-            sql.append("_INDEXES i INNER JOIN (SELECT * FROM ");
+            sql.append("_INDEXES i INNER JOIN (SELECT TABLE_ID, COL_NAME, COL_NO FROM ");
             sql.append(owner.roleFlag);
-            sql.append("_COLUMNS) as x INNER JOIN ");
-            sql.append(owner.roleFlag);
-            sql.append("_TABLES USING(TABLE_ID) USING(TABLE_ID)");
+            sql.append("_COLUMNS) as x USING(TABLE_ID)");
             sql.append(" WHERE DB_ID=(SELECT DB_ID FROM ");
         	sql.append(owner.roleFlag);
         	sql.append("_DATABASES WHERE DB_NAME='");
@@ -935,7 +933,11 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
                 sql.append(owner.roleFlag);
                 sql.append("_TABLES WHERE TABLE_NAME='");
                 sql.append(forTable.getName());
-                sql.append("')");
+                sql.append("' AND DB_ID=(SELECT DB_ID FROM ");
+                sql.append(owner.roleFlag);
+                sql.append("_DATABASES WHERE DB_NAME='");
+                sql.append(owner.getDataSource().connection.getCatalog());
+            	sql.append("'))");
             }
             JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
             return dbStat;
