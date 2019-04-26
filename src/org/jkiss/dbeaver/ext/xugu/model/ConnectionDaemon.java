@@ -7,7 +7,9 @@ import java.sql.Statement;
 import java.util.Properties;
 
 import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
+import org.jkiss.dbeaver.model.impl.edit.AbstractObjectManager;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCRemoteInstance;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 
@@ -19,6 +21,7 @@ public class ConnectionDaemon implements Runnable {
 	private String url;
 	private int sleepTime;
 	private int dbTime;
+	protected static final Log log = Log.getLog(ConnectionDaemon.class);
 	
 	public ConnectionDaemon(Connection conn, DBPConnectionConfiguration conf,  Properties props, Driver driver, String url, int dbTime) {
 		this.conn = conn;
@@ -53,9 +56,11 @@ public class ConnectionDaemon implements Runnable {
 				stmt.executeQuery("select 1 from dual");
 				Thread.sleep(sleepTime);
 				System.out.println("Daemon task running "+sleepTime+" "+dbTime);
+				log.warn("Xugu connect daemon running: Do select 1!");
 			} catch (InterruptedException | SQLException e) {
 				e.printStackTrace();
 				System.out.println("Connect time out! Do reconnect!");
+				log.warn("Xugu connect link down! Do reconnect!");
 				try {
 					if (driver == null) {
 	                    this.conn = DriverManager.getConnection(url, props);
