@@ -52,19 +52,7 @@ public class XuguRoleEditor extends AbstractDatabaseObjectEditor<XuguRole>{
     private boolean isLoaded;
     //private PrivilegeTableControl privTable;
     private boolean newUser;
-    private Text userNameText;
-    private org.eclipse.swt.widgets.List databaseAuthorityList;
-    private org.eclipse.swt.widgets.List objectAuthorityList;
-    private org.eclipse.swt.widgets.List subObjectAuthorityList;
-    
-    private Combo databaseAuthorityCombo;
-    
-    private Combo objectTypeCombo;
-    private Combo schemaCombo;
-    private Combo objectCombo;
-    private Combo objectAuthorityCombo;
-    private Combo subObjectTypeCombo;
-    private Combo subObjectCombo;
+    private Text roleNameText;
     
     Collection<XuguRoleAuthority> authorities;
 	ArrayList<String> databaseAuthorities;
@@ -83,24 +71,27 @@ public class XuguRoleEditor extends AbstractDatabaseObjectEditor<XuguRole>{
         container.setLayoutData(gd);
         container.setSize(400, 300);
 
-        newUser = !getDatabaseObject().isPersisted();
         CTabFolder cf1=new CTabFolder(container,0);
         CTabItem ti1 = new CTabItem(cf1, 1);
         CTabItem ti2 = new CTabItem(cf1, 2);
         CTabItem ti3 = new CTabItem(cf1, 3);
-        Composite loginGroup = UIUtils.createControlGroup(cf1, "Role Properties", 2, GridData.VERTICAL_ALIGN_BEGINNING|GridData.FILL_HORIZONTAL, 400);
-        loginGroup.setSize(200, 200);
-        Composite loginGroup2 = UIUtils.createControlGroup(cf1, XuguMessages.editors_authority_editor_database_title, 1, GridData.VERTICAL_ALIGN_BEGINNING|GridData.FILL_HORIZONTAL, 400);
-        loginGroup2.setSize(200, 200);
-        Composite loginGroup3 = UIUtils.createControlGroup(cf1, "", 2, GridData.VERTICAL_ALIGN_BEGINNING|GridData.FILL_HORIZONTAL, 400);
-
-        loginGroup3.setSize(860, 250);
-        ti1.setControl(loginGroup);
-        ti2.setControl(loginGroup2);
+        Composite roleGroup = UIUtils.createControlGroup(cf1, XuguMessages.editors_role_editor_general_label_role_properties_title, 2, GridData.VERTICAL_ALIGN_BEGINNING|GridData.FILL_HORIZONTAL, 400);
+        roleGroup.setSize(200, 200);
+        Composite roleGroup2 = UIUtils.createControlGroup(cf1, XuguMessages.editors_authority_editor_database_title, 1, GridData.VERTICAL_ALIGN_BEGINNING|GridData.FILL_HORIZONTAL, 400);
+        roleGroup2.setSize(200, 200);
+        Composite roleGroup3 = UIUtils.createControlGroup(cf1, XuguMessages.editors_authority_editor_object_title, 2, GridData.VERTICAL_ALIGN_BEGINNING|GridData.FILL_HORIZONTAL, 400);
+        roleGroup3.setSize(860, 250);
+        
+        ti1.setControl(roleGroup);
+        ti1.setText(XuguMessages.editors_role_editor_general_label_role_properties_title);
+        ti2.setControl(roleGroup2);
         ti2.setText(XuguMessages.editors_authority_editor_database_title);
-        ti3.setControl(loginGroup3);
+        ti3.setControl(roleGroup3);
         ti3.setText(XuguMessages.editors_authority_editor_object_title);
-        cf1.setSelection(1);
+        cf1.setSelection(0);
+        
+        roleNameText = UIUtils.createLabelText(roleGroup, XuguMessages.dialog_role_name, getDatabaseObject().getName());
+        roleNameText.setEditable(false);
     	
     	//权限处理
     	{
@@ -109,7 +100,7 @@ public class XuguRoleEditor extends AbstractDatabaseObjectEditor<XuguRole>{
     		databaseAuthorities = new ArrayList<>();
     		objectAuthorities = new ArrayList<>();
     		
-    		XuguAuthorityEditorBase baseEditor = new XuguAuthorityEditorBase(loginGroup2, loginGroup3, 2);
+    		XuguAuthorityEditorBase baseEditor = new XuguAuthorityEditorBase(roleGroup2, roleGroup3, 2);
     		baseEditor.setRoleEditor(this);	
     		if(authorities!=null) {
     			Iterator<XuguRoleAuthority> it = authorities.iterator();
@@ -210,7 +201,6 @@ public class XuguRoleEditor extends AbstractDatabaseObjectEditor<XuguRole>{
                 UIUtils.asyncExec(new Runnable() {
                     @Override
                     public void run() {
-                        userNameText.setEditable(true);
                     }
                 });
             }
