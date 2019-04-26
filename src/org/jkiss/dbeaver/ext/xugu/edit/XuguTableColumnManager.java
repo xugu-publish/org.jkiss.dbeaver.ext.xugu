@@ -123,6 +123,8 @@ public class XuguTableColumnManager extends SQLTableColumnManager<XuguTableColum
                             "ALTER TABLE " + column.getTable().getFullyQualifiedName(DBPEvaluationContext.DDL) + //$NON-NLS-1$
                             " ALTER COLUMN "+ column.getName() +" SET DEFAULT '" + command.getProperty("defaultValue")+"'" )); //$NON-NLS-1$
             	}else {
+            		String sql ="ALTER TABLE " + column.getTable().getFullyQualifiedName(DBPEvaluationContext.DDL) + //$NON-NLS-1$
+                            " ALTER COLUMN " + getNestedDeclaration(monitor, column.getTable(), command, options);
             		actionList.add(new SQLDatabasePersistAction(
                             "Modify column",
                             "ALTER TABLE " + column.getTable().getFullyQualifiedName(DBPEvaluationContext.DDL) + //$NON-NLS-1$

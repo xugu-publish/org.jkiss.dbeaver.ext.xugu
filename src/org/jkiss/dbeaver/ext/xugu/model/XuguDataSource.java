@@ -57,6 +57,9 @@ import org.jkiss.utils.BeanUtils;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.StandardConstants;
 
+import com.xugu.pool.XgConnectionPoolDataSource;
+import com.xugu.pool.XgPooledConnection;
+
 import java.io.PrintWriter;
 import java.sql.*;
 import java.util.*;
@@ -166,35 +169,42 @@ public class XuguDataSource extends JDBCDataSource
     @Override
     protected Connection openConnection(@NotNull DBRProgressMonitor monitor, JDBCRemoteInstance remoteInstance, @NotNull String purpose) {
         try {
-            this.connection = super.openConnection(monitor, remoteInstance, purpose);
-            if(this.connection!=null) {
-            	//获取构建连接所必需的变量
-            	DBPConnectionConfiguration connectionInfo = getContainer().getActualConnectionConfiguration();
-        		Properties connectProps = getAllConnectionProperties(monitor, purpose, connectionInfo);
-        		Driver driverInstance = getDriverInstance(monitor);
-        		String url = getConnectionURL(connectionInfo);
-        		int max_idle_time = 0;
-        		try {
-        			Statement stmt = this.connection.createStatement();
-        			ResultSet res = stmt.executeQuery("SHOW MAX_IDLE_TIME");
-        			if(res.next()) {
-        				max_idle_time = res.getInt(1)*1000;
-        			}
-        		}catch(SQLException e) {
-        			e.printStackTrace();
-        		}
-            	Thread daemon = new Thread(new ConnectionDaemon(this.connection, connectionInfo, connectProps, driverInstance, url, max_idle_time));
-            	daemon.start();
-            }
+//            this.connection = super.openConnection(monitor, remoteInstance, purpose);
+        	XgConnectionPoolDataSource xgCPDSource = new XgConnectionPoolDataSource();
+        	DBPConnectionConfiguration connectionInfo = getContainer().getActualConnectionConfiguration();
+        	String url = getConnectionURL(connectionInfo);
+        	xgCPDSource.setUser("SYSDBA");
+        	xgCPDSource.setPassword("SYSDBA");
+        	xgCPDSource.setUrl(url);
+        	xgCPDSource.setMaxActive(50);
+        	xgCPDSource.setMinIdle(5);
+        	xgCPDSource.setLoginTimeout(3000);
+        	xgCPDSource.setMaxWaitTime(3000);
+        	XgPooledConnection xgPconn;
+			xgPconn = (XgPooledConnection)xgCPDSource.getPooledConnection();
+			this.connection = xgPconn.getConnection();
+//			this.connection.close();
+//			Thread checkThread = new Thread(new Runnable() {
+//				@Override
+//				public void run() {
+//					// TODO Auto-generated method stub
+//					while(true) {
+//						try {
+//							if(connection.isClosed()) {
+//								XgPooledConnection xgPconn2;
+//								xgPconn2 = (XgPooledConnection)xgCPDSource.getPooledConnection();
+//								connection = xgPconn2.getConnection();
+//							}
+//						} catch (SQLException e) {
+//							// TODO Auto-generated catch block
+//							e.printStackTrace();
+//						}
+//					}
+//				}
+//			});
+//			checkThread.start();
             return this.connection;
-        } catch (DBException e) {
-        	System.out.println("EEEERror code "+e.getErrorCode());
-            if (e.getErrorCode() == XuguConstants.EC_PASSWORD_EXPIRED) {
-                if (changeExpiredPassword(monitor, purpose)) {
-                    // Retry
-                    return this.connection = openConnection(monitor, remoteInstance, purpose);
-                }
-            }
+        } catch ( SQLException e) {
             return null;
         }
     }
@@ -236,7 +246,8 @@ public class XuguDataSource extends JDBCDataSource
 
     @Override
     protected void initializeContextState(@NotNull DBRProgressMonitor monitor, @NotNull JDBCExecutionContext context, boolean setActiveObject) throws DBCException {
-        if (outputReader == null) {
+    	
+    	if (outputReader == null) {
             outputReader = new xuguOutputReader();
         }
         // Enable DBMS output
@@ -996,6 +1007,7 @@ public class XuguDataSource extends JDBCDataSource
         		sql.append(user.getName());
         		sql.append("'");
         	}
+        	boolean flag = owner.connection.isClosed();
         	return session.prepareStatement(sql.toString());
 		}
 
