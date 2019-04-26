@@ -88,7 +88,6 @@ public class XuguTableTriggerManager extends SQLTriggerManager<XuguTableTrigger,
         }
         else{
         	//强制增加CREATE OR REPLACE关键字
-        	
             Matcher m = PATTERN_TRIGGER.matcher(source);
             String keyWord = "TRIGGER";
             if(m.find()) {
@@ -97,7 +96,6 @@ public class XuguTableTriggerManager extends SQLTriggerManager<XuguTableTrigger,
             int index = source.indexOf(keyWord);
             source = "CREATE OR REPLACE TRIGGER "+source.substring(index+8);
             actions.add(new SQLDatabasePersistAction("Create trigger", source, true)); //$NON-NLS-2$
-            XuguUtils.addSchemaChangeActions(actions, trigger);
         }
     }
 
