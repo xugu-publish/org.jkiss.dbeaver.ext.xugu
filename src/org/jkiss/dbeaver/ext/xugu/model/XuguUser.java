@@ -146,7 +146,9 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
 	        	String role = rs.getString(1);
 	        	text += role+",";
 	        }
-	        text = text.substring(0, text.length()-1);
+	        if(!text.equals("")) {
+	        	text = text.substring(0, text.length()-1);
+	        }
 			this.setRoleList(text);
 			
 			//获取全部角色信息
