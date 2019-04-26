@@ -125,6 +125,24 @@ public class XuguMessages extends NLS {
 	public static String editors_user_editor_general_label_role_choosen;
 	public static String editors_user_editor_general_label_add_role;
 	public static String editors_user_editor_general_label_remove_role;
+	
+	public static String editors_user_editor_general_label_user_properties_title;
+	public static String editors_role_editor_general_label_role_properties_title;
+	public static String editors_user_editor_general_label_role_manage_title;
+	public static String editors_authority_editor_database_title;
+	public static String editors_authority_editor_object_title;     
+	public static String editors_authority_editor_db_combo;
+	public static String editors_authority_editor_grant;
+	public static String editors_authority_editor_revoke;
+	public static String editors_authority_editor_schema_combo;
+	public static String editors_authority_editor_obj_type_combo;
+	public static String editors_authority_editor_obj_list_combo;
+	public static String editors_authority_editor_subTitle1;
+	public static String editors_authority_editor_subTitle2;
+	public static String editors_authority_editor_subObj_type_combo;
+	public static String editors_authority_editor_subObj_list_combo;
+	public static String editors_authority_editor_authority_combo;
+
 	public static String tools_db_export_wizard_job_dump_log_reader;
 	public static String tools_db_export_wizard_message_export_completed;
 	public static String tools_db_export_wizard_monitor_bytes;

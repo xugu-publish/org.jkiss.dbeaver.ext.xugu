@@ -13,6 +13,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.List;
+import org.jkiss.dbeaver.ext.xugu.XuguMessages;
 import org.jkiss.dbeaver.ext.xugu.edit.RolePropertyHandler;
 import org.jkiss.dbeaver.ext.xugu.edit.UserPropertyHandler;
 import org.jkiss.dbeaver.ext.xugu.model.XuguAuthorityBase;
@@ -82,11 +83,11 @@ public class XuguAuthorityEditorBase{
 	//加载库级权限视图
 	public void loadDatabaseAuthorityView() {
 		//加载组件
-		databaseAuthorityCombo = UIUtils.createLabelCombo(parent1, "Database Authority", 0);
+		databaseAuthorityCombo = UIUtils.createLabelCombo(parent1, XuguMessages.editors_authority_editor_db_combo, 0);
 		databaseAuthorityCombo.setLayoutData(new GridData(400, 20));
-		addDatabaseAuthority = UIUtils.createPushButton(parent1, "Grant", null);
+		addDatabaseAuthority = UIUtils.createPushButton(parent1, XuguMessages.editors_authority_editor_grant, null);
 		addDatabaseAuthority.setLayoutData(new GridData(420, 30));
-		removeDatabaseAuthority = UIUtils.createPushButton(parent1, "Revoke", null);
+		removeDatabaseAuthority = UIUtils.createPushButton(parent1, XuguMessages.editors_authority_editor_revoke, null);
 		removeDatabaseAuthority.setLayoutData(new GridData(420, 30));
 		databaseAuthorityList = new org.eclipse.swt.widgets.List(parent1, SWT.V_SCROLL|SWT.MULTI);
 		databaseAuthorityList.setLayoutData(new GridData(400,180));
@@ -161,11 +162,11 @@ public class XuguAuthorityEditorBase{
 	//加载对象级权限视图
 	public void loadObjectAuthorityView(XuguGlobalObject owner) {
 		//加载组件
-		subloginGroupLeft = UIUtils.createControlGroup(parent2, "First Level", 1, GridData.VERTICAL_ALIGN_BEGINNING|GridData.FILL_HORIZONTAL, 400);
-        subloginGroupRight = UIUtils.createControlGroup(parent2, "Second Level", 1, GridData.VERTICAL_ALIGN_BEGINNING|GridData.FILL_HORIZONTAL, 400);
-        subObjectTypeCombo = UIUtils.createLabelCombo(subloginGroupRight, "SubObject Type", 0);
+		subloginGroupLeft = UIUtils.createControlGroup(parent2, XuguMessages.editors_authority_editor_subTitle1, 1, GridData.VERTICAL_ALIGN_BEGINNING|GridData.FILL_HORIZONTAL, 400);
+        subloginGroupRight = UIUtils.createControlGroup(parent2, XuguMessages.editors_authority_editor_subTitle2, 1, GridData.VERTICAL_ALIGN_BEGINNING|GridData.FILL_HORIZONTAL, 400);
+        subObjectTypeCombo = UIUtils.createLabelCombo(subloginGroupRight, XuguMessages.editors_authority_editor_subObj_type_combo, 0);
 		subObjectTypeCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		subObjectCombo = UIUtils.createLabelCombo(subloginGroupRight, "SubObject List", 0);
+		subObjectCombo = UIUtils.createLabelCombo(subloginGroupRight, XuguMessages.editors_authority_editor_subObj_list_combo, 0);
 		subObjectCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		subObjectAuthorityList = new org.eclipse.swt.widgets.List(subloginGroupRight, SWT.V_SCROLL|SWT.MULTI);
 		subObjectAuthorityList.setLayoutData(new GridData(370,190));
@@ -258,7 +259,7 @@ public class XuguAuthorityEditorBase{
 		
 		//一级对象级权限处理
 		//模式下拉框
-		schemaCombo = UIUtils.createLabelCombo(subloginGroupLeft, "Schema List", 0);
+		schemaCombo = UIUtils.createLabelCombo(subloginGroupLeft, XuguMessages.editors_authority_editor_schema_combo, 0);
 		Collection<XuguSchema> schemaList;
 		schemaList = owner.getDataSource().schemaCache.getCachedObjects();
 		Iterator<XuguSchema> it = schemaList.iterator();
@@ -266,14 +267,14 @@ public class XuguAuthorityEditorBase{
 			schemaCombo.add(it.next().getName());
 		}
 		//对象类型下拉框
-		objectTypeCombo = UIUtils.createLabelCombo(subloginGroupLeft, "Object Type", 0);
+		objectTypeCombo = UIUtils.createLabelCombo(subloginGroupLeft, XuguMessages.editors_authority_editor_obj_type_combo, 0);
 		for(int i=0, l=XuguConstants.DEF_OBJECT_TYPE_LIST.length; i<l; i++) {
 			objectTypeCombo.add(XuguConstants.DEF_OBJECT_TYPE_LIST[i]);
 		}
 		//对象下拉框
-		objectCombo = UIUtils.createLabelCombo(subloginGroupLeft, "Object List", 0);
+		objectCombo = UIUtils.createLabelCombo(subloginGroupLeft, XuguMessages.editors_authority_editor_obj_list_combo, 0);
 		//可选对象权限下拉框(包括全部一二级权限)
-		objectAuthorityCombo = UIUtils.createLabelCombo(parent2, "Authority", 0);
+		objectAuthorityCombo = UIUtils.createLabelCombo(parent2, XuguMessages.editors_authority_editor_authority_combo, 0);
 		//已选对象权限列表框
 		objectAuthorityList = new org.eclipse.swt.widgets.List(subloginGroupLeft, SWT.V_SCROLL|SWT.MULTI);
 		objectAuthorityList.setLayoutData(new GridData(370,135));
@@ -290,9 +291,9 @@ public class XuguAuthorityEditorBase{
     		ControlPropertyCommandListener.create(roleEditor, objectCombo, RolePropertyHandler.TARGET_OBJECT);
     		ControlPropertyCommandListener.create(roleEditor, objectTypeCombo, RolePropertyHandler.TARGET_TYPE);
     	}
-		addObjectAuthority = UIUtils.createPushButton(parent2, "Grant", null);
+		addObjectAuthority = UIUtils.createPushButton(parent2, XuguMessages.editors_authority_editor_grant, null);
 		addObjectAuthority.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		removeObjectAuthority = UIUtils.createPushButton(parent2, "Revoke", null);
+		removeObjectAuthority = UIUtils.createPushButton(parent2, XuguMessages.editors_authority_editor_revoke, null);
 		removeObjectAuthority.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		SelectionListener itemChangeListener = new SelectionListener() {
 			@Override

@@ -117,20 +117,18 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
         CTabItem ti3 = new CTabItem(cf1, 3);
         Composite loginGroup = UIUtils.createControlGroup(cf1, "", 2, GridData.VERTICAL_ALIGN_BEGINNING|GridData.FILL_HORIZONTAL, 400);
         loginGroup.setSize(200, 200);
-        Composite subUserGroupLeft = UIUtils.createControlGroup(loginGroup, "User Properties", 2, GridData.VERTICAL_ALIGN_BEGINNING|GridData.FILL_HORIZONTAL, 400);
-        Composite subUserGroupRight = UIUtils.createControlGroup(loginGroup, "Role Manage", 1, GridData.VERTICAL_ALIGN_BEGINNING|GridData.FILL_HORIZONTAL, 400);
-        Composite loginGroup2 = UIUtils.createControlGroup(cf1, "Database Authorities", 1, GridData.VERTICAL_ALIGN_BEGINNING|GridData.FILL_HORIZONTAL, 300);
+        Composite subUserGroupLeft = UIUtils.createControlGroup(loginGroup, XuguMessages.editors_user_editor_general_label_user_properties_title, 2, GridData.VERTICAL_ALIGN_BEGINNING|GridData.FILL_HORIZONTAL, 400);
+        Composite subUserGroupRight = UIUtils.createControlGroup(loginGroup, XuguMessages.editors_user_editor_general_label_role_manage_title, 1, GridData.VERTICAL_ALIGN_BEGINNING|GridData.FILL_HORIZONTAL, 400);
+        Composite loginGroup2 = UIUtils.createControlGroup(cf1, XuguMessages.editors_authority_editor_database_title, 1, GridData.VERTICAL_ALIGN_BEGINNING|GridData.FILL_HORIZONTAL, 300);
         loginGroup2.setSize(200, 200);
-        Composite loginGroup3 = UIUtils.createControlGroup(cf1, "Object Authorities", 2, GridData.VERTICAL_ALIGN_BEGINNING|GridData.FILL_HORIZONTAL, 400);
-//        Composite subloginGroupLeft = UIUtils.createControlGroup(loginGroup3, "First Level", 2, GridData.VERTICAL_ALIGN_BEGINNING|GridData.FILL_HORIZONTAL, 400);
-//        Composite subloginGroupRight = UIUtils.createControlGroup(loginGroup3, "Second Level", 2, GridData.VERTICAL_ALIGN_BEGINNING|GridData.FILL_HORIZONTAL, 400);
+        Composite loginGroup3 = UIUtils.createControlGroup(cf1, XuguMessages.editors_authority_editor_object_title, 2, GridData.VERTICAL_ALIGN_BEGINNING|GridData.FILL_HORIZONTAL, 400);
         loginGroup3.setSize(200, 200);
         ti1.setControl(loginGroup);
-        ti1.setText("User Properties");
+        ti1.setText(XuguMessages.editors_user_editor_general_label_user_properties_title);
         ti2.setControl(loginGroup2);
-        ti2.setText("Database Authorities");
+        ti2.setText(XuguMessages.editors_authority_editor_database_title);
         ti3.setControl(loginGroup3);
-        ti3.setText("Object Authorities");
+        ti3.setText(XuguMessages.editors_authority_editor_object_title);
         cf1.setSelection(1);
         //创建新用户时使用默认数据 修改用户时则使用当前用户数据 对密码做特殊处理 
         password = newUser ? "" : XuguConstants.DEF_PASSWORD_VALUE;

@@ -90,16 +90,16 @@ public class XuguRoleEditor extends AbstractDatabaseObjectEditor<XuguRole>{
         CTabItem ti3 = new CTabItem(cf1, 3);
         Composite loginGroup = UIUtils.createControlGroup(cf1, "Role Properties", 2, GridData.VERTICAL_ALIGN_BEGINNING|GridData.FILL_HORIZONTAL, 400);
         loginGroup.setSize(200, 200);
-        Composite loginGroup2 = UIUtils.createControlGroup(cf1, "Database Authorities", 1, GridData.VERTICAL_ALIGN_BEGINNING|GridData.FILL_HORIZONTAL, 400);
+        Composite loginGroup2 = UIUtils.createControlGroup(cf1, XuguMessages.editors_authority_editor_database_title, 1, GridData.VERTICAL_ALIGN_BEGINNING|GridData.FILL_HORIZONTAL, 400);
         loginGroup2.setSize(200, 200);
         Composite loginGroup3 = UIUtils.createControlGroup(cf1, "", 2, GridData.VERTICAL_ALIGN_BEGINNING|GridData.FILL_HORIZONTAL, 400);
 
         loginGroup3.setSize(860, 250);
         ti1.setControl(loginGroup);
         ti2.setControl(loginGroup2);
-        ti2.setText("Database Authorities");
+        ti2.setText(XuguMessages.editors_authority_editor_database_title);
         ti3.setControl(loginGroup3);
-        ti3.setText("Object Authorities");
+        ti3.setText(XuguMessages.editors_authority_editor_object_title);
         cf1.setSelection(1);
     	
     	//权限处理
