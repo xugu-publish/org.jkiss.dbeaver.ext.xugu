@@ -174,7 +174,9 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
 					//构造schemalist
 					text2 += tempSchema.getName()+",";
 				}
-				text2 = text2.substring(0, text.length()-1);
+				if(!"".equals(text2)) {
+					text2 = text2.substring(0, text2.length()-1);
+				}
 				this.setSchemaList(text2);
 			}
 		} catch (DBException | SQLException e) {
