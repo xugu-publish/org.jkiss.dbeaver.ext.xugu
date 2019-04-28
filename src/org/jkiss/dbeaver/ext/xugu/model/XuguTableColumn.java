@@ -43,7 +43,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * OracleTableColumn
+ * XuguTableColumn
  */
 public class XuguTableColumn extends JDBCTableColumn<XuguTableBase> implements DBSTableColumn, DBSTypedObjectEx, DBPHiddenObject, DBPNamedObject2
 {

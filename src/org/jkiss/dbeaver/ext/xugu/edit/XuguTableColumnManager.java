@@ -116,19 +116,27 @@ public class XuguTableColumnManager extends SQLTableColumnManager<XuguTableColum
         		}
         	}
         	if(flag) {
+        		String sql = "ALTER TABLE "+column.getTable().getFullyQualifiedName(DBPEvaluationContext.DDL)+" ALTER COLUMN";
         		//修改仅包含默认值做特殊处理(加上set关键字)
-            	if(command.getProperties().size()==1 && command.getProperty("defaultValue")!=null) {
+            	if(command.getProperty("defaultValue")!=null) {
             		actionList.add(new SQLDatabasePersistAction(
                             "Modify column",
-                            "ALTER TABLE " + column.getTable().getFullyQualifiedName(DBPEvaluationContext.DDL) + //$NON-NLS-1$
-                            " ALTER COLUMN "+ column.getName() +" SET DEFAULT '" + command.getProperty("defaultValue")+"'" )); //$NON-NLS-1$
-            	}else {
-            		String sql ="ALTER TABLE " + column.getTable().getFullyQualifiedName(DBPEvaluationContext.DDL) + //$NON-NLS-1$
-                            " ALTER COLUMN " + getNestedDeclaration(monitor, column.getTable(), command, options);
+                            sql+ column.getName() +" SET DEFAULT '" + command.getProperty("defaultValue")+"'" )); //$NON-NLS-1$
+            	}
+            	//对于非空做特殊处理（与mysql语法不一致）
+            	else if(command.getProperty("required")!=null) {
+            		if((boolean)command.getProperty("required")) {
+            			sql += " "+ column.getName() +" SET NOT NULL";
+            		}else {
+            			sql += " "+ column.getName() +" DROP NOT NULL";
+            		}
+            		actionList.add(new SQLDatabasePersistAction("Modify column",sql)); 
+            	}
+            	else {
+            		sql += getNestedDeclaration(monitor, column.getTable(), command, options);
             		actionList.add(new SQLDatabasePersistAction(
                             "Modify column",
-                            "ALTER TABLE " + column.getTable().getFullyQualifiedName(DBPEvaluationContext.DDL) + //$NON-NLS-1$
-                            " ALTER COLUMN " + getNestedDeclaration(monitor, column.getTable(), command, options))); //$NON-NLS-1$
+                            sql)); //$NON-NLS-1$
             	}
         	}else {
         		// do nothing
