@@ -119,9 +119,11 @@ public class XuguTableColumnManager extends SQLTableColumnManager<XuguTableColum
         		String sql = "ALTER TABLE "+column.getTable().getFullyQualifiedName(DBPEvaluationContext.DDL)+" ALTER COLUMN";
         		//修改仅包含默认值做特殊处理(加上set关键字)
             	if(command.getProperty("defaultValue")!=null) {
-            		actionList.add(new SQLDatabasePersistAction(
-                            "Modify column",
-                            sql+ column.getName() +" SET DEFAULT '" + command.getProperty("defaultValue")+"'" )); //$NON-NLS-1$
+            		if(command.getProperty("defaultValue").equals("")) {
+            			sql += " " + column.getName() + " DROP DEFAULT";
+            		}else {
+            			sql += " " + column.getName() +" SET DEFAULT '" + command.getProperty("defaultValue")+"'";
+            		}
             	}
             	//对于非空做特殊处理（与mysql语法不一致）
             	else if(command.getProperty("required")!=null) {
@@ -130,14 +132,11 @@ public class XuguTableColumnManager extends SQLTableColumnManager<XuguTableColum
             		}else {
             			sql += " "+ column.getName() +" DROP NOT NULL";
             		}
-            		actionList.add(new SQLDatabasePersistAction("Modify column",sql)); 
             	}
             	else {
             		sql += getNestedDeclaration(monitor, column.getTable(), command, options);
-            		actionList.add(new SQLDatabasePersistAction(
-                            "Modify column",
-                            sql)); //$NON-NLS-1$
             	}
+            	actionList.add(new SQLDatabasePersistAction("Modify column",sql)); 
         	}else {
         		// do nothing
         	}
