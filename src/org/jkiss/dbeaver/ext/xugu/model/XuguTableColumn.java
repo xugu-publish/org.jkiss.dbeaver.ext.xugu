@@ -172,6 +172,7 @@ public class XuguTableColumn extends JDBCTableColumn<XuguTableBase> implements D
             if (typeMod == XuguDataTypeModifier.REF) {
                 this.valueType = Types.REF;
             }
+            //设置非空
             setRequired(this.notNull);
             if("NUMERIC".equals(this.typeName)) {
             	setScale(this.scale);

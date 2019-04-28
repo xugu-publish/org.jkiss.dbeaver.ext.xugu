@@ -1007,7 +1007,6 @@ public class XuguDataSource extends JDBCDataSource
         		sql.append(user.getName());
         		sql.append("'");
         	}
-        	boolean flag = owner.connection.isClosed();
         	return session.prepareStatement(sql.toString());
 		}
 

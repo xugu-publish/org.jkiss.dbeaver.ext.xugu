@@ -836,9 +836,9 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
                 sql.append(forTable.getName());
                 sql.append("'");
             }
-            sql.append(") USING(TABLE_ID) JOIN ");
+            sql.append(") USING(TABLE_ID) INNER JOIN (SELECT t2.TABLE_NAME, t2.TABLE_ID FROM ");
             sql.append(owner.roleFlag);
-            sql.append("_TABLES t2 ON f.REF_TABLE_ID=t2.TABLE_ID JOIN ");
+            sql.append("_TABLES t2) ON f.REF_TABLE_ID=t2.TABLE_ID JOIN ");
             sql.append(owner.roleFlag);
             sql.append("_CONSTRAINTS f2 ON f.REF_TABLE_ID=f2.TABLE_ID ");
             sql.append("WHERE CONS_TYPE='F'");
@@ -867,30 +867,31 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
             JDBCSession session,
             XuguTable parent, XuguTableForeignKey object, JDBCResultSet dbResult)
             throws SQLException, DBException
-        {
-        	//处理多列的情况
-            String colName = JDBCUtils.safeGetStringTrimmed(dbResult, "COL_NAME");
-            if(colName.indexOf("(")!=-1) {
-            	colName = colName.substring(colName.indexOf("(")+1, colName.indexOf(")"));
-            	System.out.println("CCCCCCCCoLLLLLL2 "+colName);
-            	String[] colNames = colName.split(",");
-            	XuguTableForeignKeyColumn[] con_cols = new XuguTableForeignKeyColumn[colNames.length];
-            	for(int i=0; i<colNames.length; i++) {
-            		System.out.println("SSingle col "+colNames[i]);
-            		XuguTableColumn tableColumn = getTableColumn(session, parent, colNames[i]);
-            		con_cols[i] = new XuguTableForeignKeyColumn(
-                            object,
-                            tableColumn,
-                            tableColumn.getOrdinalPosition());
-            	}
-            	return con_cols;
-            }else {
-	            XuguTableColumn column = getTableColumn(session, parent, dbResult);
-	            return column == null ? null : new XuguTableForeignKeyColumn[] { new XuguTableForeignKeyColumn(
-	                object,
-	                column,
-	                JDBCUtils.safeGetInt(dbResult, "POSITION")) };
+        {	
+            if(dbResult!=null) {
+            	String colName = JDBCUtils.safeGetStringTrimmed(dbResult, "COL_NAME");
+            	//处理多列的情况
+            	if(colName.indexOf("(")!=-1) {
+                	colName = colName.substring(colName.indexOf("(")+1, colName.indexOf(")"));
+                	System.out.println("CCCCCCCCoLLLLLL2 "+colName);
+                	String[] colNames = colName.split(",");
+                	XuguTableForeignKeyColumn[] con_cols = new XuguTableForeignKeyColumn[colNames.length];
+                	for(int i=0; i<colNames.length; i++) {
+                		System.out.println("SSingle col "+colNames[i]);
+                		XuguTableColumn tableColumn = getTableColumn(session, parent, colNames[i]);
+                		con_cols[i] = new XuguTableForeignKeyColumn(
+                                object,
+                                tableColumn,
+                                tableColumn.getOrdinalPosition());
+                	}
+                	return con_cols;
+                }
             }
+            XuguTableColumn column = getTableColumn(session, parent, dbResult);
+            return column == null ? null : new XuguTableForeignKeyColumn[] { new XuguTableForeignKeyColumn(
+                object,
+                column,
+                JDBCUtils.safeGetInt(dbResult, "POSITION")) };
         }
 
         @Override
