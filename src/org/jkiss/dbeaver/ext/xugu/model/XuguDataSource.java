@@ -66,6 +66,8 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.xml.transform.Result;
+
 /**
  * XuguDataSource
  * @author Luke
@@ -74,6 +76,11 @@ public class XuguDataSource extends JDBCDataSource
     implements DBSObjectSelector, DBCQueryPlanner, IAdaptable {
     private static final Log log = Log.getLog(XuguDataSource.class);
 
+    public JDBCRemoteInstance remoteInstance;
+    public String purpose;
+    private Thread daemon;
+    private JDBCSession session;
+    
     final public SchemaCache schemaCache = new SchemaCache();
     final public DatabaseCache databaseCache = new DatabaseCache();
     final DataTypeCache dataTypeCache = new DataTypeCache();
@@ -83,6 +90,8 @@ public class XuguDataSource extends JDBCDataSource
     final ProfileCache profileCache = new ProfileCache();
     final public RoleCache roleCache = new RoleCache();
     
+    private XgPooledConnection xgPconn;
+    private XgConnectionPoolDataSource xgCPDSource;
     Connection connection;
     
     private xuguOutputReader outputReader;
@@ -166,45 +175,49 @@ public class XuguDataSource extends JDBCDataSource
 		}
     }
     
+    public JDBCRemoteInstance getRemoteInstance() {
+    	return this.remoteInstance;
+    }
+    
+    public String getPurpose() {
+    	return this.purpose;
+    }
+    
     @Override
     protected Connection openConnection(@NotNull DBRProgressMonitor monitor, JDBCRemoteInstance remoteInstance, @NotNull String purpose) {
         try {
-//            this.connection = super.openConnection(monitor, remoteInstance, purpose);
-        	XgConnectionPoolDataSource xgCPDSource = new XgConnectionPoolDataSource();
-        	DBPConnectionConfiguration connectionInfo = getContainer().getActualConnectionConfiguration();
-        	String url = getConnectionURL(connectionInfo);
-        	xgCPDSource.setUser("SYSDBA");
-        	xgCPDSource.setPassword("SYSDBA");
-        	xgCPDSource.setUrl(url);
-        	xgCPDSource.setMaxActive(50);
-        	xgCPDSource.setMinIdle(5);
-        	xgCPDSource.setLoginTimeout(3000);
-        	xgCPDSource.setMaxWaitTime(3000);
-        	XgPooledConnection xgPconn;
-			xgPconn = (XgPooledConnection)xgCPDSource.getPooledConnection();
-			this.connection = xgPconn.getConnection();
-//			this.connection.close();
-//			Thread checkThread = new Thread(new Runnable() {
-//				@Override
-//				public void run() {
-//					// TODO Auto-generated method stub
-//					while(true) {
-//						try {
-//							if(connection.isClosed()) {
-//								XgPooledConnection xgPconn2;
-//								xgPconn2 = (XgPooledConnection)xgCPDSource.getPooledConnection();
-//								connection = xgPconn2.getConnection();
-//							}
-//						} catch (SQLException e) {
-//							// TODO Auto-generated catch block
-//							e.printStackTrace();
-//						}
-//					}
-//				}
-//			});
-//			checkThread.start();
-            return this.connection;
-        } catch ( SQLException e) {
+            this.connection = super.openConnection(monitor, remoteInstance, purpose);
+            this.remoteInstance = remoteInstance;
+            this.purpose = purpose;
+            DBPConnectionConfiguration connectionInfo = getContainer().getActualConnectionConfiguration();
+            Properties connectProps = getAllConnectionProperties(monitor, purpose, connectionInfo);
+            String url = getConnectionURL(connectionInfo);
+            
+            if(daemon==null) {
+            	daemon = new Thread(new Runnable() {
+    				@Override
+    				public void run() {
+    					while(true) {
+    						try {
+    							if(connection.isClosed() || (session!=null && session.getExecutionContext()!=null && session.getExecutionContext().getConnection(monitor).isClosed())) {
+    								log.info("Before recover"+connection.isClosed()+" inner conn:"+session.getExecutionContext().getConnection(monitor).isClosed());
+    								System.out.println("Before recover"+connection.isClosed()+" inner conn:"+session.getExecutionContext().getConnection(monitor).isClosed());
+    				                connection = DriverManager.getConnection(url, connectProps);
+    								session.getExecutionContext().reconnect(monitor);
+    								log.info("After recover "+connection.isClosed()+" inner conn:"+session.getExecutionContext().getConnection(monitor).isClosed());
+    								System.out.println("After recover "+connection.isClosed()+" inner conn:"+session.getExecutionContext().getConnection(monitor).isClosed());
+        						}
+    						} catch (SQLException | DBCException e) {
+    							System.out.println("After recover WWWWWWWWWrong");
+    							e.printStackTrace();
+    						}
+    					}
+    				}
+                });
+                daemon.start();
+            }
+            return connection;
+        } catch ( DBCException e) {
             return null;
         }
     }
@@ -427,6 +440,7 @@ public class XuguDataSource extends JDBCDataSource
         {
             try (JDBCSession session = DBUtils.openMetaSession(monitor, this, "Load data source meta info")) {
                 // Get active schema
+            	this.session = session;
                 this.setActiveSchemaName(XuguUtils.getCurrentSchema(session, this.userRole));
                 if (this.getActiveSchemaName() != null) {
                     if (this.getActiveSchemaName().isEmpty()) {
@@ -847,6 +861,8 @@ public class XuguDataSource extends JDBCDataSource
         @Override
 		public JDBCStatement prepareLookupStatement(JDBCSession session, XuguDataSource owner, XuguDatabase object,
 				String objectName) throws SQLException {
+        	String cat = owner.getConnection().getCatalog();
+        	String str = owner.getConnection().getMetaData().getURL();
 			return session.prepareStatement(
 	                "SELECT * FROM "+owner.roleFlag+"_DATABASES" + " WHERE DB_NAME='"+owner.getConnection().getCatalog()+"'");
 		}
@@ -993,6 +1009,7 @@ public class XuguDataSource extends JDBCDataSource
 		@Override
 		public JDBCStatement prepareLookupStatement(JDBCSession session, XuguDataSource owner, XuguUser user,
 				String objectName) throws SQLException {
+			
 			StringBuilder sql = new StringBuilder("SELECT * FROM ");
 			String dbName = owner.connection.getCatalog();
         	sql.append(owner.getRoleFlag());
@@ -1007,6 +1024,7 @@ public class XuguDataSource extends JDBCDataSource
         		sql.append(user.getName());
         		sql.append("'");
         	}
+        	
         	return session.prepareStatement(sql.toString());
 		}
 

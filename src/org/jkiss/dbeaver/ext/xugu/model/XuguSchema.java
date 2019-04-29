@@ -644,6 +644,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         protected JDBCStatement prepareChildrenStatement(@NotNull JDBCSession session, @NotNull XuguSchema owner, @Nullable XuguTableBase forTable)
             throws SQLException
         {
+        	log.info("Xugu Build Select Columns SQL");
         	//xfc 修改了获取列信息的sql
             StringBuilder sql = new StringBuilder(500);
             sql.append("SELECT * FROM ");
@@ -667,6 +668,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
                 sql.append("'))");
             }
             System.out.println("sql... "+sql.toString());
+            log.info("Xugu Select Column SQL Build Complete:"+sql);
             JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
             return dbStat;
         }
@@ -681,6 +683,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         @Override
         protected void cacheChildren(XuguTableBase parent, List<XuguTableColumn> xuguTableColumns) {
         	xuguTableColumns.sort(DBUtils.orderComparator());
+        	log.info("Xugu Cache Columns Size:"+xuguTableColumns.size());
             super.cacheChildren(parent, xuguTableColumns);
         }
     }
@@ -869,6 +872,8 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
             throws SQLException, DBException
         {	
             if(dbResult!=null) {
+            	int sum = dbResult.getMetaData().getColumnCount();
+            	String colName1 = JDBCUtils.safeGetStringTrimmed(dbResult, "DEFINE");
             	String colName = JDBCUtils.safeGetStringTrimmed(dbResult, "COL_NAME");
             	//处理多列的情况
             	if(colName.indexOf("(")!=-1) {
