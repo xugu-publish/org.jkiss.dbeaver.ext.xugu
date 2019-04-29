@@ -182,8 +182,12 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
     void loadColumnComments(DBRProgressMonitor monitor) {
         try {
             try (JDBCSession session = DBUtils.openMetaSession(monitor, this, "Load table column comments")) {
-                try (JDBCPreparedStatement stat = session.prepareStatement("SELECT COL_NAME,COMMENTS FROM "+this.getDataSource().getRoleFlag()+"_COLUMNS cc WHERE cc.TABLE_ID=(SELECT TABLE_ID FROM "+this.getDataSource().getRoleFlag()+"_TABLES WHERE TABLE_NAME=?)")) {
+                try (JDBCPreparedStatement stat = session.prepareStatement("SELECT COL_NAME,COMMENTS FROM "+
+            this.getDataSource().getRoleFlag()+"_COLUMNS cc WHERE cc.TABLE_ID=(SELECT TABLE_ID FROM "+
+                		this.getDataSource().getRoleFlag()+"_TABLES WHERE TABLE_NAME=? AND DB_ID=(SELECT DB_ID FROM "+
+            this.getDataSource().getRoleFlag()+"_DATABASES WHERE DB_NAME=?))")) {
                     stat.setString(1, getName());
+                    stat.setString(2, this.getDataSource().getName());
                     try (JDBCResultSet resultSet = stat.executeQuery()) {
                         while (resultSet.next()) {
                             String colName = resultSet.getString(1);
