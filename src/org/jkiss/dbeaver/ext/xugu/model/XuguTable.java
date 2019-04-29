@@ -329,7 +329,7 @@ public class XuguTable extends XuguTablePhysical implements DBPScriptObject
         // This is dummy implementation
         // Get references from this schema only
         final Collection<XuguTableForeignKey> allForeignKeys =
-            getContainer().foreignKeyCache.getObjects(monitor, getContainer(), null);
+            getContainer().foreignKeyCache.getObjects(monitor, getContainer(), this);
         for (XuguTableForeignKey constraint : allForeignKeys) {
             if (constraint.getReferencedTable() == this) {
                 refs.add(constraint);

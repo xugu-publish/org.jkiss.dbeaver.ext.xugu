@@ -614,13 +614,19 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         	sql.append("_DATABASES WHERE DB_NAME='");
         	sql.append(owner.getDataSource().connection.getCatalog());
         	sql.append("')");
+        	log.info("Condition: "+(objectName==null || objectName.equals("")));
         	//当有检索条件时 只查询指定表 用于新建表之后的刷新工作
-        	if(object!=null) {
+        	if(objectName==null || objectName.equals("")) {
+        		log.info("WTF!????????");
+        	}else {
+        		log.info("Do the right thing");
         		sql.append(" AND TABLE_NAME = '");
-        		sql.append(object.getName());
+        		System.out.println("WTF?????????"+sql.toString());
+        		sql.append(objectName);
         		sql.append("'");
         	}
-        	final JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
+        	System.out.println(sql.toString());
+        	JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
         	System.out.println("find tables stmt "+dbStat.getQueryString());
         
             return dbStat;
@@ -631,7 +637,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
             throws SQLException, DBException
         {
         	//xfc 修改object_type字段为table_type 并修改为int类型
-            final int tableType = JDBCUtils.safeGetInt(dbResult, "TABLE_TYPE");
+            int tableType = JDBCUtils.safeGetInt(dbResult, "TABLE_TYPE");
             if (tableType==0) {
                 return new XuguTable(session.getProgressMonitor(), owner, dbResult);
             } else {
@@ -745,7 +751,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         {
             //处理多列的情况
             String colName = JDBCUtils.safeGetStringTrimmed(dbResult, "DEFINE");
-            if(colName!=null) {
+            if(colName!=null && !colName.equals("")) {
             	if(colName.indexOf(",")!=-1) {
                 	if(colName.indexOf("(")!=-1) {
                 		colName = colName.substring(colName.indexOf("(")+1, colName.indexOf(")"));
@@ -782,7 +788,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
                             tableColumn.getOrdinalPosition()) };
                 }
             }
-            final XuguTableColumn tableColumn = getTableColumn(session, parent, dbResult);
+            XuguTableColumn tableColumn = getTableColumn(session, parent, dbResult);
         	//xfc COL_NO无法从结果集直接获取 选择从column中调用get方法
             return tableColumn == null ? null : new XuguTableConstraintColumn[] { new XuguTableConstraintColumn(
                 object,
@@ -872,9 +878,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
             throws SQLException, DBException
         {	
             if(dbResult!=null) {
-            	int sum = dbResult.getMetaData().getColumnCount();
-            	String colName1 = JDBCUtils.safeGetStringTrimmed(dbResult, "DEFINE");
-            	String colName = JDBCUtils.safeGetStringTrimmed(dbResult, "COL_NAME");
+            	String colName = JDBCUtils.safeGetStringTrimmed(dbResult, "DEFINE");
             	//处理多列的情况
             	if(colName.indexOf("(")!=-1) {
                 	colName = colName.substring(colName.indexOf("(")+1, colName.indexOf(")"));
@@ -1034,7 +1038,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         	sql.append("_DATABASES WHERE DB_NAME='");
         	sql.append(owner.getDataSource().connection.getCatalog());
         	sql.append("') ORDER BY SEQ_NAME");
-            final JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
+            JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
             return dbStat;
         }
 

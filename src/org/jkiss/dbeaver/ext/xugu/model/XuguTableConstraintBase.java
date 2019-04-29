@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * OracleTableConstraint
+ * XuguTableConstraint
  */
 public abstract class XuguTableConstraintBase extends JDBCTableConstraint<XuguTableBase> {
 

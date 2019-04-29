@@ -20,11 +20,13 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.ext.xugu.model.source.XuguSourceObject;
 import org.jkiss.dbeaver.ext.xugu.model.source.XuguStatefulObject;
 import org.jkiss.dbeaver.model.DBPEvaluationContext;
 import org.jkiss.dbeaver.model.DBPNamedObject2;
 import org.jkiss.dbeaver.model.DBPRefreshableObject;
 import org.jkiss.dbeaver.model.DBUtils;
+import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.exec.jdbc.JDBCPreparedStatement;
 import org.jkiss.dbeaver.model.exec.jdbc.JDBCResultSet;
 import org.jkiss.dbeaver.model.exec.jdbc.JDBCSession;
@@ -61,6 +63,7 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
 
     private int id;
     private int tableType;
+    private String sourceDeclaration;
     
     public static class TableAdditionalInfo {
         volatile boolean loaded = false;

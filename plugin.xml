@@ -314,7 +314,7 @@
         </editor>
         
     </extension>
-
+       
     <extension point="org.jkiss.dbeaver.dataTypeProvider">
         <provider
             class="org.jkiss.dbeaver.ext.xugu.data.XuguValueHandlerProvider"

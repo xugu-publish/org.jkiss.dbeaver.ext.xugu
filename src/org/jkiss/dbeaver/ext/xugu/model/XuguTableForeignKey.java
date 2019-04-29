@@ -35,7 +35,7 @@ import org.jkiss.utils.CommonUtils;
 import java.sql.ResultSet;
 
 /**
- * OracleTableForeignKey
+ * XuguTableForeignKey
  */
 public class XuguTableForeignKey extends XuguTableConstraintBase implements DBSTableForeignKey
 {
@@ -76,6 +76,7 @@ public class XuguTableForeignKey extends XuguTableConstraintBase implements DBST
         String refOwnerName = JDBCUtils.safeGetString(dbResult, "SCHEMA_NAME");
         String refTableName = JDBCUtils.safeGetString(dbResult, "REF_TABLE_NAME");
         System.out.println("True foreign info "+refOwnerName+" "+refTableName+" "+refName);
+        log.info("Xugu can get alias filed? "+refTableName+" "+refName);
         XuguTableBase refTable = XuguTableBase.findTable(
             monitor,
             table.getDataSource(),

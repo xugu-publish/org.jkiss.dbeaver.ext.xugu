@@ -28,7 +28,7 @@ import org.jkiss.utils.CommonUtils;
 import java.sql.ResultSet;
 
 /**
- * OracleTableConstraint
+ * XuguTableConstraint
  */
 public class XuguTableConstraint extends XuguTableConstraintBase {
 
