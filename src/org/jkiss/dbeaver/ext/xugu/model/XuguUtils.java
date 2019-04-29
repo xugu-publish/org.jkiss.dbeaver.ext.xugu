@@ -117,7 +117,7 @@ public class XuguUtils {
                         object.setName(DBObjectNameCaseTransformer.transformObjectName(object, objectName));
                         object.getDataSource().getContainer().fireEvent(new DBPEvent(DBPEvent.Action.OBJECT_UPDATE, object));
                     }
-                    return source;//.substring(0, matcher.start(1)) + object.getSchema().getName() + "." + objectName + source.substring(matcher.end(2));
+                    return source;
                 }
             }
             return source.trim();

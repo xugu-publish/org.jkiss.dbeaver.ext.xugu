@@ -21,6 +21,6 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Vendor: %Bundle-Vendor
 Bundle-ClassPath: .,
- lib/cloudjdbcV1002.jar,
  lib/xugu-table-ddl-1.0.jar,
- lib/xugu-permission-meta-1.0.jar
+ lib/xugu-permission-meta-1.0.jar,
+ lib/cloudjdbcV10.2.0.4.jar

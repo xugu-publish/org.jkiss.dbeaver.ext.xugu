@@ -7,8 +7,8 @@
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry exported="true" kind="lib" path="lib/xugu-table-ddl-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/xugu-permission-meta-1.0.jar"/>
 	<classpathentry kind="lib" path="lib/cloudjdbcV10.2.0.4.jar"/>
+	<classpathentry kind="lib" path="lib/xugu-table-ddl-1.0.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
