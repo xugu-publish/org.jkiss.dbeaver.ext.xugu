@@ -165,9 +165,12 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
             try (JDBCSession session = DBUtils.openMetaSession(monitor, this, "Load table comments")) {
                 comment = JDBCUtils.queryString(
                     session,
-                    "SELECT COMMENTS FROM "+this.getDataSource().getRoleFlag()+"_TABLES WHERE TABLE_NAME=? AND TABLE_TYPE=?",
+                    "SELECT COMMENTS FROM "+this.getDataSource().getRoleFlag()+
+                    "_TABLES WHERE TABLE_NAME=? AND TABLE_TYPE=? AND DB_ID=(SELECT DB_ID FROM "+
+                    this.getDataSource().getRoleFlag()+"_DATABASES WHERE DB_NAME=?)",
                     getName(),
-                    tableType);
+                    tableType,
+                    this.getDataSource().getName());
                 if (comment == null) {
                     comment = "";
                 }
