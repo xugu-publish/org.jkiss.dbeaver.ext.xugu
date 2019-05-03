@@ -158,7 +158,7 @@ public class XuguViewManager extends SQLObjectEditor<XuguView, XuguSchema> {
         actions.add(0, new SQLDatabasePersistAction("Create view", view.getViewText()));
         boolean hasComment = command.getProperty("comment") != null;
         if (hasComment) {
-        	String sql = "COMMENT ON TABLE " + view.getFullyQualifiedName(DBPEvaluationContext.DDL) +
+        	String sql = "COMMENT ON VIEW " + view.getFullyQualifiedName(DBPEvaluationContext.DDL) +
                     " IS '" + view.getComment() + "'";
         	if(XuguConstants.LOG_PRINT_LEVEL<1) {
             	log.info("Xugu Plugin: Construct add view comment sql: "+view.getViewText());
