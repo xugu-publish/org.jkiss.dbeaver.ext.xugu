@@ -19,6 +19,7 @@ package org.jkiss.dbeaver.ext.xugu.edit;
 
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.ext.xugu.model.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.model.XuguSchema;
 import org.jkiss.dbeaver.ext.xugu.model.XuguView;
 import org.jkiss.dbeaver.model.DBPDataSource;
@@ -90,8 +91,12 @@ public class XuguViewManager extends SQLObjectEditor<XuguView, XuguSchema> {
     @Override
     protected void addObjectDeleteActions(List<DBEPersistAction> actions, ObjectDeleteCommand command, Map<String, Object> options)
     {
+    	String sql = "DROP VIEW " + command.getObject().getFullyQualifiedName(DBPEvaluationContext.DDL);
+    	if(XuguConstants.LOG_PRINT_LEVEL<1) {
+        	log.info("Xugu Plugin: Construct drop view sql: "+sql);
+        }
         actions.add(
-            new SQLDatabasePersistAction("Drop view", "DROP VIEW " + command.getObject().getFullyQualifiedName(DBPEvaluationContext.DDL)) //$NON-NLS-2$
+            new SQLDatabasePersistAction("Drop view", sql) //$NON-NLS-2$
         );
     }
 
@@ -147,13 +152,20 @@ public class XuguViewManager extends SQLObjectEditor<XuguView, XuguSchema> {
         if(actions.size()!=0) {
         	actions.remove(0);
         }
+        if(XuguConstants.LOG_PRINT_LEVEL<1) {
+        	log.info("Xugu Plugin: Construct create view sql: "+view.getViewText());
+        }
         actions.add(0, new SQLDatabasePersistAction("Create view", view.getViewText()));
         boolean hasComment = command.getProperty("comment") != null;
         if (hasComment) {
+        	String sql = "COMMENT ON TABLE " + view.getFullyQualifiedName(DBPEvaluationContext.DDL) +
+                    " IS '" + view.getComment() + "'";
+        	if(XuguConstants.LOG_PRINT_LEVEL<1) {
+            	log.info("Xugu Plugin: Construct add view comment sql: "+view.getViewText());
+            }
             actions.add(new SQLDatabasePersistAction(
                 "Comment table",
-                "COMMENT ON TABLE " + view.getFullyQualifiedName(DBPEvaluationContext.DDL) +
-                    " IS '" + view.getComment() + "'"));
+                sql));
         }
     }
 

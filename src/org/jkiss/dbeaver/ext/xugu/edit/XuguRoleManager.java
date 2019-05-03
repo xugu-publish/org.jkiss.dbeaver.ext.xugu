@@ -33,6 +33,7 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.ext.xugu.XuguMessages;
 import org.jkiss.dbeaver.ext.xugu.editors.XuguRoleEditor;
+import org.jkiss.dbeaver.ext.xugu.model.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.model.XuguDataSource;
 import org.jkiss.dbeaver.ext.xugu.model.XuguDatabase;
 import org.jkiss.dbeaver.ext.xugu.model.XuguRole;
@@ -126,15 +127,21 @@ public class XuguRoleManager extends SQLObjectEditor<XuguRole, XuguDataSource> i
         if(user!=null && !user.equals("")) {
         	sql += " INIT USER "+user;
         }		
+        if(XuguConstants.LOG_PRINT_LEVEL<1) {
+        	log.info("Xugu Plugin: Construct create role sql: "+sql);
+        }
         actions.add(new SQLDatabasePersistAction("Create role", sql));
     }
 
     @Override
     protected void addObjectDeleteActions(List<DBEPersistAction> actions, ObjectDeleteCommand command, Map<String, Object> options)
     {
+    	String sql = "DROP ROLE " + DBUtils.getQuotedIdentifier(command.getObject());
+        if(XuguConstants.LOG_PRINT_LEVEL<1) {
+        	log.info("Xugu Plugin: Construct drop role sql: "+sql);
+        }
         actions.add(
-            new SQLDatabasePersistAction("Drop role",
-                "DROP ROLE " + DBUtils.getQuotedIdentifier(command.getObject())) //$NON-NLS-2$
+            new SQLDatabasePersistAction("Drop role", sql) //$NON-NLS-2$
         );
     }
 
@@ -142,7 +149,6 @@ public class XuguRoleManager extends SQLObjectEditor<XuguRole, XuguDataSource> i
     protected void addObjectModifyActions(DBRProgressMonitor monitor, List<DBEPersistAction> actionList, ObjectChangeCommand command, Map<String, Object> options)
     {
     	// do nothing
-    	System.out.println("alter role in here?");
     }
     
     @Override

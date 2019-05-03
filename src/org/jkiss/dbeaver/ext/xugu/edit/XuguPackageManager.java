@@ -96,9 +96,12 @@ public class XuguPackageManager extends SQLObjectEditor<XuguPackage, XuguSchema>
     protected void addObjectDeleteActions(List<DBEPersistAction> actions, ObjectDeleteCommand objectDeleteCommand, Map<String, Object> options)
     {
         final XuguPackage object = objectDeleteCommand.getObject();
+        String sql = "DROP PACKAGE " + object.getFullyQualifiedName(DBPEvaluationContext.DDL);
+        if(XuguConstants.LOG_PRINT_LEVEL<1) {
+        	log.info("Xugu Plugin: Construct drop package sql: "+sql.toString());
+        }
         actions.add(
-            new SQLDatabasePersistAction("Drop package",
-                "DROP PACKAGE " + object.getFullyQualifiedName(DBPEvaluationContext.DDL)) //$NON-NLS-1$
+            new SQLDatabasePersistAction("Drop package",sql) //$NON-NLS-1$
         );
     }
 
@@ -136,6 +139,9 @@ public class XuguPackageManager extends SQLObjectEditor<XuguPackage, XuguSchema>
             	header = "CREATE OR REPLACE PACKAGE "+header.substring(header.indexOf(keyWord2)+8);
             }
             if (!CommonUtils.isEmpty(header)) {
+            	if(XuguConstants.LOG_PRINT_LEVEL<1) {
+                	log.info("Xugu Plugin: Construct create package header sql: "+header);
+                }
                 actionList.add(
                     new XuguObjectValidateAction(
                         pack, XuguObjectType.PACKAGE,
@@ -157,16 +163,23 @@ public class XuguPackageManager extends SQLObjectEditor<XuguPackage, XuguSchema>
             	body = "CREATE OR REPLACE PACKAGE "+body.substring(body.indexOf(keyWord2)+8);
             }
             if (!CommonUtils.isEmpty(body)) {
+            	if(XuguConstants.LOG_PRINT_LEVEL<1) {
+                	log.info("Xugu Plugin: Construct create package body sql: "+body);
+                }
                 actionList.add(
                     new XuguObjectValidateAction(
                         pack, XuguObjectType.PACKAGE_BODY,
                         "Create package body",
                         body));
             } else {
+            	String sql = "DROP PACKAGE BODY " + pack.getFullyQualifiedName(DBPEvaluationContext.DDL);
+            	if(XuguConstants.LOG_PRINT_LEVEL<1) {
+                	log.info("Xugu Plugin: Construct drop package body sql: "+sql);
+                }
                 actionList.add(
                     new SQLDatabasePersistAction(
-                        "Drop package header",
-                        "DROP PACKAGE BODY " + pack.getFullyQualifiedName(DBPEvaluationContext.DDL),
+                        "Drop package body",
+                        sql,
                         DBEPersistAction.ActionType.OPTIONAL) //$NON-NLS-1$
                     );
             }

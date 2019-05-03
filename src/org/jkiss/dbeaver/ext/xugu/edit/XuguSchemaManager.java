@@ -31,6 +31,7 @@ import org.eclipse.swt.widgets.Text;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.ext.xugu.XuguMessages;
+import org.jkiss.dbeaver.ext.xugu.model.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.model.XuguDataSource;
 import org.jkiss.dbeaver.ext.xugu.model.XuguDatabase;
 import org.jkiss.dbeaver.ext.xugu.model.XuguSchema;
@@ -102,17 +103,23 @@ public class XuguSchemaManager extends SQLObjectEditor<XuguSchema, XuguDataSourc
         if(user.getName()!=null && !"".equals(user.getName())) {
         	sql += " AUTHORIZATION " +user.getName();
         }
+        if(XuguConstants.LOG_PRINT_LEVEL<1) {
+        	log.info("Xugu Plugin: Construct create schema sql: "+sql);
+        }
         actions.add(new SQLDatabasePersistAction("Create schema", sql));
     }
 
     @Override
     protected void addObjectRenameActions(DBRProgressMonitor monitor, List<DBEPersistAction> actions, ObjectRenameCommand command, Map<String, Object> options)
     { 
+    	String sql = "ALTER SCHEMA " + DBUtils.getQuotedIdentifier(command.getObject().getDataSource(), command.getOldName()) + //$NON-NLS-1$
+                " RENAME TO " + DBUtils.getQuotedIdentifier(command.getObject().getDataSource(), command.getNewName());
+    	if(XuguConstants.LOG_PRINT_LEVEL<1) {
+        	log.info("Xugu Plugin: Construct rename schema sql: "+sql);
+        }
         actions.add(
             new SQLDatabasePersistAction(
-                "Rename schema",
-                "ALTER SCHEMA " + DBUtils.getQuotedIdentifier(command.getObject().getDataSource(), command.getOldName()) + //$NON-NLS-1$
-                    " RENAME TO " + DBUtils.getQuotedIdentifier(command.getObject().getDataSource(), command.getNewName())) //$NON-NLS-1$
+                "Rename schema",sql) //$NON-NLS-1$
         );
     }
 
@@ -132,6 +139,9 @@ public class XuguSchemaManager extends SQLObjectEditor<XuguSchema, XuguDataSourc
 	protected void addObjectDeleteActions(List<DBEPersistAction> actions,
 			SQLObjectEditor<XuguSchema, XuguDataSource>.ObjectDeleteCommand command, Map<String, Object> options) {
 		String sql = "DROP SCHEMA " + command.getObject().getName();
+		if(XuguConstants.LOG_PRINT_LEVEL<1) {
+        	log.info("Xugu Plugin: Construct drop schema sql: "+sql);
+        }
         actions.add(new SQLDatabasePersistAction("Create schema", sql));
 	}
     

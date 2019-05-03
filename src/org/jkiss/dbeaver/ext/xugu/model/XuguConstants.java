@@ -31,6 +31,8 @@ public class XuguConstants {
     public static final String CMD_COMPILE = "org.jkiss.dbeaver.ext.xugu.code.compile"; //$NON-NLS-1$
 
     public static final int DEFAULT_PORT = 5138;
+    
+    public static final int LOG_PRINT_LEVEL = 0;
 
     public static final String SCHEMA_SYS = "SYS";
     public static final String VIEW_ALL_SOURCE = "ALL_SOURCE";

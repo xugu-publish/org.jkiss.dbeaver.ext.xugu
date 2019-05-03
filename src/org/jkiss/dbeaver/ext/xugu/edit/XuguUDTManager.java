@@ -14,6 +14,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.ext.xugu.XuguMessages;
+import org.jkiss.dbeaver.ext.xugu.model.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.model.XuguSchema;
 import org.jkiss.dbeaver.ext.xugu.model.XuguSequence;
 import org.jkiss.dbeaver.ext.xugu.model.XuguUDT;
@@ -65,15 +66,22 @@ public class XuguUDTManager extends SQLObjectEditor<XuguUDT, XuguSchema>{
 	protected void addObjectCreateActions(DBRProgressMonitor monitor, List<DBEPersistAction> actions, ObjectCreateCommand command, Map<String, Object> options) {
 		XuguUDT udt = command.getObject();
 		String sql = udt.getTypeHead();
+		if(XuguConstants.LOG_PRINT_LEVEL<1) {
+        	log.info("Xugu Plugin: Construct create UDT sql: "+sql);
+        }
 		actions.add(new SQLDatabasePersistAction("Create UDT", sql));
 	}
 	
 	@Override
 	protected void addObjectDeleteActions(List<DBEPersistAction> actions,
 			SQLObjectEditor<XuguUDT, XuguSchema>.ObjectDeleteCommand command, Map<String, Object> options) {
+		String sql = "DROP TYPE " + DBUtils.getQuotedIdentifier(command.getObject());
+		if(XuguConstants.LOG_PRINT_LEVEL<1) {
+        	log.info("Xugu Plugin: Construct drop UDT sql: "+sql);
+        }
 		actions.add(
             new SQLDatabasePersistAction("Drop UDT",
-                "DROP TYPE " + DBUtils.getQuotedIdentifier(command.getObject())) //$NON-NLS-2$
+                sql) //$NON-NLS-2$
         );
 	}
 	

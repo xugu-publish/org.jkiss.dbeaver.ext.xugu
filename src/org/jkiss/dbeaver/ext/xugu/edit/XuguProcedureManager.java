@@ -78,9 +78,12 @@ public class XuguProcedureManager extends SQLObjectEditor<XuguProcedureStandalon
     protected void addObjectDeleteActions(List<DBEPersistAction> actions, ObjectDeleteCommand objectDeleteCommand, Map<String, Object> options)
     {
         final XuguProcedureStandalone object = objectDeleteCommand.getObject();
+        String sql = "DROP " + object.getProcedureType().name() + " " + object.getFullyQualifiedName(DBPEvaluationContext.DDL);
+        if(XuguConstants.LOG_PRINT_LEVEL<1) {
+        	log.info("Xugu Plugin: Construct drop procedure sql: "+sql);
+        }
         actions.add(
-            new SQLDatabasePersistAction("Drop procedure",
-                "DROP " + object.getProcedureType().name() + " " + object.getFullyQualifiedName(DBPEvaluationContext.DDL)) //$NON-NLS-1$ //$NON-NLS-2$
+            new SQLDatabasePersistAction("Drop procedure",sql) //$NON-NLS-1$ //$NON-NLS-2$
         );
     }
 
@@ -111,6 +114,9 @@ public class XuguProcedureManager extends SQLObjectEditor<XuguProcedureStandalon
         }
         int index = source.indexOf(keyWord);
         source = "CREATE OR REPLACE " + keyWord.toUpperCase() + source.substring(index+keyWord.length());
+        if(XuguConstants.LOG_PRINT_LEVEL<1) {
+        	log.info("Xugu Plugin: Construct create procedure sql: "+source);
+        }
         actionList.add(new XuguObjectValidateAction(procedure, XuguObjectType.PROCEDURE, "Create procedure", source)); //$NON-NLS-2$
         XuguUtils.addSchemaChangeActions(actionList, procedure);
     }

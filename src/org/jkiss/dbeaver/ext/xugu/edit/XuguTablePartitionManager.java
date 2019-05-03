@@ -25,6 +25,7 @@ import org.eclipse.swt.widgets.Text;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.ext.xugu.XuguMessages;
 import org.jkiss.dbeaver.ext.xugu.edit.XuguSchemaManager.NewUserDialog;
+import org.jkiss.dbeaver.ext.xugu.model.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.model.XuguDataSource;
 import org.jkiss.dbeaver.ext.xugu.model.XuguSchema;
 import org.jkiss.dbeaver.ext.xugu.model.XuguTableBase;
@@ -126,6 +127,9 @@ public class XuguTablePartitionManager extends SQLObjectEditor<XuguTablePartitio
 	    		sql.append(")");
 	    		break;
 	    	}
+	    	if(XuguConstants.LOG_PRINT_LEVEL<1) {
+            	log.info("Xugu Plugin: Construct add table partition sql: "+sql.toString());
+            }
 			actions.add(new SQLDatabasePersistAction("Modify table, Add Partition", sql.toString()));
 		}
     }
@@ -139,6 +143,9 @@ public class XuguTablePartitionManager extends SQLObjectEditor<XuguTablePartitio
         	sql.append(command.getObject().getParentObject().getName());
         	sql.append(" DROP PARTITION ");
         	sql.append(command.getObject().getName());
+        	if(XuguConstants.LOG_PRINT_LEVEL<1) {
+            	log.info("Xugu Plugin: Construct drop table partition sql: "+sql.toString());
+            }
         	actions.add(new SQLDatabasePersistAction("Drop Partition", sql.toString()));
     	}
     	//若是新增表情况时则直接将改对象从缓存中剔除
@@ -157,6 +164,9 @@ public class XuguTablePartitionManager extends SQLObjectEditor<XuguTablePartitio
         	sql.append(" SET PARTITION ");
         	sql.append(command.getObject().getName());
         	sql.append((boolean)command.getProperty("online")?" ONLINE":" OFFLINE");
+        	if(XuguConstants.LOG_PRINT_LEVEL<1) {
+            	log.info("Xugu Plugin: Construct alter table partition sql: "+sql.toString());
+            }
         	actionList.add(new SQLDatabasePersistAction("Alter Partition", sql.toString()));
     	}
     }

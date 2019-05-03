@@ -21,6 +21,7 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.ext.xugu.XuguMessages;
+import org.jkiss.dbeaver.ext.xugu.model.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.model.XuguDataSource;
 import org.jkiss.dbeaver.ext.xugu.model.XuguRole;
 import org.jkiss.dbeaver.ext.xugu.model.XuguSchema;
@@ -154,7 +155,9 @@ public class XuguUserManager extends SQLObjectEditor<XuguUser, XuguDataSource> i
         		}
         		sql.append(user.isLocked()?" ACCOUNT LOCK":"");
         		sql.append(user.isExpired()?" PASSWORD EXPIRED":"");
-        		
+        		if(XuguConstants.LOG_PRINT_LEVEL<1) {
+                	log.info("Xugu Plugin: Construct create user sql: "+sql.toString());
+                }
                 DBEPersistAction action = new SQLDatabasePersistAction("Create User", sql.toString());
                 actions.add(action);
         	}
@@ -165,6 +168,9 @@ public class XuguUserManager extends SQLObjectEditor<XuguUser, XuguDataSource> i
     protected void addObjectDeleteActions(List<DBEPersistAction> actions, ObjectDeleteCommand command, Map<String, Object> options)
     {
     	String sql = "DROP USER " + command.getObject().getName();
+    	if(XuguConstants.LOG_PRINT_LEVEL<1) {
+        	log.info("Xugu Plugin: Construct drop user sql: "+sql);
+        }
         DBEPersistAction action = new SQLDatabasePersistAction("Drop User", sql);
         actions.add(action);
     }
@@ -176,6 +182,9 @@ public class XuguUserManager extends SQLObjectEditor<XuguUser, XuguDataSource> i
     		System.out.println(options.get(k));
     	}
     	String sql = "ALTER USER " + command.getObject().getName() + " IDENTIFIED BY ";
+    	if(XuguConstants.LOG_PRINT_LEVEL<1) {
+        	log.info("Xugu Plugin: Construct alter user sql: "+sql);
+        }
         DBEPersistAction action = new SQLDatabasePersistAction("Alter User", sql);
         actionList.add(action);
     }

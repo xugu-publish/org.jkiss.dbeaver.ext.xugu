@@ -168,7 +168,10 @@ public class XuguTableManager extends SQLTableManager<XuguTable, XuguSchema> imp
         		tableDef = tableDef.substring(0, tableDef.length()-1);
         		tableDef += "\n)";
     		}
-    		actions.add(new SQLDatabasePersistAction("Add Partition", tableDef));
+    		if(XuguConstants.LOG_PRINT_LEVEL<1) {
+            	log.info("Xugu Plugin: Construct create table sql: "+tableDef);
+            }
+    		actions.add(new SQLDatabasePersistAction("Create table", tableDef));
     		System.out.println("yes!");
     	}
 //        //刷新？
@@ -182,6 +185,9 @@ public class XuguTableManager extends SQLTableManager<XuguTable, XuguSchema> imp
             StringBuilder query = new StringBuilder("ALTER TABLE "); //$NON-NLS-1$
             query.append(command.getObject().getFullyQualifiedName(DBPEvaluationContext.DDL)).append(" "); //$NON-NLS-1$
             appendTableModifiers(monitor, command.getObject(), command, query, true);
+            if(XuguConstants.LOG_PRINT_LEVEL<1) {
+            	log.info("Xugu Plugin: Construct alter table sql: "+query.toString());
+            }
             actionList.add(new SQLDatabasePersistAction(query.toString()));
         }
     }
@@ -189,10 +195,14 @@ public class XuguTableManager extends SQLTableManager<XuguTable, XuguSchema> imp
     @Override
     protected void addObjectExtraActions(DBRProgressMonitor monitor, List<DBEPersistAction> actions, NestedObjectCommand<XuguTable, PropertyHandler> command, Map<String, Object> options) {
         if (command.getProperty("comment") != null) {
+        	String sql = "COMMENT ON TABLE " + command.getObject().getFullyQualifiedName(DBPEvaluationContext.DDL) +
+                    " IS " + SQLUtils.quoteString(command.getObject(), command.getObject().getComment());
+        	if(XuguConstants.LOG_PRINT_LEVEL<1) {
+            	log.info("Xugu Plugin: Construct add table comment sql: "+sql);
+            }
             actions.add(new SQLDatabasePersistAction(
                 "Comment table",
-                "COMMENT ON TABLE " + command.getObject().getFullyQualifiedName(DBPEvaluationContext.DDL) +
-                    " IS " + SQLUtils.quoteString(command.getObject(), command.getObject().getComment())));
+                sql));
         }
     }
 
@@ -216,11 +226,15 @@ public class XuguTableManager extends SQLTableManager<XuguTable, XuguSchema> imp
     @Override
     protected void addObjectRenameActions(DBRProgressMonitor monitor, List<DBEPersistAction> actions, ObjectRenameCommand command, Map<String, Object> options)
     {
+    	String sql = "ALTER TABLE " + DBUtils.getQuotedIdentifier(command.getObject().getSchema()) + "." + DBUtils.getQuotedIdentifier(command.getObject().getDataSource(), command.getOldName()) + //$NON-NLS-1$
+                " RENAME TO " + DBUtils.getQuotedIdentifier(command.getObject().getDataSource(), command.getNewName());
+    	if(XuguConstants.LOG_PRINT_LEVEL<1) {
+        	log.info("Xugu Plugin: Construct rename table sql: "+sql);
+        }
         actions.add(
             new SQLDatabasePersistAction(
                 "Rename table",
-                "ALTER TABLE " + DBUtils.getQuotedIdentifier(command.getObject().getSchema()) + "." + DBUtils.getQuotedIdentifier(command.getObject().getDataSource(), command.getOldName()) + //$NON-NLS-1$
-                    " RENAME TO " + DBUtils.getQuotedIdentifier(command.getObject().getDataSource(), command.getNewName())) //$NON-NLS-1$
+                sql) //$NON-NLS-1$
         );
     }
 
@@ -229,12 +243,16 @@ public class XuguTableManager extends SQLTableManager<XuguTable, XuguSchema> imp
     protected void addObjectDeleteActions(List<DBEPersistAction> actions, ObjectDeleteCommand command, Map<String, Object> options)
     {
         XuguTable object = command.getObject();
+        String sql = "DROP " + (object.isView() ? "VIEW" : "TABLE") +  //$NON-NLS-2$
+                " " + object.getFullyQualifiedName(DBPEvaluationContext.DDL) +
+                (!object.isView() && CommonUtils.getOption(options, OPTION_DELETE_CASCADE) ? " CASCADE CONSTRAINTS" : "");
+        if(XuguConstants.LOG_PRINT_LEVEL<1) {
+        	log.info("Xugu Plugin: Construct drop table sql: "+sql);
+        }
         actions.add(
             new SQLDatabasePersistAction(
                 ModelMessages.model_jdbc_drop_table,
-                "DROP " + (object.isView() ? "VIEW" : "TABLE") +  //$NON-NLS-2$
-                    " " + object.getFullyQualifiedName(DBPEvaluationContext.DDL) +
-                    (!object.isView() && CommonUtils.getOption(options, OPTION_DELETE_CASCADE) ? " CASCADE CONSTRAINTS" : "")
+                sql
             )
         );
     }

@@ -18,6 +18,7 @@
 package org.jkiss.dbeaver.ext.xugu.edit;
 
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.ext.xugu.model.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.model.XuguTableBase;
 import org.jkiss.dbeaver.ext.xugu.model.XuguTableTrigger;
 import org.jkiss.dbeaver.ext.xugu.model.XuguUtils;
@@ -74,8 +75,12 @@ public class XuguTableTriggerManager extends SQLTriggerManager<XuguTableTrigger,
     @Override
     protected void addObjectDeleteActions(List<DBEPersistAction> actions, ObjectDeleteCommand command, Map<String, Object> options)
     {
+    	String sql = "DROP TRIGGER " + command.getObject().getFullyQualifiedName(DBPEvaluationContext.DDL);
+    	if(XuguConstants.LOG_PRINT_LEVEL<1) {
+        	log.info("Xugu Plugin: Construct drop trigger sql: "+sql);
+        }
         actions.add(
-            new SQLDatabasePersistAction("Drop trigger", "DROP TRIGGER " + command.getObject().getFullyQualifiedName(DBPEvaluationContext.DDL)) //$NON-NLS-2$
+            new SQLDatabasePersistAction("Drop trigger",sql) //$NON-NLS-2$
         );
     }
 
@@ -95,6 +100,9 @@ public class XuguTableTriggerManager extends SQLTriggerManager<XuguTableTrigger,
             }
             int index = source.indexOf(keyWord);
             source = "CREATE OR REPLACE TRIGGER "+source.substring(index+8);
+            if(XuguConstants.LOG_PRINT_LEVEL<1) {
+            	log.info("Xugu Plugin: Construct create trigger sql: "+source);
+            }
             actions.add(new SQLDatabasePersistAction("Create trigger", source, true)); //$NON-NLS-2$
         }
     }

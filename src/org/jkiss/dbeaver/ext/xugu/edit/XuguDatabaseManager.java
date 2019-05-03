@@ -99,13 +99,20 @@ public class XuguDatabaseManager extends SQLObjectEditor<XuguDatabase, XuguDataS
         if(database.getTimeZone()!=null) {
         	sql +=" TIME ZONE '"+database.getTimeZone()+"'";
         }
+        if(XuguConstants.LOG_PRINT_LEVEL<1) {
+        	log.info("Xugu Plugin: Construct create database sql: "+sql.toString());
+        }
         actions.add(new SQLDatabasePersistAction("Create database", sql));
     }
 
     @Override
     protected void addObjectDeleteActions(List<DBEPersistAction> actions, ObjectDeleteCommand command, Map<String, Object> options)
     {
-        actions.add(new SQLDatabasePersistAction("Drop database", "DROP DATABASE '" + command.getObject().getName() + "'")); //$NON-NLS-2$
+    	String sql = "DROP DATABASE '" + command.getObject().getName() + "'";
+    	if(XuguConstants.LOG_PRINT_LEVEL<1) {
+        	log.info("Xugu Plugin: Construct drop database sql: "+sql);
+        }
+        actions.add(new SQLDatabasePersistAction("Drop database", sql)); //$NON-NLS-2$
     }
 
     @Override

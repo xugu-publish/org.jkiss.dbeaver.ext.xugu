@@ -351,7 +351,9 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
             	builder.append(owner.getDataSource().getRoleFlag());
             	builder.append("_VIEWS WHERE VIEW_NAME=?)\n ORDER BY TRIG_NAME");
         	}
-        	
+        	if(XuguConstants.LOG_PRINT_LEVEL<1) {
+            	log.info("Xugu Plugin: Construct select triggers sql: "+builder.toString());
+            }
             JDBCPreparedStatement dbStat = session.prepareStatement(builder.toString());
             dbStat.setString(1, owner.getSchema().getName());
             dbStat.setString(2, owner.getName());
@@ -393,7 +395,9 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
         		}
         		sql.append(")");
         	}
-        	System.out.println("find trigger columns "+sql.toString());
+        	if(XuguConstants.LOG_PRINT_LEVEL<1) {
+            	log.info("Xugu Plugin: Construct select trigger columns sql: "+sql.toString());
+            }
             JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
             return dbStat;
         }

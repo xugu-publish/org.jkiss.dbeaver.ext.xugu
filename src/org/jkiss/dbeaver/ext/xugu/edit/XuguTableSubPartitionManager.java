@@ -23,6 +23,7 @@ import org.eclipse.swt.widgets.Text;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.ext.xugu.XuguMessages;
 import org.jkiss.dbeaver.ext.xugu.edit.XuguSchemaManager.NewUserDialog;
+import org.jkiss.dbeaver.ext.xugu.model.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.model.XuguDataSource;
 import org.jkiss.dbeaver.ext.xugu.model.XuguSchema;
 import org.jkiss.dbeaver.ext.xugu.model.XuguTableBase;
@@ -152,6 +153,9 @@ public class XuguTableSubPartitionManager extends SQLObjectEditor<XuguTableSubPa
         	sql.append(" SET SUBPARTITION ");
         	sql.append(command.getObject().getName());
         	sql.append((boolean)command.getProperty("online")?" ONLINE":" OFFLINE");
+        	if(XuguConstants.LOG_PRINT_LEVEL<1) {
+            	log.info("Xugu Plugin: Construct add subpartition sql: "+sql.toString());
+            }
         	actionList.add(new SQLDatabasePersistAction("Alter Partition", sql.toString()));
     	}
     	System.out.println("No Online Option");

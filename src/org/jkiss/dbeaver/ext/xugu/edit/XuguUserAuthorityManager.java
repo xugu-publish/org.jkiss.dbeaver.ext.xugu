@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.ext.xugu.model.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.model.XuguSchema;
 import org.jkiss.dbeaver.ext.xugu.model.XuguUDT;
 import org.jkiss.dbeaver.ext.xugu.model.XuguUser;
@@ -57,9 +58,13 @@ public class XuguUserAuthorityManager extends SQLObjectEditor<XuguUserAuthority,
 	@Override
 	protected void addObjectCreateActions(DBRProgressMonitor monitor, List<DBEPersistAction> actions,
 			SQLObjectEditor<XuguUserAuthority, XuguUser>.ObjectCreateCommand command, Map<String, Object> options) {
+		String sql = "GRANT " + command.getObject().getName() +" TO "+command.getObject().getUser().getName();
+		if(XuguConstants.LOG_PRINT_LEVEL<1) {
+        	log.info("Xugu Plugin: Construct grant user sql: "+sql);
+        }
 		actions.add(
 	            new SQLDatabasePersistAction("Grant User",
-	                "GRANT " + command.getObject().getName() +" TO "+command.getObject().getUser().getName()) //$NON-NLS-2$
+	                sql) //$NON-NLS-2$
 	        );
 	}
 
@@ -67,9 +72,12 @@ public class XuguUserAuthorityManager extends SQLObjectEditor<XuguUserAuthority,
 	protected void addObjectDeleteActions(List<DBEPersistAction> actions,
 			SQLObjectEditor<XuguUserAuthority, XuguUser>.ObjectDeleteCommand command, Map<String, Object> options) {
 		String query = "Revoke " + command.getObject().getName() +" FROM "+command.getObject().getUser().getName();
+		if(XuguConstants.LOG_PRINT_LEVEL<1) {
+        	log.info("Xugu Plugin: Construct revoke user sql: "+query);
+        }
 		actions.add(
 	            new SQLDatabasePersistAction("Revoke User",
-	                "Revoke " + command.getObject().getName() +" FROM "+command.getObject().getUser().getName()) //$NON-NLS-2$
+	                query) //$NON-NLS-2$
 	        );
 	}
 
