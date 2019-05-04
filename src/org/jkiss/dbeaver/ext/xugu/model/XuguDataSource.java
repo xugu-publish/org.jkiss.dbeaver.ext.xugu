@@ -159,6 +159,7 @@ public class XuguDataSource extends JDBCDataSource
     public Connection getSYSDBAConn(DBRProgressMonitor monitor) {
     	try {
 	    	DBPConnectionConfiguration connectionInfo = getContainer().getActualConnectionConfiguration();
+	    	connectionInfo.setDatabaseName("SYSTEM");
 			Driver driverInstance = getDriverInstance(monitor);
 			String url = getConnectionURL(connectionInfo)+"?user=SYSDBA&password=SYSDBA";
 	    	Connection conn = null;
@@ -169,7 +170,6 @@ public class XuguDataSource extends JDBCDataSource
             }
 			return conn;
 		} catch (Exception e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 			return null;
 		}
