@@ -61,7 +61,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
     final public ForeignKeyCache foreignKeyCache = new ForeignKeyCache();
 //    final public TriggerCache triggerCache = new TriggerCache();
     final public IndexCache indexCache = new IndexCache();
-    final public DataTypeCache dataTypeCache = new DataTypeCache();
+//    final public DataTypeCache dataTypeCache = new DataTypeCache();
     final public SequenceCache sequenceCache = new SequenceCache();
     final public PackageCache packageCache = new PackageCache();
     final public SynonymCache synonymCache = new SynonymCache();
@@ -254,13 +254,13 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
      * @return list 数据类型列表
      * @throws DBException
      */
-    @Association
-    public Collection<XuguDataType> getDataTypes(DBRProgressMonitor monitor)
-        throws DBException
-    {
-        Collection<XuguDataType> list = dataTypeCache.getAllObjects(monitor, this);
-        return list;
-    }
+//    @Association
+//    public Collection<XuguDataType> getDataTypes(DBRProgressMonitor monitor)
+//        throws DBException
+//    {
+//        Collection<XuguDataType> list = dataTypeCache.getAllObjects(monitor, this);
+//        return list;
+//    }
 
     /**
      * 根据数据类型名从缓存中获取指定的数据类型对象
@@ -269,12 +269,12 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
      * @return type 数据类型对象
      * @throws DBException
      */
-    public XuguDataType getDataType(DBRProgressMonitor monitor, String name)
-        throws DBException
-    {
-        XuguDataType type = dataTypeCache.getObject(monitor, this, name);
-        return type;
-    }
+//    public XuguDataType getDataType(DBRProgressMonitor monitor, String name)
+//        throws DBException
+//    {
+//        XuguDataType type = dataTypeCache.getObject(monitor, this, name);
+//        return type;
+//    }
 
     /**
      * 从序列缓存中获取全部的缓存信息（提供给界面展示）
@@ -461,7 +461,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         children.addAll(foreignKeyCache.getAllObjects(monitor, this));
 //        children.addAll(triggerCache.getAllObjects(monitor, this));
         children.addAll(indexCache.getAllObjects(monitor, this));
-        children.addAll(dataTypeCache.getAllObjects(monitor, this));
+//        children.addAll(dataTypeCache.getAllObjects(monitor, this));
         children.addAll(sequenceCache.getAllObjects(monitor, this));
         children.addAll(packageCache.getAllObjects(monitor, this));
         children.addAll(synonymCache.getAllObjects(monitor, this));
@@ -521,7 +521,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
             monitor.subTask("Cache indexes");
             indexCache.getAllObjects(monitor, this);
             monitor.subTask("Cache datatypes");
-            dataTypeCache.getAllObjects(monitor, this);
+//            dataTypeCache.getAllObjects(monitor, this);
             monitor.subTask("Cache sequences");
             sequenceCache.getAllObjects(monitor, this);
             monitor.subTask("Cache packages");
@@ -547,7 +547,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         packageCache.clearCache();
         proceduresCache.clearCache();
 //        triggerCache.clearCache();
-        dataTypeCache.clearCache();
+//        dataTypeCache.clearCache();
         sequenceCache.clearCache();
         synonymCache.clearCache();
         udtCache.clearCache();
@@ -1012,8 +1012,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguSchema owner) throws SQLException
         {
         	//do nothing
-            JDBCPreparedStatement dbStat = session.prepareStatement("");
-            return dbStat;
+            return null;
         }
 
         @Override

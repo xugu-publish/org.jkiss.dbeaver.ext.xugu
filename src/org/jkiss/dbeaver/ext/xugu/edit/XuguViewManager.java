@@ -167,6 +167,7 @@ public class XuguViewManager extends SQLObjectEditor<XuguView, XuguSchema> {
                 "Comment table",
                 sql));
         }
+        view.setPersisted(true);
     }
 
 }

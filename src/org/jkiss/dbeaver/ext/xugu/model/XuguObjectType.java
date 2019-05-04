@@ -134,20 +134,20 @@ public enum XuguObjectType implements DBSObjectType {
 	TABLE_PARTITION("TABLE PARTITION", null, DBSObject.class, null),
 	//trigger的OBJ_TYPE为11
 	TRIGGER("11", DBIcon.TREE_TRIGGER, XuguTrigger.class, null),
-	TYPE("TYPE", DBIcon.TREE_DATA_TYPE, XuguDataType.class, new ObjectFinder() {
-        @Override
-        public XuguDataType findObject(DBRProgressMonitor monitor, XuguSchema schema, String objectName) throws DBException
-        {
-            return schema.dataTypeCache.getObject(monitor, schema, objectName);
-        }
-    }),
-	TYPE_BODY("TYPE BODY", DBIcon.TREE_DATA_TYPE, XuguDataType.class, new ObjectFinder() {
-        @Override
-        public XuguDataType findObject(DBRProgressMonitor monitor, XuguSchema schema, String objectName) throws DBException
-        {
-            return schema.dataTypeCache.getObject(monitor, schema, objectName);
-        }
-    }),
+//	TYPE("TYPE", DBIcon.TREE_DATA_TYPE, XuguDataType.class, new ObjectFinder() {
+//        @Override
+//        public XuguDataType findObject(DBRProgressMonitor monitor, XuguSchema schema, String objectName) throws DBException
+//        {
+//            return schema.dataTypeCache.getObject(monitor, schema, objectName);
+//        }
+//    }),
+//	TYPE_BODY("TYPE BODY", DBIcon.TREE_DATA_TYPE, XuguDataType.class, new ObjectFinder() {
+//        @Override
+//        public XuguDataType findObject(DBRProgressMonitor monitor, XuguSchema schema, String objectName) throws DBException
+//        {
+//            return schema.dataTypeCache.getObject(monitor, schema, objectName);
+//        }
+//    }),
 	//view的OBJ_TYPE为9
 	VIEW("9", DBIcon.TREE_VIEW, XuguView.class, new ObjectFinder() {
         @Override

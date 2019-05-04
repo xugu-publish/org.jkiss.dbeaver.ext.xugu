@@ -664,13 +664,7 @@ public class XuguDataSource extends JDBCDataSource
             // Simple type name
             return getLocalDataType(typeFullName);
         } else {
-            String schemaName = typeFullName.substring(0, divPos);
-            String typeName = typeFullName.substring(divPos + 1);
-            XuguSchema schema = getSchema(monitor, schemaName);
-            if (schema == null) {
-                return null;
-            }
-            return schema.getDataType(monitor, typeName);
+            return null;
         }
     }
 
