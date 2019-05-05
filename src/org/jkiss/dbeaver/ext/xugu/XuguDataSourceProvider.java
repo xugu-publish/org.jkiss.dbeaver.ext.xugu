@@ -76,6 +76,7 @@ public class XuguDataSourceProvider extends JDBCDataSourceProvider {
         }
 
         if (!CommonUtils.isEmpty(connectionInfo.getDatabaseName())) {
+        	url.append("/");
             url.append(connectionInfo.getDatabaseName());
         }
         return url.toString();
