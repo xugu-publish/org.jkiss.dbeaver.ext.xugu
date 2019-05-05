@@ -21,7 +21,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.model.XuguDataSource;
-import org.jkiss.dbeaver.ext.xugu.model.dict.XuguConnectionType;
+//import org.jkiss.dbeaver.ext.xugu.model.dict.XuguConnectionType;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
@@ -89,59 +89,4 @@ public class XuguDataSourceProvider extends JDBCDataSourceProvider {
     {
         return new XuguDataSource(monitor, container);
     }
-
-    //////////////////////////////////////
-    // Client manager
-
-//    @Override
-//    public List<DBPNativeClientLocation> findLocalClientLocations()
-//    {
-////        List<DBPNativeClientLocation> homeIds = new ArrayList<>();
-////        for (XuguHomeDescriptor home : OCIUtils.getOraHomes()) {
-////            homeIds.add(home);
-////        }
-////        return homeIds;
-//    	return null;
-//    }
-
-//    @Override
-//    public DBPNativeClientLocation getDefaultLocalClientLocation()
-//    {
-//        List<XuguHomeDescriptor> oraHomes = OCIUtils.getOraHomes();
-//        if (!oraHomes.isEmpty()) {
-//            return oraHomes.get(0);
-//        }
-//        return null;
-//    }
-
-//    @Override
-//    public String getProductName(DBPNativeClientLocation location) throws DBException {
-//        Integer oraVersion = getOracleVersion(location);
-//        return "Xugu" + (oraVersion == null ? "" : " " + oraVersion);
-//    }
-//
-//    @Override
-//    public String getProductVersion(DBPNativeClientLocation location) throws DBException {
-//        boolean isInstantClient = OCIUtils.isInstantClient(location.getName());
-//        return OCIUtils.getFullOraVersion(location.getName(), isInstantClient);
-//    }
-
-//    public static Integer getOracleVersion(DBPNativeClientLocation location)
-//    {
-//        File oraHome = location.getPath();
-//        boolean isInstantClient = OCIUtils.isInstantClient(location.getName());
-//        File folder = isInstantClient ? oraHome : new File(oraHome, "bin");
-//        if (!folder.exists()) {
-//            return null;
-//        }
-//        for (int counter = 7; counter <= 15; counter++) {
-//            String dllName = System.mapLibraryName("ocijdbc" + counter);
-//            File ociLibFile = new File(folder, dllName);
-//            if (ociLibFile.exists()) {
-//                return counter;
-//            }
-//        }
-//        return null;
-//    }
-
 }

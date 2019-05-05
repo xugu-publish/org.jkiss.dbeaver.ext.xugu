@@ -52,7 +52,6 @@ public class XuguConstants {
         "GUEST",
     };
     
-    
     //默认的连接守护进程休眠时间1分钟
     public static final int DEFAULT_SLEEP_TIME = 60000;
 
