@@ -21,27 +21,16 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.ModelPreferences;
 import org.jkiss.dbeaver.ext.xugu.XuguConstants;
-import org.jkiss.dbeaver.ext.xugu.XuguExecuteSQL_DBA;
-import org.jkiss.dbeaver.ext.xugu.XuguExecuteSQL_NORMAL;
 import org.jkiss.dbeaver.ext.xugu.model.XuguCharset;
-import org.jkiss.dbeaver.ext.xugu.XuguExecuteSQL_SYSDBA;
-import org.jkiss.dbeaver.ext.xugu.XuguMessages;
-//import org.jkiss.dbeaver.ext.xugu.model.session.XuguServerSessionManager;
 import org.jkiss.dbeaver.model.*;
 import org.jkiss.dbeaver.model.access.DBAPasswordChangeInfo;
-import org.jkiss.dbeaver.model.admin.sessions.DBAServerSessionManager;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.exec.*;
 import org.jkiss.dbeaver.model.exec.jdbc.*;
-import org.jkiss.dbeaver.model.exec.plan.DBCPlan;
-import org.jkiss.dbeaver.model.exec.plan.DBCPlanStyle;
-import org.jkiss.dbeaver.model.exec.plan.DBCQueryPlanner;
 import org.jkiss.dbeaver.model.impl.jdbc.*;
 import org.jkiss.dbeaver.model.impl.jdbc.cache.JDBCObjectCache;
-import org.jkiss.dbeaver.model.impl.jdbc.cache.JDBCStructCache;
 import org.jkiss.dbeaver.model.impl.jdbc.cache.JDBCStructLookupCache;
 import org.jkiss.dbeaver.model.meta.Association;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
@@ -50,7 +39,6 @@ import org.jkiss.dbeaver.model.sql.SQLQueryResult;
 import org.jkiss.dbeaver.model.sql.SQLState;
 import org.jkiss.dbeaver.model.struct.*;
 import org.jkiss.dbeaver.runtime.ui.DBUserInterface;
-import org.jkiss.dbeaver.ui.UIUtils;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.BeanUtils;
 import org.jkiss.utils.CommonUtils;
@@ -64,8 +52,6 @@ import java.sql.*;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.xml.transform.Result;
 
 /**
  * XuguDataSource
@@ -88,8 +74,6 @@ public class XuguDataSource extends JDBCDataSource
     final public UserCache userCache = new UserCache();
     final public RoleCache roleCache = new RoleCache();
     
-    private XgPooledConnection xgPconn;
-    private XgConnectionPoolDataSource xgCPDSource;
     Connection connection;
     
     private xuguOutputReader outputReader;
@@ -391,22 +375,6 @@ public class XuguDataSource extends JDBCDataSource
         return publicSchema.getSynonyms(monitor);
     }
 
-    public boolean isAtLeastV9() {
-        return getInfo().getDatabaseVersion().getMajor() >= 9;
-    }
-
-    public boolean isAtLeastV10() {
-        return getInfo().getDatabaseVersion().getMajor() >= 10;
-    }
-
-    public boolean isAtLeastV11() {
-        return getInfo().getDatabaseVersion().getMajor() >= 11;
-    }
-
-    public boolean isAtLeastV12() {
-        return getInfo().getDatabaseVersion().getMajor() >= 12;
-    }
-
     @Override
     public void initialize(@NotNull DBRProgressMonitor monitor)
         throws DBException {
@@ -431,20 +399,21 @@ public class XuguDataSource extends JDBCDataSource
         }
         this.publicSchema = new XuguSchema(this, 1, XuguConstants.USER_PUBLIC);
         {
-            try (JDBCSession session = DBUtils.openMetaSession(monitor, this, "Load data source meta info")) {
+//            try (JDBCSession session = DBUtils.openMetaSession(monitor, this, "Load data source meta info")) {
                 // Get active schema
-            	this.session = session;
-                this.setActiveSchemaName(XuguUtils.getCurrentSchema(session, this.userRole));
-                if (this.getActiveSchemaName() != null) {
-                    if (this.getActiveSchemaName().isEmpty()) {
-                        this.setActiveSchemaName(null);
-                    }
-                }
+        	JDBCSession session = DBUtils.openMetaSession(monitor, this, "Load data source meta info");
+            this.session = session;
+//                this.setActiveSchemaName(XuguUtils.getCurrentSchema(session, this.userRole));
+//                if (this.getActiveSchemaName() != null) {
+//                    if (this.getActiveSchemaName().isEmpty()) {
+//                        this.setActiveSchemaName(null);
+//                    }
+//                }
 
-            } catch (SQLException e) {
-                //throw new DBException(e);
-                log.warn(e);
-            }
+//            } catch (SQLException e) {
+//                //throw new DBException(e);
+//                log.warn(e);
+//            }
         }
         // Cache data types
         {
@@ -463,11 +432,6 @@ public class XuguDataSource extends JDBCDataSource
         }
     }
 
-    private void setActiveSchemaName(String currentSchema) {
-		// TODO Auto-generated method stub
-		
-	}
-
 	@Override
     public DBSObject refreshObject(@NotNull DBRProgressMonitor monitor)
         throws DBException {
@@ -479,7 +443,6 @@ public class XuguDataSource extends JDBCDataSource
         if("SYS".equals(this.roleFlag)) {
         	this.roleCache.clearCache();
         }
-        this.setActiveSchemaName(null);
 
         this.initialize(monitor);
 
@@ -532,7 +495,7 @@ public class XuguDataSource extends JDBCDataSource
         for (JDBCExecutionContext context : getDefaultInstance().getAllContexts()) {
             setCurrentSchema(monitor, context, (XuguSchema) object);
         }
-        setActiveSchemaName(object.getName());
+//        setActiveSchemaName(object.getName());
 
         // Send notifications
         if (oldSelectedEntity != null) {
@@ -1015,19 +978,4 @@ public class XuguDataSource extends JDBCDataSource
 	public String getActiveSchemaName() {
 		return activeSchemaName;
 	}
-
-//	 @NotNull
-//    @Override
-//    public DBCPlan planQueryExecution(@NotNull DBCSession session, @NotNull String query) throws DBException {
-//        XuguPlanAnalyser plan = new XuguPlanAnalyser(this, (JDBCSession) session, query);
-//        plan.explain();
-//        return plan;
-//    }
-//
-//    @NotNull
-//    @Override
-//    public DBCPlanStyle getPlanStyle() {
-//        return DBCPlanStyle.PLAN;
-//    }
-    
 }
