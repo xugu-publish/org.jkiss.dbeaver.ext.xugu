@@ -443,7 +443,7 @@ public class XuguDataType extends XuguObject<DBSObject>
             return componentType;
         }
         XuguSchema schema = getSchema();
-        if (schema == null || !TYPE_CODE_COLLECTION.equals(typeCode) || !getDataSource().isAtLeastV10()) {
+        if (schema == null || !TYPE_CODE_COLLECTION.equals(typeCode)) {
             return null;
         }
         try (JDBCSession session = DBUtils.openMetaSession(monitor, this, "Load collection types")) {
