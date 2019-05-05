@@ -28,7 +28,7 @@ import org.jkiss.dbeaver.ext.xugu.XuguExecuteSQL_NORMAL;
 import org.jkiss.dbeaver.ext.xugu.model.XuguCharset;
 import org.jkiss.dbeaver.ext.xugu.XuguExecuteSQL_SYSDBA;
 import org.jkiss.dbeaver.ext.xugu.XuguMessages;
-import org.jkiss.dbeaver.ext.xugu.model.session.XuguServerSessionManager;
+//import org.jkiss.dbeaver.ext.xugu.model.session.XuguServerSessionManager;
 import org.jkiss.dbeaver.model.*;
 import org.jkiss.dbeaver.model.access.DBAPasswordChangeInfo;
 import org.jkiss.dbeaver.model.admin.sessions.DBAServerSessionManager;
@@ -579,9 +579,10 @@ public class XuguDataSource extends JDBCDataSource
             return adapter.cast(new XuguStructureAssistant(this));
         } else if (adapter == DBCServerOutputReader.class) {
             return adapter.cast(outputReader);
-        } else if (adapter == DBAServerSessionManager.class) {
-            return adapter.cast(new XuguServerSessionManager(getDefaultInstance().getDefaultContext(false)));
-        }
+        } 
+//        else if (adapter == DBAServerSessionManager.class) {
+//            return adapter.cast(new XuguServerSessionManager(getDefaultInstance().getDefaultContext(false)));
+//        }
         return super.getAdapter(adapter);
     }
 
