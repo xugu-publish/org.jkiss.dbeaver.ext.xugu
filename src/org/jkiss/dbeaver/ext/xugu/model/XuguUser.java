@@ -202,6 +202,7 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
 					userAuthorities.add(one);
 				}
 			}
+			System.out.println(userAuthorities.size());
 		}
     }
 

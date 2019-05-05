@@ -237,7 +237,6 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
     		objectAuthorities = new ArrayList<>();
     		XuguAuthorityEditorBase baseEditor = new XuguAuthorityEditorBase(userGroup2, userGroup3, 1);
     		baseEditor.setUserEditor(this);
-    		baseEditor.loadDatabaseAuthorityView();
     		if(authorities!=null) {
     			Iterator<XuguUserAuthority> it = authorities.iterator();
     			XuguUserAuthority authority;
@@ -251,6 +250,7 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
     			}
     		}
     		baseEditor.loadDatabaseAuthorities(databaseAuthorities, objectAuthorities);
+    		baseEditor.loadDatabaseAuthorityView();
     		baseEditor.loadObjectAuthorityView(getDatabaseObject());
     	}
     	
