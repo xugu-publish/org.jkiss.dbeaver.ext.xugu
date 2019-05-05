@@ -38,7 +38,7 @@ class XuguSQLDialect extends JDBCSQLDialect {
 
     public static final String[] EXEC_KEYWORDS = new String[]{ "call" };
 
-    public static final String[] ORACLE_NON_TRANSACTIONAL_KEYWORDS = ArrayUtils.concatArrays(
+    public static final String[] XUGU_NON_TRANSACTIONAL_KEYWORDS = ArrayUtils.concatArrays(
         BasicSQLDialect.NON_TRANSACTIONAL_KEYWORDS,
         new String[]{
             "CREATE", "ALTER", "DROP",
@@ -46,14 +46,14 @@ class XuguSQLDialect extends JDBCSQLDialect {
         }
     );
 
-    public static final String[][] ORACLE_BEGIN_END_BLOCK = new String[][]{
+    public static final String[][] XUGU_BEGIN_END_BLOCK = new String[][]{
         {SQLConstants.BLOCK_BEGIN, SQLConstants.BLOCK_END},
         {"IF", SQLConstants.BLOCK_END},
         {"LOOP", SQLConstants.BLOCK_END + " LOOP"},
         {"CASE", SQLConstants.BLOCK_END + " CASE"},
     };
 
-    public static final String[] ORACLE_BLOCK_HEADERS = new String[]{
+    public static final String[] XUGU_BLOCK_HEADERS = new String[]{
         "DECLARE",
         //"IS",
     };
@@ -328,12 +328,12 @@ class XuguSQLDialect extends JDBCSQLDialect {
 
     @Override
     public String[][] getBlockBoundStrings() {
-        return ORACLE_BEGIN_END_BLOCK;
+        return XUGU_BEGIN_END_BLOCK;
     }
 
     @Override
     public String[] getBlockHeaderStrings() {
-        return ORACLE_BLOCK_HEADERS;
+        return XUGU_BLOCK_HEADERS;
     }
 
     @NotNull
@@ -383,7 +383,7 @@ class XuguSQLDialect extends JDBCSQLDialect {
     @NotNull
     @Override
     protected String[] getNonTransactionKeywords() {
-        return ORACLE_NON_TRANSACTIONAL_KEYWORDS;
+        return XUGU_NON_TRANSACTIONAL_KEYWORDS;
     }
 
     @Override
