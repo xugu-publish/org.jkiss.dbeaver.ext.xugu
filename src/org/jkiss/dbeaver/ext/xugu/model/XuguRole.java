@@ -71,7 +71,7 @@ public class XuguRole extends XuguGlobalObject implements DBARole, DBPRefreshabl
                     this.authentication = JDBCUtils.safeGetString(resultSet, "PASSWORD");
     			}
         		//加载权限
-        		Vector<Object> authorities = new LoadPermission().loadPermission(conn, this.name);
+        		Vector<Object> authorities = new LoadPermission().loadPermission(conn, this.name, 0);
         		roleAuthorities = new ArrayList<>();
         		Iterator<Object> it = authorities.iterator();
         		while(it.hasNext()) {

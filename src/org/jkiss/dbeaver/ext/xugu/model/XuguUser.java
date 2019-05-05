@@ -185,7 +185,7 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
 		}
 		if(resultSet!=null) {
 			//加载权限
-			Vector<Object> authorities = new LoadPermission().loadPermission(conn, this.user_name);
+			Vector<Object> authorities = new LoadPermission().loadPermission(conn, this.user_name, 0);
 			userAuthorities = new ArrayList<>();
 			Iterator<Object> it = authorities.iterator();
 			while(it.hasNext()) {
@@ -529,14 +529,4 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
 		}
 		return "";
 	}
-	
-//	public void loadGrants() {
-//		// 获取connection
-//		System.out.println("ok?");
-//		new TestClass().print();
-//		System.out.println("ok?");
-//		new Parsing().loadDDL((com.xugu.cloudjdbc.Connection) this.conn, "SYSDBA", "TEST1");
-//		Vector<Object> grants = new LoadPermission().loadPermission(this.conn, this.user_name);
-//		System.out.println(grants.size());
-//	}
 }
