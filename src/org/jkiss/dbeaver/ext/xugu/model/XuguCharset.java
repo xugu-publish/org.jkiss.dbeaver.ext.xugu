@@ -47,7 +47,7 @@ public class XuguCharset extends XuguInformation {
     private void loadInfo(ResultSet dbResult)
         throws SQLException
     {
-    	this.name = JDBCUtils.safeGetString(dbResult, "CLIENT_ENCODING");
+    	this.name = JDBCUtils.safeGetString(dbResult, "DB_CHARSET");
     }
 
     void addCollation(XuguCollation collation)
