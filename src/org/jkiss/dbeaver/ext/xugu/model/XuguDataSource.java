@@ -26,7 +26,6 @@ import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.XuguExecuteSQL_DBA;
 import org.jkiss.dbeaver.ext.xugu.XuguExecuteSQL_NORMAL;
 import org.jkiss.dbeaver.ext.xugu.model.XuguCharset;
-//import org.jkiss.dbeaver.ext.xugu.model.plan.XuguPlanAnalyser;
 import org.jkiss.dbeaver.ext.xugu.XuguExecuteSQL_SYSDBA;
 import org.jkiss.dbeaver.ext.xugu.XuguMessages;
 import org.jkiss.dbeaver.ext.xugu.model.session.XuguServerSessionManager;
@@ -87,7 +86,6 @@ public class XuguDataSource extends JDBCDataSource
     
     private final TablespaceCache tablespaceCache = new TablespaceCache();
     final public UserCache userCache = new UserCache();
-//    final ProfileCache profileCache = new ProfileCache();
     final public RoleCache roleCache = new RoleCache();
     
     private XgPooledConnection xgPconn;
@@ -383,11 +381,6 @@ public class XuguDataSource extends JDBCDataSource
         return userCache.getObject(monitor, this, name);
     }
 
-//    @Association
-//    public Collection<XuguUserProfile> getProfiles(DBRProgressMonitor monitor) throws DBException {
-//        return profileCache.getAllObjects(monitor, this);
-//    }
-
     @Association
     public Collection<XuguRole> getRoles(DBRProgressMonitor monitor) throws DBException {
     	return roleCache.getAllObjects(monitor, this);
@@ -483,7 +476,6 @@ public class XuguDataSource extends JDBCDataSource
         this.schemaCache.clearCache();
         this.tablespaceCache.clearCache();
         this.userCache.clearCache();
-//        this.profileCache.clearCache();
         if("SYS".equals(this.roleFlag)) {
         	this.roleCache.clearCache();
         }
@@ -579,20 +571,6 @@ public class XuguDataSource extends JDBCDataSource
             throw new DBCException(e, this);
         }
     }
-
-//    @NotNull
-//    @Override
-//    public DBCPlan planQueryExecution(@NotNull DBCSession session, @NotNull String query) throws DBException {
-//        XuguPlanAnalyser plan = new XuguPlanAnalyser(this, (JDBCSession) session, query);
-//        plan.explain();
-//        return plan;
-//    }
-
-//    @NotNull
-//    @Override
-//    public DBCPlanStyle getPlanStyle() {
-//        return DBCPlanStyle.PLAN;
-//    }
 
     @Nullable
     @Override
