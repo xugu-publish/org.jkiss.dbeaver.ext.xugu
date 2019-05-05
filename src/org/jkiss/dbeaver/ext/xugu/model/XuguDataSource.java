@@ -259,15 +259,23 @@ public class XuguDataSource extends JDBCDataSource
              // Read charsets and collations
                 {
                     charsets = new ArrayList<>();
-                    try (JDBCStatement dbStat = session.createStatement()) {
-                        try (JDBCResultSet dbResult = dbStat.executeQuery("SHOW DB_INFO")) {
+                    Connection tempSYSConn = getSYSDBAConn(monitor);
+                    try (Statement dbStat = tempSYSConn.createStatement()) {
+                        try (ResultSet dbResult = dbStat.executeQuery("SELECT DISTINCT CHARSET_NAME FROM SYS_CHARSETS")) {
                             while (dbResult.next()) {
-                                XuguCharset charset = new XuguCharset(this, dbResult);
+                                XuguCharset charset = new XuguCharset(this, tempSYSConn, JDBCUtils.safeGetString(dbResult, "CHARSET_NAME"));
                                 charsets.add(charset);
                             }
                         }
                     } catch (SQLException ex) {
                         // Engines are not supported. Shame on it. Leave this list empty
+                    }finally {
+                    	try {
+							tempSYSConn.close();
+						} catch (SQLException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
                     }
                     Collections.sort(charsets, DBUtils.<XuguCharset>nameComparator());
                     

@@ -23,31 +23,42 @@ import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
 import org.jkiss.dbeaver.model.meta.Property;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 /**
- * XuguCharset
+ * @author Maple4Real
+ *	编码方式
  */
 public class XuguCharset extends XuguInformation {
 
     private String name;
+    private Connection conn;
     private List<XuguCollation> collations = new ArrayList<>();
 
-    public XuguCharset(XuguDataSource dataSource, ResultSet dbResult)
+    public XuguCharset(XuguDataSource dataSource, Connection conn, String name)
         throws SQLException
     {
         super(dataSource);
-        this.loadInfo(dbResult);
+        this.name = name;
+        this.conn = conn;
+        this.loadInfo();
     }
 
-    private void loadInfo(ResultSet dbResult)
+    public void loadInfo()
         throws SQLException
     {
-    	this.name = JDBCUtils.safeGetString(dbResult, "DB_CHARSET");
+    	Statement stmt = this.conn.createStatement();
+    	ResultSet rs = stmt.executeQuery("SELECT * FROM SYS_CHARSETS WHERE CHARSET_NAME='"+this.name+"'");
+    	while(rs.next()) {
+    		XuguCollation temp = new XuguCollation(this, rs);
+    		addCollation(temp);
+    	}
     }
 
     void addCollation(XuguCollation collation)
@@ -73,9 +84,7 @@ public class XuguCharset extends XuguInformation {
     public XuguCollation getDefaultCollation()
     {
         for (XuguCollation collation : collations) {
-            if (collation.isDefault()) {
-                return collation;
-            }
+            return collation;
         }
         return null;
     }

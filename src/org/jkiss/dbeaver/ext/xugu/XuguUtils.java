@@ -33,6 +33,7 @@ import java.util.*;
 
 /**
  * Xugu utils
+ * 提供常用方法
  */
 public class XuguUtils {
 

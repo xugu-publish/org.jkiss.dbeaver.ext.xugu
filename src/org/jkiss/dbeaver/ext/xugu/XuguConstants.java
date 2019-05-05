@@ -23,6 +23,7 @@ import org.jkiss.dbeaver.model.struct.rdb.DBSIndexType;
 
 /**
  * Xugu constants
+ * 程序中被使用的一些常量
  */
 public class XuguConstants {
 

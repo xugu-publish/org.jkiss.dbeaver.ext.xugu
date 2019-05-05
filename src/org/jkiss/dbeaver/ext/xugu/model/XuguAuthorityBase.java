@@ -9,6 +9,10 @@ import org.jkiss.dbeaver.model.struct.DBSObject;
 
 import com.xugu.permission.LoadPermission;
 
+/**
+ * @author Maple4Real
+ *	用户权限和角色权限的基类
+ */
 public abstract class XuguAuthorityBase<PARENT extends DBSObject> extends XuguObject<PARENT>{
 
 	private String parentName;

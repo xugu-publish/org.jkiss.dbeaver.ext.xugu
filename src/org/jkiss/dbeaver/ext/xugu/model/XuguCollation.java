@@ -18,7 +18,6 @@ package org.jkiss.dbeaver.ext.xugu.model;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
-import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.struct.DBSObject;
@@ -32,11 +31,10 @@ import java.sql.SQLException;
 public class XuguCollation extends XuguInformation {
 
     private XuguCharset charset;
-    private int id;
     private String name;
-    private boolean isDefault;
-    private boolean isCompiled;
-    private int sortLength;
+    private int max_bytes;
+    private int min_bytes;
+    private String comment;
 
     public XuguCollation(XuguCharset charset, ResultSet dbResult)
         throws SQLException
@@ -49,11 +47,10 @@ public class XuguCollation extends XuguInformation {
     private void loadInfo(ResultSet dbResult)
         throws SQLException
     {
-        this.name = JDBCUtils.safeGetString(dbResult, XuguConstants.COL_COLLATION);
-        this.id = JDBCUtils.safeGetInt(dbResult, XuguConstants.COL_ID);
-        this.isDefault = "Yes".equalsIgnoreCase(JDBCUtils.safeGetString(dbResult, XuguConstants.COL_DEFAULT));
-        this.isCompiled = "Yes".equalsIgnoreCase(JDBCUtils.safeGetString(dbResult, XuguConstants.COL_COMPILED));
-        this.sortLength = JDBCUtils.safeGetInt(dbResult, XuguConstants.COL_SORT_LENGTH);
+        this.name = JDBCUtils.safeGetString(dbResult, "COLLATE_NAME");
+        this.max_bytes = JDBCUtils.safeGetInt(dbResult, "MAX_BYTES");
+        this.min_bytes = JDBCUtils.safeGetInt(dbResult, "MIN_BYTES");
+        this.comment = JDBCUtils.safeGetString(dbResult, "COMMENT");
     }
 
     @Property(viewable = true, order = 2)
@@ -71,29 +68,23 @@ public class XuguCollation extends XuguInformation {
     }
 
     @Property(viewable = true, order = 3)
-    public int getId()
+    public int getMaxBytes()
     {
-        return id;
+        return max_bytes;
     }
 
     @Property(viewable = true, order = 4)
-    public boolean isDefault()
+    public int getMinBytes()
     {
-        return isDefault;
+        return min_bytes;
     }
 
     @Property(viewable = true, order = 5)
-    public boolean isCompiled()
+    public String getComment()
     {
-        return isCompiled;
+        return comment;
     }
-
-    @Property(viewable = true, order = 6)
-    public int getSortLength()
-    {
-        return sortLength;
-    }
-
+    
     @Nullable
     @Override
     public String getDescription()
