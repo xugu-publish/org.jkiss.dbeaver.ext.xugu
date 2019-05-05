@@ -54,7 +54,7 @@ public class XuguRole extends XuguGlobalObject implements DBARole, DBPRefreshabl
     private int id;
     private String authentication;
     private Collection<XuguRoleAuthority> roleAuthorities;
-    private final UserCache userCache = new UserCache();
+//    private final UserCache userCache = new UserCache();
     private String userDesc;
     private Connection conn;
     DBRProgressMonitor monitor;
@@ -123,16 +123,16 @@ public class XuguRole extends XuguGlobalObject implements DBARole, DBPRefreshabl
     	userDesc = desc;
     }
     
-    @Association
-    public Collection<XuguPrivUser> getUserPrivs(DBRProgressMonitor monitor) throws DBException
-    {
-        return userCache.getAllObjects(monitor, this);
-    }
+//    @Association
+//    public Collection<XuguUser> getUserPrivs(DBRProgressMonitor monitor) throws DBException
+//    {
+//        return userCache.getAllObjects(monitor, this);
+//    }
 
     @Nullable
     @Override
     public DBSObject refreshObject(@NotNull DBRProgressMonitor monitor) throws DBException {
-        userCache.clearCache();
+//        userCache.clearCache();
         return this;
     }
     
@@ -186,22 +186,22 @@ public class XuguRole extends XuguGlobalObject implements DBARole, DBPRefreshabl
 		return res;
 	}
     
-    static class UserCache extends JDBCObjectCache<XuguRole, XuguPrivUser> {
-        @Override
-        protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguRole owner) throws SQLException
-        {
-            final JDBCPreparedStatement dbStat = session.prepareStatement(
-                    "SELECT * FROM SYS_USERS WHERE USER_ID IN \n" + 
-                    "(SELECT USER_ID FROM SYS_ROLE_MEMBERS WHERE ROLE_ID=?)");
-            dbStat.setString(1, owner.getID()+"");
-            return dbStat;
-        }
-
-        @Override
-        protected XuguPrivUser fetchObject(@NotNull JDBCSession session, @NotNull XuguRole owner, @NotNull JDBCResultSet resultSet) throws SQLException, DBException
-        {
-            return new XuguPrivUser(owner, resultSet);
-        }
-    }
+//    static class UserCache extends JDBCObjectCache<XuguRole, XuguUser> {
+//        @Override
+//        protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguRole owner) throws SQLException
+//        {
+//            final JDBCPreparedStatement dbStat = session.prepareStatement(
+//                    "SELECT * FROM SYS_USERS WHERE USER_ID IN \n" + 
+//                    "(SELECT USER_ID FROM SYS_ROLE_MEMBERS WHERE ROLE_ID=?)");
+//            dbStat.setString(1, owner.getID()+"");
+//            return dbStat;
+//        }
+//
+//        @Override
+//        protected XuguUser fetchObject(@NotNull JDBCSession session, @NotNull XuguRole owner, @NotNull JDBCResultSet resultSet) throws SQLException, DBException
+//        {
+//            return new XuguUser(owner.getDataSource(), resultSet, session.getProgressMonitor());
+//        }
+//    }
 
 }
