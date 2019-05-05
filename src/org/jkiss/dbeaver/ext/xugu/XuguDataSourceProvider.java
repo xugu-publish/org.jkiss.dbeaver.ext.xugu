@@ -22,8 +22,6 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.ext.xugu.model.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.model.XuguDataSource;
 import org.jkiss.dbeaver.ext.xugu.model.dict.XuguConnectionType;
-import org.jkiss.dbeaver.ext.xugu.oci.OCIUtils;
-import org.jkiss.dbeaver.ext.xugu.oci.XuguHomeDescriptor;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
@@ -40,7 +38,7 @@ import java.util.List;
 import java.util.Map;
 
 //加载数据源信息
-public class XuguDataSourceProvider extends JDBCDataSourceProvider implements DBPNativeClientLocationManager {
+public class XuguDataSourceProvider extends JDBCDataSourceProvider {
 
     public XuguDataSourceProvider()
     {
@@ -68,54 +66,17 @@ public class XuguDataSourceProvider extends JDBCDataSourceProvider implements DB
         }
         StringBuilder url = new StringBuilder(100);
         url.append("jdbc:xugu://"); //$NON-NLS-1$
-        if (connectionType == XuguConstants.ConnectionType.TNS) {
-            // TNS name specified
-            // Try to get description from TNSNAMES
-            File oraHomePath;
-            boolean checkTnsAdmin;
-            String tnsPathProp = CommonUtils.toString(connectionInfo.getProviderProperty(XuguConstants.PROP_TNS_PATH));
-            if (!CommonUtils.isEmpty(tnsPathProp)) {
-                oraHomePath = new File(tnsPathProp);
-                checkTnsAdmin = false;
-            } else {
-                final String clientHomeId = connectionInfo.getClientHomeId();
-                final XuguHomeDescriptor oraHome = CommonUtils.isEmpty(clientHomeId) ? null : OCIUtils.getOraHome(clientHomeId);
-                oraHomePath = oraHome == null ? null : oraHome.getPath();
-                checkTnsAdmin = true;
-            }
 
-            final Map<String, String> tnsNames = OCIUtils.readTnsNames(oraHomePath, checkTnsAdmin);
-            final String tnsDescription = tnsNames.get(connectionInfo.getDatabaseName());
-            if (!CommonUtils.isEmpty(tnsDescription)) {
-                url.append(tnsDescription);
-            } else {
-                final File tnsNamesFile = OCIUtils.findTnsNamesFile(oraHomePath, checkTnsAdmin);
-                if (tnsNamesFile != null && tnsNamesFile.exists()) {
-                    System.setProperty(XuguConstants.VAR_ORACLE_NET_TNS_ADMIN, tnsNamesFile.getAbsolutePath());
-                }
-                url.append(connectionInfo.getDatabaseName());
-            }
-        } else {
-            // Basic connection info specified
-//            boolean isSID = XuguConnectionType.SID.name().equals(connectionInfo.getProviderProperty(XuguConstants.PROP_SID_SERVICE));
-//            if (!isSID) {
-//                url.append("//"); //$NON-NLS-1$
-//            }
-            if (!CommonUtils.isEmpty(connectionInfo.getHostName())) {
-                url.append(connectionInfo.getHostName());
-            }
-            if (!CommonUtils.isEmpty(connectionInfo.getHostPort())) {
-                url.append(":"); //$NON-NLS-1$
-                url.append(connectionInfo.getHostPort());
-            }
-//            if (isSID) {
-//                url.append(":"); //$NON-NLS-1$
-//            } else {
-                url.append("/"); //$NON-NLS-1$
-//            }
-            if (!CommonUtils.isEmpty(connectionInfo.getDatabaseName())) {
-                url.append(connectionInfo.getDatabaseName());
-            }
+        if (!CommonUtils.isEmpty(connectionInfo.getHostName())) {
+            url.append(connectionInfo.getHostName());
+        }
+        if (!CommonUtils.isEmpty(connectionInfo.getHostPort())) {
+            url.append(":"); //$NON-NLS-1$
+            url.append(connectionInfo.getHostPort());
+        }
+
+        if (!CommonUtils.isEmpty(connectionInfo.getDatabaseName())) {
+            url.append(connectionInfo.getDatabaseName());
         }
         return url.toString();
     }
@@ -132,54 +93,55 @@ public class XuguDataSourceProvider extends JDBCDataSourceProvider implements DB
     //////////////////////////////////////
     // Client manager
 
-    @Override
-    public List<DBPNativeClientLocation> findLocalClientLocations()
-    {
-        List<DBPNativeClientLocation> homeIds = new ArrayList<>();
-        for (XuguHomeDescriptor home : OCIUtils.getOraHomes()) {
-            homeIds.add(home);
-        }
-        return homeIds;
-    }
+//    @Override
+//    public List<DBPNativeClientLocation> findLocalClientLocations()
+//    {
+////        List<DBPNativeClientLocation> homeIds = new ArrayList<>();
+////        for (XuguHomeDescriptor home : OCIUtils.getOraHomes()) {
+////            homeIds.add(home);
+////        }
+////        return homeIds;
+//    	return null;
+//    }
 
-    @Override
-    public DBPNativeClientLocation getDefaultLocalClientLocation()
-    {
-        List<XuguHomeDescriptor> oraHomes = OCIUtils.getOraHomes();
-        if (!oraHomes.isEmpty()) {
-            return oraHomes.get(0);
-        }
-        return null;
-    }
+//    @Override
+//    public DBPNativeClientLocation getDefaultLocalClientLocation()
+//    {
+//        List<XuguHomeDescriptor> oraHomes = OCIUtils.getOraHomes();
+//        if (!oraHomes.isEmpty()) {
+//            return oraHomes.get(0);
+//        }
+//        return null;
+//    }
 
-    @Override
-    public String getProductName(DBPNativeClientLocation location) throws DBException {
-        Integer oraVersion = getOracleVersion(location);
-        return "Xugu" + (oraVersion == null ? "" : " " + oraVersion);
-    }
+//    @Override
+//    public String getProductName(DBPNativeClientLocation location) throws DBException {
+//        Integer oraVersion = getOracleVersion(location);
+//        return "Xugu" + (oraVersion == null ? "" : " " + oraVersion);
+//    }
+//
+//    @Override
+//    public String getProductVersion(DBPNativeClientLocation location) throws DBException {
+//        boolean isInstantClient = OCIUtils.isInstantClient(location.getName());
+//        return OCIUtils.getFullOraVersion(location.getName(), isInstantClient);
+//    }
 
-    @Override
-    public String getProductVersion(DBPNativeClientLocation location) throws DBException {
-        boolean isInstantClient = OCIUtils.isInstantClient(location.getName());
-        return OCIUtils.getFullOraVersion(location.getName(), isInstantClient);
-    }
-
-    public static Integer getOracleVersion(DBPNativeClientLocation location)
-    {
-        File oraHome = location.getPath();
-        boolean isInstantClient = OCIUtils.isInstantClient(location.getName());
-        File folder = isInstantClient ? oraHome : new File(oraHome, "bin");
-        if (!folder.exists()) {
-            return null;
-        }
-        for (int counter = 7; counter <= 15; counter++) {
-            String dllName = System.mapLibraryName("ocijdbc" + counter);
-            File ociLibFile = new File(folder, dllName);
-            if (ociLibFile.exists()) {
-                return counter;
-            }
-        }
-        return null;
-    }
+//    public static Integer getOracleVersion(DBPNativeClientLocation location)
+//    {
+//        File oraHome = location.getPath();
+//        boolean isInstantClient = OCIUtils.isInstantClient(location.getName());
+//        File folder = isInstantClient ? oraHome : new File(oraHome, "bin");
+//        if (!folder.exists()) {
+//            return null;
+//        }
+//        for (int counter = 7; counter <= 15; counter++) {
+//            String dllName = System.mapLibraryName("ocijdbc" + counter);
+//            File ociLibFile = new File(folder, dllName);
+//            if (ociLibFile.exists()) {
+//                return counter;
+//            }
+//        }
+//        return null;
+//    }
 
 }
