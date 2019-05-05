@@ -18,6 +18,7 @@
 package org.jkiss.dbeaver.ext.xugu;
 
 import org.jkiss.dbeaver.model.DBConstants;
+import org.jkiss.dbeaver.model.struct.DBSEntityConstraintType;
 import org.jkiss.dbeaver.model.struct.rdb.DBSIndexType;
 
 /**
@@ -33,195 +34,131 @@ public class XuguConstants {
         TNS,
         CUSTOM
     }
-    
-    public static final int DEFAULT_PORT = 3306;
+    public static final int DEFAULT_PORT = 5138;
     public static final String DEFAULT_HOST = "localhost";
+    public static final String CMD_COMPILE = "org.jkiss.dbeaver.ext.xugu.code.compile"; //$NON-NLS-1$
+    //日志打印级别 0输出所有 大于1则不输出info类型日志
+    public static final int LOG_PRINT_LEVEL = 0;
+
+    public static final String SCHEMA_SYS = "SYS";
+    public static final String VIEW_ALL_SOURCE = "ALL_SOURCE";
+    public static final String VIEW_DBA_SOURCE = "DBA_SOURCE";
+    public static final String VIEW_DBA_TAB_PRIVS = "DBA_TAB_PRIVS";
+
+    public static final String[] SYSTEM_SCHEMAS = {
+        "SYSDBA",
+        "SYSAUDITOR",
+        "SYSSSO",
+        "GUEST",
+    };
+    
+    
     //默认的连接守护进程休眠时间1分钟
     public static final int DEFAULT_SLEEP_TIME = 60000;
 
+    public static final String PROP_CONNECTION_TYPE = DBConstants.INTERNAL_PROP_PREFIX + "connection-type@";
     public static final String PROP_SERVER_TIMEZONE = DBConstants.INTERNAL_PROP_PREFIX + "serverTimezone@";
-
-    public static final String PROP_ZERO_DATETIME_BEHAVIOR = "zeroDateTimeBehavior";
-    public static final String PROP_REQUIRE_SSL = "ssl.require";
-    public static final String PROP_VERIFY_SERVER_SERT = "ssl.verify.server";
-    public static final String PROP_SSL_CIPHER_SUITES = "ssl.cipher.suites";
-    public static final String PROP_SSL_PUBLIC_KEY_RETRIEVE = "ssl.public.key.retrieve";
-    public static final String PROP_SSL_CLIENT_CERT = "ssl.client.cert";
-    public static final String PROP_SSL_CLIENT_KEY = "ssl.client.key";
-    public static final String PROP_SSL_CA_CERT = "ssl.ca.cert";
-    public static final String PROP_SSL_DEBUG = "ssl.debug";
-
-    public static final String[] TABLE_TYPES = new String[]{"TABLE", "VIEW", "LOCAL TEMPORARY"};
-
-    public static final String INFO_SCHEMA_NAME = "information_schema";
-    public static final String MYSQL_SCHEMA_NAME = "mysql";
-
-    public static final String META_TABLE_ENGINES = INFO_SCHEMA_NAME + ".ENGINES";
-    public static final String META_TABLE_SCHEMATA = INFO_SCHEMA_NAME + ".SCHEMATA";
-    public static final String META_TABLE_TABLES = INFO_SCHEMA_NAME + ".TABLES";
-    public static final String META_TABLE_ROUTINES = INFO_SCHEMA_NAME + ".ROUTINES";
-    public static final String META_TABLE_TRIGGERS = INFO_SCHEMA_NAME + ".TRIGGERS";
-    public static final String META_TABLE_COLUMNS = INFO_SCHEMA_NAME + ".COLUMNS";
-    public static final String META_TABLE_TABLE_CONSTRAINTS = INFO_SCHEMA_NAME + ".TABLE_CONSTRAINTS";
-    public static final String META_TABLE_KEY_COLUMN_USAGE = INFO_SCHEMA_NAME + ".KEY_COLUMN_USAGE";
-    public static final String META_TABLE_STATISTICS = INFO_SCHEMA_NAME + ".STATISTICS";
-    public static final String META_TABLE_PARTITIONS = INFO_SCHEMA_NAME + ".PARTITIONS";
-    public static final String META_TABLE_VIEWS = INFO_SCHEMA_NAME + ".VIEWS";
-
-    public static final String COL_ENGINE_NAME = "ENGINE";
-    public static final String COL_ENGINE_SUPPORT = "SUPPORT";
-    public static final String COL_ENGINE_DESCRIPTION = "COMMENT";
-    public static final String COL_ENGINE_SUPPORT_TXN = "TRANSACTIONS";
-    public static final String COL_ENGINE_SUPPORT_XA = "XA";
-    public static final String COL_ENGINE_SUPPORT_SAVEPOINTS = "SAVEPOINTS";
-
-    public static final String COL_CATALOG_NAME = "CATALOG_NAME";
-    public static final String COL_DATABASE_NAME = "`Database`";
-    public static final String COL_SCHEMA_NAME = "SCHEMA_NAME";
-    public static final String COL_DEFAULT_CHARACTER_SET_NAME = "DEFAULT_CHARACTER_SET_NAME";
-    public static final String COL_DEFAULT_COLLATION_NAME = "DEFAULT_COLLATION_NAME";
-    public static final String COL_SQL_PATH = "SQL_PATH";
-
-    public static final String COL_TABLE_SCHEMA = "TABLE_SCHEMA";
-    public static final String COL_TABLE_NAME = "TABLE_NAME";
-    public static final String COL_TABLE_TYPE = "TABLE_TYPE";
-    public static final String COL_ENGINE = "ENGINE";
-    public static final String COL_VERSION = "VERSION";
-    public static final String COL_ROWS = "ROWS";
-    public static final String COL_TABLE_ROWS = "TABLE_ROWS";
-    public static final String COL_AUTO_INCREMENT = "AUTO_INCREMENT";
-    public static final String COL_TABLE_COMMENT = "COMMENT";
-    public static final String COL_COLUMNS_NAME = "COLUMNS_NAME";
-    public static final String COL_ORDINAL_POSITION = "ORDINAL_POSITION";
-    public static final String COL_CREATE_TIME = "CREATE_TIME";
-    public static final String COL_UPDATE_TIME = "UPDATE_TIME";
-    public static final String COL_CHECK_TIME = "CHECK_TIME";
-    public static final String COL_COLLATION = "COLLATION";
-    public static final String COL_COLLATION_NAME = "COLLATION_NAME";
-    public static final String COL_NULLABLE = "NULLABLE";
-    public static final String COL_SUB_PART = "SUB_PART";
-    public static final String COL_AVG_ROW_LENGTH = "AVG_ROW_LENGTH";
-    public static final String COL_DATA_LENGTH = "DATA_LENGTH";
-    public static final String COL_INDEX_NAME = "INDEX_NAME";
-    public static final String COL_INDEX_TYPE = "INDEX_TYPE";
-    public static final String COL_SEQ_IN_INDEX = "SEQ_IN_INDEX";
-    public static final String COL_NON_UNIQUE = "NON_UNIQUE";
-    public static final String COL_COMMENT = "COMMENT";
     
-    public static final String COL_COLUMN_NAME = "COLUMN_NAME";
-    public static final String COL_COLUMN_KEY = "COLUMN_KEY";
-    public static final String COL_DATA_TYPE = "DATA_TYPE";
-    public static final String COL_CHARACTER_MAXIMUM_LENGTH = "CHARACTER_MAXIMUM_LENGTH";
-    public static final String COL_CHARACTER_OCTET_LENGTH = "CHARACTER_OCTET_LENGTH";
-    public static final String COL_NUMERIC_PRECISION = "NUMERIC_PRECISION";
-    public static final String COL_NUMERIC_SCALE = "NUMERIC_SCALE";
-    public static final String COL_COLUMN_DEFAULT = "COLUMN_DEFAULT";
-    public static final String COL_IS_NULLABLE = "IS_NULLABLE";
-    public static final String COL_IS_UPDATABLE = "IS_UPDATABLE";
-    public static final String COL_COLUMN_COMMENT = "COLUMN_COMMENT";
-    public static final String COL_COLUMN_EXTRA = "EXTRA";
-    public static final String COL_COLUMN_TYPE = "COLUMN_TYPE";
-
-    public static final String COL_ROUTINE_SCHEMA = "ROUTINE_SCHEMA";
-    public static final String COL_ROUTINE_NAME = "ROUTINE_NAME";
-    public static final String COL_ROUTINE_TYPE = "ROUTINE_TYPE";
-    public static final String COL_DTD_IDENTIFIER = "DTD_IDENTIFIER";
-    public static final String COL_ROUTINE_BODY = "ROUTINE_BODY";
-    public static final String COL_ROUTINE_DEFINITION = "ROUTINE_DEFINITION";
-    public static final String COL_EXTERNAL_NAME = "EXTERNAL_NAME";
-    public static final String COL_EXTERNAL_LANGUAGE = "EXTERNAL_LANGUAGE";
-    public static final String COL_PARAMETER_STYLE = "PARAMETER_STYLE";
-    public static final String COL_IS_DETERMINISTIC = "IS_DETERMINISTIC";
-    public static final String COL_SQL_DATA_ACCESS = "SQL_DATA_ACCESS";
-    public static final String COL_SECURITY_TYPE = "SECURITY_TYPE";
-    public static final String COL_ROUTINE_COMMENT = "ROUTINE_COMMENT";
-    public static final String COL_DEFINER = "DEFINER";
-    public static final String COL_CHARACTER_SET_CLIENT = "CHARACTER_SET_CLIENT";
-
-    public static final String COL_TRIGGER_SCHEMA = "TRIGGER_SCHEMA";
-	public static final String COL_TRIGGER_NAME = "TRIGGER_NAME";
-	public static final String COL_TRIGGER_EVENT_MANIPULATION = "EVENT_MANIPULATION"; 	 
-	public static final String COL_TRIGGER_EVENT_OBJECT_SCHEMA = "EVENT_OBJECT_SCHEMA";
-	public static final String COL_TRIGGER_EVENT_OBJECT_TABLE = "EVENT_OBJECT_TABLE"; 	 
-	public static final String COL_TRIGGER_ACTION_ORDER = "ACTION_ORDER";
-	public static final String COL_TRIGGER_ACTION_CONDITION = "ACTION_CONDITION";
-	public static final String COL_TRIGGER_ACTION_STATEMENT = "ACTION_STATEMENT"; 	 
-	public static final String COL_TRIGGER_ACTION_ORIENTATION = "ACTION_ORIENTATION";
-	public static final String COL_TRIGGER_ACTION_TIMING = "ACTION_TIMING"; 	 
-	public static final String COL_TRIGGER_SQL_MODE = "SQL_MODE";
-	public static final String COL_TRIGGER_DEFINER = "DEFINER";
-	public static final String COL_TRIGGER_CHARACTER_SET_CLIENT = "CHARACTER_SET_CLIENT";
-	public static final String COL_TRIGGER_COLLATION_CONNECTION = "COLLATION_CONNECTION";
-	public static final String COL_TRIGGER_DATABASE_COLLATION = "DATABASE_COLLATION";
+    public static final String[] TABLE_TYPES = new String[]{"TABLE", "VIEW"};
     
-    public static final String COL_CONSTRAINT_NAME = "CONSTRAINT_NAME";
-    public static final String COL_CONSTRAINT_TYPE = "CONSTRAINT_TYPE";
-
-    public static final String CONSTRAINT_FOREIGN_KEY = "FOREIGN KEY";
-    public static final String CONSTRAINT_PRIMARY_KEY = "PRIMARY KEY";
-    public static final String CONSTRAINT_UNIQUE = "UNIQUE";
-
-    public static final String INDEX_PRIMARY = "PRIMARY";
-
-    public static final String EXTRA_AUTO_INCREMENT = "auto_increment";
-
     public static final String TYPE_NAME_ENUM = "enum";
     public static final String TYPE_NAME_SET = "set";
-
-    public static final DBSIndexType INDEX_TYPE_BTREE = new DBSIndexType("BTREE", "BTree");
-    public static final DBSIndexType INDEX_TYPE_FULLTEXT = new DBSIndexType("FULLTEXT", "Full Text");
-    public static final DBSIndexType INDEX_TYPE_HASH = new DBSIndexType("HASH", "Hash");
-    public static final DBSIndexType INDEX_TYPE_RTREE = new DBSIndexType("RTREE", "RTree");
-
-    public static final String COL_CHARSET = "CHARSET";
-    public static final String COL_DESCRIPTION = "DESCRIPTION";
-    public static final String COL_MAX_LEN = "MAXLEN";
+    public static final String YES = "YES";
+    
     public static final String COL_ID = "ID";
     public static final String COL_DEFAULT = "DEFAULT";
     public static final String COL_COMPILED = "COMPILED";
     public static final String COL_SORT_LENGTH = "SORTLEN";
-
-    public static final String COL_PARTITION_NAME = "PARTITION_NAME";
-    public static final String COL_SUBPARTITION_NAME = "SUBPARTITION_NAME";
-    public static final String COL_PARTITION_ORDINAL_POSITION = "PARTITION_ORDINAL_POSITION";
-    public static final String COL_SUBPARTITION_ORDINAL_POSITION = "SUBPARTITION_ORDINAL_POSITION";
-    public static final String COL_PARTITION_METHOD = "PARTITION_METHOD";
-    public static final String COL_SUBPARTITION_METHOD = "SUBPARTITION_METHOD";
-    public static final String COL_PARTITION_EXPRESSION = "PARTITION_EXPRESSION";
-    public static final String COL_SUBPARTITION_EXPRESSION = "SUBPARTITION_EXPRESSION";
-    public static final String COL_PARTITION_DESCRIPTION = "PARTITION_DESCRIPTION";
-    public static final String COL_PARTITION_COMMENT = "PARTITION_COMMENT";
-
-    public static final String COL_MAX_DATA_LENGTH = "MAX_DATA_LENGTH";
-    public static final String COL_INDEX_LENGTH = "INDEX_LENGTH";
-    public static final String COL_NODEGROUP = "NODEGROUP";
-    public static final String COL_DATA_FREE = "DATA_FREE";
-    public static final String COL_CHECKSUM = "CHECKSUM";
-    public static final String COL_CHECK_OPTION = "CHECK_OPTION";
-    public static final String COL_VIEW_DEFINITION = "VIEW_DEFINITION";
-
-    public static final String TYPE_VARCHAR = "varchar";
-    public static final String TYPE_JSON = "json";
-    public static final String TYPE_GEOMETRY = "geometry";
-    public static final String TYPE_YEAR = "year";
-
-    public static final String BIN_FOLDER = "bin";
-    public static final String ENV_VARIABLE_MYSQL_PWD = "MYSQL_PWD";
+    public static final String COL_COLLATION="COLLATION";
     
-	public static final int EC_PASSWORD_EXPIRED = 0;
-	public static final String PROP_SESSION_TERRITORY = null;
-	public static final String PROP_SESSION_LANGUAGE = null;
-	public static final String PROP_SESSION_NLS_DATE_FORMAT = null;
 	//xfc 用户角色 SYSDBA DBA NORMAL
 	public static final String PROP_INTERNAL_LOGON = "SYSDBA";
 	public static final int EC_FEATURE_NOT_SUPPORTED = 0;
 	public static final String OS_AUTH_PROP = null;
 	public static final String PROP_USE_RULE_HINT = null;
 	public static final String USER_PUBLIC = "GUEST";
-	public static final Object TYPE_FQ_XML = null;
-	public static final Object TYPE_NAME_XML = null;
-	public static final String PREF_EXPLAIN_TABLE_NAME = null;
-	public static final String PLAN_TABLE_DEFINITION = null;
-	public static final String PREF_DBMS_OUTPUT = "xugu.dbms.output";
+	public static final String TYPE_NAME_XML = "XMLTYPE";
+    public static final String TYPE_FQ_XML = "SYS.XMLTYPE";
+    public static final String TYPE_NAME_BFILE = "BFILE";
+    public static final String TYPE_NAME_TIMESTAMP = "TIMESTAMP";
 	
+    public static final DBSIndexType INDEX_TYPE_BTREE = new DBSIndexType("0", "BTree");
+    public static final DBSIndexType INDEX_TYPE_RTREE = new DBSIndexType("1", "RTree");
+    public static final DBSIndexType INDEX_TYPE_FULL_TEXT = new DBSIndexType("2","Full text");
+    
+    public static final String COL_OWNER = "OWNER";
+    public static final String COL_TABLE_NAME = "TABLE_NAME";
+    public static final String COL_CONSTRAINT_NAME = "CONSTRAINT_NAME";
+    public static final String COL_CONSTRAINT_TYPE = "CONSTRAINT_TYPE";
+    
+    public static final String PROP_OBJECT_DEFINITION = "objectDefinitionText";
+    public static final String PROP_OBJECT_BODY_DEFINITION = "extendedDefinitionText";
+	
+    public static final String PREF_EXPLAIN_TABLE_NAME = "xugu.explain.table";
+    public static final String PREF_SUPPORT_ROWID = "xugu.support.rowid";
+    public static final String PREF_DBMS_OUTPUT = "xugu.dbms.output";
+    public static final String PREF_DBMS_READ_ALL_SYNONYMS = "xugu.read.all.synonyms";
+    public static final String PREF_DISABLE_SCRIPT_ESCAPE_PROCESSING = "xugu.disable.script.escape";
+    public static final String PREF_KEY_DDL_FORMAT = "xugu.ddl.format";
+    
+    public static final DBSEntityConstraintType CONSTRAINT_DEFAULT = new DBSEntityConstraintType("D","Constraint that indicates a default value", null, false, false, false);
+    public static final DBSEntityConstraintType CONSTRAINT_NOT_NULL = new DBSEntityConstraintType("N","Constraint that indicates this column can not be null", null, false, false, false);
+    public static final DBSEntityConstraintType CONSTRAINT_REF_COLUMN = new DBSEntityConstraintType("F", "Constraint that involves a REF column", null, false, false, false);
+
+    public static final int DATA_TYPE_TIMESTAMP_WITH_TIMEZONE = 101;
+    public static final int DATA_TYPE_TIMESTAMP_WITH_LOCAL_TIMEZONE = 102;
+    
+    public static final String XMLTYPE_CLASS_NAME = "XMLType";
+    public static final String[] DEFAULT_CHAR_SET = {"GBK", "GB2312", "UTF-8"};
+    public static final String DEF_PASSWORD_VALUE = "**********"; //$NON-NLS-1$
+    public static final String DEF_UNTIL_TIME = "1970-1-1 07:00:00.933";
+    
+    public static final String[] DEF_DATABASE_AUTHORITY_LIST = {
+    		"可创建任何数据库","可修改任何数据库","可删除任何数据库",
+    		"可创建任何模式","可修改任何模式","可删除任何模式",
+    		"可创建任何表","可修改任何表结构","可删除任何表","可引用任何表","可查询任何表","可插入记录，在任何表","可删除记录，在任何表","可更新记录，在任何表",
+    		"可创建任何视图","可修改任何视图结构","可删除任何视图","可查询任何视图","可插入记录，在任何视图","可删除记录，在任何视图","可更新记录，在任何视图",
+    		"可创建任何序列值","可修改任何序列值","可删除任何序列值","可读任何序列值","可更新任何序列值","可引用任何序列值",
+    		"可创建任何包","可修改任何包","可删除任何包","可执行任何包",
+    		"可创建任何存储过程或函数","可修改任何存储过程或函数","可删除任何存储过程或函数","可执行任何存储过程或函数",
+    		"可创建任何触发器","可修改任何触发器","可删除任何触发器",
+    		"可创建任何索引","可修改任何索引","可删除任何索引",
+    		"可创建任何同义词","可修改任何同义词","可删除任何同义词",
+    		"可创建任何用户","可修改任何用户","可删除任何用户",
+    		"可创建任何定时作业","可修改任何定时作业","可删除任何定时作业",
+    		"可创建任何角色","可修改任何角色","可删除任何角色",
+    		"可创建任何UDT","可修改任何UDT","可删除任何UDT",
+    		"可创建表","可创建视图","可创建序列值","可创建包","可创建存储过程或函数","可创建触发器","可创建索引","可创建同义词","可创建UDT"
+    };
+    public static final String[] DEF_TABLE_AUTHORITY_LIST= {
+    		"可修改表结构","可删除表","可引用表","可读表","可插入记录，在表","可删除记录，在表","可更新记录，在表"
+    };
+    public static final String[] DEF_VIEW_AUTHORITY_LIST= {
+    		"可修改视图结构","可删除视图","可读视图","可插入记录，在视图","可删除记录，在视图","可更新记录，在视图"
+    };
+    public static final String[] DEF_SEQUENCE_AUTHORITY_LIST= {
+    		"可修改序列值","可删除序列值","可读序列值","可更新序列值","可引用序列值"
+    };
+    public static final String[] DEF_PACKAGE_AUTHORITY_LIST= {
+    		"可修改包","可删除包","可执行包"
+    };
+    public static final String[] DEF_PROCEDURE_AUTHORITY_LIST= {
+    		"可修改存储过程或函数","可删除存储过程或函数","可执行存储过程或函数"
+    };
+    public static final String[] DEF_TRIGGER_AUTHORITY_LIST= {
+    		"可修改触发器","可删除触发器"
+    };
+    public static final String[] DEF_COLUMN_AUTHORITY_LIST= {
+    		"可读列","可更新列"
+    };
+    
+    public static final String[] DEF_OBJECT_TYPE_LIST = {
+    		"TABLE",
+    		"VIEW",
+    		"SEQUENCE",
+    		"TRIGGER",
+    		"PACKAGE",
+    		"PROCEDURE",
+    		"COLUMN"
+    };
 }

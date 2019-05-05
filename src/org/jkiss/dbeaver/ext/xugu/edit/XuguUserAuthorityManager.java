@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.jkiss.dbeaver.DBException;
-import org.jkiss.dbeaver.ext.xugu.model.XuguConstants;
+import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.model.XuguSchema;
 import org.jkiss.dbeaver.ext.xugu.model.XuguUDT;
 import org.jkiss.dbeaver.ext.xugu.model.XuguUser;

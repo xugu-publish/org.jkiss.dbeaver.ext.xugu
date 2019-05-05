@@ -17,7 +17,7 @@
 package org.jkiss.dbeaver.ext.xugu.data;
 
 import org.jkiss.code.Nullable;
-import org.jkiss.dbeaver.ext.xugu.model.XuguConstants;
+import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.model.data.DBDDataFormatter;
 import org.jkiss.dbeaver.model.data.DBDDataFormatterProfile;
 import org.jkiss.dbeaver.model.impl.jdbc.data.handlers.JDBCTemporalAccessorValueHandler;

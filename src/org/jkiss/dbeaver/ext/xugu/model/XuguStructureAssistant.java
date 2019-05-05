@@ -32,12 +32,13 @@ import org.jkiss.dbeaver.model.struct.*;
 import org.jkiss.dbeaver.model.struct.rdb.DBSProcedure;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
+import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 
 import java.sql.SQLException;
 import java.util.*;
 
 /**
- * OracleStructureAssistant
+ * XuguStructureAssistant
  */
 public class XuguStructureAssistant implements DBSStructureAssistant
 {

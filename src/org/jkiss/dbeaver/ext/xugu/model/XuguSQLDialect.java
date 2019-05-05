@@ -28,6 +28,7 @@ import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
 import org.jkiss.dbeaver.model.sql.SQLConstants;
 import org.jkiss.dbeaver.model.struct.rdb.DBSProcedure;
 import org.jkiss.utils.ArrayUtils;
+import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 
 import java.util.Arrays;
 
@@ -63,7 +64,6 @@ class XuguSQLDialect extends JDBCSQLDialect {
         "FUNCTION",
         "TYPE",
         "TRIGGER",
-        "MATERIALIZED",
         "IF",
         "EACH",
         "RETURN",

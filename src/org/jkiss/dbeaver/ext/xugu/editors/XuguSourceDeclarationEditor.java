@@ -17,7 +17,7 @@
 
 package org.jkiss.dbeaver.ext.xugu.editors;
 
-import org.jkiss.dbeaver.ext.xugu.model.XuguConstants;
+import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.model.source.XuguSourceObject;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.ui.editors.sql.SQLSourceViewer;

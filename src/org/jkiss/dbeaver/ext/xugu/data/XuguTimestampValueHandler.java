@@ -18,7 +18,7 @@ package org.jkiss.dbeaver.ext.xugu.data;
 
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
-import org.jkiss.dbeaver.ext.xugu.model.XuguConstants;
+import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.model.data.DBDDataFormatterProfile;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.exec.DBCSession;
@@ -51,38 +51,7 @@ public class XuguTimestampValueHandler extends JDBCDateTimeValueHandler {
 
     @Override
     public Object getValueFromObject(DBCSession session, DBSTypedObject type, Object object, boolean copy) throws DBCException {
-        if (object != null) {
-            String className = object.getClass().getName();
-            if (className.startsWith(XuguConstants.TIMESTAMP_CLASS_NAME)) {
-                try {
-                    return getTimestampReadMethod(object.getClass(), ((JDBCSession)session).getOriginal(), object);
-                } catch (Exception e) {
-                    throw new DBCException("Error extracting Xugu TIMESTAMP value", e);
-                }
-            }
-        }
         return super.getValueFromObject(session, type, object, copy);
-    }
-
-    private static Object getTimestampReadMethod(Class<?> aClass, Connection connection, Object object) throws Exception {
-        switch (aClass.getName()) {
-            case XuguConstants.TIMESTAMP_CLASS_NAME:
-                return getNativeMethod(aClass, "timestampValue")
-                    .invoke(object);
-            case XuguConstants.TIMESTAMPTZ_CLASS_NAME:
-                return getNativeMethod(aClass, "timestampValue", Connection.class)
-                    .invoke(object, connection);
-            case XuguConstants.TIMESTAMPLTZ_CLASS_NAME:
-                return getNativeMethod(aClass, "timestampValue", Connection.class, Calendar.class)
-                    .invoke(object, connection, Calendar.getInstance());
-        }
-        throw new DBException("Unsupported Xugu TIMESTAMP type: " + aClass.getName());
-    }
-
-    private static Method getNativeMethod(Class<?> aClass, String name, Class<?> ... args) throws NoSuchMethodException {
-        Method method = aClass.getMethod(name, args);
-        method.setAccessible(true);
-        return method;
     }
 
     @Nullable

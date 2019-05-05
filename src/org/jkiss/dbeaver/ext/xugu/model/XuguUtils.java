@@ -18,10 +18,6 @@ package org.jkiss.dbeaver.ext.xugu.model;
 
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.ext.xugu.XuguExecuteSQL_DBA;
-import org.jkiss.dbeaver.ext.xugu.XuguExecuteSQL_NORMAL;
-import org.jkiss.dbeaver.ext.xugu.XuguExecuteSQL_SYSDBA;
-import org.jkiss.dbeaver.ext.xugu.XuguMessages;
 import org.jkiss.dbeaver.ext.xugu.model.source.XuguSourceObject;
 import org.jkiss.dbeaver.ext.xugu.model.source.XuguStatefulObject;
 import org.jkiss.dbeaver.model.*;
@@ -39,6 +35,7 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.DBSObjectLazy;
 import org.jkiss.utils.CommonUtils;
+import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 
 import com.xugu.ddl.Parsing;
 
@@ -142,64 +139,6 @@ public class XuguUtils {
             }
         }
     }
-
-//    public static String getSource(DBRProgressMonitor monitor, XuguSourceObject sourceObject, boolean body, boolean insertCreateReplace) throws DBCException
-//    {
-//        if (sourceObject.getSourceType().isCustom()) {
-//            log.warn("Can't read source for custom source objects");
-//            return "-- ???? CUSTOM SOURCE";
-//        }
-//        final String sourceType = sourceObject.getSourceType().name();
-//        final XuguSchema sourceOwner = sourceObject.getSchema();
-//        if (sourceOwner == null) {
-//            log.warn("No source owner for object '" + sourceObject.getName() + "'");
-//            return null;
-//        }
-//        monitor.beginTask("Load sources for '" + sourceObject.getName() + "'...", 1);
-//        String sysViewName = XuguConstants.VIEW_DBA_SOURCE;
-//        if (!sourceObject.getDataSource().isViewAvailable(monitor, XuguConstants.SCHEMA_SYS, sysViewName)) {
-//            sysViewName = XuguConstants.VIEW_ALL_SOURCE;
-//        }
-//        try (final JDBCSession session = DBUtils.openMetaSession(monitor, sourceOwner, "Load source code for " + sourceType + " '" + sourceObject.getName() + "'")) {
-//            try (JDBCPreparedStatement dbStat = session.prepareStatement(
-//                "SELECT TEXT FROM ALL_OBJECTS " +
-//                    "WHERE TYPE=? AND OWNER=? AND NAME=? " +
-//                    "ORDER BY LINE")) {
-//                dbStat.setString(1, body ? sourceType + " BODY" : sourceType);
-//                dbStat.setString(2, sourceOwner.getName());
-//                dbStat.setString(3, sourceObject.getName());
-//                dbStat.setFetchSize(DBConstants.METADATA_FETCH_SIZE);
-//                try (JDBCResultSet dbResult = dbStat.executeQuery()) {
-//                    StringBuilder source = null;
-//                    int lineCount = 0;
-//                    while (dbResult.next()) {
-//                        if (monitor.isCanceled()) {
-//                            break;
-//                        }
-//                        final String line = dbResult.getString(1);
-//                        if (source == null) {
-//                            source = new StringBuilder(200);
-//                        }
-//                        source.append(line);
-//                        lineCount++;
-//                        monitor.subTask("Line " + lineCount);
-//                    }
-//                    if (source == null) {
-//                        return null;
-//                    }
-//                    if (insertCreateReplace) {
-//                        return insertCreateReplace(sourceObject, body, source.toString());
-//                    } else {
-//                        return source.toString();
-//                    }
-//                }
-//            }
-//        } catch (SQLException e) {
-//            throw new DBCException(e, sourceOwner.getDataSource());
-//        } finally {
-//            monitor.done();
-//        }
-//    }
 
     public static String getSysUserViewName(DBRProgressMonitor monitor, XuguDataSource dataSource, String viewName)
     {

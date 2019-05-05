@@ -17,7 +17,7 @@
 package org.jkiss.dbeaver.ext.xugu.data;
 
 import org.jkiss.code.NotNull;
-import org.jkiss.dbeaver.ext.xugu.model.XuguConstants;
+import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.model.data.DBDContent;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.exec.DBCSession;
@@ -76,8 +76,6 @@ public class XuguXMLValueHandler extends XuguCLOBValueHandler {
 
         if (object == null) {
             return new XuguContentXML(session.getDataSource(), null);
-        } else if (object.getClass().getName().equals(XuguConstants.XMLTYPE_CLASS_NAME)) {
-            return new XuguContentXML(session.getDataSource(), new XuguXMLWrapper(object));
         } else if (object instanceof SQLXML) {
             return new XuguContentXML(session.getDataSource(), (SQLXML) object);
         } else {

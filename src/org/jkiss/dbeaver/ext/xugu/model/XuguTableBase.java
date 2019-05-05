@@ -46,6 +46,7 @@ import org.jkiss.dbeaver.model.struct.DBSObjectState;
 import org.jkiss.dbeaver.model.struct.rdb.DBSTableForeignKey;
 import org.jkiss.dbeaver.model.struct.rdb.DBSTableIndex;
 import org.jkiss.utils.CommonUtils;
+import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

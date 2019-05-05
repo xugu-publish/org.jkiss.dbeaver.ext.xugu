@@ -27,7 +27,7 @@ import org.jkiss.dbeaver.ext.xugu.edit.RolePropertyHandler;
 import org.jkiss.dbeaver.ext.xugu.edit.UserPropertyHandler;
 import org.jkiss.dbeaver.ext.xugu.editors.XuguUserEditorAbstract.UserPageControl;
 import org.jkiss.dbeaver.ext.xugu.model.XuguAuthorityBase;
-import org.jkiss.dbeaver.ext.xugu.model.XuguConstants;
+import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.model.XuguDataSource;
 import org.jkiss.dbeaver.ext.xugu.model.XuguRole;
 import org.jkiss.dbeaver.ext.xugu.model.XuguRoleAuthority;

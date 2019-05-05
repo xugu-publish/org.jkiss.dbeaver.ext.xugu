@@ -33,7 +33,7 @@ import org.jkiss.dbeaver.ext.xugu.XuguMessages;
 //import org.jkiss.dbeaver.ext.xugu.controls.PrivilegeTableControl;
 //import org.jkiss.dbeaver.ext.xugu.edit.XuguCommandGrantPrivilege;
 import org.jkiss.dbeaver.ext.xugu.edit.UserPropertyHandler;
-import org.jkiss.dbeaver.ext.xugu.model.XuguConstants;
+import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.model.XuguRole;
 import org.jkiss.dbeaver.ext.xugu.model.XuguSchema;
 //import org.jkiss.dbeaver.ext.xugu.model.XuguGrant;

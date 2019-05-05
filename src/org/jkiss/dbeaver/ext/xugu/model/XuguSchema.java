@@ -42,6 +42,7 @@ import org.jkiss.dbeaver.model.struct.rdb.DBSProcedureContainer;
 import org.jkiss.dbeaver.model.struct.rdb.DBSSchema;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
+import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

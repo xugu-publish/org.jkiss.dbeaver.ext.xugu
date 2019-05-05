@@ -19,7 +19,7 @@ package org.jkiss.dbeaver.ext.xugu;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
-import org.jkiss.dbeaver.ext.xugu.model.XuguConstants;
+import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.model.XuguDataSource;
 import org.jkiss.dbeaver.ext.xugu.model.dict.XuguConnectionType;
 import org.jkiss.dbeaver.model.DBPDataSource;
@@ -53,7 +53,6 @@ public class XuguDataSourceProvider extends JDBCDataSourceProvider {
     @Override
     public String getConnectionURL(DBPDriver driver, DBPConnectionConfiguration connectionInfo)
     {
-        //boolean isOCI = OCIUtils.isOciDriver(driver);
         XuguConstants.ConnectionType connectionType;
         String conTypeProperty = connectionInfo.getProviderProperty(XuguConstants.PROP_CONNECTION_TYPE);
         if (conTypeProperty != null) {

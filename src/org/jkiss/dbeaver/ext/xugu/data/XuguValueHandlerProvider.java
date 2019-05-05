@@ -16,7 +16,7 @@
  */
 package org.jkiss.dbeaver.ext.xugu.data;
 
-import org.jkiss.dbeaver.ext.xugu.model.XuguConstants;
+import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.model.XuguDataSource;
 import org.jkiss.dbeaver.model.DBPDataKind;
 import org.jkiss.dbeaver.model.DBPDataSource;
@@ -43,12 +43,7 @@ public class XuguValueHandlerProvider implements DBDValueHandlerProvider {
                 return XuguCLOBValueHandler.INSTANCE;
             case Types.TIME_WITH_TIMEZONE:
             case Types.TIMESTAMP_WITH_TIMEZONE:
-            case XuguConstants.DATA_TYPE_TIMESTAMP_WITH_TIMEZONE:
-                if (((XuguDataSource)dataSource).isDriverVersionAtLeast(12, 2)) {
-                    return new XuguTemporalAccessorValueHandler(preferences.getDataFormatterProfile());
-                } else {
-                    return new XuguTimestampValueHandler(preferences.getDataFormatterProfile());
-                }
+                return new XuguTimestampValueHandler(preferences.getDataFormatterProfile());
             case Types.STRUCT:
                 return XuguObjectValueHandler.INSTANCE;
         }
