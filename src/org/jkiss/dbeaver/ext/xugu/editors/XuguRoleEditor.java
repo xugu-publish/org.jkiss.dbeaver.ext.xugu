@@ -50,7 +50,6 @@ public class XuguRoleEditor extends AbstractDatabaseObjectEditor<XuguRole>{
     
 	private PageControl pageControl;
     private boolean isLoaded;
-    //private PrivilegeTableControl privTable;
     private boolean newUser;
     private Text roleNameText;
     

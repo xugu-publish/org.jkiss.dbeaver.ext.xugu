@@ -350,24 +350,6 @@ public class XuguDataType extends XuguObject<DBSObject>
             return (XuguDataType)superType;
         } else {
         	return null;
-//            try {
-//                XuguLazyReference olr = (XuguLazyReference) superType;
-//                final XuguSchema superSchema = getDataSource().getSchema(monitor, olr.schemaName);
-//                if (superSchema == null) {
-//                    log.warn("Referenced schema '" + olr.schemaName + "' not found for super type '" + olr.objectName + "'");
-//                } else {
-//                    superType = superSchema.dataTypeCache.getObject(monitor, superSchema, olr.objectName);
-//                    if (superType == null) {
-//                        log.warn("Referenced type '" + olr.objectName + "' not found in schema '" + olr.schemaName + "'");
-//                    } else {
-//                        return (XuguDataType)superType;
-//                    }
-//                }
-//            } catch (DBException e) {
-//                log.error(e);
-//            }
-//            superType = null;
-//            return null;
         }
     }
 

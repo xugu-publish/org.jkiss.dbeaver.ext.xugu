@@ -20,7 +20,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 
 /**
- * MySQL informational object
+ * Xugu informational object
  */
 public abstract class XuguInformation implements DBSObject {
 

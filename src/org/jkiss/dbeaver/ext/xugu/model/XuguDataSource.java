@@ -87,7 +87,7 @@ public class XuguDataSource extends JDBCDataSource
     
     private final TablespaceCache tablespaceCache = new TablespaceCache();
     final public UserCache userCache = new UserCache();
-    final ProfileCache profileCache = new ProfileCache();
+//    final ProfileCache profileCache = new ProfileCache();
     final public RoleCache roleCache = new RoleCache();
     
     private XgPooledConnection xgPconn;
@@ -278,7 +278,7 @@ public class XuguDataSource extends JDBCDataSource
                 {
                     charsets = new ArrayList<>();
                     try (JDBCStatement dbStat = session.createStatement()) {
-                        try (JDBCResultSet dbResult = dbStat.executeQuery("SHOW CLIENT_ENCODING")) {
+                        try (JDBCResultSet dbResult = dbStat.executeQuery("SHOW DB_INFO")) {
                             while (dbResult.next()) {
                                 XuguCharset charset = new XuguCharset(this, dbResult);
                                 charsets.add(charset);
@@ -383,10 +383,10 @@ public class XuguDataSource extends JDBCDataSource
         return userCache.getObject(monitor, this, name);
     }
 
-    @Association
-    public Collection<XuguUserProfile> getProfiles(DBRProgressMonitor monitor) throws DBException {
-        return profileCache.getAllObjects(monitor, this);
-    }
+//    @Association
+//    public Collection<XuguUserProfile> getProfiles(DBRProgressMonitor monitor) throws DBException {
+//        return profileCache.getAllObjects(monitor, this);
+//    }
 
     @Association
     public Collection<XuguRole> getRoles(DBRProgressMonitor monitor) throws DBException {
@@ -483,7 +483,7 @@ public class XuguDataSource extends JDBCDataSource
         this.schemaCache.clearCache();
         this.tablespaceCache.clearCache();
         this.userCache.clearCache();
-        this.profileCache.clearCache();
+//        this.profileCache.clearCache();
         if("SYS".equals(this.roleFlag)) {
         	this.roleCache.clearCache();
         }
@@ -1060,39 +1060,39 @@ public class XuguDataSource extends JDBCDataSource
         }
     }
 
-    static class ProfileCache extends JDBCStructCache<XuguDataSource, XuguUserProfile, XuguUserProfile.ProfileResource> {
-        protected ProfileCache() {
-            super("PROFILE");
-        }
-
-        @Override
-        protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguDataSource owner) throws SQLException {
-            return session.prepareStatement(
-                "SELECT DISTINCT PROFILE FROM DBA_PROFILES ORDER BY PROFILE");
-        }
-
-        @Override
-        protected XuguUserProfile fetchObject(@NotNull JDBCSession session, @NotNull XuguDataSource owner, @NotNull JDBCResultSet resultSet) throws SQLException, DBException {
-            return new XuguUserProfile(owner, resultSet);
-        }
-
-        @Override
-        protected JDBCStatement prepareChildrenStatement(@NotNull JDBCSession session, @NotNull XuguDataSource dataSource, @Nullable XuguUserProfile forObject) throws SQLException {
-            final JDBCPreparedStatement dbStat = session.prepareStatement(
-                "SELECT RESOURCE_NAME,RESOURCE_TYPE,LIMIT FROM DBA_PROFILES " +
-                    (forObject == null ? "" : "WHERE PROFILE=? ") +
-                    "ORDER BY RESOURCE_NAME");
-            if (forObject != null) {
-                dbStat.setString(1, forObject.getName());
-            }
-            return dbStat;
-        }
-
-        @Override
-        protected XuguUserProfile.ProfileResource fetchChild(@NotNull JDBCSession session, @NotNull XuguDataSource dataSource, @NotNull XuguUserProfile parent, @NotNull JDBCResultSet dbResult) throws SQLException, DBException {
-            return new XuguUserProfile.ProfileResource(parent, dbResult);
-        }
-    }
+//    static class ProfileCache extends JDBCStructCache<XuguDataSource, XuguUserProfile, XuguUserProfile.ProfileResource> {
+//        protected ProfileCache() {
+//            super("PROFILE");
+//        }
+//
+//        @Override
+//        protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguDataSource owner) throws SQLException {
+//            return session.prepareStatement(
+//                "SELECT DISTINCT PROFILE FROM DBA_PROFILES ORDER BY PROFILE");
+//        }
+//
+//        @Override
+//        protected XuguUserProfile fetchObject(@NotNull JDBCSession session, @NotNull XuguDataSource owner, @NotNull JDBCResultSet resultSet) throws SQLException, DBException {
+//            return new XuguUserProfile(owner, resultSet);
+//        }
+//
+//        @Override
+//        protected JDBCStatement prepareChildrenStatement(@NotNull JDBCSession session, @NotNull XuguDataSource dataSource, @Nullable XuguUserProfile forObject) throws SQLException {
+//            final JDBCPreparedStatement dbStat = session.prepareStatement(
+//                "SELECT RESOURCE_NAME,RESOURCE_TYPE,LIMIT FROM DBA_PROFILES " +
+//                    (forObject == null ? "" : "WHERE PROFILE=? ") +
+//                    "ORDER BY RESOURCE_NAME");
+//            if (forObject != null) {
+//                dbStat.setString(1, forObject.getName());
+//            }
+//            return dbStat;
+//        }
+//
+//        @Override
+//        protected XuguUserProfile.ProfileResource fetchChild(@NotNull JDBCSession session, @NotNull XuguDataSource dataSource, @NotNull XuguUserProfile parent, @NotNull JDBCResultSet dbResult) throws SQLException, DBException {
+//            return new XuguUserProfile.ProfileResource(parent, dbResult);
+//        }
+//    }
 
     public Collection<XuguCharset> getCharsets()
     {
