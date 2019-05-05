@@ -59,14 +59,11 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
     final public ViewCache viewCache = new ViewCache();
     final public ConstraintCache constraintCache = new ConstraintCache();
     final public ForeignKeyCache foreignKeyCache = new ForeignKeyCache();
-//    final public TriggerCache triggerCache = new TriggerCache();
     final public IndexCache indexCache = new IndexCache();
-//    final public DataTypeCache dataTypeCache = new DataTypeCache();
     final public SequenceCache sequenceCache = new SequenceCache();
     final public PackageCache packageCache = new PackageCache();
     final public SynonymCache synonymCache = new SynonymCache();
     final public UDTCache udtCache = new UDTCache();
-//    final public DBLinkCache dbLinkCache = new DBLinkCache();
     final public ProceduresCache proceduresCache = new ProceduresCache();
     final public SchedulerJobCache schedulerJobCache = new SchedulerJobCache();
 

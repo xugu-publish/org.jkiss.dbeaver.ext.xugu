@@ -26,7 +26,7 @@ import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.XuguExecuteSQL_DBA;
 import org.jkiss.dbeaver.ext.xugu.XuguExecuteSQL_NORMAL;
 import org.jkiss.dbeaver.ext.xugu.model.XuguCharset;
-import org.jkiss.dbeaver.ext.xugu.model.plan.XuguPlanAnalyser;
+//import org.jkiss.dbeaver.ext.xugu.model.plan.XuguPlanAnalyser;
 import org.jkiss.dbeaver.ext.xugu.XuguExecuteSQL_SYSDBA;
 import org.jkiss.dbeaver.ext.xugu.XuguMessages;
 import org.jkiss.dbeaver.ext.xugu.model.session.XuguServerSessionManager;
@@ -73,7 +73,7 @@ import javax.xml.transform.Result;
  * @author Luke
  */
 public class XuguDataSource extends JDBCDataSource
-    implements DBSObjectSelector, DBCQueryPlanner, IAdaptable {
+    implements DBSObjectSelector, IAdaptable {
     private static final Log log = Log.getLog(XuguDataSource.class);
 
     public JDBCRemoteInstance remoteInstance;
@@ -668,52 +668,6 @@ public class XuguDataSource extends JDBCDataSource
         }
     }
 
-//    @Nullable
-//    public String getPlanTableName(JDBCSession session)
-//        throws DBException
-//    {
-//        if (planTableName == null) {
-//            String[] candidateNames;
-//            String tableName = getContainer().getPreferenceStore().getString(XuguConstants.PREF_EXPLAIN_TABLE_NAME);
-//            if (!CommonUtils.isEmpty(tableName)) {
-//                candidateNames = new String[]{tableName};
-//            } else {
-//                candidateNames = new String[]{"PLAN_TABLE", "TOAD_PLAN_TABLE"};
-//            }
-//            for (String candidate : candidateNames) {
-//                try {
-//                    JDBCUtils.executeSQL(session, "SELECT 1 FROM " + candidate);
-//                } catch (SQLException e) {
-//                    // No such table
-//                    continue;
-//                }
-//                planTableName = candidate;
-//                break;
-//            }
-//            if (planTableName == null) {
-//                final String newPlanTableName = candidateNames[0];
-//                // Plan table not found - try to create new one
-//                if (!UIUtils.confirmAction(
-//                    "xugu PLAN_TABLE missing",
-//                    "PLAN_TABLE not found in current user's session. " +
-//                        "Do you want DBeaver to create new PLAN_TABLE (" + newPlanTableName + ")?")) {
-//                    return null;
-//                }
-//                planTableName = createPlanTable(session, newPlanTableName);
-//            }
-//        }
-//        return planTableName;
-//    }
-
-//    private String createPlanTable(JDBCSession session, String tableName) throws DBException {
-//        try {
-//            JDBCUtils.executeSQL(session, XuguConstants.PLAN_TABLE_DEFINITION.replace("${TABLE_NAME}", tableName));
-//        } catch (SQLException e) {
-//            throw new DBException("Error creating PLAN table", e, this);
-//        }
-//        return tableName;
-//    }
-
     @Nullable
     @Override
     public DBCQueryTransformer createQueryTransformer(@NotNull DBCQueryTransformType type) {
@@ -1060,40 +1014,6 @@ public class XuguDataSource extends JDBCDataSource
         }
     }
 
-//    static class ProfileCache extends JDBCStructCache<XuguDataSource, XuguUserProfile, XuguUserProfile.ProfileResource> {
-//        protected ProfileCache() {
-//            super("PROFILE");
-//        }
-//
-//        @Override
-//        protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguDataSource owner) throws SQLException {
-//            return session.prepareStatement(
-//                "SELECT DISTINCT PROFILE FROM DBA_PROFILES ORDER BY PROFILE");
-//        }
-//
-//        @Override
-//        protected XuguUserProfile fetchObject(@NotNull JDBCSession session, @NotNull XuguDataSource owner, @NotNull JDBCResultSet resultSet) throws SQLException, DBException {
-//            return new XuguUserProfile(owner, resultSet);
-//        }
-//
-//        @Override
-//        protected JDBCStatement prepareChildrenStatement(@NotNull JDBCSession session, @NotNull XuguDataSource dataSource, @Nullable XuguUserProfile forObject) throws SQLException {
-//            final JDBCPreparedStatement dbStat = session.prepareStatement(
-//                "SELECT RESOURCE_NAME,RESOURCE_TYPE,LIMIT FROM DBA_PROFILES " +
-//                    (forObject == null ? "" : "WHERE PROFILE=? ") +
-//                    "ORDER BY RESOURCE_NAME");
-//            if (forObject != null) {
-//                dbStat.setString(1, forObject.getName());
-//            }
-//            return dbStat;
-//        }
-//
-//        @Override
-//        protected XuguUserProfile.ProfileResource fetchChild(@NotNull JDBCSession session, @NotNull XuguDataSource dataSource, @NotNull XuguUserProfile parent, @NotNull JDBCResultSet dbResult) throws SQLException, DBException {
-//            return new XuguUserProfile.ProfileResource(parent, dbResult);
-//        }
-//    }
-
     public Collection<XuguCharset> getCharsets()
     {
         return charsets;
@@ -1117,18 +1037,18 @@ public class XuguDataSource extends JDBCDataSource
 		return activeSchemaName;
 	}
 
-	 @NotNull
-    @Override
-    public DBCPlan planQueryExecution(@NotNull DBCSession session, @NotNull String query) throws DBException {
-        XuguPlanAnalyser plan = new XuguPlanAnalyser(this, (JDBCSession) session, query);
-        plan.explain();
-        return plan;
-    }
-
-    @NotNull
-    @Override
-    public DBCPlanStyle getPlanStyle() {
-        return DBCPlanStyle.PLAN;
-    }
+//	 @NotNull
+//    @Override
+//    public DBCPlan planQueryExecution(@NotNull DBCSession session, @NotNull String query) throws DBException {
+//        XuguPlanAnalyser plan = new XuguPlanAnalyser(this, (JDBCSession) session, query);
+//        plan.explain();
+//        return plan;
+//    }
+//
+//    @NotNull
+//    @Override
+//    public DBCPlanStyle getPlanStyle() {
+//        return DBCPlanStyle.PLAN;
+//    }
     
 }
