@@ -22,7 +22,7 @@ import org.jkiss.dbeaver.model.DBPQualifiedObject;
 import org.jkiss.dbeaver.model.DBUtils;
 
 /**
- * Abstract oracle schema object
+ * Abstract xugu schema object
  */
 public abstract class XuguSchemaObject extends XuguObject<XuguSchema> implements DBPQualifiedObject
 {

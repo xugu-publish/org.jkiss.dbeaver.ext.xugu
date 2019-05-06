@@ -82,48 +82,11 @@ public abstract class XuguTablePhysical extends XuguTableBase implements DBSObje
         System.out.println("yes");
     }
 
-//    @Property(category = CAT_STATISTICS, viewable = true, order = 20)
-//    public long getRowCount()
-//    {
-//        return rowCount;
-//    }
-//
-//    @Property(category = CAT_STATISTICS, viewable = false, expensive = true, order = 21)
-//    public synchronized Long getRealRowCount(DBRProgressMonitor monitor)
-//    {
-//        if (realRowCount != null) {
-//            return realRowCount;
-//        }
-//        if (!isPersisted()) {
-//            // Do not count rows for views
-//            return null;
-//        }
-//
-//        // Query row count
-//        try (DBCSession session = DBUtils.openMetaSession(monitor, this, "Read row count")) {
-//            realRowCount = countData(new AbstractExecutionSource(this, session.getExecutionContext(), this), session, null, DBSDataContainer.FLAG_NONE);
-//        } catch (DBException e) {
-//            log.debug("Can't fetch row count", e);
-//        }
-//        if (realRowCount == null) {
-//            realRowCount = -1L;
-//        }
-//
-//        return realRowCount;
-//    }
-
     @Override
     public Object getLazyReference(Object propertyId)
     {
         return tablespace;
     }
-
-//    @Property(viewable = true, order = 22, editable = true, updatable = true, listProvider = TablespaceListProvider.class)
-//    @LazyProperty(cacheValidator = XuguTablespace.TablespaceReferenceValidator.class)
-//    public Object getTablespace(DBRProgressMonitor monitor) throws DBException
-//    {
-//        return XuguTablespace.resolveTablespaceReference(monitor, this, null);
-//    }
 
     public Object getTablespace() {
         return tablespace;

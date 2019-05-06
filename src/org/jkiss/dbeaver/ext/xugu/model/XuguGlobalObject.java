@@ -23,7 +23,7 @@ import org.jkiss.dbeaver.model.DBPSaveableObject;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 
 /**
- * Abstract oracle schema object
+ * Abstract xugu object
  */
 public abstract class XuguGlobalObject implements DBSObject, DBPSaveableObject
 {
@@ -47,12 +47,14 @@ public abstract class XuguGlobalObject implements DBSObject, DBPSaveableObject
         return null;
     }
 
+    //返回父对象
     @Override
     public DBSObject getParentObject()
     {
         return dataSource.getContainer();
     }
-
+    
+    //返回数据源
     @NotNull
     @Override
     public XuguDataSource getDataSource()
@@ -60,12 +62,14 @@ public abstract class XuguGlobalObject implements DBSObject, DBPSaveableObject
         return dataSource;
     }
 
+    //是否存在
     @Override
     public boolean isPersisted()
     {
         return persisted;
     }
 
+    //设置是否存在
     @Override
     public void setPersisted(boolean persisted)
     {

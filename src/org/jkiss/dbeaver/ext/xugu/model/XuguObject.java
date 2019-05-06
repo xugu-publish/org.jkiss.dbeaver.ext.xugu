@@ -25,7 +25,7 @@ import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.utils.CommonUtils;
 
 /**
- * Abstract oracle object
+ * Abstract xugu object
  */
 public abstract class XuguObject<PARENT extends DBSObject> implements DBSObject, DBPSaveableObject
 {
@@ -66,12 +66,14 @@ public abstract class XuguObject<PARENT extends DBSObject> implements DBSObject,
         return null;
     }
 
+    //返回父对象
     @Override
     public PARENT getParentObject()
     {
         return parent;
     }
 
+    //返回数据源
     @NotNull
     @Override
     public XuguDataSource getDataSource()
@@ -79,6 +81,7 @@ public abstract class XuguObject<PARENT extends DBSObject> implements DBSObject,
         return (XuguDataSource) parent.getDataSource();
     }
 
+    //返回名称
     @NotNull
     @Override
     @Property(viewable = true, editable = true, order = 1)
@@ -87,22 +90,26 @@ public abstract class XuguObject<PARENT extends DBSObject> implements DBSObject,
         return name;
     }
 
+    //设置名称
     public void setName(String name)
     {
         this.name = name;
     }
 
+    //获取ID
     public long getObjectId()
     {
         return objectId;
     }
 
+    //是否存在
     @Override
     public boolean isPersisted()
     {
         return persisted;
     }
 
+    //设置是否存在
     @Override
     public void setPersisted(boolean persisted)
     {

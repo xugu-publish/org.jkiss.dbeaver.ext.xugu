@@ -245,34 +245,6 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
     	XuguView view = viewCache.getObject(monitor, this, name, XuguView.class);
     	return view;
     }
-    
-    /**
-     * 从数据类型缓存中获取全部数据类型信息（提供给界面展示）
-     * @param monitor 监控
-     * @return list 数据类型列表
-     * @throws DBException
-     */
-//    @Association
-//    public Collection<XuguDataType> getDataTypes(DBRProgressMonitor monitor)
-//        throws DBException
-//    {
-//        Collection<XuguDataType> list = dataTypeCache.getAllObjects(monitor, this);
-//        return list;
-//    }
-
-    /**
-     * 根据数据类型名从缓存中获取指定的数据类型对象
-     * @param monitor 监控
-     * @param name 数据类型名
-     * @return type 数据类型对象
-     * @throws DBException
-     */
-//    public XuguDataType getDataType(DBRProgressMonitor monitor, String name)
-//        throws DBException
-//    {
-//        XuguDataType type = dataTypeCache.getObject(monitor, this, name);
-//        return type;
-//    }
 
     /**
      * 从序列缓存中获取全部的缓存信息（提供给界面展示）

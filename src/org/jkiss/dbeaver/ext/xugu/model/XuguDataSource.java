@@ -142,6 +142,7 @@ public class XuguDataSource extends JDBCDataSource
     public Connection getSYSDBAConn(DBRProgressMonitor monitor) {
     	try {
 	    	DBPConnectionConfiguration connectionInfo = getContainer().getActualConnectionConfiguration();
+	    	String nowDB = connectionInfo.getDatabaseName();
 	    	connectionInfo.setDatabaseName("SYSTEM");
 			Driver driverInstance = getDriverInstance(monitor);
 			String url = getConnectionURL(connectionInfo)+"?user=SYSDBA&password=SYSDBA";
@@ -151,6 +152,7 @@ public class XuguDataSource extends JDBCDataSource
             } else {
 				conn = driverInstance.connect(url, null);
             }
+			connectionInfo.setDatabaseName(nowDB);
 			return conn;
 		} catch (Exception e1) {
 			e1.printStackTrace();
