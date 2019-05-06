@@ -108,36 +108,37 @@ public class XuguDataSource extends JDBCDataSource
         }
     }
 
-    public Boolean isViewAvailable(@NotNull DBRProgressMonitor monitor, @NotNull String schemaName, @NotNull String viewName) {
-        viewName = viewName.toUpperCase();
-        Boolean available;
-        synchronized (availableViews) {
-            available = availableViews.get(viewName);
-        }
-        if (available == null) {
-            try {
-                try (JDBCSession session = DBUtils.openMetaSession(monitor, this, "Check view existence")) {
-                	String target = "SELECT 1 FROM " + DBUtils.getQuotedIdentifier(this, schemaName) + "." +
-                            DBUtils.getQuotedIdentifier(this, viewName) + " WHERE 1<>1";
-                    try (final JDBCPreparedStatement dbStat = session.prepareStatement(
-                        "SELECT 1 FROM " + DBUtils.getQuotedIdentifier(this, schemaName) + "." +
-                        DBUtils.getQuotedIdentifier(this, viewName) + " WHERE 1<>1"))
-                    {
-                        dbStat.setFetchSize(1);
-                        dbStat.execute();
-                        available = true;
-                    }
-                }
-            } catch (SQLException e) {
-                available = false;
-            }
-            synchronized (availableViews) {
-                availableViews.put(viewName, available);
-            }
-        }
-        return available;
-    }
+//    public Boolean isViewAvailable(@NotNull DBRProgressMonitor monitor, @NotNull String schemaName, @NotNull String viewName) {
+//        viewName = viewName.toUpperCase();
+//        Boolean available;
+//        synchronized (availableViews) {
+//            available = availableViews.get(viewName);
+//        }
+//        if (available == null) {
+//            try {
+//                try (JDBCSession session = DBUtils.openMetaSession(monitor, this, "Check view existence")) {
+//                	String target = "SELECT 1 FROM " + DBUtils.getQuotedIdentifier(this, schemaName) + "." +
+//                            DBUtils.getQuotedIdentifier(this, viewName) + " WHERE 1<>1";
+//                    try (final JDBCPreparedStatement dbStat = session.prepareStatement(
+//                        "SELECT 1 FROM " + DBUtils.getQuotedIdentifier(this, schemaName) + "." +
+//                        DBUtils.getQuotedIdentifier(this, viewName) + " WHERE 1<>1"))
+//                    {
+//                        dbStat.setFetchSize(1);
+//                        dbStat.execute();
+//                        available = true;
+//                    }
+//                }
+//            } catch (SQLException e) {
+//                available = false;
+//            }
+//            synchronized (availableViews) {
+//                availableViews.put(viewName, available);
+//            }
+//        }
+//        return available;
+//    }
 
+    //获取一个临时的指向系统库的SYSDBA连接
     public Connection getSYSDBAConn(DBRProgressMonitor monitor) {
     	try {
 	    	DBPConnectionConfiguration connectionInfo = getContainer().getActualConnectionConfiguration();
@@ -165,6 +166,7 @@ public class XuguDataSource extends JDBCDataSource
     	return this.purpose;
     }
     
+    //基本操作为打开连接，但是当第一次执行时，会加载一个守护进程以检查连接状态
     @Override
     protected Connection openConnection(@NotNull DBRProgressMonitor monitor, JDBCRemoteInstance remoteInstance, @NotNull String purpose) {
         try {
@@ -204,41 +206,42 @@ public class XuguDataSource extends JDBCDataSource
         }
     }
 
-    private boolean changeExpiredPassword(DBRProgressMonitor monitor, String purpose) {
-        DBPConnectionConfiguration connectionInfo = getContainer().getActualConnectionConfiguration();
-        DBAPasswordChangeInfo passwordInfo = DBUserInterface.getInstance().promptUserPasswordChange("Password has expired. Set new password.", connectionInfo.getUserName(), connectionInfo.getUserPassword());
-        if (passwordInfo == null) {
-            return false;
-        }
+//    private boolean changeExpiredPassword(DBRProgressMonitor monitor, String purpose) {
+//        DBPConnectionConfiguration connectionInfo = getContainer().getActualConnectionConfiguration();
+//        DBAPasswordChangeInfo passwordInfo = DBUserInterface.getInstance().promptUserPasswordChange("Password has expired. Set new password.", connectionInfo.getUserName(), connectionInfo.getUserPassword());
+//        if (passwordInfo == null) {
+//            return false;
+//        }
+//
+//        // Obtain connection
+//        try {
+//            if (passwordInfo.getNewPassword() == null) {
+//                throw new DBException("You can't set empty password");
+//            }
+//            Properties connectProps = getAllConnectionProperties(monitor, purpose, connectionInfo);
+//            connectProps.setProperty("xugu.jdbc.newPassword", passwordInfo.getNewPassword());
+//
+//            final String url = getConnectionURL(connectionInfo);
+//            monitor.subTask("Connecting for expired password change");
+//            Driver driverInstance = getDriverInstance(monitor);
+//            try (Connection connection = driverInstance.connect(url, connectProps)) {
+//                if (connection == null) {
+//                    throw new DBCException("Null connection returned");
+//                }
+//            }
+//
+//            connectionInfo.setUserPassword(passwordInfo.getNewPassword());
+//            getContainer().getConnectionConfiguration().setUserPassword(passwordInfo.getNewPassword());
+//            getContainer().getRegistry().flushConfig();
+//            return true;
+//        }
+//        catch (Exception e) {
+//            DBUserInterface.getInstance().showError("Error changing password", "Error changing expired password", e);
+//            return false;
+//        }
+//    }
 
-        // Obtain connection
-        try {
-            if (passwordInfo.getNewPassword() == null) {
-                throw new DBException("You can't set empty password");
-            }
-            Properties connectProps = getAllConnectionProperties(monitor, purpose, connectionInfo);
-            connectProps.setProperty("xugu.jdbc.newPassword", passwordInfo.getNewPassword());
-
-            final String url = getConnectionURL(connectionInfo);
-            monitor.subTask("Connecting for expired password change");
-            Driver driverInstance = getDriverInstance(monitor);
-            try (Connection connection = driverInstance.connect(url, connectProps)) {
-                if (connection == null) {
-                    throw new DBCException("Null connection returned");
-                }
-            }
-
-            connectionInfo.setUserPassword(passwordInfo.getNewPassword());
-            getContainer().getConnectionConfiguration().setUserPassword(passwordInfo.getNewPassword());
-            getContainer().getRegistry().flushConfig();
-            return true;
-        }
-        catch (Exception e) {
-            DBUserInterface.getInstance().showError("Error changing password", "Error changing expired password", e);
-            return false;
-        }
-    }
-
+    //初始化上下文
     @Override
     protected void initializeContextState(@NotNull DBRProgressMonitor monitor, @NotNull JDBCExecutionContext context, boolean setActiveObject) throws DBCException {
     	
@@ -313,17 +316,17 @@ public class XuguDataSource extends JDBCDataSource
         return connectionsProps;
     }
 
-    public boolean isAdmin() {
-        return isAdmin;
-    }
-
-    public boolean isAdminVisible() {
-        return isAdmin || isAdminVisible;
-    }
-
-    public boolean isUseRuleHint() {
-        return useRuleHint;
-    }
+//    public boolean isAdmin() {
+//        return isAdmin;
+//    }
+//
+//    public boolean isAdminVisible() {
+//        return isAdmin || isAdminVisible;
+//    }
+//
+//    public boolean isUseRuleHint() {
+//        return useRuleHint;
+//    }
 
     public String getRoleFlag() {
     	return this.roleFlag;
@@ -407,21 +410,8 @@ public class XuguDataSource extends JDBCDataSource
         }
         this.publicSchema = new XuguSchema(this, 1, XuguConstants.USER_PUBLIC);
         {
-//            try (JDBCSession session = DBUtils.openMetaSession(monitor, this, "Load data source meta info")) {
-                // Get active schema
         	JDBCSession session = DBUtils.openMetaSession(monitor, this, "Load data source meta info");
             this.session = session;
-//                this.setActiveSchemaName(XuguUtils.getCurrentSchema(session, this.userRole));
-//                if (this.getActiveSchemaName() != null) {
-//                    if (this.getActiveSchemaName().isEmpty()) {
-//                        this.setActiveSchemaName(null);
-//                    }
-//                }
-
-//            } catch (SQLException e) {
-//                //throw new DBException(e);
-//                log.warn(e);
-//            }
         }
         // Cache data types
         {
@@ -429,14 +419,8 @@ public class XuguDataSource extends JDBCDataSource
             for (Map.Entry<String, XuguDataType.TypeDesc> predefinedType : XuguDataType.PREDEFINED_TYPES.entrySet()) {
                 XuguDataType dataType = new XuguDataType(this, predefinedType.getKey(), true);
                 dtList.add(dataType);
-                System.out.println("add data type "+dataType.name);
             }
             this.dataTypeCache.setCache(dtList);
-            List<XuguDataType> ttt = this.dataTypeCache.getCachedObjects();
-            for(XuguDataType t:ttt) {
-            	System.out.println("AAAAAA after add data type "+t.name);
-            }
-            System.out.println("");
         }
     }
 
@@ -503,7 +487,6 @@ public class XuguDataSource extends JDBCDataSource
         for (JDBCExecutionContext context : getDefaultInstance().getAllContexts()) {
             setCurrentSchema(monitor, context, (XuguSchema) object);
         }
-//        setActiveSchemaName(object.getName());
 
         // Send notifications
         if (oldSelectedEntity != null) {
@@ -551,9 +534,6 @@ public class XuguDataSource extends JDBCDataSource
         } else if (adapter == DBCServerOutputReader.class) {
             return adapter.cast(outputReader);
         } 
-//        else if (adapter == DBAServerSessionManager.class) {
-//            return adapter.cast(new XuguServerSessionManager(getDefaultInstance().getDefaultContext(false)));
-//        }
         return super.getAdapter(adapter);
     }
 

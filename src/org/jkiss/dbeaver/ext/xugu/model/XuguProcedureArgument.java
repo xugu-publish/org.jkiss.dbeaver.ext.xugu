@@ -36,7 +36,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * OracleProcedureArgument
+ * XuguProcedureArgument
  */
 public class XuguProcedureArgument implements DBSProcedureParameter, DBSTypedObject
 {
@@ -76,37 +76,6 @@ public class XuguProcedureArgument implements DBSProcedureParameter, DBSTypedObj
         this.procedure = procedure;
         if(dbResult!=null) {
         	this.define = JDBCUtils.safeGetString(dbResult, "DEFINE");
-        	//需要手动处理Define
-        	
-//            this.name = JDBCUtils.safeGetString(dbResult, "ARGUMENT_NAME");
-//            this.position = JDBCUtils.safeGetInt(dbResult, "POSITION");
-//            this.dataLevel = JDBCUtils.safeGetInt(dbResult, "DATA_LEVEL");
-//            this.sequence = JDBCUtils.safeGetInt(dbResult, "SEQUENCE");
-//            this.mode = XuguParameterMode.getMode(JDBCUtils.safeGetString(dbResult, "IN_OUT"));
-//            final String dataType = JDBCUtils.safeGetString(dbResult, "DATA_TYPE");
-//            this.type = CommonUtils.isEmpty(dataType) ? null : XuguDataType.resolveDataType(
-//                monitor,
-//                procedure.getDataSource(),
-//                null,
-//                dataType);
-//            final String typeName = JDBCUtils.safeGetString(dbResult, "TYPE_NAME");
-//            final String typeOwner = JDBCUtils.safeGetString(dbResult, "TYPE_OWNER");
-//            this.packageTypeName = JDBCUtils.safeGetString(dbResult, "TYPE_SUBNAME");
-//            if (!CommonUtils.isEmpty(typeName) && !CommonUtils.isEmpty(typeOwner) && CommonUtils.isEmpty(this.packageTypeName)) {
-//                this.dataType = XuguDataType.resolveDataType(
-//                    monitor,
-//                    procedure.getDataSource(),
-//                    typeOwner,
-//                    typeName);
-//                if (this.dataType == null) {
-//                    this.packageTypeName = typeOwner + "." + typeName;
-//                }
-//            } else if (this.packageTypeName != null) {
-//                packageTypeName = typeName + "." + packageTypeName;
-//            }
-//            this.dataLength = JDBCUtils.safeGetInt(dbResult, "DATA_LENGTH");
-//            this.dataScale = JDBCUtils.safeGetInt(dbResult, "DATA_SCALE");
-//            this.dataPrecision = JDBCUtils.safeGetInt(dbResult, "DATA_PRECISION");
         }
         
     }

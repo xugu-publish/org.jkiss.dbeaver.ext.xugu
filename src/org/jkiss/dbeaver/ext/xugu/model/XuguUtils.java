@@ -140,51 +140,6 @@ public class XuguUtils {
         }
     }
 
-    public static String getSysUserViewName(DBRProgressMonitor monitor, XuguDataSource dataSource, String viewName)
-    {
-        String dbaView = "DBA_" + viewName;
-        if (dataSource.isViewAvailable(monitor, XuguConstants.SCHEMA_SYS, dbaView)) {
-            return XuguConstants.SCHEMA_SYS + "." + dbaView;
-        } else {
-            return XuguConstants.SCHEMA_SYS + ".USER_" + viewName;
-        }
-    }
-
-    public static String getSysCatalogHint(XuguDataSource dataSource)
-    {
-        return dataSource.isUseRuleHint() ? "/*+RULE*/" : "";
-    }
-
-    static <PARENT extends DBSObject> Object resolveLazyReference(
-        DBRProgressMonitor monitor,
-        PARENT parent,
-        DBSObjectCache<PARENT,?> cache,
-        DBSObjectLazy<?> referrer,
-        Object propertyId)
-        throws DBException
-    {
-        final Object reference = referrer.getLazyReference(propertyId);
-        if (reference instanceof String) {
-            Object object;
-            if (monitor != null) {
-                object = cache.getObject(
-                    monitor,
-                    parent,
-                    (String) reference);
-            } else {
-                object = cache.getCachedObject((String) reference);
-            }
-            if (object != null) {
-                return object;
-            } else {
-                log.warn("Object '" + reference + "' not found");
-                return reference;
-            }
-        } else {
-            return reference;
-        }
-    }
-
     //xfc 修改了获取对象状态的sql和逻辑
     public static boolean getObjectStatus(
         DBRProgressMonitor monitor,

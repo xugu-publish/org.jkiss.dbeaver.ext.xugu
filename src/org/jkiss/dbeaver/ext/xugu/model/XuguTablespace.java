@@ -49,7 +49,6 @@ import java.util.Map;
  * Xugu tablespace
  */
 public class XuguTablespace extends XuguGlobalObject implements DBPRefreshableObject
-//public class XuguTablespace extends XuguGlobalObject
 {
 
     public enum Status {
@@ -174,23 +173,23 @@ public class XuguTablespace extends XuguGlobalObject implements DBPRefreshableOb
         return media_Error;
     }
 
-    static class SegmentCache extends JDBCObjectCache<XuguTablespace, XuguSegment<XuguTablespace>> {
-        @Override
-        protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguTablespace owner) throws SQLException
-        {
-            final JDBCPreparedStatement dbStat = session.prepareStatement(
-                "SELECT * FROM " + XuguUtils.getSysUserViewName(session.getProgressMonitor(), owner.getDataSource(), "SEGMENTS") +
-                " WHERE TABLESPACE_NAME=? ORDER BY SEGMENT_NAME");
-            dbStat.setString(1, owner.getName());
-            return dbStat;
-        }
-
-        @Override
-        protected XuguSegment<XuguTablespace> fetchObject(@NotNull JDBCSession session, @NotNull XuguTablespace owner, @NotNull JDBCResultSet resultSet) throws SQLException, DBException
-        {
-            return new XuguSegment<>(session.getProgressMonitor(), owner, resultSet);
-        }
-    }
+//    static class SegmentCache extends JDBCObjectCache<XuguTablespace, XuguSegment<XuguTablespace>> {
+//        @Override
+//        protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguTablespace owner) throws SQLException
+//        {
+//            final JDBCPreparedStatement dbStat = session.prepareStatement(
+//                "SELECT * FROM " + XuguUtils.getSysUserViewName(session.getProgressMonitor(), owner.getDataSource(), "SEGMENTS") +
+//                " WHERE TABLESPACE_NAME=? ORDER BY SEGMENT_NAME");
+//            dbStat.setString(1, owner.getName());
+//            return dbStat;
+//        }
+//
+//        @Override
+//        protected XuguSegment<XuguTablespace> fetchObject(@NotNull JDBCSession session, @NotNull XuguTablespace owner, @NotNull JDBCResultSet resultSet) throws SQLException, DBException
+//        {
+//            return new XuguSegment<>(session.getProgressMonitor(), owner, resultSet);
+//        }
+//    }
 
 //    static Object resolveTablespaceReference(DBRProgressMonitor monitor, DBSObjectLazy<XuguDataSource> referrer, @Nullable Object propertyId) throws DBException
 //    {
