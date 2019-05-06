@@ -314,42 +314,6 @@ public class XuguSchedulerJob extends XuguSchemaObject implements XuguStatefulOb
 	@Override
 	public String getObjectDefinitionText(DBRProgressMonitor monitor, Map<String, Object> options) throws DBException {
 		return "ACTION STRING";
-//        if (action == null && monitor != null) {
-//        	monitor.beginTask("Load action for '" + this.getName() + "'...", 1);
-//        	try (final JDBCSession session = DBUtils.openMetaSession(monitor, this, "Load action for " + XuguObjectType.JOB + " '" + this.getName() + "'")) {
-//        		try (JDBCPreparedStatement dbStat = session.prepareStatement(
-//                        "SELECT JOB_ACTION FROM " + this.getDataSource().getRoleFlag() + "_JOBS " +
-//                            "WHERE DB_ID=? AND JOB_NAME=? ")) {
-//                    dbStat.setString(1, getDbID()+"" );
-//                    dbStat.setString(2, getName());
-//                    dbStat.setFetchSize(DBConstants.METADATA_FETCH_SIZE);
-//                    try (JDBCResultSet dbResult = dbStat.executeQuery()) {
-//                        StringBuilder actionBuilder = null;
-//                        int lineCount = 0;
-//                        while (dbResult.next()) {
-//                            if (monitor.isCanceled()) {
-//                                break;
-//                            }
-//                            final String line = dbResult.getString(1);
-//                            if (actionBuilder == null) {
-//                            	actionBuilder = new StringBuilder(4000);
-//                            }
-//                            actionBuilder.append(line);
-//                            lineCount++;
-//                            monitor.subTask("Line " + lineCount);
-//                        }
-//                        if (actionBuilder != null) {
-//                        	action = actionBuilder.toString().getBytes();
-//                        }
-//                    }
-//        		}
-//            } catch (SQLException e) {
-//                throw new DBCException(e, this.getDataSource());
-//            } finally {
-//                monitor.done();
-//            }
-//        }
-//        return action.toString();
 	}
 
 	@Override
