@@ -17,10 +17,12 @@
 package org.jkiss.dbeaver.ext.xugu.model;
 
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.osgi.util.NLS;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.core.CoreMessages;
 import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.model.XuguCharset;
 import org.jkiss.dbeaver.model.*;
@@ -44,8 +46,7 @@ import org.jkiss.utils.BeanUtils;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.StandardConstants;
 
-import com.xugu.pool.XgConnectionPoolDataSource;
-import com.xugu.pool.XgPooledConnection;
+//import com.xugu.outjar.OutJarClass;
 
 import java.io.PrintWriter;
 import java.sql.*;
@@ -64,7 +65,8 @@ public class XuguDataSource extends JDBCDataSource
     public JDBCRemoteInstance remoteInstance;
     public String purpose;
     private Thread daemon;
-    private JDBCSession session;
+    private JDBCSession metaSession;
+    private JDBCSession utilSession;
     
     final public SchemaCache schemaCache = new SchemaCache();
     final public DatabaseCache databaseCache = new DatabaseCache();
@@ -175,27 +177,34 @@ public class XuguDataSource extends JDBCDataSource
             this.connection = super.openConnection(monitor, remoteInstance, purpose);
             this.remoteInstance = remoteInstance;
             this.purpose = purpose;
-            DBPConnectionConfiguration connectionInfo = getContainer().getActualConnectionConfiguration();
-            Properties connectProps = getAllConnectionProperties(monitor, purpose, connectionInfo);
-            String url = getConnectionURL(connectionInfo);
-            
             if(daemon==null) {
             	daemon = new Thread(new Runnable() {
     				@Override
     				public void run() {
     					while(true) {
     						try {
-    							if(connection.isClosed() || (session!=null && session.getExecutionContext()!=null && session.getExecutionContext().getConnection(monitor).isClosed())) {
-    								log.info("Before recover"+connection.isClosed()+" inner conn:"+session.getExecutionContext().getConnection(monitor).isClosed());
-    								System.out.println("Before recover"+connection.isClosed()+" inner conn:"+session.getExecutionContext().getConnection(monitor).isClosed());
-    				                connection = DriverManager.getConnection(url, connectProps);
-    								session.getExecutionContext().reconnect(monitor);
-    								log.info("After recover "+connection.isClosed()+" inner conn:"+session.getExecutionContext().getConnection(monitor).isClosed());
-    								System.out.println("After recover "+connection.isClosed()+" inner conn:"+session.getExecutionContext().getConnection(monitor).isClosed());
-        						}
-    						} catch (SQLException | DBCException e) {
-    							System.out.println("After recover WWWWWWWWWrong");
+    							System.out.println("daemon running");
+    							if(metaSession!=null && metaSession.getExecutionContext()!=null) {
+    								Statement stmt = metaSession.getExecutionContext().getConnection(monitor).createStatement();
+        							stmt.executeQuery("select 1 from dual");
+        							stmt.close();
+    							}
+    							if(utilSession!=null && utilSession.getExecutionContext()!=null) {
+    								Statement stmt = utilSession.getExecutionContext().getConnection(monitor).createStatement();
+        							stmt.executeQuery("select 1 from dual");
+        							stmt.close();
+    							}
+    							Thread.sleep(5000);
+    						} catch (SQLException | InterruptedException e) {
+    							System.out.println("Connection down!");
     							e.printStackTrace();
+    						}finally {
+    							if(metaSession!=null) {
+    								metaSession.close();
+    							}
+    							if(utilSession!=null) {
+    								utilSession.close();
+    							}
     						}
     					}
     				}
@@ -393,6 +402,10 @@ public class XuguDataSource extends JDBCDataSource
         throws DBException {
         super.initialize(monitor);
 
+//        OutJarClass ooo = new OutJarClass();
+//        String tempStr = ooo.printInfo("world");
+//        System.out.println("WWWWWWWWWWWWTFFFFFFFFFF"+tempStr);
+//        log.info("WWWWWWWWWWWWTFFFFFFFFFF"+tempStr);
         DBPConnectionConfiguration connectionInfo = getContainer().getConnectionConfiguration();
         
         {
@@ -412,8 +425,10 @@ public class XuguDataSource extends JDBCDataSource
         }
         this.publicSchema = new XuguSchema(this, 1, XuguConstants.USER_PUBLIC);
         {
-        	JDBCSession session = DBUtils.openMetaSession(monitor, this, "Load data source meta info");
-            this.session = session;
+        	JDBCSession session = DBUtils.openMetaSession(monitor, this, "Check meta connection");
+            this.metaSession = session;
+            JDBCSession session2 = DBUtils.openUtilSession(monitor, this, "Check util connection");
+            this.utilSession = session2;
         }
         // Cache data types
         {
