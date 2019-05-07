@@ -69,7 +69,7 @@ public class XuguUtils {
         String objectFullName = DBUtils.getObjectFullName(object, DBPEvaluationContext.DDL);
         monitor.beginTask("Load sources for " + objectType + " '" + objectFullName + "'...", 1);
         Connection conn = object.getDataSource().getConnection();
-        String ddl = new Parsing().loadDDL((com.xugu.cloudjdbc.Connection) conn, object.getSchema().getName(), object.getName());
+        String ddl = new Parsing().loadDDL(conn, object.getSchema().getName(), object.getName());
         return ddl;
     }
 
