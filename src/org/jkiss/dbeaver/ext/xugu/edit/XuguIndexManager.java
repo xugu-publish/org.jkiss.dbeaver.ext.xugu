@@ -18,6 +18,7 @@
 package org.jkiss.dbeaver.ext.xugu.edit;
 
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.XuguMessages;
 import org.jkiss.dbeaver.ext.xugu.model.XuguTableColumn;
 import org.jkiss.dbeaver.ext.xugu.model.XuguTableIndex;
@@ -40,6 +41,7 @@ import org.jkiss.dbeaver.ui.UITask;
 import org.jkiss.dbeaver.ui.editors.object.struct.EditIndexPage;
 import org.jkiss.utils.CommonUtils;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -64,10 +66,14 @@ public class XuguIndexManager extends SQLIndexManager<XuguTableIndex, XuguTableP
         return new UITask<XuguTableIndex>() {
             @Override
             protected XuguTableIndex runTask() {
+            	List<DBSIndexType> indexTypes = new ArrayList<>();
+            	indexTypes.add(XuguConstants.INDEX_TYPE_BTREE);
+            	indexTypes.add(XuguConstants.INDEX_TYPE_RTREE);
+            	indexTypes.add(XuguConstants.INDEX_TYPE_FULL_TEXT);
                 EditIndexPage editPage = new EditIndexPage(
                     XuguMessages.edit_xugu_index_manager_dialog_title,
                     parent,
-                    Collections.singletonList(DBSIndexType.OTHER));
+                    indexTypes);
                 if (!editPage.edit()) {
                     return null;
                 }
