@@ -486,21 +486,14 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
             monitor.subTask("Cache table constraints");
             constraintCache.getObjects(monitor, this, null);
             foreignKeyCache.getObjects(monitor, this, null);
-//            monitor.subTask("Cache triggers");
-//            triggerCache.getAllObjects(monitor, this);
             monitor.subTask("Cache indexes");
             indexCache.getAllObjects(monitor, this);
-            monitor.subTask("Cache datatypes");
-//            dataTypeCache.getAllObjects(monitor, this);
             monitor.subTask("Cache sequences");
             sequenceCache.getAllObjects(monitor, this);
             monitor.subTask("Cache packages");
             packageCache.getAllObjects(monitor, this);
             monitor.subTask("Cache synonyms");
             synonymCache.getAllObjects(monitor, this);
-           
-//            monitor.subTask("Cache dblink");
-//            dbLinkCache.getAllObjects(monitor, this);
             monitor.subTask("Cache job");
             schedulerJobCache.getAllObjects(monitor, this);
         }
@@ -636,7 +629,8 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
             	sql.append(owner.roleFlag);
             	sql.append("_DATABASES WHERE DB_NAME='");
             	sql.append(owner.getDataSource().connection.getCatalog());
-                sql.append("'))");
+                sql.append("' AND SCHEMA_ID="
+                		+ owner.getId() + "))");
             }
             if(XuguConstants.LOG_PRINT_LEVEL<1) {
             	log.info("Xugu Plugin: Construct select table columns sql: "+sql.toString());
@@ -900,9 +894,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
             StringBuilder sql = new StringBuilder();
             sql.append("SELECT DISTINCT *, KEYS AS COL_NAME FROM ");
             sql.append(owner.roleFlag);
-            sql.append("_INDEXES i INNER JOIN (SELECT TABLE_ID, COL_NAME, COL_NO FROM ");
-            sql.append(owner.roleFlag);
-            sql.append("_COLUMNS) as x USING(TABLE_ID)");
+            sql.append("_INDEXES");
             sql.append(" WHERE DB_ID=(SELECT DB_ID FROM ");
         	sql.append(owner.roleFlag);
         	sql.append("_DATABASES WHERE DB_NAME='");
