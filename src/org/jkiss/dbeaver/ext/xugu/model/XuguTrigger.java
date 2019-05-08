@@ -38,7 +38,7 @@ import java.sql.ResultSet;
 import java.util.Map;
 
 /**
- * OracleTrigger
+ * XuguTrigger
  */
 public abstract class XuguTrigger<PARENT extends DBSObject> extends XuguObject<PARENT> implements DBSTrigger, DBPQualifiedObject, XuguSourceObject
 {
@@ -119,7 +119,7 @@ public abstract class XuguTrigger<PARENT extends DBSObject> extends XuguObject<P
         return objectType;
     }
 
-    @Property(viewable = true, order = 5)
+    @Property(viewable = true, editable = true, updatable = true, order = 5)
     public String getTriggerType()
     {
     	switch(triggerType) {
@@ -132,7 +132,11 @@ public abstract class XuguTrigger<PARENT extends DBSObject> extends XuguObject<P
     	}
     }
 
-    @Property(viewable = true, order = 6)
+    public void setTriggerType(int type) {
+    	this.triggerType = type;
+    }
+    
+    @Property(viewable = true, editable = true, updatable = true, order = 6)
     public String getTriggeringEvent()
     {
     	switch(triggeringEvent) {
@@ -145,6 +149,10 @@ public abstract class XuguTrigger<PARENT extends DBSObject> extends XuguObject<P
     	default:
     		return triggeringEvent+"";
     	}
+    }
+    
+    public void setTriggeringEvent(int event) {
+    	this.triggeringEvent = event;
     }
 
 //    @Property(viewable = true, order = 7)
