@@ -46,7 +46,7 @@ import org.jkiss.utils.BeanUtils;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.StandardConstants;
 
-//import com.xugu.outjar.OutJarClass;
+import com.xugu.outjar.OutJarClass;
 
 import java.io.PrintWriter;
 import java.sql.*;
@@ -774,11 +774,8 @@ public class XuguDataSource extends JDBCDataSource
         	sql.append(owner.roleFlag);
         	sql.append("_SCHEMAS");
         	if (forDB != null) {
-                sql.append(" where DB_ID=(SELECT DB_ID FROM ");
-                sql.append(owner.roleFlag);
-                sql.append("_DATABASES WHERE DB_NAME='");
-                sql.append(forDB.getName());
-                sql.append("')");
+                sql.append(" where DB_ID=");
+                sql.append(forDB.getID());
             }
         	JDBCStatement dbStat = session.prepareStatement(sql.toString());
 			return dbStat;
@@ -800,25 +797,27 @@ public class XuguDataSource extends JDBCDataSource
         @Override
 		public JDBCStatement prepareLookupStatement(@NotNull JDBCSession session, @NotNull XuguDataSource owner, XuguSchema schema, String name) throws SQLException {
             StringBuilder schemasQuery = new StringBuilder();
-            //过滤条件
-            DBSObjectFilter schemaFilters = owner.getContainer().getObjectFilter(XuguSchema.class, null, false);
+//            //过滤条件
+//            DBSObjectFilter schemaFilters = owner.getContainer().getObjectFilter(XuguSchema.class, null, false);
             String dbName = owner.connection.getCatalog();
         	//xfc 根据owner的用户角色选取不同的语句来查询schema
         	schemasQuery.append("SELECT * FROM ");
-        	if(owner.getRoleFlag()!=null && !"NULL".equals(owner.getRoleFlag())) {
-        		schemasQuery.append(owner.getRoleFlag());
-        	}else {
-        		schemasQuery.append("ALL");
-        	}
-        	schemasQuery.append("_SCHEMAS");
-        	schemasQuery.append(" WHERE DB_ID=(SELECT DB_ID FROM ");
-        	schemasQuery.append(owner.getRoleFlag());
-        	schemasQuery.append("_DATABASES WHERE DB_NAME='");
-        	schemasQuery.append(dbName);
-        	schemasQuery.append("')");
+        	try {
+	        	if(owner.getRoleFlag()!=null && !"NULL".equals(owner.getRoleFlag())) {
+	        		schemasQuery.append(owner.getRoleFlag());
+	        	}else {
+	        		schemasQuery.append("ALL");
+	        	}
+	        	schemasQuery.append("_SCHEMAS");
+	        	schemasQuery.append(" WHERE DB_ID=");
+				schemasQuery.append(owner.databaseCache.getObject(session.getProgressMonitor(), owner, dbName).getID());
+			} catch (DBException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
         	if(schema!=null) {
-        		schemasQuery.append(" AND SCHEMA_NAME = '");
-        		schemasQuery.append(schema.getName());
+        		schemasQuery.append(" AND SCHEMA_ID = '");
+        		schemasQuery.append(schema.getID());
         		schemasQuery.append("'");
         	}
             JDBCPreparedStatement dbStat = session.prepareStatement(schemasQuery.toString());
@@ -905,17 +904,18 @@ public class XuguDataSource extends JDBCDataSource
 			
 			StringBuilder sql = new StringBuilder("SELECT * FROM ");
 			String dbName = owner.connection.getCatalog();
-        	sql.append(owner.getRoleFlag());
-        	sql.append("_USERS");
-        	sql.append(" WHERE IS_ROLE=FALSE AND DB_ID=(SELECT DB_ID FROM ");
-        	sql.append(owner.getRoleFlag());
-        	sql.append("_DATABASES WHERE DB_NAME='");
-        	sql.append(dbName);
-        	sql.append("')");
+			try {
+				sql.append(owner.getRoleFlag());
+	        	sql.append("_USERS");
+	        	sql.append(" WHERE IS_ROLE=FALSE AND DB_ID=");
+				sql.append(owner.databaseCache.getObject(session.getProgressMonitor(), owner, dbName).getID());
+			} catch (DBException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
         	if(user!=null) {
-        		sql.append(" AND USER_NAME = '");
-        		sql.append(user.getName());
-        		sql.append("'");
+        		sql.append(" AND USER_ID =");
+        		sql.append(user.getUser_id());
         	}
         	
         	return session.prepareStatement(sql.toString());
@@ -940,14 +940,17 @@ public class XuguDataSource extends JDBCDataSource
         @Override
         protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguDataSource owner) throws SQLException {
         	StringBuilder sql = new StringBuilder();
-        	sql.append("SELECT * FROM ");
-        	sql.append(owner.getRoleFlag());
-        	sql.append("_USERS WHERE IS_ROLE=true");
-        	sql.append(" AND DB_ID=(SELECT DB_ID FROM ");
-        	sql.append(owner.getRoleFlag());
-        	sql.append("_DATABASES WHERE DB_NAME='");
-        	sql.append(owner.connection.getCatalog());
-        	sql.append("')");
+        	String dbName = owner.connection.getCatalog();
+        	try {
+	        	sql.append("SELECT * FROM ");
+	        	sql.append(owner.getRoleFlag());
+	        	sql.append("_USERS WHERE IS_ROLE=true");
+	        	sql.append(" AND DB_ID=");
+				sql.append(owner.databaseCache.getObject(session.getProgressMonitor(), owner, dbName).getID());
+			} catch (DBException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
         	return session.prepareStatement(sql.toString());      
         }
 

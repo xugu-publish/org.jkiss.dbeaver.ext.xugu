@@ -59,6 +59,7 @@ import java.util.List;
 public class XuguDatabase extends XuguGlobalObject
 {
     private XuguDataSource dataSource;
+    private int id;
     private String name;
     private Integer databaseSize;
     private String charset;
@@ -78,6 +79,7 @@ public class XuguDatabase extends XuguGlobalObject
     	super(dataSource, true);
         this.dataSource = dataSource;
         if (dbResult != null) {
+        	this.id = JDBCUtils.safeGetInt(dbResult, "DB_ID");
             this.name = JDBCUtils.safeGetString(dbResult, "DB_NAME");
             this.charset = JDBCUtils.safeGetString(dbResult, "CHAR_SET");
             this.timeZone = JDBCUtils.safeGetString(dbResult, "TIME_ZONE");
@@ -111,9 +113,15 @@ public class XuguDatabase extends XuguGlobalObject
         return dataSource;
     }
 
+    @Property(viewable = true, editable = false, order = 1)
+    public int getID()
+    {
+        return id;
+    }
+    
     @NotNull
     @Override
-    @Property(viewable = true, editable = true, order = 1)
+    @Property(viewable = true, editable = true, order = 2)
     public String getName()
     {
         return name;
@@ -124,7 +132,7 @@ public class XuguDatabase extends XuguGlobalObject
         this.name = name;
     }
     
-    @Property(viewable = true, editable=true, order=2)
+    @Property(viewable = true, editable=true, order=3)
     public String getCharset() {
     	return charset;
     }
@@ -133,7 +141,7 @@ public class XuguDatabase extends XuguGlobalObject
     	this.charset = charset;
     }
     
-    @Property(viewable = true, editable=true, order=3)
+    @Property(viewable = true, editable=true, order=4)
     public String getTimeZone(){
     	return timeZone;
     }
