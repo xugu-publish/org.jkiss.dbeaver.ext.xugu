@@ -170,11 +170,10 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
                 comment = JDBCUtils.queryString(
                     session,
                     "SELECT COMMENTS FROM "+this.getDataSource().getRoleFlag()+
-                    "_TABLES WHERE TABLE_NAME=? AND TABLE_TYPE=? AND DB_ID=(SELECT DB_ID FROM "+
-                    this.getDataSource().getRoleFlag()+"_DATABASES WHERE DB_NAME=?)",
-                    getName(),
+                    "_TABLES WHERE TABLE_ID=? AND TABLE_TYPE=? AND DB_ID=?",
+                    getID(),
                     tableType,
-                    this.getDataSource().getName());
+                    this.getSchema().getDBID(this.getSchema(), session));
                 if (comment == null) {
                     comment = "";
                 }
@@ -190,11 +189,9 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
         try {
             try (JDBCSession session = DBUtils.openMetaSession(monitor, this, "Load table column comments")) {
                 try (JDBCPreparedStatement stat = session.prepareStatement("SELECT COL_NAME,COMMENTS FROM "+
-            this.getDataSource().getRoleFlag()+"_COLUMNS cc WHERE cc.TABLE_ID=(SELECT TABLE_ID FROM "+
-                		this.getDataSource().getRoleFlag()+"_TABLES WHERE TABLE_NAME=? AND DB_ID=(SELECT DB_ID FROM "+
-            this.getDataSource().getRoleFlag()+"_DATABASES WHERE DB_NAME=?))")) {
-                    stat.setString(1, getName());
-                    stat.setString(2, this.getDataSource().getName());
+            this.getDataSource().getRoleFlag()+"_COLUMNS cc WHERE cc.TABLE_ID=? AND DB_ID=?")) {
+                    stat.setInt(1, getID());
+                    stat.setInt(2, this.getSchema().getDBID(this.getSchema(), session));
                     try (JDBCResultSet resultSet = stat.executeQuery()) {
                         while (resultSet.next()) {
                             String colName = resultSet.getString(1);
@@ -336,28 +333,26 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
         	if(owner.getType()==0) {
         		builder.append("SELECT *, tr.OBJ_ID AS TABLE_ID\nFROM ");
             	builder.append(owner.getDataSource().getRoleFlag());
-            	builder.append("_TRIGGERS tr WHERE SCHEMA_ID=(SELECT SCHEMA_ID FROM ");
-            	builder.append(owner.getDataSource().getRoleFlag());
-            	builder.append("_SCHEMAS WHERE SCHEMA_NAME=?) AND TABLE_ID=(SELECT TABLE_ID FROM ");
-            	builder.append(owner.getDataSource().getRoleFlag());
-            	builder.append("_TABLES WHERE TABLE_NAME=?)\n ORDER BY TRIG_NAME");
+            	builder.append("_TRIGGERS tr WHERE SCHEMA_ID=");
+            	builder.append(owner.getSchema().getDBID(owner.getSchema(), session));
+            	builder.append(" AND TABLE_ID=");
+            	builder.append(owner.getID());
+            	builder.append("\n ORDER BY TRIG_NAME");
         	}
         	//对象类型为view
         	else {
         		builder.append("SELECT *, tr.OBJ_ID AS VIEW_ID\nFROM ");
             	builder.append(owner.getDataSource().getRoleFlag());
-            	builder.append("_TRIGGERS tr WHERE SCHEMA_ID=(SELECT SCHEMA_ID FROM ");
-            	builder.append(owner.getDataSource().getRoleFlag());
-            	builder.append("_SCHEMAS WHERE SCHEMA_NAME=?) AND VIEW_ID=(SELECT VIEW_ID FROM ");
-            	builder.append(owner.getDataSource().getRoleFlag());
-            	builder.append("_VIEWS WHERE VIEW_NAME=?)\n ORDER BY TRIG_NAME");
+            	builder.append("_TRIGGERS tr WHERE SCHEMA_ID=");
+            	builder.append(owner.getSchema().getDBID(owner.getSchema(), session));
+            	builder.append("AND VIEW_ID=");
+            	builder.append(owner.getID());
+            	builder.append("\n ORDER BY TRIG_NAME");
         	}
         	if(XuguConstants.LOG_PRINT_LEVEL<1) {
             	log.info("Xugu Plugin: Construct select triggers sql: "+builder.toString());
             }
             JDBCPreparedStatement dbStat = session.prepareStatement(builder.toString());
-            dbStat.setString(1, owner.getSchema().getName());
-            dbStat.setString(2, owner.getName());
             return dbStat;
         }
 
@@ -376,11 +371,8 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
         	int i2 = cols.indexOf(" ON ");
         	StringBuilder sql = new StringBuilder();
         	sql.append("SELECT * FROM "+ owner.getDataSource().getRoleFlag() +"_COLUMNS WHERE ");
-    		sql.append("TABLE_ID=(SELECT TABLE_ID FROM " + owner.getDataSource().getRoleFlag() + "_TABLES WHERE TABLE_NAME='");
-    		sql.append(owner.getName());
-    		sql.append("' AND SCHEMA_ID='");
-    		sql.append(owner.getSchema().getId());
-    		sql.append("')");
+    		sql.append("TABLE_ID=");
+    		sql.append(owner.getID());
         	//指定了特殊字段则仅查询指定字段，若没有则直接查该表的所有列
         	if(i1!=-1) {
         		cols = cols.substring(i1+4, i2);
