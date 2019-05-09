@@ -25,7 +25,9 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.utils.CommonUtils;
 
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * XuguTableTrigger
@@ -35,11 +37,13 @@ public class XuguTrigger extends XuguTriggerBase<XuguTableBase>
     private static final Log log = Log.getLog(XuguTrigger.class);
 
     private XuguSchema ownerSchema;
-
+    private List<String> includeCols;
+    
     public XuguTrigger(XuguTableBase table, String name)
     {
         super(table, name);
         this.ownerSchema = table.getSchema();
+        includeCols = new ArrayList<String>();
     }
 
     public XuguTrigger(
@@ -48,8 +52,15 @@ public class XuguTrigger extends XuguTriggerBase<XuguTableBase>
     {
         super(table, dbResult);
         this.ownerSchema = table.getSchema();
+        includeCols = new ArrayList<String>();
     }
 
+    @Property(viewable = true, order = 3)
+    public String getObjName()
+    {
+        return parent.getName();
+    }
+    
     @Override
     @Property(viewable = true, order = 4)
     public XuguTableBase getTable()
@@ -67,10 +78,17 @@ public class XuguTrigger extends XuguTriggerBase<XuguTableBase>
     {
         return parent.triggerCache.getChildren(monitor, parent, this);
     }
-
+    
+    public List<String> getIncludeColumns(){
+    	return includeCols;
+    }
+    
+    public void setIncludeColumns(List<String> cols) {
+    	this.includeCols = cols;
+    }
+    
 	@Override
 	public void setObjectDefinitionText(String source) {
-		// TODO Auto-generated method stub
 		super.setObjectDefinitionText(source);
 	}
 

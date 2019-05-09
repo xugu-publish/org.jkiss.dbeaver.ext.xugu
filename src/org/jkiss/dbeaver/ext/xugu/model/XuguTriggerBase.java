@@ -1,19 +1,3 @@
-/*
- * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2017 Serge Rider (serge@jkiss.org)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.jkiss.dbeaver.ext.xugu.model;
 
 import org.jkiss.code.NotNull;
@@ -72,13 +56,11 @@ public abstract class XuguTriggerBase<PARENT extends DBSObject> extends XuguObje
     private int triggerTime;
     private int obj_id;
     private String refName;
-//    private String whenClause;
     private XuguObjectStatus status;
     private boolean valid;
     private boolean deleted;
     private String define;
-//    private ActionType actionType;
-//    private String sourceDeclaration;
+    private String allDefine;
 
     public XuguTriggerBase(PARENT parent, String name)
     {
@@ -103,8 +85,8 @@ public abstract class XuguTriggerBase<PARENT extends DBSObject> extends XuguObje
         }
         this.status = JDBCUtils.safeGetBoolean(dbResult, "ENABLE")?XuguObjectStatus.ENABLED:XuguObjectStatus.DISABLED;
         this.valid = JDBCUtils.safeGetBoolean(dbResult, "VALID");
-        String allDef = JDBCUtils.safeGetString(dbResult, "DEFINE");
-        this.define = allDef.substring(allDef.indexOf("BEGIN\n"));
+        this.allDefine = JDBCUtils.safeGetString(dbResult, "DEFINE");
+        this.define = allDefine.substring(allDefine.indexOf("BEGIN"));
     }
 
     @NotNull
@@ -115,10 +97,10 @@ public abstract class XuguTriggerBase<PARENT extends DBSObject> extends XuguObje
         return super.getName();
     }
 
-    @Property(viewable = true, order = 5)
-    public BaseObjectType getObjectType()
+    @Property(viewable = true, order = 2)
+    public String getObjectType()
     {
-        return objectType;
+        return objectType.toString();
     }
 
     public void setObjectType(String type) {
@@ -146,12 +128,22 @@ public abstract class XuguTriggerBase<PARENT extends DBSObject> extends XuguObje
     public String getTriggeringEvent()
     {
     	switch(triggeringEvent) {
+    	case 0:
+    		return "";
     	case 1:
     		return "INSERT";
     	case 2:
     		return "UPDATE";
+    	case 3:
+    		return "INSERT,UPDATE";
     	case 4:
     		return "DELETE";
+    	case 5:
+    		return "INSERT,DELETE";
+    	case 6:
+    		return "UPDATE,DELETE";
+    	case 7:
+    		return "INSERT,DELETE,UPDATE";
     	default:
     		return "NOT SUPPORTED "+triggeringEvent;
     	}
@@ -180,43 +172,13 @@ public abstract class XuguTriggerBase<PARENT extends DBSObject> extends XuguObje
     	this.triggerTime = time;
     }
 
-//    @Property(viewable = true, order = 7)
-//    public String getColumnName()
-//    {
-//        return columnName;
-//    }
-
-//    @Property(order = 8)
-//    public String getRefNames()
-//    {
-//        return refNames;
-//    }
-//
-//    @Property(order = 9)
-//    public String getWhenClause()
-//    {
-//        return whenClause;
-//    }
-//
-//    @Property(viewable = true, order = 10)
-//    public XuguObjectStatus getStatus()
-//    {
-//        return status;
-//    }
-
     @Nullable
     @Override
-    @Property(multiline = true, order = 11)
+    @Property(multiline = true, order = 8)
     public String getDescription()
     {
-        return define;
+        return allDefine;
     }
-
-//    @Property(viewable = true, order = 12)
-//    public ActionType getActionType()
-//    {
-//        return actionType;
-//    }
 
     @Override
     public XuguSourceType getSourceType()
@@ -228,9 +190,6 @@ public abstract class XuguTriggerBase<PARENT extends DBSObject> extends XuguObje
     @Property(hidden = true, editable = true, updatable = true, order = -1)
     public String getObjectDefinitionText(DBRProgressMonitor monitor, Map<String, Object> options) throws DBException
     {
-//        if (define == null && monitor != null) {
-//            define = XuguUtils.getSource(monitor, this, false, false);
-//        }
         return this.define;
     }
 

@@ -1126,7 +1126,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
     /**
      *	视图缓存
      */
-    static class ViewCache extends JDBCStructLookupCache<XuguSchema, XuguView, XuguTableColumn> {
+    public static class ViewCache extends JDBCStructLookupCache<XuguSchema, XuguView, XuguTableColumn> {
     	
     	ViewCache()
         {
