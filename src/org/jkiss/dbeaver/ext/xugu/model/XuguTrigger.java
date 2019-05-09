@@ -68,6 +68,7 @@ public abstract class XuguTrigger<PARENT extends DBSObject> extends XuguObject<P
     private BaseObjectType objectType;
     private int triggerType;
     private int triggeringEvent;
+    private int triggerTime;
 //    private String columnName;
     private int obj_id;
     
@@ -94,6 +95,7 @@ public abstract class XuguTrigger<PARENT extends DBSObject> extends XuguObject<P
         this.objectType = BaseObjectType.TABLE;
         this.triggerType = JDBCUtils.safeGetInt(dbResult, "TRIG_TYPE");
         this.triggeringEvent = JDBCUtils.safeGetInt(dbResult, "TRIG_EVENT");
+        this.triggerTime = JDBCUtils.safeGetInt(dbResult, "TRIG_TIME");
         //根据obj_id获取？是否代表列id？
         if(parent.getType()==0) {
         	this.obj_id = JDBCUtils.safeGetInt(dbResult, "TABLE_ID");
@@ -102,7 +104,8 @@ public abstract class XuguTrigger<PARENT extends DBSObject> extends XuguObject<P
         }
         this.status = JDBCUtils.safeGetBoolean(dbResult, "ENABLE")?XuguObjectStatus.ENABLED:XuguObjectStatus.DISABLED;
         this.valid = JDBCUtils.safeGetBoolean(dbResult, "VALID");
-        this.define = JDBCUtils.safeGetString(dbResult, "DEFINE");
+        String allDef = JDBCUtils.safeGetString(dbResult, "DEFINE");
+        this.define = allDef.substring(allDef.indexOf("BEGIN\n"));
     }
 
     @NotNull
@@ -119,16 +122,16 @@ public abstract class XuguTrigger<PARENT extends DBSObject> extends XuguObject<P
         return objectType;
     }
 
-    @Property(viewable = true, editable = true, updatable = true, order = 5)
+    @Property(viewable = true, editable = false, updatable = false, order = 5)
     public String getTriggerType()
     {
     	switch(triggerType) {
     	case 1:
-    		return "ROW";
+    		return "FOR EACH ROW";
     	case 2:
-    		return "STATEMENT";
+    		return "FOR STATEMENT";
 		default:
-			return triggerType+"";
+			return "NOT SUPPORTED "+triggerType;
     	}
     }
 
@@ -136,23 +139,42 @@ public abstract class XuguTrigger<PARENT extends DBSObject> extends XuguObject<P
     	this.triggerType = type;
     }
     
-    @Property(viewable = true, editable = true, updatable = true, order = 6)
+    @Property(viewable = true, editable = false, updatable = false, order = 6)
     public String getTriggeringEvent()
     {
     	switch(triggeringEvent) {
     	case 1:
-    		return "insert";
+    		return "INSERT";
     	case 2:
-    		return "update";
+    		return "UPDATE";
     	case 4:
-    		return "delete";
+    		return "DELETE";
     	default:
-    		return triggeringEvent+"";
+    		return "NOT SUPPORTED "+triggeringEvent;
     	}
     }
     
     public void setTriggeringEvent(int event) {
     	this.triggeringEvent = event;
+    }
+    
+    @Property(viewable = true, editable = false, updatable = false, order = 7)
+    public String getTriggerTime()
+    {
+    	switch(triggerTime) {
+    	case 1:
+    		return "BEFORE";
+    	case 2:
+    		return "REPLACE";
+    	case 4:
+    		return "AFTER";
+    	default:
+    		return "NOT SUPPORTED "+triggerTime;
+    	}
+    }
+    
+    public void setTriggerTime(int time) {
+    	this.triggerTime = time;
     }
 
 //    @Property(viewable = true, order = 7)
