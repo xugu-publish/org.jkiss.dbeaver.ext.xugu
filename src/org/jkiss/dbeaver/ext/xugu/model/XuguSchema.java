@@ -588,7 +588,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
 			sql.append(owner.getDBID(owner, session));
         	//当有检索条件时 只查询指定表 用于新建表之后的刷新工作
         	if(object!=null) {
-        		sql.append(" AND TABLE_ID = '");
+        		sql.append(" AND TABLE_ID = ");
         		sql.append(object.getID());
         	}
         	if(XuguConstants.LOG_PRINT_LEVEL<1) {
