@@ -28,19 +28,19 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import java.sql.ResultSet;
 
 /**
- * OracleTriggerColumn
+ * XuguTriggerColumn
  */
 public class XuguTriggerColumn extends AbstractTriggerColumn
 {
     private static final Log log = Log.getLog(XuguTriggerColumn.class);
 
-    private XuguTrigger trigger;
+    private XuguTriggerBase trigger;
     private String name;
     private XuguTableColumn tableColumn;
 
     public XuguTriggerColumn(
         DBRProgressMonitor monitor,
-        XuguTrigger trigger,
+        XuguTriggerBase trigger,
         XuguTableColumn tableColumn,
         ResultSet dbResult) throws DBException
     {
@@ -50,14 +50,14 @@ public class XuguTriggerColumn extends AbstractTriggerColumn
         //不存在col_list列 是否等价于define？
     }
 
-    XuguTriggerColumn(XuguTrigger trigger, XuguTriggerColumn source)
+    XuguTriggerColumn(XuguTriggerBase trigger, XuguTriggerColumn source)
     {
         this.trigger = trigger;
         this.tableColumn = source.tableColumn;
     }
 
     @Override
-    public XuguTrigger getTrigger()
+    public XuguTriggerBase getTrigger()
     {
         return trigger;
     }
@@ -91,7 +91,7 @@ public class XuguTriggerColumn extends AbstractTriggerColumn
     }
 
     @Override
-    public XuguTrigger getParentObject()
+    public XuguTriggerBase getParentObject()
     {
         return trigger;
     }

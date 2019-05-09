@@ -191,7 +191,7 @@ public class XuguUtils {
 			Collection<XuguSequence> seqList = null;
 			Collection<XuguPackage> pacList = null;
 			Collection<XuguProcedureStandalone> procList = null;
-			Collection<XuguTableTrigger> triList = null;
+			Collection<XuguTrigger> triList = null;
 			List<XuguTableColumn> colList = null;
 			switch(Type) {
 			case "TABLE":
@@ -276,8 +276,8 @@ public class XuguUtils {
 			}
 			if(triList!=null && triList.size()>0) {
 				String res = "";
-				Iterator<XuguTableTrigger> it = triList.iterator();
-				XuguTableTrigger trigger = it.next();
+				Iterator<XuguTrigger> it = triList.iterator();
+				XuguTrigger trigger = it.next();
 				while(it.hasNext()) {
 					res += trigger.getTable().getName()+"."+trigger.getName()+",";
 				}

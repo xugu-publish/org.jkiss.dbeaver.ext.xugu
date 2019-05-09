@@ -246,7 +246,7 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
     }
 
     @Association
-    public Collection<XuguTableTrigger> getTriggers(DBRProgressMonitor monitor)
+    public Collection<XuguTrigger> getTriggers(DBRProgressMonitor monitor)
         throws DBException
     {
         return triggerCache.getAllObjects(monitor, this);
@@ -318,7 +318,7 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
         }
     }
 
-    static class TriggerCache extends JDBCStructCache<XuguTableBase, XuguTableTrigger, XuguTriggerColumn> {
+    static class TriggerCache extends JDBCStructCache<XuguTableBase, XuguTrigger, XuguTriggerColumn> {
         TriggerCache()
         {
             super("TRIGGER_NAME");
@@ -334,7 +334,7 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
         		builder.append("SELECT *, tr.OBJ_ID AS TABLE_ID\nFROM ");
             	builder.append(owner.getDataSource().getRoleFlag());
             	builder.append("_TRIGGERS tr WHERE SCHEMA_ID=");
-            	builder.append(owner.getSchema().getDBID(owner.getSchema(), session));
+            	builder.append(owner.getSchema().getID());
             	builder.append(" AND TABLE_ID=");
             	builder.append(owner.getID());
             	builder.append("\n ORDER BY TRIG_NAME");
@@ -344,8 +344,8 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
         		builder.append("SELECT *, tr.OBJ_ID AS VIEW_ID\nFROM ");
             	builder.append(owner.getDataSource().getRoleFlag());
             	builder.append("_TRIGGERS tr WHERE SCHEMA_ID=");
-            	builder.append(owner.getSchema().getDBID(owner.getSchema(), session));
-            	builder.append("AND VIEW_ID=");
+            	builder.append(owner.getSchema().getID());
+            	builder.append(" AND VIEW_ID=");
             	builder.append(owner.getID());
             	builder.append("\n ORDER BY TRIG_NAME");
         	}
@@ -357,13 +357,13 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
         }
 
         @Override
-        protected XuguTableTrigger fetchObject(@NotNull JDBCSession session, @NotNull XuguTableBase owner, @NotNull JDBCResultSet resultSet) throws SQLException, DBException
+        protected XuguTrigger fetchObject(@NotNull JDBCSession session, @NotNull XuguTableBase owner, @NotNull JDBCResultSet resultSet) throws SQLException, DBException
         {
-            return new XuguTableTrigger(owner, resultSet);
+            return new XuguTrigger(owner, resultSet);
         }
 
         @Override
-        protected JDBCStatement prepareChildrenStatement(@NotNull JDBCSession session, @NotNull XuguTableBase owner, @Nullable XuguTableTrigger forObject) throws SQLException
+        protected JDBCStatement prepareChildrenStatement(@NotNull JDBCSession session, @NotNull XuguTableBase owner, @Nullable XuguTrigger forObject) throws SQLException
         {
             //通过获取description中的字段名来查询触发器的列信息
         	String cols = forObject.getDescription();
@@ -371,7 +371,8 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
         	int i2 = cols.indexOf(" ON ");
         	StringBuilder sql = new StringBuilder();
         	sql.append("SELECT * FROM "+ owner.getDataSource().getRoleFlag() +"_COLUMNS WHERE ");
-    		sql.append("TABLE_ID=");
+        	//columns系统表中只有table_id字段 不需要区分view
+        	sql.append("TABLE_ID=");
     		sql.append(owner.getID());
         	//指定了特殊字段则仅查询指定字段，若没有则直接查该表的所有列
         	if(i1!=-1) {
@@ -396,7 +397,7 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
         }
 
         @Override
-        protected XuguTriggerColumn fetchChild(@NotNull JDBCSession session, @NotNull XuguTableBase owner, @NotNull XuguTableTrigger parent, @NotNull JDBCResultSet dbResult) throws SQLException, DBException
+        protected XuguTriggerColumn fetchChild(@NotNull JDBCSession session, @NotNull XuguTableBase owner, @NotNull XuguTrigger parent, @NotNull JDBCResultSet dbResult) throws SQLException, DBException
         {
             XuguTableBase refTable = XuguTableBase.findTable(
                 session.getProgressMonitor(),
