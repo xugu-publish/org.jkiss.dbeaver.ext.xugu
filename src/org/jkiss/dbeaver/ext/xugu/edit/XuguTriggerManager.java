@@ -146,6 +146,7 @@ public class XuguTriggerManager extends SQLTriggerManager<XuguTrigger, XuguTable
             	log.info("Xugu Plugin: Construct create trigger sql: "+source);
             }
             actions.add(new SQLDatabasePersistAction("Create trigger", source, true)); //$NON-NLS-2$
+            trigger.setPersisted(true);
         }
     }
     

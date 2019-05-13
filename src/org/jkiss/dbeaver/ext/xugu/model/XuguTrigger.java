@@ -79,11 +79,12 @@ public class XuguTrigger extends XuguTriggerBase<XuguTableBase>
     {
     	Collection<XuguTriggerColumn> res = new ArrayList<>();
     	Collection<XuguTableColumn> tCols = parent.getAttributes(monitor);
-    	if(this.includeCols!=null) {
+    	if(this.isPersisted()==false && this.includeCols!=null) {
     		if(this.includeCols.size()!=0) {
     			Iterator<XuguTableColumn> it = tCols.iterator();
     			while(it.hasNext()) {
     				XuguTableColumn tempCol = it.next();
+    				tempCol.setPersisted(true);
     				if(includeCols.contains(tempCol.getName())) {
     					res.add(new XuguTriggerColumn(tempCol.getName(), this, tempCol));
     				}
@@ -92,6 +93,7 @@ public class XuguTrigger extends XuguTriggerBase<XuguTableBase>
     			Iterator<XuguTableColumn> it = tCols.iterator();
     			while(it.hasNext()) {
     				XuguTableColumn tempCol = it.next();
+    				tempCol.setPersisted(true);
     				res.add(new XuguTriggerColumn(tempCol.getName(), this, tempCol));
     			}
     		}

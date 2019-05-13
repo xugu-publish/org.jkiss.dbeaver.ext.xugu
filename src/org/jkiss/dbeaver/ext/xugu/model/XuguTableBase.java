@@ -367,8 +367,8 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
         {
             //通过获取description中的字段名来查询触发器的列信息
         	String cols = forObject.getDescription();
-        	int i1 = cols.indexOf(" OF ");
-        	int i2 = cols.indexOf(" ON ");
+        	int i1 = cols.toUpperCase().indexOf(" OF ");
+        	int i2 = cols.toUpperCase().indexOf(" ON ");
         	StringBuilder sql = new StringBuilder();
         	sql.append("SELECT * FROM "+ owner.getDataSource().getRoleFlag() +"_COLUMNS WHERE ");
         	//columns系统表中只有table_id字段 不需要区分view
@@ -381,7 +381,7 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
         		sql.append(" AND COL_NAME IN(");
         		for(int i=0; i<col.length; i++) {
         			sql.append("'");
-        			sql.append(col[i]);
+        			sql.append(col[i].replaceAll("\"", ""));
         			sql.append("'");
         			if(i!=col.length-1) {
         				sql.append(",");
