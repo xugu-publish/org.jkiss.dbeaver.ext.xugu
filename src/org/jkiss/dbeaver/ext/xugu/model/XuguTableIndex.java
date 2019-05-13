@@ -216,6 +216,7 @@ public class XuguTableIndex extends JDBCTableIndex<XuguSchema, XuguTablePhysical
 		return is_unique;
 	}
 
+	@Property(viewable = true, order = 6)
 	public boolean isIs_local() {
 		return is_local;
 	}
