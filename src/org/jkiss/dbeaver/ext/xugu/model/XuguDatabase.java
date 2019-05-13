@@ -54,7 +54,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * GenericCatalog
+ * XuguDatabase
  */
 public class XuguDatabase extends XuguGlobalObject
 {

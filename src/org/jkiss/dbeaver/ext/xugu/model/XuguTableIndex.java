@@ -116,7 +116,6 @@ public class XuguTableIndex extends JDBCTableIndex<XuguSchema, XuguTablePhysical
         	this.nologging = JDBCUtils.safeGetBoolean(dbResult, "INDEX_ID");
         	this.valid = JDBCUtils.safeGetBoolean(dbResult, "INDEX_ID");
         }
-//        this.tablespace = JDBCUtils.safeGetString(dbResult, "TABLESPACE_NAME");
     }
 
     public XuguTableIndex(XuguSchema schema, XuguTablePhysical parent, String name, boolean unique, DBSIndexType indexType)

@@ -67,9 +67,11 @@ public class XuguUtils {
         String objectFullName = DBUtils.getObjectFullName(object, DBPEvaluationContext.DDL);
         monitor.beginTask("Load sources for " + objectType + " '" + objectFullName + "'...", 1);
         Connection conn = object.getDataSource().getConnection();
+        log.info("get new object");
         Parsing pp = new Parsing();
-        log.info("over little pppppppppppppppppp");
+        log.info("use out method");
         String ddl = pp.loadDDL(conn, object.getSchema().getName(), object.getName());
+        log.info("out method done");
         return ddl;
     }
 
