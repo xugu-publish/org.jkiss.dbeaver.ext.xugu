@@ -230,7 +230,6 @@
 
     <extension point="org.jkiss.dbeaver.objectManager">
     	<manager class="org.jkiss.dbeaver.ext.xugu.edit.XuguUserManager" objectType="org.jkiss.dbeaver.ext.xugu.model.XuguUser"/>
-        <manager class="org.jkiss.dbeaver.ext.xugu.edit.XuguDataTypeManager" objectType="org.jkiss.dbeaver.ext.xugu.model.XuguDataType"/>
         <manager class="org.jkiss.dbeaver.ext.xugu.edit.XuguDatabaseManager" objectType="org.jkiss.dbeaver.ext.xugu.model.XuguDatabase"/>
         <manager class="org.jkiss.dbeaver.ext.xugu.edit.XuguSchemaManager" objectType="org.jkiss.dbeaver.ext.xugu.model.XuguSchema"/>
         <manager class="org.jkiss.dbeaver.ext.xugu.edit.XuguTableManager" objectType="org.jkiss.dbeaver.ext.xugu.model.XuguTable"/>
