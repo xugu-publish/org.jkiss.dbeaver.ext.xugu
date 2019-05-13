@@ -371,35 +371,6 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         XuguUDT udt = udtCache.getObject(monitor, this, name, XuguUDT.class);
         return udt;
     }
-    
-    /**
-     * 从触发器缓存中获取全部的触发器信息
-     * @param monitor 监控
-     * @return list 触发器列表
-     * @throws DBException
-     */
-//    @Association
-//    public Collection<XuguSchemaTrigger> getTriggers(DBRProgressMonitor monitor)
-//        throws DBException
-//    {
-//        return triggerCache.getAllObjects(monitor, this);
-//    }
-
-    
-//    @Association
-//    public Collection<XuguTableTrigger> getTableTriggers(DBRProgressMonitor monitor)
-//            throws DBException
-//    {
-//        List<XuguTableTrigger> allTableTriggers = new ArrayList<>();
-//        for (XuguTableBase table : tableCache.getAllObjects(monitor, this)) {
-//            Collection<XuguTableTrigger> triggers = table.getTriggers(monitor);
-//            if (!CommonUtils.isEmpty(triggers)) {
-//                allTableTriggers.addAll(triggers);
-//            }
-//        }
-//        allTableTriggers.sort(Comparator.comparing(XuguTrigger::getName));
-//        return allTableTriggers;
-//    }
 
     /**
      * 从数据库连接缓存中获取全部的数据库连接信息

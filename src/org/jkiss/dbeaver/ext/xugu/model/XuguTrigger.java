@@ -27,10 +27,11 @@ import org.jkiss.utils.CommonUtils;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 /**
- * XuguTableTrigger
+ * XuguTrigger
  */
 public class XuguTrigger extends XuguTriggerBase<XuguTableBase>
 {
@@ -76,7 +77,28 @@ public class XuguTrigger extends XuguTriggerBase<XuguTableBase>
     @Association
     public Collection<XuguTriggerColumn> getColumns(DBRProgressMonitor monitor) throws DBException
     {
-        return parent.triggerCache.getChildren(monitor, parent, this);
+    	Collection<XuguTriggerColumn> res = new ArrayList<>();
+    	Collection<XuguTableColumn> tCols = parent.getAttributes(monitor);
+    	if(this.includeCols!=null) {
+    		if(this.includeCols.size()!=0) {
+    			Iterator<XuguTableColumn> it = tCols.iterator();
+    			while(it.hasNext()) {
+    				XuguTableColumn tempCol = it.next();
+    				if(includeCols.contains(tempCol.getName())) {
+    					res.add(new XuguTriggerColumn(tempCol.getName(), this, tempCol));
+    				}
+    			}
+    		}else {
+    			Iterator<XuguTableColumn> it = tCols.iterator();
+    			while(it.hasNext()) {
+    				XuguTableColumn tempCol = it.next();
+    				res.add(new XuguTriggerColumn(tempCol.getName(), this, tempCol));
+    			}
+    		}
+    		return res;
+    	}else {
+    		return parent.triggerCache.getChildren(monitor, parent, this);
+    	}
     }
     
     public List<String> getIncludeColumns(){

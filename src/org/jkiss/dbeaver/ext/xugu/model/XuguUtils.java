@@ -35,13 +35,10 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.DBSObjectLazy;
 import org.jkiss.utils.CommonUtils;
-import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 
 import com.xugu.ddl.Parsing;
+import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 
-//import com.xugu.ddl.Parsing;
-//
-//import utils.Util;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -69,7 +66,9 @@ public class XuguUtils {
         String objectFullName = DBUtils.getObjectFullName(object, DBPEvaluationContext.DDL);
         monitor.beginTask("Load sources for " + objectType + " '" + objectFullName + "'...", 1);
         Connection conn = object.getDataSource().getConnection();
-        String ddl = new Parsing().loadDDL(conn, object.getSchema().getName(), object.getName());
+        Parsing pp = new Parsing();
+        log.info("over little pppppppppppppppppp");
+        String ddl = pp.loadDDL(conn, object.getSchema().getName(), object.getName());
         return ddl;
     }
 

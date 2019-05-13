@@ -192,7 +192,7 @@ public abstract class XuguTriggerBase<PARENT extends DBSObject> extends XuguObje
     {
         return this.define;
     }
-
+    
     @Override
     public void setObjectDefinitionText(String source)
     {

@@ -154,44 +154,24 @@ public class XuguTriggerManager extends SQLTriggerManager<XuguTrigger, XuguTable
     	private XuguTrigger trigger;
     	private XuguTableBase table;
         private Text nameText;
-        private Combo typeCombo;
-        private Combo objListCombo;
+        private Text parentTypeText;
+        private Text parentNameText;
         private Combo triggerTypeCombo;
         private Button triggerEventInsert;
         private Button triggerEventUpdate;
         private Button triggerEventDelete;
         private Button triggerTimingBefore;
         private Button triggerTimingAfter;
-        private List<String> tableList;
-        private List<String> viewList;
         private Table colListTable;
-        private List<XuguTableColumn> colList;
+        private Collection<XuguTableColumn> colList;
         
         public NewTriggerDialog(Shell parentShell, XuguTableBase table, DBRProgressMonitor monitor)
         {
             super(parentShell);
             this.monitor = monitor;
-            this.trigger = new XuguTrigger(table, ""); 
             this.table = table;
             XuguSchema parent = table.getSchema();
-            tableList = new ArrayList<>();
-            viewList = new ArrayList<>();
             colList = new ArrayList<>();
-            try {
-				Collection<XuguTable> allTables = parent.getTables(monitor);
-				Iterator<XuguTable> it1 = allTables.iterator();
-				while(it1.hasNext()) {
-					tableList.add(it1.next().getName());
-				}
-				Collection<XuguView> allViews = parent.getViews(monitor);
-				Iterator<XuguView> it2 = allViews.iterator();
-				while(it2.hasNext()) {
-					viewList.add(it2.next().getName());
-				}
-			} catch (DBException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
         }
 
         public XuguTrigger getTrigger()
@@ -222,31 +202,15 @@ public class XuguTriggerManager extends SQLTriggerManager<XuguTrigger, XuguTable
             nameText = UIUtils.createLabelText(composite, "Trigger name", null);
             nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             
-            typeCombo = UIUtils.createLabelCombo(composite, "OBJECT TYPE", 0);
-            typeCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-            typeCombo.add("TABLE");
-            typeCombo.add("VIEW");
-            typeCombo.addSelectionListener(new SelectionListener() {
-				@Override
-				public void widgetSelected(SelectionEvent e) {
-					objListCombo.removeAll();
-					if(typeCombo.getText().equals("TABLE")) {
-						for(String str:tableList) {
-							objListCombo.add(str);
-						}
-					}else if(typeCombo.getText().equals("VIEW")){
-						for(String str:viewList) {
-							objListCombo.add(str);
-						}
-					}
-				}
-				@Override
-				public void widgetDefaultSelected(SelectionEvent e) {
-				}
-            });
+            parentTypeText = UIUtils.createLabelText(composite, "PARENT TYPE", null);
+            parentTypeText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+            parentTypeText.setText(table.getType()==0?"TABLE":"VIEW");
+            parentTypeText.setEditable(false);
             
-            objListCombo = UIUtils.createLabelCombo(composite, "OBJECT LIST", 0);
-            objListCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+            parentNameText = UIUtils.createLabelText(composite, "PARENT NAME", null);
+            parentNameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+            parentNameText.setText(table.getName());
+            parentNameText.setEditable(false);
             
             Composite eventBox = UIUtils.createPlaceholder(composite, 4, 1);
             eventBox.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -291,30 +255,19 @@ public class XuguTriggerManager extends SQLTriggerManager<XuguTrigger, XuguTable
             triggerEventUpdate.addSelectionListener(new SelectionListener() {
 				@Override
 				public void widgetSelected(SelectionEvent e) {
-					String objType = typeCombo.getText();
-					String objName = objListCombo.getText();
+					String objType = parentTypeText.getText();
+					String objName = parentNameText.getText();
 					if(!triggerEventUpdate.getSelection()) {
 						//清空列信息
 						colListTable.removeAll();
 					}
 					else{
 						if(objType!=null && !"".equals(objType) && objName!=null && !"".equals(objName)){
-							if("TABLE".equals(objType)) {
-								try {
-									XuguTable targetTable = table.getSchema().getTable(monitor, objName);
-									colList = table.getSchema().tableCache.getChildren(monitor, table.getSchema(), targetTable);
-								} catch (DBException e1) {
-									// TODO Auto-generated catch block
-									e1.printStackTrace();
-								}
-							}else if("VIEW".equals(objType)) {
-								try {
-									XuguView targetView = table.getSchema().getView(monitor, objName);
-									colList = table.getSchema().viewCache.getChildren(monitor, table.getSchema(), targetView);
-								} catch (DBException e1) {
-									// TODO Auto-generated catch block
-									e1.printStackTrace();
-								}
+							try {
+								colList = table.getAttributes(monitor);
+							} catch (DBException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
 							}
 							//重新加载数据
 							if(colList.size()!=0) {
@@ -346,8 +299,11 @@ public class XuguTriggerManager extends SQLTriggerManager<XuguTrigger, XuguTable
         protected void okPressed()
         {
         	String source = "\nBEGIN\n\nEND";
-            trigger.setName(DBObjectNameCaseTransformer.transformObjectName(trigger, nameText.getText()));
-            trigger.setObjectType(typeCombo.getText());
+            //设置父对象信息
+            this.trigger = new XuguTrigger(table, ""); 
+
+			trigger.setName(DBObjectNameCaseTransformer.transformObjectName(trigger, nameText.getText()));
+            trigger.setObjectType(parentTypeText.getText());
             trigger.setTriggerTime(Integer.parseInt(triggerTimingBefore.getData().toString()));
             if(triggerTypeCombo.getSelectionIndex()>-1) {
             	trigger.setTriggerType(triggerTypeCombo.getSelectionIndex()+1);

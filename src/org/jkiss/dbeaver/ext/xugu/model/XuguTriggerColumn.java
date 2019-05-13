@@ -49,6 +49,13 @@ public class XuguTriggerColumn extends AbstractTriggerColumn
         this.name = JDBCUtils.safeGetString(dbResult, "COL_NAME");
         //不存在col_list列 是否等价于define？
     }
+    
+    public XuguTriggerColumn(String name, XuguTriggerBase trigger,
+            XuguTableColumn tableColumn) {
+    	this.name = name;
+    	this.trigger = trigger;
+        this.tableColumn = tableColumn;
+    }
 
     XuguTriggerColumn(XuguTriggerBase trigger, XuguTriggerColumn source)
     {
