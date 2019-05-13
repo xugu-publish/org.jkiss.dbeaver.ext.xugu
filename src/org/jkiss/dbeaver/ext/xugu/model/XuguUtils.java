@@ -41,6 +41,7 @@ import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collection;
@@ -72,6 +73,21 @@ public class XuguUtils {
         return ddl;
     }
 
+    public static int getDBIdleTime(Connection conn) {
+    	try {
+    		Statement stmt = conn.createStatement();
+			ResultSet rs = stmt.executeQuery("SHOW MAX_IDLE_TIME");
+			if(rs.next()) {
+				return rs.getInt(1);
+			}
+			return -1;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return -1;
+		}
+    }
+    
     public static void setCurrentSchema(JDBCSession session, String schema) throws SQLException {
         JDBCUtils.executeSQL(session,
             "SET CURRENT_SCHEMA=" + DBUtils.getQuotedIdentifier(session.getDataSource(), schema));

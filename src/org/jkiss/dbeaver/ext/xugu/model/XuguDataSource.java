@@ -67,6 +67,7 @@ public class XuguDataSource extends JDBCDataSource
 
     public JDBCRemoteInstance remoteInstance;
     public String purpose;
+    private int def_time;
     private Thread daemon;
     private JDBCSession metaSession;
     private JDBCSession utilSession;
@@ -180,6 +181,15 @@ public class XuguDataSource extends JDBCDataSource
             this.connection = super.openConnection(monitor, remoteInstance, purpose);
             this.remoteInstance = remoteInstance;
             this.purpose = purpose;
+            int max_idle_time = XuguUtils.getDBIdleTime(connection);
+            this.def_time = XuguConstants.DEFAULT_SLEEP_TIME;
+            if(def_time>max_idle_time) {
+            	if(max_idle_time>0) {
+            		def_time = max_idle_time*1000/2;
+            	}else {
+            		log.warn("Max_idle_time setting has error, use default sleep time");
+            	}
+            }
             if(daemon==null) {
             	daemon = new Thread(new Runnable() {
     				@Override
@@ -197,7 +207,7 @@ public class XuguDataSource extends JDBCDataSource
         							stmt.executeQuery("select 1 from dual");
         							stmt.close();
     							}
-    							Thread.sleep(5000);
+    							Thread.sleep(def_time);
     						} catch (SQLException | InterruptedException e) {
     							System.out.println("Connection down!");
     							e.printStackTrace();
