@@ -27,7 +27,11 @@ import org.jkiss.dbeaver.ext.xugu.model.XuguUserAuthority;
 import org.jkiss.dbeaver.ui.UIUtils;
 import org.jkiss.dbeaver.ui.editors.AbstractDatabaseObjectEditor;
 import org.jkiss.dbeaver.ui.editors.ControlPropertyCommandListener;
-
+/**
+ * @author Maple4Real
+ * 权限管理辅助界面
+ * 被用于设置用户或角色的权限界面
+ */
 public class XuguAuthorityEditorBase{
 	private XuguUserEditorGeneral userEditor;
 	private XuguRoleEditor roleEditor;

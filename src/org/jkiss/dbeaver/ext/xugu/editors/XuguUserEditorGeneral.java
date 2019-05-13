@@ -57,7 +57,8 @@ import java.util.List;
 import java.util.Vector;
 
 /**
- * XuguUserEditorGeneral
+ * @author Maple4Real
+ * 用户属性界面衍生类
  */
 public class XuguUserEditorGeneral extends XuguUserEditorAbstract
 {

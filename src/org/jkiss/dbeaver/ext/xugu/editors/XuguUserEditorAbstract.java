@@ -35,7 +35,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 /**
- * MySQLUserEditorAbstract
+ * @author Maple4Real
+ * 用户属性界面基类
  */
 public abstract class XuguUserEditorAbstract extends AbstractDatabaseObjectEditor<XuguUser>
 {
