@@ -52,7 +52,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Xugu table column manager
+ * @author Maple4Real
+ * 表字段管理器
+ * 进行字段的创建，修改和删除（均相当于修改表结构）
  */
 public class XuguTableColumnManager extends SQLTableColumnManager<XuguTableColumn, XuguTableBase> implements DBEObjectRenamer<XuguTableColumn> {
 

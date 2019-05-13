@@ -38,7 +38,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * XuguProcedureManager
+ * @author Maple4Real
+ * 存储过程管理器
+ * 进行存储过程的创建和删除（修改等同于创建并替换）
  */
 public class XuguProcedureManager extends SQLObjectEditor<XuguProcedureStandalone, XuguSchema> {
 

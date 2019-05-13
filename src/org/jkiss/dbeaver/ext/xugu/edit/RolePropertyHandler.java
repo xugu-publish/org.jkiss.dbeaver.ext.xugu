@@ -4,7 +4,11 @@ import org.jkiss.dbeaver.ext.xugu.model.XuguRole;
 import org.jkiss.dbeaver.ext.xugu.model.XuguUser;
 import org.jkiss.dbeaver.model.edit.prop.DBEPropertyHandler;
 import org.jkiss.dbeaver.model.edit.prop.DBEPropertyReflector;
-
+/**
+ * @author Maple4Real
+ * 角色属性处理器
+ * 将界面逻辑与处理逻辑进行映射
+ */
 public enum RolePropertyHandler implements DBEPropertyHandler<XuguRole>, DBEPropertyReflector<XuguRole> {
     NAME,
     ROLE_LIST,

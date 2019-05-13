@@ -32,7 +32,9 @@ import org.jkiss.dbeaver.ui.editors.object.struct.EditForeignKeyPage;
 import org.jkiss.utils.CommonUtils;
 
 /**
- * Xugu foreign key manager
+ * @author Maple4Real
+ * 外键管理器
+ * 进行外键的增加
  */
 public class XuguForeignKeyManager extends SQLForeignKeyManager<XuguTableForeignKey, XuguTableBase> {
 

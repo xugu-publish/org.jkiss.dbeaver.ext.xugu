@@ -47,7 +47,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Xugu index manager
+ * @author Maple4Real
+ * 索引管理器
+ * 进行索引的增加和删除
  */
 public class XuguIndexManager extends SQLIndexManager<XuguTableIndex, XuguTablePhysical> {
 

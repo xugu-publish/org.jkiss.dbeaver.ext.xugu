@@ -23,8 +23,10 @@ import org.jkiss.dbeaver.model.edit.prop.DBEPropertyReflector;
 import org.jkiss.utils.CommonUtils;
 
 /**
-* User property handler
-*/
+ * @author Maple4Real
+ * 用户属性处理器
+ * 将界面逻辑与处理逻辑进行映射
+ */
 public enum UserPropertyHandler implements DBEPropertyHandler<XuguUser>, DBEPropertyReflector<XuguUser> {
     NAME,
     HOST,

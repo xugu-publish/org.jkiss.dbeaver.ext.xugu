@@ -51,6 +51,12 @@ import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.ui.UITask;
 import org.jkiss.dbeaver.ui.UIUtils;
 
+/**
+ * @author Maple4Real
+ * 二级分区管理器
+ * 进行二级分区的创建和删除，修改仅支持设置是否在线
+ * 包含一个内部界面类，用于进行属性设定
+ */
 public class XuguTableSubPartitionManager extends SQLObjectEditor<XuguTableSubPartition, XuguTablePhysical>{
 	private String dataFileDesc;
 	@Override

@@ -24,6 +24,11 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author Maple4Real
+ * 序列管理器
+ * 进行序列的创建，修改和删除
+ */
 public class XuguSequenceManager extends SQLObjectEditor<XuguSequence, XuguSchema> {
 
     @Override

@@ -71,7 +71,10 @@ import java.util.regex.Pattern;
 import java.util.Iterator;
 
 /**
- * XuguTableTriggerManager
+ * @author Maple4Real
+ * 触发器管理器
+ * 进行触发器的创建和删除，修改相当于创建并替换
+ * 包含一个内部界面类，用于进行属性设定
  */
 public class XuguTriggerManager extends SQLTriggerManager<XuguTrigger, XuguTableBase> {
 	private final static Pattern PATTERN_TRIGGER = Pattern.compile("(TRIGGER)", Pattern.CASE_INSENSITIVE);

@@ -32,7 +32,12 @@ import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.ui.UITask;
 import org.jkiss.dbeaver.ui.UIUtils;
 import org.jkiss.dbeaver.ui.editors.object.struct.EntityEditPage;
-
+/**
+ * @author Maple4Real
+ * 同义词管理器
+ * 进行同义词的创建和删除，不支持修改
+ * 包含一个内部界面类，用于进行属性设定
+ */
 public class XuguSynonymManager extends SQLObjectEditor<XuguSynonym, XuguSchema> implements DBEObjectRenamer<XuguSynonym> {
 	@Override
     public long getMakerOptions(DBPDataSource dataSource)

@@ -47,7 +47,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Xugu table manager
+ * @author Maple4Real
+ * 表、视图管理器
+ * 进行表、视图的创建，修改和删除
  */
 public class XuguTableManager extends SQLTableManager<XuguTable, XuguSchema> implements DBEObjectRenamer<XuguTable> {
 

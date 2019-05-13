@@ -37,6 +37,12 @@ import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.ui.UITask;
 import org.jkiss.dbeaver.ui.UIUtils;
 
+/**
+ * @author Maple4Real
+ * 表空间管理器
+ * 进行表空间的创建，修改和删除
+ * 包含一个内部界面类，用于进行属性设定
+ */
 public class XuguTablespaceManager extends SQLObjectEditor<XuguTablespace, XuguDataSource> implements DBEObjectRenamer<XuguTablespace> {
 	private String dataFileDesc;
 	@Override

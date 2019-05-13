@@ -59,7 +59,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * XuguSchemaManager
+ * @author Maple4Real
+ * 模式管理器
+ * 进行模式的创建和删除，修改仅支持重命名
+ * 包含一个内部界面类，用于进行属性设定
  */
 public class XuguSchemaManager extends SQLObjectEditor<XuguSchema, XuguDataSource> implements DBEObjectRenamer<XuguSchema> {
 

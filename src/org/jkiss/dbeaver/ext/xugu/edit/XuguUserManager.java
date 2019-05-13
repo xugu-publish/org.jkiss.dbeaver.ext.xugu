@@ -55,7 +55,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * XuguUserManager
+ * @author Maple4Real
+ * 用户管理器
+ * 进行用户的创建，修改和删除
+ * 包含一个内部界面类，用于进行属性设定
  */
 public class XuguUserManager extends SQLObjectEditor<XuguUser, XuguDataSource> implements DBEObjectMaker<XuguUser, XuguDataSource>, DBECommandFilter<XuguUser> {
 

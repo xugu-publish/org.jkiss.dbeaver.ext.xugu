@@ -45,7 +45,9 @@ import java.util.regex.Pattern;
 import javax.swing.text.Utilities;
 
 /**
- * XuguPackageManager
+ * @author Maple4Real
+ * 包管理器
+ * 进行包的创建和删除（修改等同于创建并替换）
  */
 public class XuguPackageManager extends SQLObjectEditor<XuguPackage, XuguSchema> {
 	private final static Pattern PATTERN_OR = Pattern.compile("(OR)", Pattern.CASE_INSENSITIVE);

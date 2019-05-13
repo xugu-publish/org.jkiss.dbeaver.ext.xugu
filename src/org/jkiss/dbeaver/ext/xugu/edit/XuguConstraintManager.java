@@ -39,7 +39,9 @@ import org.jkiss.dbeaver.ui.UITask;
 import org.jkiss.dbeaver.ui.editors.object.struct.EditConstraintPage;
 import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 /**
- * Xugu constraint manager
+ * @author Maple4Real
+ * 约束管理器
+ * 进行约束的增加删除和修改
  */
 public class XuguConstraintManager extends SQLConstraintManager<XuguTableConstraint, XuguTableBase> {
 

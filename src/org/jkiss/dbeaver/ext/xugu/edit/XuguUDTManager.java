@@ -35,6 +35,11 @@ import org.jkiss.dbeaver.ui.UITask;
 import org.jkiss.dbeaver.ui.UIUtils;
 import org.jkiss.dbeaver.ui.editors.object.struct.EntityEditPage;
 
+/**
+ * @author Maple4Real
+ * 自定义类型管理器
+ * 进行自定义类型的创建和删除，不支持修改
+ */
 public class XuguUDTManager extends SQLObjectEditor<XuguUDT, XuguSchema>{
 	@Override
     public long getMakerOptions(DBPDataSource dataSource)

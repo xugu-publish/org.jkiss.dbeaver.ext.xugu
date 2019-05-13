@@ -18,7 +18,11 @@ import org.jkiss.dbeaver.model.impl.edit.SQLDatabasePersistAction;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.sql.SQLUtils;
 import org.jkiss.utils.CommonUtils;
-
+/**
+ * @author Maple4Real
+ * 角色属性修改逻辑
+ * 根据界面上设置的用户相关属性生成指定数据库操作action
+ */
 public class XuguCommandChangeRole extends DBECommandComposite<XuguRole, RolePropertyHandler> {
 
     protected XuguCommandChangeRole(XuguRole role)
@@ -53,7 +57,7 @@ public class XuguCommandChangeRole extends DBECommandComposite<XuguRole, RolePro
             }
             actions.add(new SQLDatabasePersistAction("Create role", sql));
         }
-        //修改用户权限
+        //修改角色权限
         else {
         	StringBuilder script = new StringBuilder();
             //对权限做额外处理

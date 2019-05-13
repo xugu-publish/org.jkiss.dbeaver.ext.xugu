@@ -39,7 +39,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 生成修改用户 command
+ * @author Maple4Real
+ * 用户属性修改逻辑
+ * 根据界面上设置的用户相关属性生成指定数据库操作action
  */
 public class XuguCommandChangeUser extends DBECommandComposite<XuguUser, UserPropertyHandler> {
 

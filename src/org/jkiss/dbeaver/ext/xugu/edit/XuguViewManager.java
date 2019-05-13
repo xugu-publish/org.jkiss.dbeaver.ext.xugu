@@ -39,7 +39,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * XuguViewManager
+ * @author Maple4Real
+ * 视图管理器
+ * 进行视图的创建和删除，修改相当于创建并替换
  */
 public class XuguViewManager extends SQLObjectEditor<XuguView, XuguSchema> {
 
