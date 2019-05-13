@@ -22,10 +22,22 @@
   		<artifactId>org.osgi.core</artifactId>
   		<version>4.2.0</version>
   	</dependency>
+  	<!--  
+  	<dependency>
+  		<groupId>com.xugu.ddl</groupId>
+  		<artifactId>xugu-table-ddl</artifactId>
+  		<version>1.0</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>com.xugu.permission</groupId>
+  		<artifactId>xugu-permission-meta</artifactId>
+  		<version>1.0</version>
+  	</dependency>
   	<dependency>
   		<groupId>com.xugu</groupId>
-  		<artifactId>ddl</artifactId>
-  		<version>1.0.0</version>
+  		<artifactId>outjar</artifactId>
+  		<version>1.0</version>
   	</dependency>
+  	-->
   </dependencies>
 </project>
