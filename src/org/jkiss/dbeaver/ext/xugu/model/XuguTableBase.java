@@ -246,7 +246,10 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
     public Collection<XuguTrigger> getTriggers(DBRProgressMonitor monitor)
         throws DBException
     {
-        return triggerCache.getAllObjects(monitor, this);
+    	if(this.isPersisted()) {
+    		return triggerCache.getAllObjects(monitor, this);
+    	}
+    	return null;
     }
 
     @Override
@@ -325,7 +328,7 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
         @Override
         protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguTableBase owner) throws SQLException
         {
-        	StringBuilder builder = new StringBuilder();
+    		StringBuilder builder = new StringBuilder();
         	//对象类型为table
         	if(owner.getType()==0) {
         		builder.append("SELECT *, tr.OBJ_ID AS TABLE_ID\nFROM ");
