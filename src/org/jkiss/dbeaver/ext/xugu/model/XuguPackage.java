@@ -55,8 +55,6 @@ public class XuguPackage extends XuguSchemaObject
     private boolean valid;
     private String sourceDeclaration;
     private String sourceDefinition;
-    private String spec;
-    private String body;
 
     public XuguPackage(
         XuguSchema schema,

@@ -1,7 +1,6 @@
 package org.jkiss.dbeaver.ext.xugu.edit;
 
 import org.jkiss.dbeaver.ext.xugu.model.XuguRole;
-import org.jkiss.dbeaver.ext.xugu.model.XuguUser;
 import org.jkiss.dbeaver.model.edit.prop.DBEPropertyHandler;
 import org.jkiss.dbeaver.model.edit.prop.DBEPropertyReflector;
 /**

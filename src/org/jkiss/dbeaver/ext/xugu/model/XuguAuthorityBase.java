@@ -1,13 +1,6 @@
 package org.jkiss.dbeaver.ext.xugu.model;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Vector;
-
-import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.struct.DBSObject;
-
-import com.xugu.permission.LoadPermission;
 
 /**
  * @author Maple4Real
@@ -29,5 +22,9 @@ public abstract class XuguAuthorityBase<PARENT extends DBSObject> extends XuguOb
 
 	public boolean isDatabase() {
 		return this.isDatabase;
+	}
+	
+	public String getParentName() {
+		return this.parentName;
 	}
 }

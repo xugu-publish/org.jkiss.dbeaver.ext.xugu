@@ -16,7 +16,7 @@
  */
 package org.jkiss.dbeaver.ext.xugu.model;
 
-import org.jkiss.dbeaver.Log;
+//import org.jkiss.dbeaver.Log;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.impl.DBObjectNameCaseTransformer;
 import org.jkiss.dbeaver.model.impl.jdbc.struct.JDBCTableConstraint;
@@ -33,7 +33,7 @@ import java.util.List;
  */
 public abstract class XuguTableConstraintBase extends JDBCTableConstraint<XuguTableBase> {
 
-    private static final Log log = Log.getLog(XuguTableConstraintBase.class);
+//    private static final Log log = Log.getLog(XuguTableConstraintBase.class);
 
     private XuguObjectStatus status;
     private List<XuguTableConstraintColumn> columns;

@@ -17,15 +17,11 @@
 package org.jkiss.dbeaver.ext.xugu.model;
 
 import org.jkiss.code.NotNull;
-import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.ext.xugu.model.source.XuguStatefulObject;
 import org.jkiss.dbeaver.model.DBConstants;
-import org.jkiss.dbeaver.model.DBPEvaluationContext;
 import org.jkiss.dbeaver.model.DBPScriptObjectExt;
 import org.jkiss.dbeaver.model.DBUtils;
-import org.jkiss.dbeaver.model.edit.DBEPersistAction;
-import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.exec.jdbc.JDBCPreparedStatement;
 import org.jkiss.dbeaver.model.exec.jdbc.JDBCResultSet;
 import org.jkiss.dbeaver.model.exec.jdbc.JDBCSession;
@@ -33,7 +29,6 @@ import org.jkiss.dbeaver.model.exec.jdbc.JDBCStatement;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
 import org.jkiss.dbeaver.model.impl.jdbc.cache.JDBCObjectCache;
 import org.jkiss.dbeaver.model.meta.Association;
-import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSObjectState;
 
@@ -48,11 +43,6 @@ import java.util.Map;
  *   作业信息类，包含作业相关的基本信息，以及作业参数缓存
  */
 public class XuguSchedulerJob extends XuguSchemaObject implements XuguStatefulObject, DBPScriptObjectExt {
-
-    private static final String CAT_SETTINGS = "Settings";
-    private static final String CAT_STATISTICS = "Statistics";
-    private static final String CAT_EVENTS = "Events";
-    private static final String CAT_ADVANCED = "Advanced";
 
     private int jobID;
 	private int dbID;

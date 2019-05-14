@@ -42,8 +42,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.swing.text.Utilities;
-
 /**
  * @author Maple4Real
  * 包管理器

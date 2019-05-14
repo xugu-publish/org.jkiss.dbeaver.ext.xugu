@@ -16,31 +16,20 @@
  */
 package org.jkiss.dbeaver.ext.xugu.model;
 
-import org.jkiss.code.NotNull;
-import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.ext.xugu.model.XuguSchema.TableCache;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPRefreshableObject;
 import org.jkiss.dbeaver.model.DBPSaveableObject;
-import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.access.DBAUser;
-import org.jkiss.dbeaver.model.impl.AbstractObjectCache;
 import org.jkiss.dbeaver.model.impl.DBObjectNameCaseTransformer;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
-import org.jkiss.dbeaver.model.impl.jdbc.cache.JDBCStructLookupCache;
-import org.jkiss.dbeaver.model.meta.Association;
 import org.jkiss.dbeaver.model.meta.Property;
-//import org.jkiss.dbeaver.model.meta.IPropertyCacheValidator;
-//import org.jkiss.dbeaver.model.meta.LazyProperty;
-//import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 
 import java.sql.Statement;
 import com.xugu.permission.LoadPermission;
 
-//import org.jkiss.dbeaver.model.struct.DBSObjectLazy;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -49,7 +38,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Vector;
 
 /**
@@ -60,7 +48,6 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
 {
     private static final Log log = Log.getLog(XuguUser.class);
     
-    private Vector<Object> authorityList;
 	private Vector<String> authorityKey;
 	private Vector<String> authorityValue;
 	

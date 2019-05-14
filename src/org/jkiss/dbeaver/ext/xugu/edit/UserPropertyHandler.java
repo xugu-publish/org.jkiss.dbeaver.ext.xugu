@@ -17,11 +17,8 @@
 package org.jkiss.dbeaver.ext.xugu.edit;
 
 import org.jkiss.dbeaver.ext.xugu.model.XuguUser;
-import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.edit.prop.DBEPropertyHandler;
 import org.jkiss.dbeaver.model.edit.prop.DBEPropertyReflector;
-import org.jkiss.utils.CommonUtils;
-
 /**
  * @author Maple4Real
  * 用户属性处理器

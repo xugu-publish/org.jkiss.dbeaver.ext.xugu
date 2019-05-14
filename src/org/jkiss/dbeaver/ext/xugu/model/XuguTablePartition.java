@@ -17,12 +17,7 @@
 
 package org.jkiss.dbeaver.ext.xugu.model;
 
-import org.jkiss.dbeaver.model.meta.Association;
-import org.jkiss.utils.CommonUtils;
-
 import java.sql.ResultSet;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * @author Maple4Real

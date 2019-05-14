@@ -31,7 +31,6 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.sql.SQLUtils;
 import org.jkiss.utils.CommonUtils;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -173,7 +172,6 @@ public class XuguCommandChangeUser extends DBECommandComposite<XuguUser, UserPro
 				}
 			}
 			String schema = "";
-			String objectType = "";
 			String object = "";
 			String realTargetName = "";
 			String[] newAuthorities = null;
@@ -221,7 +219,6 @@ public class XuguCommandChangeUser extends DBECommandComposite<XuguUser, UserPro
             			it = oldAuthorities2.iterator();
             			newAuthorities = (String[]) entry.getValue();
             			schema = getProperties().get("TARGET_SCHEMA").toString();
-            			objectType = getProperties().get("TARGET_TYPE").toString();
             			object = getProperties().get("TARGET_OBJECT").toString();
             			realTargetName = "\""+schema+"\".\""+object+"\"";
             			//遍历新权限列表，若旧权限不存在于其中，则做revoke操作
@@ -263,7 +260,6 @@ public class XuguCommandChangeUser extends DBECommandComposite<XuguUser, UserPro
             			newAuthorities = (String[]) entry.getValue();
             			schema = getProperties().get("TARGET_SCHEMA").toString();
             			object = getProperties().get("TARGET_OBJECT").toString();
-            			objectType = getProperties().get("TARGET_TYPE").toString();
             			String subObject = getProperties().get("SUB_TARGET_OBJECT").toString();
             			String subObjectType = getProperties().get("SUB_TARGET_TYPE").toString();
             			realTargetName = "\""+schema+"\".\""+object+"\""+".\""+subObject+"\"";
@@ -316,6 +312,8 @@ public class XuguCommandChangeUser extends DBECommandComposite<XuguUser, UserPro
                 			}
             			}
             			break;
+				default:
+					break;
             	}
             }
         }

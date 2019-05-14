@@ -6,17 +6,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.jkiss.dbeaver.DBException;
-import org.jkiss.dbeaver.ext.xugu.XuguMessages;
 import org.jkiss.dbeaver.ext.xugu.XuguUtils;
 import org.jkiss.dbeaver.ext.xugu.model.XuguRole;
 import org.jkiss.dbeaver.ext.xugu.model.XuguRoleAuthority;
 import org.jkiss.dbeaver.model.edit.DBEPersistAction;
 import org.jkiss.dbeaver.model.edit.prop.DBECommandComposite;
-import org.jkiss.dbeaver.model.exec.DBCSession;
 import org.jkiss.dbeaver.model.impl.edit.SQLDatabasePersistAction;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
-import org.jkiss.dbeaver.model.sql.SQLUtils;
 import org.jkiss.utils.CommonUtils;
 /**
  * @author Maple4Real
@@ -59,7 +55,6 @@ public class XuguCommandChangeRole extends DBECommandComposite<XuguRole, RolePro
         }
         //修改角色权限
         else {
-        	StringBuilder script = new StringBuilder();
             //对权限做额外处理
             //库级权限
             Collection<XuguRoleAuthority> oldAuthorities = getObject().getRoleDatabaseAuthorities();
@@ -76,7 +71,6 @@ public class XuguCommandChangeRole extends DBECommandComposite<XuguRole, RolePro
 				}
 			}
 			String schema = "";
-			String objectType = "";
 			String object = "";
 			String realTargetName = "";
 			String[] newAuthorities = null;
@@ -124,7 +118,6 @@ public class XuguCommandChangeRole extends DBECommandComposite<XuguRole, RolePro
             			it = oldAuthorities2.iterator();
             			newAuthorities = (String[]) entry.getValue();
             			schema = getProperties().get("TARGET_SCHEMA").toString();
-            			objectType = getProperties().get("TARGET_TYPE").toString();
             			object = getProperties().get("TARGET_OBJECT").toString();
             			realTargetName = "\""+schema+"\".\""+object+"\"";
             			//遍历新权限列表，若旧权限不存在于其中，则做revoke操作
@@ -166,7 +159,6 @@ public class XuguCommandChangeRole extends DBECommandComposite<XuguRole, RolePro
             			newAuthorities = (String[]) entry.getValue();
             			schema = getProperties().get("TARGET_SCHEMA").toString();
             			object = getProperties().get("TARGET_OBJECT").toString();
-            			objectType = getProperties().get("TARGET_TYPE").toString();
             			String subObject = getProperties().get("SUB_TARGET_OBJECT").toString();
             			String subObjectType = getProperties().get("SUB_TARGET_TYPE").toString();
             			realTargetName = "\""+schema+"\".\""+object+"\""+".\""+subObject+"\"";
@@ -219,6 +211,8 @@ public class XuguCommandChangeRole extends DBECommandComposite<XuguRole, RolePro
                 			}
             			}
             			break;
+					default:
+						break;
             	}
             }
         }

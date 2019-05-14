@@ -1,6 +1,5 @@
 package org.jkiss.dbeaver.ext.xugu.edit;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -20,29 +19,16 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.ext.xugu.XuguMessages;
-import org.jkiss.dbeaver.ext.xugu.edit.XuguSchemaManager.NewUserDialog;
 import org.jkiss.dbeaver.ext.xugu.XuguConstants;
-import org.jkiss.dbeaver.ext.xugu.model.XuguDataSource;
-import org.jkiss.dbeaver.ext.xugu.model.XuguSchema;
-import org.jkiss.dbeaver.ext.xugu.model.XuguTableBase;
 import org.jkiss.dbeaver.ext.xugu.model.XuguTableColumn;
-import org.jkiss.dbeaver.ext.xugu.model.XuguTableConstraint;
 import org.jkiss.dbeaver.ext.xugu.model.XuguTablePartition;
 import org.jkiss.dbeaver.ext.xugu.model.XuguTablePhysical;
-import org.jkiss.dbeaver.ext.xugu.model.XuguTablespace;
-import org.jkiss.dbeaver.ext.xugu.model.XuguUser;
 import org.jkiss.dbeaver.model.DBPDataSource;
-import org.jkiss.dbeaver.model.DBPEvaluationContext;
-import org.jkiss.dbeaver.model.DBUtils;
-import org.jkiss.dbeaver.model.edit.DBECommand;
 import org.jkiss.dbeaver.model.edit.DBECommandContext;
-import org.jkiss.dbeaver.model.edit.DBEObjectRenamer;
 import org.jkiss.dbeaver.model.edit.DBEPersistAction;
-import org.jkiss.dbeaver.model.exec.DBCSession;
 import org.jkiss.dbeaver.model.impl.DBObjectNameCaseTransformer;
 import org.jkiss.dbeaver.model.impl.DBSObjectCache;
 import org.jkiss.dbeaver.model.impl.edit.SQLDatabasePersistAction;
@@ -59,7 +45,6 @@ import org.jkiss.dbeaver.ui.UIUtils;
  * 包含一个内部界面类，用于进行属性设定
  */
 public class XuguTablePartitionManager extends SQLObjectEditor<XuguTablePartition, XuguTablePhysical>{
-	private String dataFileDesc;
 	@Override
 	public long getMakerOptions(DBPDataSource dataSource) {
 		// TODO Auto-generated method stub

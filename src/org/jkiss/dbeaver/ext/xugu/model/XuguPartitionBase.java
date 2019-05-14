@@ -16,18 +16,11 @@
  */
 package org.jkiss.dbeaver.ext.xugu.model;
 
-import org.jkiss.dbeaver.DBException;
-import org.jkiss.dbeaver.ext.xugu.XuguMessages;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
-import org.jkiss.dbeaver.model.meta.LazyProperty;
 import org.jkiss.dbeaver.model.meta.Property;
-import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSObject;
-import org.jkiss.dbeaver.model.struct.DBSObjectLazy;
-import org.jkiss.utils.CommonUtils;
 
 import java.sql.ResultSet;
-import java.sql.Timestamp;
 
 /**
  * @author Maple4Real

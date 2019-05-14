@@ -1,11 +1,7 @@
 package org.jkiss.dbeaver.ext.xugu.model;
 
-import java.util.Iterator;
-import java.util.Vector;
-
 import org.jkiss.dbeaver.model.impl.DBObjectNameCaseTransformer;
 import org.jkiss.dbeaver.model.meta.Property;
-import org.jkiss.dbeaver.model.struct.DBSObject;
 /**
  * @author Maple4Real
  *   用户权限信息类
