@@ -882,7 +882,8 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
             XuguTablePhysical parent, XuguTableIndex object, JDBCResultSet dbResult)
             throws SQLException, DBException
         {
-            String columnName = JDBCUtils.safeGetStringTrimmed(dbResult, "COL_NAME");
+        	//处理别名情况
+            String columnName = JDBCUtils.safeGetStringTrimmed(dbResult, "KEYS");
             columnName = columnName.replaceAll("\"", "");
             //处理多字段情况
             if(columnName.indexOf(",")!=-1) {

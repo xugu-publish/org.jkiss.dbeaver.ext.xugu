@@ -71,7 +71,7 @@ public class XuguUtils {
         log.info("get new object");
         Parsing pp = new Parsing();
         log.info("use out method");
-        String ddl = pp.loadDDL(conn, object.getSchema().getName(), object.getName());
+        String ddl = pp.loadDDL((com.xugu.cloudjdbc.Connection)conn, object.getSchema().getName(), object.getName());
         log.info("out method done");
         return ddl;
     }
