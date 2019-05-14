@@ -32,6 +32,7 @@ import org.jkiss.dbeaver.ext.xugu.XuguMessages;
 import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.model.XuguDataSource;
 import org.jkiss.dbeaver.ext.xugu.model.XuguDatabase;
+import org.jkiss.dbeaver.ext.xugu.views.XuguWarningDialog;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.edit.DBECommandContext;
 import org.jkiss.dbeaver.model.edit.DBEObjectRenamer;
@@ -85,6 +86,13 @@ public class XuguDatabaseManager extends SQLObjectEditor<XuguDatabase, XuguDataS
         }.execute();
     }
 
+    //禁止删除数据库
+    @Override
+    public boolean canDeleteObject(XuguDatabase object)
+    {
+        return false;
+    }
+    
     @Override
     protected void addObjectCreateActions(DBRProgressMonitor monitor, List<DBEPersistAction> actions, ObjectCreateCommand command, Map<String, Object> options)
     {
@@ -105,11 +113,7 @@ public class XuguDatabaseManager extends SQLObjectEditor<XuguDatabase, XuguDataS
     @Override
     protected void addObjectDeleteActions(List<DBEPersistAction> actions, ObjectDeleteCommand command, Map<String, Object> options)
     {
-    	String sql = "DROP DATABASE '" + command.getObject().getName() + "'";
-    	if(XuguConstants.LOG_PRINT_LEVEL<1) {
-        	log.info("Xugu Plugin: Construct drop database sql: "+sql);
-        }
-        actions.add(new SQLDatabasePersistAction("Drop database", sql)); //$NON-NLS-2$
+    	//do nothing
     }
 
     @Override
