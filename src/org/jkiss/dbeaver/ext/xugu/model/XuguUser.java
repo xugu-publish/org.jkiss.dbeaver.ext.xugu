@@ -333,12 +333,10 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
 		return last_modi_time;
 	}
 	
-	@Property(viewable = true, order = 6)
 	public Vector<String> getAuthorityKey(){
 		return authorityKey;
 	}
 	
-	@Property(viewable = true, order = 7)
 	public Vector<String> getAuthorityValue(){
 		return authorityValue;
 	}
