@@ -34,8 +34,6 @@ import java.util.List;
  */
 public class XuguTrigger extends XuguTriggerBase<XuguTableBase>
 {
-//    private static final Log log = Log.getLog(XuguTrigger.class);
-
     private XuguSchema ownerSchema;
     private List<String> includeCols;
     

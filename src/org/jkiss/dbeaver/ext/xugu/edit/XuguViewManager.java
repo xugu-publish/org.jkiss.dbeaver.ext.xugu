@@ -17,21 +17,36 @@
  */
 package org.jkiss.dbeaver.ext.xugu.edit;
 
+import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.ext.xugu.XuguConstants;
+import org.jkiss.dbeaver.ext.xugu.XuguMessages;
+import org.jkiss.dbeaver.ext.xugu.edit.XuguSynonymManager.NewSynonymDialog;
 import org.jkiss.dbeaver.ext.xugu.model.XuguSchema;
+import org.jkiss.dbeaver.ext.xugu.model.XuguSynonym;
 import org.jkiss.dbeaver.ext.xugu.model.XuguView;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPEvaluationContext;
 import org.jkiss.dbeaver.model.edit.DBECommandContext;
 import org.jkiss.dbeaver.model.edit.DBEPersistAction;
 import org.jkiss.dbeaver.model.edit.prop.DBECommandComposite;
+import org.jkiss.dbeaver.model.impl.DBObjectNameCaseTransformer;
 import org.jkiss.dbeaver.model.impl.DBSObjectCache;
 import org.jkiss.dbeaver.model.impl.edit.SQLDatabasePersistAction;
 import org.jkiss.dbeaver.model.impl.sql.edit.SQLObjectEditor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSObject;
+import org.jkiss.dbeaver.ui.UITask;
+import org.jkiss.dbeaver.ui.UIUtils;
 import org.jkiss.utils.CommonUtils;
 
 import java.util.List;
@@ -72,9 +87,18 @@ public class XuguViewManager extends SQLObjectEditor<XuguView, XuguSchema> {
     @Override
     protected XuguView createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, XuguSchema parent, Object copyFrom)
     {
-        XuguView newView = new XuguView(parent, "NEW_VIEW"); //$NON-NLS-1$
-        newView.setViewText("CREATE VIEW " + newView.getFullyQualifiedName(DBPEvaluationContext.DDL) + " AS\nSELECT");
-        return newView;
+    	return new UITask<XuguView>() {
+            @Override
+            protected XuguView runTask() {
+                NewViewDialog dialog = new NewViewDialog(UIUtils.getActiveWorkbenchShell(), parent);
+                if (dialog.open() != IDialogConstants.OK_ID) {
+                    return null;
+                }
+            	XuguView newView = dialog.getView();
+            	newView.setViewText("CREATE VIEW " + newView.getFullyQualifiedName(DBPEvaluationContext.DDL) + " AS\nSELECT");
+                return newView;
+            }
+        }.execute();
     }
 
     @Override
@@ -106,7 +130,6 @@ public class XuguViewManager extends SQLObjectEditor<XuguView, XuguSchema> {
         final XuguView view = command.getObject();
         boolean replace = view.isReplace();
         boolean force = view.isForce();
-        
         if (replace) {
         	//增加replace关键字的语句
         	if(view.getViewText().toUpperCase().indexOf("REPLACE")==-1) {
@@ -169,7 +192,58 @@ public class XuguViewManager extends SQLObjectEditor<XuguView, XuguSchema> {
                 sql));
         }
         view.setPersisted(true);
+        System.out.println("VVVView "+view.getName());
     }
+    
+    static class NewViewDialog extends Dialog {
+    	
+    	private XuguView view;
+        private Text nameText;
 
+        public NewViewDialog(Shell parentShell, XuguSchema dataSource)
+        {
+            super(parentShell);
+            this.view = new XuguView(dataSource, null);  
+        }
+
+        public XuguView getView()
+        {
+            return view;
+        }
+        
+        @Override
+        protected boolean isResizable()
+        {
+            return true;
+        }
+        
+        @Override
+        protected Point getInitialSize() {
+        	return new Point(300, 200);
+        }
+        
+        @Override
+        protected Control createDialogArea(Composite parent)
+        {
+            getShell().setText(XuguMessages.dialog_synonym_create_title);
+
+            Control container = super.createDialogArea(parent);
+            Composite composite = UIUtils.createPlaceholder((Composite) container, 2, 5);
+            composite.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+            nameText = UIUtils.createLabelText(composite, "View Name", null);
+            nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+            return parent;
+        }
+
+        @Override
+        protected void okPressed()
+        {
+            view.setName(DBObjectNameCaseTransformer.transformObjectName(view, nameText.getText()));
+            super.okPressed();
+        }
+
+    }
 }
 
