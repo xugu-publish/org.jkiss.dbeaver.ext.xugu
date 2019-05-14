@@ -95,7 +95,7 @@ public class XuguDatabase extends XuguGlobalObject
     
     @NotNull
     @Override
-    @Property(viewable = true, editable = false, order = 2)
+    @Property(viewable = true, editable = false, updatable=false, order = 2)
     public String getName()
     {
         return name;

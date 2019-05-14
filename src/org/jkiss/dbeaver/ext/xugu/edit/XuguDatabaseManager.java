@@ -55,7 +55,7 @@ import java.util.Map;
  * 不支持重命名
  * 包含一个内部界面类，用于进行属性设定
  */
-public class XuguDatabaseManager extends SQLObjectEditor<XuguDatabase, XuguDataSource> implements DBEObjectRenamer<XuguDatabase> {
+public class XuguDatabaseManager extends SQLObjectEditor<XuguDatabase, XuguDataSource> {
 
     @Override
     public long getMakerOptions(DBPDataSource dataSource)
@@ -116,11 +116,7 @@ public class XuguDatabaseManager extends SQLObjectEditor<XuguDatabase, XuguDataS
     	//do nothing
     }
 
-    @Override
-    public void renameObject(DBECommandContext commandContext, XuguDatabase database, String newName) throws DBException
-    {
-        throw new DBException("Direct database rename is not implemented in XuguDB. You should use export/import functions for that.");
-    }
+    
     
     static class NewDBDialog extends Dialog {
     	
