@@ -36,7 +36,8 @@ import java.sql.ResultSet;
 import java.util.Map;
 
 /**
- * Xugu UDT
+ * @author Maple4Real
+ *  自定义类型信息类
  */
 public class XuguUDT extends XuguSchemaObject implements DBSDataType{
 

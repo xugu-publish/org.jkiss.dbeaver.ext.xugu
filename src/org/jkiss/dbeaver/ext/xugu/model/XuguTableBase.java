@@ -55,7 +55,7 @@ import java.util.Map;
 
 /**
  * XuguTable base
- * 查询并加载表元信息
+ * 表信息基类，包含触发器缓存
  */
 public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema>
     implements DBPNamedObject2, DBPRefreshableObject, XuguStatefulObject

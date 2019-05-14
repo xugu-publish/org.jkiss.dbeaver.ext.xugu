@@ -44,7 +44,8 @@ import java.util.Collection;
 import java.util.Map;
 
 /**
- * Xugu scheduler job
+ * @author Maple4Real
+ *   作业信息类，包含作业相关的基本信息，以及作业参数缓存
  */
 public class XuguSchedulerJob extends XuguSchemaObject implements XuguStatefulObject, DBPScriptObjectExt {
 

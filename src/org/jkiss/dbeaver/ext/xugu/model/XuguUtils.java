@@ -51,7 +51,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 /**
- * Xugu utils
+ * @author Maple4Real
+ *   工具类
  */
 public class XuguUtils {
 

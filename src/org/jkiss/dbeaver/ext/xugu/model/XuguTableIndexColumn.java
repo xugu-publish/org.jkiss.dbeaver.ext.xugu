@@ -22,7 +22,8 @@ import org.jkiss.dbeaver.model.impl.struct.AbstractTableIndexColumn;
 import org.jkiss.dbeaver.model.meta.Property;
 
 /**
- * GenericIndexColumn
+ * @author Maple4Real
+ *   索引字段信息类，包含索引和字段信息
  */
 public class XuguTableIndexColumn extends AbstractTableIndexColumn
 {

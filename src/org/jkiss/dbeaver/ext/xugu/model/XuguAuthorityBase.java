@@ -17,6 +17,7 @@ public abstract class XuguAuthorityBase<PARENT extends DBSObject> extends XuguOb
 
 	private String parentName;
 	protected String targetName;
+	//是否为库级权限
 	protected boolean isDatabase;
 	
 	protected XuguAuthorityBase(PARENT parent, String name, String targetName, boolean isDatabase, boolean persisted) {

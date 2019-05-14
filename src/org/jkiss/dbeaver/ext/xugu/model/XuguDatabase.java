@@ -54,7 +54,8 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * XuguDatabase
+ * @author Maple4Real
+ *   包含数据库基本信息，其中模式信息由dataSource获取
  */
 public class XuguDatabase extends XuguGlobalObject
 {

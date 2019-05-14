@@ -25,7 +25,8 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * Table partition
+ * @author Maple4Real
+ *  表分区衍生类
  */
 public class XuguTablePartition extends XuguPartitionBase<XuguTablePhysical> {
 	

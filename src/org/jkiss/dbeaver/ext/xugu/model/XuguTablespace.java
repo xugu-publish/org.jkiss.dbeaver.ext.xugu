@@ -46,7 +46,8 @@ import java.util.Collection;
 import java.util.Map;
 
 /**
- * Xugu tablespace
+ * @author Maple4Real
+ *   表空间信息类，包含表空间基本信息
  */
 public class XuguTablespace extends XuguGlobalObject implements DBPRefreshableObject
 {

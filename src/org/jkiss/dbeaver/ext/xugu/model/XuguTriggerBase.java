@@ -22,7 +22,8 @@ import java.sql.ResultSet;
 import java.util.Map;
 
 /**
- * XuguTrigger
+ * @author Maple4Real
+ *   触发器基类，包含触发器基本信息
  */
 public abstract class XuguTriggerBase<PARENT extends DBSObject> extends XuguObject<PARENT> implements DBSTrigger, DBPQualifiedObject, XuguSourceObject
 {

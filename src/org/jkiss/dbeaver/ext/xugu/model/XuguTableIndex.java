@@ -37,9 +37,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * XuguTableIndex
+ * @author Maple4Real
+ *   索引信息类，包含索引相关的基本信息
  */
-//public class XuguTableIndex extends JDBCTableIndex<XuguSchema, XuguTablePhysical> implements DBSObjectLazy
 public class XuguTableIndex extends JDBCTableIndex<XuguSchema, XuguTablePhysical>
 {
     private boolean nonUnique;

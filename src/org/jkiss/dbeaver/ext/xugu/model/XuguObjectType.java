@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Object type
+ * Xugu Object Type
  */
 public enum XuguObjectType implements DBSObjectType {
 //	USER("USER", null, XuguUser.class, null),

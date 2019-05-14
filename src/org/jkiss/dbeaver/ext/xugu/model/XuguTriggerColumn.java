@@ -28,7 +28,8 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import java.sql.ResultSet;
 
 /**
- * XuguTriggerColumn
+ * @author Maple4Real
+ *   触发器字段信息类，包含触发器和字段信息
  */
 public class XuguTriggerColumn extends AbstractTriggerColumn
 {

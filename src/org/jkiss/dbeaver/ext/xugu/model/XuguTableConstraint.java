@@ -29,7 +29,8 @@ import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import java.sql.ResultSet;
 
 /**
- * XuguTableConstraint
+ * @author Maple4Real
+ *   约束信息类，包含约束相关的基本信息
  */
 public class XuguTableConstraint extends XuguTableConstraintBase {
 

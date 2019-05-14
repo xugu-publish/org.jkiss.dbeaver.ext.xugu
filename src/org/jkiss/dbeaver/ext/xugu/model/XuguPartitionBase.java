@@ -30,7 +30,8 @@ import java.sql.ResultSet;
 import java.sql.Timestamp;
 
 /**
- * Xugu abstract partition
+ * @author Maple4Real
+ *   表分区的基类，包括分区类型等分区基本信息
  */
 public abstract class XuguPartitionBase<PARENT extends DBSObject> extends XuguObject<PARENT>
 {
@@ -154,7 +155,6 @@ public abstract class XuguPartitionBase<PARENT extends DBSObject> extends XuguOb
         			}
     			}
     		}
-    		String[] values = value.split(",");
     	}else {
     		this.partiValue = value;
     	}

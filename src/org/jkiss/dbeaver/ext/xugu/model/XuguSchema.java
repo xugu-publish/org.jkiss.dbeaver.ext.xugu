@@ -51,8 +51,8 @@ import java.sql.SQLException;
 import java.util.*;
 
 /**
- * XuguSchema
- * @author luke
+ * @author Maple4Real
+ *   模式信息类，包含模式相关的基本信息，以及表级对象缓存（表、视图、约束、外键、索引、序列、包、存储过程、作业、同义词、自定义类型）
  */
 public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefreshableObject, DBPSystemObject, DBSProcedureContainer
 {

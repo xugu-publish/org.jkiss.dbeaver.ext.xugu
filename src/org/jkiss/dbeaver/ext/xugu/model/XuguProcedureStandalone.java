@@ -38,7 +38,8 @@ import java.util.Collection;
 import java.util.Map;
 
 /**
- * GenericProcedure
+ * @author Maple4Real
+ *   存储过程衍生类，包括存储过程名、定义、参数等具体信息
  */
 public class XuguProcedureStandalone extends XuguProcedureBase<XuguSchema> implements XuguSourceObject, DBPRefreshableObject
 {

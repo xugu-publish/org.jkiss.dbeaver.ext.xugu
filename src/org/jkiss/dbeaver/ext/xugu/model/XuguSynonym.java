@@ -29,7 +29,8 @@ import java.sql.Date;
 import java.sql.ResultSet;
 
 /**
- * Xugu synonym
+ * @author Maple4Real
+ *   同义词信息类，包含同义词相关的基本信息
  */
 public class XuguSynonym extends XuguSchemaObject implements DBSAlias {
 
@@ -37,7 +38,6 @@ public class XuguSynonym extends XuguSchemaObject implements DBSAlias {
     private int objectSchemaID;
     private String objectSchemaName;
     private int objectUserID;
-    //private String objectTypeName;
     private String objectName;
     private int targetSchemaID;
     private String targetName;
@@ -45,7 +45,6 @@ public class XuguSynonym extends XuguSchemaObject implements DBSAlias {
     private boolean valid;
     private boolean deleted;
     private Date createTime;
-//    private String dbLink;
 
     public XuguSynonym(XuguSchema schema, ResultSet dbResult)
     {

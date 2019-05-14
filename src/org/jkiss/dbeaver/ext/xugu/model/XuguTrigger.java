@@ -31,7 +31,8 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * XuguTrigger
+ * @author Maple4Real
+ *   触发器衍生类，包含触发器具体信息
  */
 public class XuguTrigger extends XuguTriggerBase<XuguTableBase>
 {

@@ -53,7 +53,8 @@ import java.util.Map;
 import java.util.Vector;
 
 /**
- * XuguUser
+ * @author Maple4Real
+ *   用户信息类，包含名称、用户权限等具体信息
  */
 public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshableObject, DBPSaveableObject
 {

@@ -33,7 +33,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * XuguTable
+ * @author Maple4Real
+ *   表信息衍生类，包含表相关的基本信息
  */
 public class XuguTable extends XuguTablePhysical implements DBPScriptObject
 {

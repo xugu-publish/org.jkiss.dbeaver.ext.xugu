@@ -43,7 +43,8 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * XuguTableColumn
+ * @author Maple4Real
+ *  表字段信息类，包含字段相关的基本信息
  */
 public class XuguTableColumn extends JDBCTableColumn<XuguTableBase> implements DBSTableColumn, DBSTypedObjectEx, DBPHiddenObject, DBPNamedObject2
 {

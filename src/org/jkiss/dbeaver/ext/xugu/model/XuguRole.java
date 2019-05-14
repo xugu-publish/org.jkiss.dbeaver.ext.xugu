@@ -44,7 +44,8 @@ import java.util.Iterator;
 import java.util.Vector;
 
 /**
- * XuguRole
+ * @author Maple4Real
+ *   角色信息类，包含名称、角色权限等具体信息
  */
 public class XuguRole extends XuguGlobalObject implements DBARole, DBPRefreshableObject
 {

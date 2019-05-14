@@ -23,7 +23,8 @@ import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import java.util.List;
 
 /**
- * GenericConstraintColumn
+ * @author Maple4Real
+ *   外键字段信息类，包含外键和字段信息
  */
 public class XuguTableForeignKeyColumn extends XuguTableConstraintColumn implements DBSTableForeignKeyColumn
 {

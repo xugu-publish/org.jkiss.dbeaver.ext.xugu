@@ -35,7 +35,8 @@ import org.jkiss.utils.CommonUtils;
 import java.sql.ResultSet;
 
 /**
- * XuguTableForeignKey
+ * @author Maple4Real
+ *   外键信息类，包含外键相关的基本信息
  */
 public class XuguTableForeignKey extends XuguTableConstraintBase implements DBSTableForeignKey
 {

@@ -45,7 +45,8 @@ import java.sql.SQLException;
 import java.util.*;
 
 /**
- * GenericProcedure
+ * @author Maple4Real
+ *   包含包相关的基本信息，以及存储过程缓存
  */
 public class XuguPackage extends XuguSchemaObject
     implements XuguSourceObject, DBPScriptObjectExt, DBSObjectContainer, DBSPackage, DBPRefreshableObject, DBSProcedureContainer

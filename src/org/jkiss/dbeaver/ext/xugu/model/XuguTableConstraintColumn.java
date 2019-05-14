@@ -23,7 +23,8 @@ import org.jkiss.dbeaver.model.impl.struct.AbstractTableConstraintColumn;
 import org.jkiss.dbeaver.model.meta.Property;
 
 /**
- * GenericConstraintColumn
+ * @author Maple4Real
+ *   约束字段信息类，包含约束和字段信息
  */
 public class XuguTableConstraintColumn extends AbstractTableConstraintColumn
 {

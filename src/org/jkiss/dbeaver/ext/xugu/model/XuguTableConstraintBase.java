@@ -28,7 +28,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * XuguTableConstraint
+ * @author Maple4Real
+ *   约束信息基类
  */
 public abstract class XuguTableConstraintBase extends JDBCTableConstraint<XuguTableBase> {
 

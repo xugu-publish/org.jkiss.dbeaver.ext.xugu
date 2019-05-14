@@ -10,7 +10,8 @@ import org.jkiss.dbeaver.model.struct.DBSTypedObject;
 import java.sql.ResultSet;
 
 /**
- * XuguSchedulerJobArgument
+ * @author Maple4Real
+ *   作业参数信息类
  */
 public class XuguSchedulerJobArgument implements DBSParameter
 {

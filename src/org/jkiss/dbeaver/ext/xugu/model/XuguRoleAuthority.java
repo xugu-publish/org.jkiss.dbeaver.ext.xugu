@@ -5,7 +5,10 @@ import java.util.Vector;
 import org.jkiss.dbeaver.model.impl.DBObjectNameCaseTransformer;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.struct.DBSObject;
-
+/**
+ * @author Maple4Real
+ *   角色权限信息类
+ */
 public class XuguRoleAuthority extends XuguAuthorityBase{
 	boolean isDatabase;
 	protected XuguRoleAuthority(DBSObject parent, String name, String targetName, boolean isDatabase, boolean persisted) {

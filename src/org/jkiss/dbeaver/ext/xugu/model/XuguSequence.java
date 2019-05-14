@@ -27,11 +27,11 @@ import java.sql.Date;
 import java.sql.ResultSet;
 
 /**
- * Xugu sequence
+ * @author Maple4Real
+ *   序列信息类，包含序列相关的基本信息
  */
 public class XuguSequence extends XuguSchemaObject implements DBSSequence {
 
-    
     private long cacheSize;
     private BigDecimal lastValue;
     

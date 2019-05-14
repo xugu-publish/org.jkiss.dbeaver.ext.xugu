@@ -45,7 +45,8 @@ import java.util.Map;
 import javax.xml.validation.Schema;
 
 /**
- * OracleView
+ * @author Maple4Real
+ *   视图信息类
  */
 public class XuguView extends XuguTableBase implements XuguSourceObject
 {

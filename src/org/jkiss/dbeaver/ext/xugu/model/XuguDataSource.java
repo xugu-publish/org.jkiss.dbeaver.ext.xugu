@@ -58,8 +58,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * XuguDataSource
- * @author Luke
+ * @author Maple4Real
+ * 数据源类，包含连接信息以及模式级别的对象缓存（模式、角色、用户、表空间、数据类型）
+ * 负责创建连接、初始化上下文等
  */
 public class XuguDataSource extends JDBCDataSource
     implements DBSObjectSelector, DBCQueryPlanner, IAdaptable {
@@ -431,7 +432,7 @@ public class XuguDataSource extends JDBCDataSource
             JDBCSession session2 = DBUtils.openUtilSession(monitor, this, "Check util connection");
             this.utilSession = session2;
         }
-        // Cache data types
+        // 真正进行数据类型缓存
         {
             List<XuguDataType> dtList = new ArrayList<>();
             for (Map.Entry<String, XuguDataType.TypeDesc> predefinedType : XuguDataType.PREDEFINED_TYPES.entrySet()) {
@@ -806,12 +807,14 @@ public class XuguDataSource extends JDBCDataSource
     	return DBCPlanStyle.PLAN;
     }
     
+    //数据库缓存
     static class DatabaseCache extends JDBCStructLookupCache<XuguDataSource, XuguDatabase, XuguSchema> {
         
         public DatabaseCache() {
 			super("DATABASE_NAME");
 		}
         
+        //缓存库信息
         @Override
 		public JDBCStatement prepareLookupStatement(JDBCSession session, XuguDataSource owner, XuguDatabase object,
 				String objectName) throws SQLException {
@@ -824,6 +827,7 @@ public class XuguDataSource extends JDBCDataSource
             return new XuguDatabase(owner, resultSet);
         }
 
+        //缓存模式信息以作为库信息的成员
 		@Override
 		protected JDBCStatement prepareChildrenStatement(JDBCSession session, XuguDataSource owner,
 				XuguDatabase forDB) throws SQLException {
@@ -847,6 +851,7 @@ public class XuguDataSource extends JDBCDataSource
 		}
     }
     
+    //模式缓存
     public static class SchemaCache extends JDBCStructLookupCache<XuguDataSource, XuguSchema, XuguSchema> {
         SchemaCache() {
         	super("SCHEMA_NAME");
@@ -856,8 +861,6 @@ public class XuguDataSource extends JDBCDataSource
         @Override
 		public JDBCStatement prepareLookupStatement(@NotNull JDBCSession session, @NotNull XuguDataSource owner, XuguSchema schema, String name) throws SQLException {
             StringBuilder schemasQuery = new StringBuilder();
-//            //过滤条件
-//            DBSObjectFilter schemaFilters = owner.getContainer().getObjectFilter(XuguSchema.class, null, false);
             String dbName = owner.connection.getCatalog();
         	//xfc 根据owner的用户角色选取不同的语句来查询schema
         	schemasQuery.append("SELECT * FROM ");
@@ -917,7 +920,7 @@ public class XuguDataSource extends JDBCDataSource
 		}
     }
     
-    
+    //数据类型缓存 不做查询操作 在initialize函数中进行初始化
     static class DataTypeCache extends JDBCObjectCache<XuguDataSource, XuguDataType> {
         @Override
         protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguDataSource owner) throws SQLException {
@@ -932,6 +935,7 @@ public class XuguDataSource extends JDBCDataSource
         }
     }
 
+    //表空间缓存
     static class TablespaceCache extends JDBCObjectCache<XuguDataSource, XuguTablespace> {
         @Override
         protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguDataSource owner) throws SQLException {
@@ -946,6 +950,7 @@ public class XuguDataSource extends JDBCDataSource
         }
     }
 
+    //用户缓存
     public static class UserCache extends JDBCStructLookupCache<XuguDataSource, XuguUser, XuguUser> {
         public UserCache() {
         	super("USER_NAME");
@@ -995,6 +1000,7 @@ public class XuguDataSource extends JDBCDataSource
 		}
     }
 
+    //角色缓存
     public class RoleCache extends JDBCObjectCache<XuguDataSource, XuguRole> {
         @Override
         protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguDataSource owner) throws SQLException {
