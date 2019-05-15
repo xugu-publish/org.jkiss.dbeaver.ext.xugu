@@ -84,7 +84,17 @@ public class XuguTableColumnManager extends SQLTableColumnManager<XuguTableColum
     protected void addObjectCreateActions(DBRProgressMonitor monitor, List<DBEPersistAction> actions, ObjectCreateCommand command, Map<String, Object> options)
     {
     	 final XuguTableBase table = command.getObject().getTable();
-    	 String query = "ALTER TABLE " + table.getFullyQualifiedName(DBPEvaluationContext.DDL) + " ADD "  + getNestedDeclaration(monitor, table, command, options);
+    	 String query ;
+    	 String DEFAULT[] = null;
+    	 if (getNestedDeclaration(monitor, table, command, options).toString()!=null) {
+    		 DEFAULT = getNestedDeclaration(monitor, table, command, options).toString().split(" DEFAULT ");   		
+		}    
+    	 DBPDataKind dataKind = command.getObject().getDataKind();
+    	 if (dataKind == DBPDataKind.STRING) {
+        	 query = "ALTER TABLE " + table.getFullyQualifiedName(DBPEvaluationContext.DDL) + " ADD "  + DEFAULT[0] + " DEFAULT " + "'" + DEFAULT[1] + "'";
+		}else {
+			 query = "ALTER TABLE " + table.getFullyQualifiedName(DBPEvaluationContext.DDL) + " ADD "  + getNestedDeclaration(monitor, table, command, options);			
+		}
          if(command.getProperty("comment")!=null && !"".equals(command.getProperty("comment"))) {
         	 query += " comment '"+command.getObject().getComment(monitor)+"'";
          }
