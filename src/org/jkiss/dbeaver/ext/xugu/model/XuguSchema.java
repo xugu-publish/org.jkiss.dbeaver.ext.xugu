@@ -487,6 +487,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         throws DBException
     {
         tableCache.clearCache();
+        viewCache.clearCache();
         foreignKeyCache.clearCache();
         constraintCache.clearCache();
         indexCache.clearCache();

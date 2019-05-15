@@ -104,13 +104,13 @@ public class XuguViewManager extends SQLObjectEditor<XuguView, XuguSchema> {
     @Override
     protected void addObjectCreateActions(DBRProgressMonitor monitor, List<DBEPersistAction> actions, ObjectCreateCommand command, Map<String, Object> options)
     {
-        createOrReplaceViewQuery(actions, command);
+        createOrReplaceViewQuery(monitor, actions, command);
     }
 
     @Override
     protected void addObjectModifyActions(DBRProgressMonitor monitor, List<DBEPersistAction> actionList, ObjectChangeCommand command, Map<String, Object> options)
     {
-        createOrReplaceViewQuery(actionList, command);
+        createOrReplaceViewQuery(monitor, actionList, command);
     }
 
     @Override
@@ -125,9 +125,9 @@ public class XuguViewManager extends SQLObjectEditor<XuguView, XuguSchema> {
         );
     }
 
-    private void createOrReplaceViewQuery(List<DBEPersistAction> actions, DBECommandComposite<XuguView, PropertyHandler> command)
+    private void createOrReplaceViewQuery(DBRProgressMonitor monitor, List<DBEPersistAction> actions, DBECommandComposite<XuguView, PropertyHandler> command)
     {
-        final XuguView view = command.getObject();
+        XuguView view = command.getObject();
         boolean replace = view.isReplace();
         boolean force = view.isForce();
         if (replace) {
@@ -191,7 +191,12 @@ public class XuguViewManager extends SQLObjectEditor<XuguView, XuguSchema> {
                 "Comment table",
                 sql));
         }
-        view.setPersisted(true);
+        // 做一次刷新操作
+        try {
+			view.getSchema().viewCache.refreshObject(monitor, view.getSchema(), view);
+		} catch (DBException e) {
+			e.printStackTrace();
+		}
         System.out.println("VVVView "+view.getName());
     }
     
