@@ -22,6 +22,7 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.ext.xugu.model.*;
 import org.jkiss.dbeaver.model.DBPEvaluationContext;
+import org.jkiss.dbeaver.model.DBPScriptObject;
 import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.edit.DBECommandContext;
 import org.jkiss.dbeaver.model.edit.DBEObjectRenamer;
@@ -33,10 +34,13 @@ import org.jkiss.dbeaver.model.messages.ModelMessages;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.sql.SQLUtils;
 import org.jkiss.dbeaver.model.struct.DBSObject;
+import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -96,85 +100,121 @@ public class XuguTableManager extends SQLTableManager<XuguTable, XuguSchema> imp
     @Override
     protected void addStructObjectCreateActions(DBRProgressMonitor monitor, List<DBEPersistAction> actions, StructCreateCommand command, Map<String, Object> options) throws DBException {
     	super.addStructObjectCreateActions(monitor, actions, command, options);
-    	Collection<XuguTablePartition> partList = command.getObject().getPartitions(monitor);
-    	Collection<XuguTableSubPartition> subpartList = command.getObject().getSubPartitions(monitor);
-    	if(partList!=null && partList.size()!=0) {
-    		//替换掉原有的建表语句，在其后加上分区定义语句
+    	//对字段注释增加额外处理
+    	XuguTable table = command.getObject();
+    	Collection<XuguTableColumn> cols = table.getAttributes(monitor);
+    	if(cols!=null) {
+    		List<String> colComments = new ArrayList<>();
+        	Iterator<XuguTableColumn> it = cols.iterator();
+        	while(it.hasNext()) {
+        		XuguTableColumn col = it.next();
+        		String com = col.getComment(monitor);
+        		//没有注释也用空串占位
+        		if(com==null||"".equals(com)) {
+        			colComments.add("");
+        		}else {
+        			colComments.add(com);
+        		}
+        	}
+        	//重新组装语句
+        	//加上字段注释信息
     		String tableDef = actions.get(0).getScript();
     		actions.remove(0);
-    		Iterator<XuguTablePartition> iterator = partList.iterator();
-    		boolean flag = true;
-    		String oldName = "";
-    		while(iterator.hasNext()) {
-    			XuguTablePartition part = iterator.next();
-    			//第一次循环设置分区类型和分区键
-    			if(flag) {
-    				//hash分区仅需要设置头部，设置好后跳出循环
-    				if("HASH".equals(part.getPartiType())) {
-    					tableDef += "\nPARTITION BY "+part.getPartiType()+"("+part.getPartiKey()+") PARTITIONS "+part.getPartiValue();
-    					break;
-    				}else if("AUTOMATIC".equals(part.getPartiType())) {
-    					tableDef += "\nPARTITION BY "+"RANGE("+part.getPartiKey()+") INTERVAL "+part.getAutoPartiSpan()+" "+part.getAutoPartiType()
-    					+" PARTITIONS(";
-    				}else {
-    					tableDef += "\nPARTITION BY "+part.getPartiType()+"("+part.getPartiKey()+") PARTITIONS(";
-    				}
-    				oldName = part.getName();
+    		int start = tableDef.indexOf("(");
+    		int end = tableDef.lastIndexOf(")");
+    		String midDef = tableDef.substring(start+1, end);
+    		String[] midDefs = midDef.split(",");
+    		midDef = "";
+    		for(int i=0; i<colComments.size(); i++) {
+    			if(!"".equals(colComments.get(i))) {
+    				midDefs[i] += " COMMENT '"+colComments.get(i)+"'";
     			}
-    			//缓存中存在重复部分
-    			if((flag || !oldName.equals(part.getName()))&&!part.isSubPartition()) {
-    				if("LIST".equals(part.getPartiType())) {
-        				tableDef += "\n"+part.getName()+" VALUES('"+part.getPartiValue()+"')";
-        			}else {
-        				tableDef += "\n"+part.getName()+" VALUES LESS THAN("+part.getPartiValue()+")";
-        			}
-        			tableDef += ",";
-        			oldName = part.getName();
+    			midDef += midDefs[i];
+    			if(i!=colComments.size()-1) {
+    				midDef += ", ";
     			}
-    			flag = false;
     		}
-    		tableDef = tableDef.substring(0, tableDef.length()-1);
-    		tableDef += "\n)";
-    		if(subpartList!=null && subpartList.size()!=0) {
-    			Iterator<XuguTableSubPartition> iterator2 = subpartList.iterator();
-        		boolean flag2 = true;
-        		while(iterator2.hasNext()) {
-        			XuguTableSubPartition part = iterator2.next();
+    		tableDef = tableDef.substring(0, start+1)+midDef+tableDef.substring(end);
+        	Collection<XuguTablePartition> partList = command.getObject().getPartitions(monitor);
+        	Collection<XuguTableSubPartition> subpartList = command.getObject().getSubPartitions(monitor);
+        	if(partList!=null && partList.size()!=0) {
+        		//替换掉原有的建表语句，在其后加上分区定义语句
+//        		String tableDef = actions.get(0).getScript();
+//        		actions.remove(0);
+        		Iterator<XuguTablePartition> iterator = partList.iterator();
+        		boolean flag = true;
+        		String oldName = "";
+        		while(iterator.hasNext()) {
+        			XuguTablePartition part = iterator.next();
         			//第一次循环设置分区类型和分区键
-        			if(flag2) {
+        			if(flag) {
         				//hash分区仅需要设置头部，设置好后跳出循环
         				if("HASH".equals(part.getPartiType())) {
-        					tableDef += "\nSUBPARTITION BY "+part.getPartiType()+"("+part.getPartiKey()+") SUBPARTITIONS "+part.getPartiValue();
+        					tableDef += "\nPARTITION BY "+part.getPartiType()+"("+part.getPartiKey()+") PARTITIONS "+part.getPartiValue();
         					break;
+        				}else if("AUTOMATIC".equals(part.getPartiType())) {
+        					tableDef += "\nPARTITION BY "+"RANGE("+part.getPartiKey()+") INTERVAL "+part.getAutoPartiSpan()+" "+part.getAutoPartiType()
+        					+" PARTITIONS(";
         				}else {
-        					tableDef += "\nSUBPARTITION BY "+part.getPartiType()+"("+part.getPartiKey()+") SUBPARTITIONS(";
+        					tableDef += "\nPARTITION BY "+part.getPartiType()+"("+part.getPartiKey()+") PARTITIONS(";
         				}
         				oldName = part.getName();
         			}
         			//缓存中存在重复部分
-        			if((flag2 || !oldName.equals(part.getName()))&&part.isSubPartition()) {
+        			if((flag || !oldName.equals(part.getName()))&&!part.isSubPartition()) {
         				if("LIST".equals(part.getPartiType())) {
             				tableDef += "\n"+part.getName()+" VALUES('"+part.getPartiValue()+"')";
             			}else {
             				tableDef += "\n"+part.getName()+" VALUES LESS THAN("+part.getPartiValue()+")";
             			}
-        				tableDef += ",";
+            			tableDef += ",";
             			oldName = part.getName();
         			}
-        			flag2 = false;
+        			flag = false;
         		}
         		tableDef = tableDef.substring(0, tableDef.length()-1);
         		tableDef += "\n)";
-    		}
-    		if(XuguConstants.LOG_PRINT_LEVEL<1) {
-            	log.info("Xugu Plugin: Construct create table sql: "+tableDef);
-            }
-    		actions.add(new SQLDatabasePersistAction("Create table", tableDef));
-    		System.out.println("yes!");
+        		if(subpartList!=null && subpartList.size()!=0) {
+        			Iterator<XuguTableSubPartition> iterator2 = subpartList.iterator();
+            		boolean flag2 = true;
+            		while(iterator2.hasNext()) {
+            			XuguTableSubPartition part = iterator2.next();
+            			//第一次循环设置分区类型和分区键
+            			if(flag2) {
+            				//hash分区仅需要设置头部，设置好后跳出循环
+            				if("HASH".equals(part.getPartiType())) {
+            					tableDef += "\nSUBPARTITION BY "+part.getPartiType()+"("+part.getPartiKey()+") SUBPARTITIONS "+part.getPartiValue();
+            					break;
+            				}else {
+            					tableDef += "\nSUBPARTITION BY "+part.getPartiType()+"("+part.getPartiKey()+") SUBPARTITIONS(";
+            				}
+            				oldName = part.getName();
+            			}
+            			//缓存中存在重复部分
+            			if((flag2 || !oldName.equals(part.getName()))&&part.isSubPartition()) {
+            				if("LIST".equals(part.getPartiType())) {
+                				tableDef += "\n"+part.getName()+" VALUES('"+part.getPartiValue()+"')";
+                			}else {
+                				tableDef += "\n"+part.getName()+" VALUES LESS THAN("+part.getPartiValue()+")";
+                			}
+            				tableDef += ",";
+                			oldName = part.getName();
+            			}
+            			flag2 = false;
+            		}
+            		tableDef = tableDef.substring(0, tableDef.length()-1);
+            		tableDef += "\n)";
+        		}
+        		if(XuguConstants.LOG_PRINT_LEVEL<1) {
+                	log.info("Xugu Plugin: Construct create table sql: "+tableDef);
+                }
+        		System.out.println("yes!");
+        	}
+        	actions.add(new SQLDatabasePersistAction("Create table", tableDef));
+        	XuguDataSource source = command.getObject().getDataSource();
+        	XuguSchema schema = command.getObject().getSchema();
+        	source.schemaCache.refreshObject(monitor, source, schema);
     	}
-    	XuguDataSource source = command.getObject().getDataSource();
-    	XuguSchema schema = command.getObject().getSchema();
-    	source.schemaCache.refreshObject(monitor, source, schema);
     }
     
     @Override
