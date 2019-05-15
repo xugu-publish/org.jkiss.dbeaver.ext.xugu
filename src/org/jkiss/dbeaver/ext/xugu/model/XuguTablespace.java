@@ -127,98 +127,46 @@ public class XuguTablespace extends XuguGlobalObject implements DBPRefreshableOb
     
     @NotNull
     @Override
-    @Property(viewable = true, editable = true, order = 3)
+    @Property(viewable = true, editable = false, order = 3)
     public String getName()
     {
         return name;
     }
     
-	@Property(viewable = true, editable = true, order = 1)
+	@Property(viewable = true, editable = false, order = 1)
     public int getNodeID()
     {
         return nodeID;
     }
     
-    @Property(viewable = true, editable = true, order = 2)
+    @Property(viewable = true, editable = false, order = 2)
     public long getSpaceID()
     {
         return space_ID;
     }
     
-    @Property(viewable = true, editable = true, order = 4)
+    @Property(viewable = true, editable = false, order = 4)
     public int getDataFileNum()
     {
         return dataFile_Num;
     }
 
-    @Property(viewable = true, editable = true, order = 5)
+    @Property(viewable = true, editable = false, order = 5)
     public String getSpaceType()
     {
         return space_Type;
     }
     
-    @Property(viewable = true, editable = true, order = 6)
+    @Property(viewable = true, editable = false, order = 6)
     public boolean getMediaError()
     {
         return media_Error;
     }
 
-//    static class SegmentCache extends JDBCObjectCache<XuguTablespace, XuguSegment<XuguTablespace>> {
-//        @Override
-//        protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguTablespace owner) throws SQLException
-//        {
-//            final JDBCPreparedStatement dbStat = session.prepareStatement(
-//                "SELECT * FROM " + XuguUtils.getSysUserViewName(session.getProgressMonitor(), owner.getDataSource(), "SEGMENTS") +
-//                " WHERE TABLESPACE_NAME=? ORDER BY SEGMENT_NAME");
-//            dbStat.setString(1, owner.getName());
-//            return dbStat;
-//        }
-//
-//        @Override
-//        protected XuguSegment<XuguTablespace> fetchObject(@NotNull JDBCSession session, @NotNull XuguTablespace owner, @NotNull JDBCResultSet resultSet) throws SQLException, DBException
-//        {
-//            return new XuguSegment<>(session.getProgressMonitor(), owner, resultSet);
-//        }
-//    }
-
-//    static Object resolveTablespaceReference(DBRProgressMonitor monitor, DBSObjectLazy<XuguDataSource> referrer, @Nullable Object propertyId) throws DBException
-//    {
-//        final XuguDataSource dataSource = referrer.getDataSource();
-//        if (!dataSource.isAdmin()) {
-//            return referrer.getLazyReference(propertyId);
-//        } else {
-//            return XuguUtils.resolveLazyReference(monitor, dataSource, dataSource.getTablespaceCache(), referrer, propertyId);
-//        }
-//    }
-//
-//    public static class TablespaceReferenceValidator implements IPropertyCacheValidator<DBSObjectLazy<XuguDataSource>> {
-//        @Override
-//        public boolean isPropertyCached(DBSObjectLazy<XuguDataSource> object, Object propertyId)
-//        {
-//            return
-//                object.getLazyReference(propertyId) instanceof XuguTablespace ||
-//                object.getLazyReference(propertyId) == null ||
-//                object.getDataSource().getTablespaceCache().isFullyCached() ||
-//                !object.getDataSource().isAdmin();
-//        }
-//    }
-    
-
 	public void setName(String name) {
 		// TODO Auto-generated method stub
 		this.name = name;
 	}
-
-//	@Override
-//	public XuguSourceType getSourceType() {
-//		// TODO Auto-generated method stub
-//		return XuguSourceType.TABLESPACE;
-//	}
-//	@Override
-//	public DBEPersistAction[] getCompileActions() {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
 	
 	public String getFilePath() {
 		return filePath;

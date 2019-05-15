@@ -37,12 +37,24 @@ import org.jkiss.dbeaver.ui.UIUtils;
  * 进行表空间的创建，修改和删除
  * 包含一个内部界面类，用于进行属性设定
  */
-public class XuguTablespaceManager extends SQLObjectEditor<XuguTablespace, XuguDataSource> implements DBEObjectRenamer<XuguTablespace> {
+public class XuguTablespaceManager extends SQLObjectEditor<XuguTablespace, XuguDataSource> {
 	@Override
 	public long getMakerOptions(DBPDataSource dataSource) {
 		// TODO Auto-generated method stub
 		return FEATURE_SAVE_IMMEDIATELY;
 	}
+	
+	@Override
+    public boolean canEditObject(XuguTablespace object)
+    {
+        return false;
+    }
+	
+	@Override
+    public boolean canDeleteObject(XuguTablespace object)
+    {
+        return false;
+    }
 	
 	@Override
 	public DBSObjectCache<? extends DBSObject, XuguTablespace> getObjectsCache(XuguTablespace object) {
@@ -182,12 +194,4 @@ public class XuguTablespaceManager extends SQLObjectEditor<XuguTablespace, XuguD
         }
 
     }
-
-	@Override
-	public void renameObject(DBECommandContext commandContext, XuguTablespace object, String newName)
-			throws DBException {
-		// TODO Auto-generated method stub
-		throw new DBException("Direct tablespace rename is not yet implemented in XuguDB. You should use export/import functions for that.");
-	}
-
 }
