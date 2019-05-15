@@ -73,23 +73,25 @@ public class XuguProcedureStandalone extends XuguProcedureBase<XuguSchema> imple
             if(reg!=null) {
             	String head = this.sourceDeclaration.substring(0, this.sourceDeclaration.toUpperCase().indexOf(reg));
                 if(head.indexOf("(")!=-1) {
-                	String param = head.substring(head.indexOf("(")+1, head.indexOf(")"));
-                    String[] params = param.split(",");
-                    this.procParams = new ArrayList<XuguProcedureParameter>();
-                    for(int i=0; i<params.length; i++) {
-                    	params[i] = params[i].trim();
-                    	String mode = "";
-                    	if(params[i].toUpperCase().indexOf("IN OUT")!=-1) {
-                    		mode = "IN OUT";
-                    	}else if(params[i].toUpperCase().indexOf("IN")!=-1) {
-                    		mode = "IN";
-                    	}else if(params[i].toUpperCase().indexOf("OUT")!=-1) {
-                    		mode = "OUT";
-                    	}
-                    	String[] duals = params[i].split(" ");
-                    	procParams.add(new XuguProcedureParameter(monitor, this,duals[0], duals[duals.length-1], mode));
-                    	System.out.println(JDBCUtils.safeGetString(dbResult, "PROC_NAME")+" proc params :"+duals[0]+" "+duals[duals.length-1]);
-                    }
+                	String param = head.substring(head.indexOf("(")+1, head.indexOf(")")).trim();
+                	if(!"".equals(param)) {
+                		String[] params = param.split(",");
+                        this.procParams = new ArrayList<XuguProcedureParameter>();
+                        for(int i=0; i<params.length; i++) {
+                        	params[i] = params[i].trim();
+                        	String mode = "";
+                        	if(params[i].toUpperCase().indexOf("IN OUT")!=-1) {
+                        		mode = "IN OUT";
+                        	}else if(params[i].toUpperCase().indexOf("IN")!=-1) {
+                        		mode = "IN";
+                        	}else if(params[i].toUpperCase().indexOf("OUT")!=-1) {
+                        		mode = "OUT";
+                        	}
+                        	String[] duals = params[i].split(" ");
+                        	procParams.add(new XuguProcedureParameter(monitor, this,duals[0], duals[duals.length-1], mode));
+                        	System.out.println(JDBCUtils.safeGetString(dbResult, "PROC_NAME")+" proc params :"+duals[0]+" "+duals[duals.length-1]);
+                        }
+                	}
                 }
             }
         }

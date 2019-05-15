@@ -119,7 +119,7 @@
                         	<!--存储过程和函数-->
                         	<folder type="org.jkiss.dbeaver.ext.xugu.model.XuguProcedureStandalone" label="%tree.procedures.node.name" icon="#procedures" description="Procedures">
                             	<items label="%tree.procedures.node.name" itemLabel="%tree.procedure.node.name" path="procedure" property="procedures" icon="#procedure" id="Procedure">
-				                	<items label="%tree.scheduler.job.arguments.node.name" itemLabel="%tree.scheduler.job.argument.node.name" path="parameter" property="parameters" icon="#argument"/>
+				                	<items label="%tree.scheduler.job.parameters.node.name" itemLabel="%tree.scheduler.job.parameter.node.name" path="parameter" property="parameters" icon="#argument"/>
 				                </items>			                
                         	</folder>
 				        	<!--同义词-->               
@@ -133,7 +133,7 @@
                         	<!--作业-->
 	                        <folder type="org.jkiss.dbeaver.ext.xugu.model.XuguSchedulerJob" label="%tree.scheduler.jobs.node.name" icon="#scheduler_job_folder" description="Scheduler jobs">
                                 <items label="%tree.scheduler.job.node.name" path="schedulerJob" property="schedulerJobs" icon="icons/scheduled_job.png">
-                                    <items label="%tree.scheduler.job.arguments.node.name" itemLabel="%tree.scheduler.job.argument.node.name" path="parameter" property="parameters" icon="#argument"/>
+                                    <items label="%tree.scheduler.job.parameters.node.name" itemLabel="%tree.scheduler.job.parameter.node.name" path="parameter" property="parameters" icon="#argument"/>
                                 </items>
 	                        </folder> 			
 		                </items>
