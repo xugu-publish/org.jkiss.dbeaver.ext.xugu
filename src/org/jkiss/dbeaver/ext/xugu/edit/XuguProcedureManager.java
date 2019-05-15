@@ -121,7 +121,6 @@ public class XuguProcedureManager extends SQLObjectEditor<XuguProcedureStandalon
         	log.info("Xugu Plugin: Construct create procedure sql: "+source);
         }
         actionList.add(new XuguObjectValidateAction(procedure, XuguObjectType.PROCEDURE, "Create procedure", source)); //$NON-NLS-2$
-        XuguUtils.addSchemaChangeActions(actionList, procedure);
     }
 
 }
