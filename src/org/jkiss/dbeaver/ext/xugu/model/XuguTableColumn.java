@@ -65,7 +65,6 @@ public class XuguTableColumn extends JDBCTableColumn<XuguTableBase> implements D
     private int domainID;
     private boolean deleted;
     private boolean isVirtual;
-    private String comments;
     private double repetRate;
     private double dispersion;
     private String maxVal;
@@ -109,7 +108,7 @@ public class XuguTableColumn extends JDBCTableColumn<XuguTableBase> implements D
                 this.domainID = JDBCUtils.safeGetInt(dbResult, "DOMAIN_ID");
                 this.deleted = JDBCUtils.safeGetBoolean(dbResult, "DELETED");
                 this.isVirtual = JDBCUtils.safeGetBoolean(dbResult, "IS_VIRTUAL");
-                this.comments = JDBCUtils.safeGetString(dbResult, "COMMENTS");
+                this.comment = JDBCUtils.safeGetString(dbResult, "COMMENTS");
                 this.repetRate = JDBCUtils.safeGetDouble(dbResult, "REPET_RATE");
                 this.dispersion = JDBCUtils.safeGetDouble(dbResult, "DISPERSION");
                 this.maxVal = JDBCUtils.safeGetString(dbResult, "MAX_VAL");

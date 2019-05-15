@@ -34,6 +34,7 @@ import java.util.*;
 /**
  * Xugu utils
  * 提供常用方法
+ * some new comments
  */
 public class XuguUtils {
 

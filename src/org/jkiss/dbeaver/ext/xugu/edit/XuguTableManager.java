@@ -188,6 +188,12 @@ public class XuguTableManager extends SQLTableManager<XuguTable, XuguSchema> imp
             	log.info("Xugu Plugin: Construct alter table sql: "+query.toString());
             }
             actionList.add(new SQLDatabasePersistAction(query.toString()));
+        	XuguSchema schema = command.getObject().getSchema();
+        	try {
+				schema.tableCache.refreshObject(monitor, schema, command.getObject());
+			} catch (DBException e) {
+				e.printStackTrace();
+			}
         }
     }
 

@@ -21,6 +21,7 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.model.XuguDataType;
+import org.jkiss.dbeaver.ext.xugu.model.XuguSchema;
 import org.jkiss.dbeaver.ext.xugu.model.XuguTableBase;
 import org.jkiss.dbeaver.ext.xugu.model.XuguTableColumn;
 import org.jkiss.dbeaver.model.DBPDataKind;
@@ -94,6 +95,11 @@ public class XuguTableColumnManager extends SQLTableColumnManager<XuguTableColum
              new SQLDatabasePersistAction(
                  ModelMessages.model_jdbc_create_new_table_column,
                  query ));
+     	 try {
+			 table.getSchema().tableCache.refreshObject(monitor, table.getSchema(), table);
+		 } catch (DBException e) {
+			 e.printStackTrace();
+		 }
     }
     
     //修改了表结构修改的sql语句
@@ -156,6 +162,13 @@ public class XuguTableColumnManager extends SQLTableColumnManager<XuguTableColum
         else {
         	// do nothing
         }
+        try {
+        	XuguTableBase table = column.getTable();
+        	XuguSchema schema = table.getSchema();
+			table.getDataSource().schemaCache.refreshObject(monitor, schema.getDataSource(), schema);
+		} catch (DBException e) {
+			e.printStackTrace();
+		}
     }
 
     @Override
