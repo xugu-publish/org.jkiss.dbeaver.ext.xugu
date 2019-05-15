@@ -99,7 +99,7 @@ public class XuguProcedureStandalone extends XuguProcedureBase<XuguSchema> imple
     {
         super(xuguSchema, name, 0L, procedureType);
         sourceDeclaration =
-            procedureType.name() + " " + name + GeneralUtils.getDefaultLineSeparator() +
+        	"CREATE OR REPLACE "+procedureType.name() + " " + name + GeneralUtils.getDefaultLineSeparator() +
             "IS" + GeneralUtils.getDefaultLineSeparator() +
             "BEGIN" + GeneralUtils.getDefaultLineSeparator() +
             "END " + name + ";" + GeneralUtils.getDefaultLineSeparator();
