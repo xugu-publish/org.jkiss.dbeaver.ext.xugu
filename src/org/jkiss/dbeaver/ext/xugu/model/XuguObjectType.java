@@ -42,7 +42,7 @@ public enum XuguObjectType implements DBSObjectType {
 	DIRECTORY("DIRECTORY", null, DBSObject.class, null),
 	EVALUATION_CONTEXT("EVALUATION CONTEXT", null, DBSObject.class, null),
     FOREIGN_KEY ("FOREIGN KEY", DBIcon.TREE_FOREIGN_KEY, XuguTableForeignKey.class, null), // fake object
-	FUNCTION("FUNCTION", DBIcon.TREE_PROCEDURE, XuguProcedureStandalone.class, new ObjectFinder() {
+	FUNCTION("7", DBIcon.TREE_PROCEDURE, XuguProcedureStandalone.class, new ObjectFinder() {
         @Override
         public XuguProcedureStandalone findObject(DBRProgressMonitor monitor, XuguSchema schema, String objectName) throws DBException
         {
