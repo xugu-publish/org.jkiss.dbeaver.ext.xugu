@@ -259,20 +259,17 @@
             <objectType name="org.jkiss.dbeaver.ext.xugu.model.XuguView"/>
             <objectType name="org.jkiss.dbeaver.ext.xugu.model.XuguProcedureStandalone"/>
             <objectType name="org.jkiss.dbeaver.ext.xugu.model.XuguPackage"/>
-            <objectType name="org.jkiss.dbeaver.ext.xugu.model.XuguDataType" if="!object.predefined"/>
             <objectType name="org.jkiss.dbeaver.ext.xugu.model.XuguTrigger"/>
         </editor>
         <editor id="source.definition" class="org.jkiss.dbeaver.ext.xugu.editors.XuguSourceDefinitionEditor"
             label="%editor.package.body.name" description="%editor.package.body.description" icon="#sql_text" position="additions_middle"
             contributor="org.jkiss.dbeaver.ui.editors.sql.SQLEditorContributorNested" type="folder" embeddable="false">
             <objectType name="org.jkiss.dbeaver.ext.xugu.model.XuguPackage"/>
-            <objectType name="org.jkiss.dbeaver.ext.xugu.model.XuguDataType" if="!object.predefined"/>
         </editor>
         <editor id="schedulerJob.action" class="org.jkiss.dbeaver.ext.xugu.editors.SchedulerJobActionEditor"
             label="%editor.scheduler.job.action.name" description="%editor.schedulerJob.action.description" icon="#sql_text" position="additions_middle"
             contributor="org.jkiss.dbeaver.ui.editors.sql.SQLEditorContributorNested" type="folder" embeddable="false">
             <objectType name="org.jkiss.dbeaver.ext.xugu.model.XuguSchedulerJob"/>
-            <objectType name="org.jkiss.dbeaver.ext.xugu.model.XuguDataType" if="!object.predefined"/>
         </editor>
         <editor id="source.ddl" class="org.jkiss.dbeaver.ext.xugu.editors.XuguObjectDDLEditor"
             label="DDL" description="DDL" icon="#sql_text" position="additions_middle"
