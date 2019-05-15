@@ -121,21 +121,21 @@ public class XuguTableColumnManager extends SQLTableColumnManager<XuguTableColum
         		}
         	}
         	if(flag) {
-        		String sql = "ALTER TABLE "+column.getTable().getFullyQualifiedName(DBPEvaluationContext.DDL)+" ALTER COLUMN";
+        		String sql = "ALTER TABLE "+column.getTable().getFullyQualifiedName(DBPEvaluationContext.DDL)+" ALTER COLUMN ";
         		//修改仅包含默认值做特殊处理(加上set关键字)
             	if(command.getProperty("defaultValue")!=null) {
             		if(command.getProperty("defaultValue").equals("")) {
-            			sql += " " + column.getName() + " DROP DEFAULT";
+            			sql += column.getName() + " DROP DEFAULT";
             		}else {
-            			sql += " " + column.getName() +" SET DEFAULT '" + command.getProperty("defaultValue")+"'";
+            			sql += column.getName() +" SET DEFAULT '" + command.getProperty("defaultValue")+"'";
             		}
             	}
             	//对于非空做特殊处理（与mysql语法不一致）
             	else if(command.getProperty("required")!=null) {
             		if((boolean)command.getProperty("required")) {
-            			sql += " "+ column.getName() +" SET NOT NULL";
+            			sql += column.getName() +" SET NOT NULL";
             		}else {
-            			sql += " "+ column.getName() +" DROP NOT NULL";
+            			sql += column.getName() +" DROP NOT NULL";
             		}
             	}
             	else {
