@@ -172,8 +172,9 @@ public class XuguTableManager extends SQLTableManager<XuguTable, XuguSchema> imp
     		actions.add(new SQLDatabasePersistAction("Create table", tableDef));
     		System.out.println("yes!");
     	}
-//        //刷新？
-//        table.getDataSource().refreshObject(monitor);
+    	XuguDataSource source = command.getObject().getDataSource();
+    	XuguSchema schema = command.getObject().getSchema();
+    	source.schemaCache.refreshObject(monitor, source, schema);
     }
     
     @Override
