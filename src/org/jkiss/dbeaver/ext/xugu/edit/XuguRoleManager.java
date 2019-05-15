@@ -64,7 +64,7 @@ import java.util.Map;
  * 进行索引的创建和删除，不支持修改
  * 包含一个内部界面类，用于进行属性设定
  */
-public class XuguRoleManager extends SQLObjectEditor<XuguRole, XuguDataSource> implements DBEObjectRenamer<XuguRole> {
+public class XuguRoleManager extends SQLObjectEditor<XuguRole, XuguDataSource>{
 
     @Override
     public long getMakerOptions(DBPDataSource dataSource)
@@ -152,12 +152,6 @@ public class XuguRoleManager extends SQLObjectEditor<XuguRole, XuguDataSource> i
     protected void addObjectModifyActions(DBRProgressMonitor monitor, List<DBEPersistAction> actionList, ObjectChangeCommand command, Map<String, Object> options)
     {
     	// do nothing
-    }
-    
-    @Override
-    public void renameObject(DBECommandContext commandContext, XuguRole role, String newName) throws DBException
-    {
-        throw new DBException("Direct database rename is not yet implemented in Xugu. You should use export/import functions for that.");
     }
     
     static class innerDialog extends Dialog{

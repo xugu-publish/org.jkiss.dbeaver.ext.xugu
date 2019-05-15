@@ -92,7 +92,7 @@ public class XuguRole extends XuguGlobalObject implements DBARole, DBPRefreshabl
 
     @NotNull
     @Override
-    @Property(viewable = true, order = 2)
+    @Property(viewable = true, editable=false, order = 2)
     public String getName() {
         return name;
     }
