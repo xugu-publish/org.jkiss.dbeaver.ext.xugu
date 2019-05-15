@@ -37,7 +37,7 @@ import java.util.List;
 /**
  * XuguProcedureArgument
  */
-public class XuguProcedureArgument implements DBSProcedureParameter, DBSTypedObject
+public class XuguProcedureParameter implements DBSProcedureParameter, DBSTypedObject
 {
     private final XuguProcedureBase procedure;
     private String name;
@@ -52,9 +52,9 @@ public class XuguProcedureArgument implements DBSProcedureParameter, DBSTypedObj
     private int dataScale;
     private int dataPrecision;
     private String define;
-    private List<XuguProcedureArgument> attributes;
+    private List<XuguProcedureParameter> attributes;
 
-    public XuguProcedureArgument(DBRProgressMonitor monitor, XuguProcedureBase procedure, String name, String datatype, String mode) {
+    public XuguProcedureParameter(DBRProgressMonitor monitor, XuguProcedureBase procedure, String name, String datatype, String mode) {
     	this.procedure = procedure;
     	this.name = name;
     	//对int做转化
@@ -67,7 +67,7 @@ public class XuguProcedureArgument implements DBSProcedureParameter, DBSTypedObj
     	this.mode = XuguParameterMode.getMode(mode);
     }
     
-    public XuguProcedureArgument(
+    public XuguProcedureParameter(
         DBRProgressMonitor monitor,
         XuguProcedureBase procedure,
         ResultSet dbResult)
@@ -203,12 +203,12 @@ public class XuguProcedureArgument implements DBSProcedureParameter, DBSTypedObj
     }
 
     @Association
-    public Collection<XuguProcedureArgument> getAttributes()
+    public Collection<XuguProcedureParameter> getAttributes()
     {
         return attributes;
     }
 
-    void addAttribute(XuguProcedureArgument attribute)
+    void addAttribute(XuguProcedureParameter attribute)
     {
         if (attributes == null) {
             attributes = new ArrayList<>();

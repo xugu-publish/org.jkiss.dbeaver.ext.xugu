@@ -74,12 +74,12 @@ public abstract class XuguProcedureBase<PARENT extends DBSObjectContainer> exten
     public abstract Integer getOverloadNumber();
 
     @Override
-    public Collection<XuguProcedureArgument> getParameters(DBRProgressMonitor monitor) throws DBException
+    public Collection<XuguProcedureParameter> getParameters(DBRProgressMonitor monitor) throws DBException
     {
         return argumentsCache.getAllObjects(monitor, this);
     }
 
-    static class ArgumentsCache extends JDBCObjectCache<XuguProcedureBase, XuguProcedureArgument> {
+    static class ArgumentsCache extends JDBCObjectCache<XuguProcedureBase, XuguProcedureParameter> {
 
         @Override
         protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguProcedureBase procedure) throws SQLException
@@ -92,22 +92,22 @@ public abstract class XuguProcedureBase<PARENT extends DBSObjectContainer> exten
         }
 
         @Override
-        protected XuguProcedureArgument fetchObject(@NotNull JDBCSession session, @NotNull XuguProcedureBase procedure, @NotNull JDBCResultSet resultSet) throws SQLException, DBException
+        protected XuguProcedureParameter fetchObject(@NotNull JDBCSession session, @NotNull XuguProcedureBase procedure, @NotNull JDBCResultSet resultSet) throws SQLException, DBException
         {
-            return new XuguProcedureArgument(session.getProgressMonitor(), procedure, resultSet);
+            return new XuguProcedureParameter(session.getProgressMonitor(), procedure, resultSet);
         }
 
         @Override
-        protected void invalidateObjects(DBRProgressMonitor monitor, XuguProcedureBase owner, Iterator<XuguProcedureArgument> objectIter)
+        protected void invalidateObjects(DBRProgressMonitor monitor, XuguProcedureBase owner, Iterator<XuguProcedureParameter> objectIter)
         {
-            IntKeyMap<XuguProcedureArgument> argStack = new IntKeyMap<>();
+            IntKeyMap<XuguProcedureParameter> argStack = new IntKeyMap<>();
             while (objectIter.hasNext()) {
-                XuguProcedureArgument argument = objectIter.next();
+                XuguProcedureParameter argument = objectIter.next();
                 final int curDataLevel = argument.getDataLevel();
                 argStack.put(curDataLevel, argument);
                 if (curDataLevel > 0) {
                     objectIter.remove();
-                    XuguProcedureArgument parentArgument = argStack.get(curDataLevel - 1);
+                    XuguProcedureParameter parentArgument = argStack.get(curDataLevel - 1);
                     if (parentArgument == null) {
                         log.error("Broken arguments structure for '" + argument.getParentObject().getFullyQualifiedName(DBPEvaluationContext.DDL) + "' - no parent argument for argument " + argument.getSequence());
                     } else {

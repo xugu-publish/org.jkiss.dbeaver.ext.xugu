@@ -64,7 +64,7 @@ public class XuguSchedulerJob extends XuguSchemaObject implements XuguStatefulOb
     private boolean autoDrop;
     private boolean isSys;
     private String comments;
-    private Collection<XuguProcedureArgument> procParams;
+    private Collection<XuguProcedureParameter> procParams;
 
     private final ArgumentsCache argumentsCache = new ArgumentsCache();
 
@@ -237,7 +237,7 @@ public class XuguSchedulerJob extends XuguSchemaObject implements XuguStatefulOb
 	}
     
     @Association
-    public Collection<XuguProcedureArgument> getArguments(DBRProgressMonitor monitor) throws DBException
+    public Collection<XuguProcedureParameter> getArguments(DBRProgressMonitor monitor) throws DBException
     {
     	System.out.println("real return the params");
         return this.procParams;

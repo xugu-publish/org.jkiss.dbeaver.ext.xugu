@@ -46,7 +46,7 @@ public class XuguProcedureStandalone extends XuguProcedureBase<XuguSchema> imple
 
     private boolean valid;
     private String sourceDeclaration;
-    private Collection<XuguProcedureArgument> procParams;
+    private Collection<XuguProcedureParameter> procParams;
     public XuguProcedureStandalone(DBRProgressMonitor monitor,
         XuguSchema schema,
         ResultSet dbResult)
@@ -75,7 +75,7 @@ public class XuguProcedureStandalone extends XuguProcedureBase<XuguSchema> imple
                 if(head.indexOf("(")!=-1) {
                 	String param = head.substring(head.indexOf("(")+1, head.indexOf(")"));
                     String[] params = param.split(",");
-                    this.procParams = new ArrayList<XuguProcedureArgument>();
+                    this.procParams = new ArrayList<XuguProcedureParameter>();
                     for(int i=0; i<params.length; i++) {
                     	params[i] = params[i].trim();
                     	String mode = "";
@@ -87,7 +87,7 @@ public class XuguProcedureStandalone extends XuguProcedureBase<XuguSchema> imple
                     		mode = "OUT";
                     	}
                     	String[] duals = params[i].split(" ");
-                    	procParams.add(new XuguProcedureArgument(monitor, this,duals[0], duals[duals.length-1], mode));
+                    	procParams.add(new XuguProcedureParameter(monitor, this,duals[0], duals[duals.length-1], mode));
                     	System.out.println(JDBCUtils.safeGetString(dbResult, "PROC_NAME")+" proc params :"+duals[0]+" "+duals[duals.length-1]);
                     }
                 }
@@ -107,7 +107,7 @@ public class XuguProcedureStandalone extends XuguProcedureBase<XuguSchema> imple
     }
 
     @Override
-    public Collection<XuguProcedureArgument> getParameters(DBRProgressMonitor monitor) throws DBException
+    public Collection<XuguProcedureParameter> getParameters(DBRProgressMonitor monitor) throws DBException
     {
         return this.procParams;
     }
