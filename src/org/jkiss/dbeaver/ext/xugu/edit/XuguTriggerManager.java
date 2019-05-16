@@ -128,11 +128,13 @@ public class XuguTriggerManager extends SQLTriggerManager<XuguTrigger, XuguTable
             if(event.indexOf(",")!=-1) {
             	event = event.replaceAll(",", " OR ");
             }
+            String condition = trigger.getTriggerCondition();
+            String realCondition = condition!=null?"".equals(condition)?null:condition:null;
             source = "CREATE OR REPLACE TRIGGER "+
             		trigger.getName()+" \n"+
             		timing+" "+event+targetCols+
             		" ON "+trigger.getTable().getName()+" \n"+
-            		type+" \n"+
+            		type+ " WHEN("+realCondition+") \n"+
             		source;
             if(XuguConstants.LOG_PRINT_LEVEL<1) {
             	log.info("Xugu Plugin: Construct create trigger sql: "+source);
@@ -155,6 +157,7 @@ public class XuguTriggerManager extends SQLTriggerManager<XuguTrigger, XuguTable
         private Button triggerEventDelete;
         private Button triggerTimingBefore;
         private Button triggerTimingAfter;
+        private Text triggerConditionText;
         private Table colListTable;
         private Collection<XuguTableColumn> colList;
         
@@ -219,6 +222,20 @@ public class XuguTriggerManager extends SQLTriggerManager<XuguTrigger, XuguTable
             triggerTypeCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             triggerTypeCombo.add("ROW");
             triggerTypeCombo.add("STATEMENT");
+            triggerTypeCombo.addSelectionListener(new SelectionListener() {
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					if("ROW".equals(triggerTypeCombo.getText())) {
+						triggerConditionText.setEditable(true);
+					}else if("STATEMENT".equals(triggerTypeCombo.getText())) {
+						triggerConditionText.setText("");
+						triggerConditionText.setEditable(false);
+					}
+				}
+				@Override
+				public void widgetDefaultSelected(SelectionEvent e) {
+				}
+            });
             
             Composite timeBox = UIUtils.createPlaceholder(composite, 3, 1);
             timeBox.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -228,6 +245,10 @@ public class XuguTriggerManager extends SQLTriggerManager<XuguTrigger, XuguTable
             triggerTimingBefore.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             triggerTimingAfter = UIUtils.createRadioButton(timeBox, "After", 2, null);
             triggerTimingAfter.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+            
+            triggerConditionText = UIUtils.createLabelText(composite, "Trigger condition", null);
+            triggerConditionText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+            triggerConditionText.setEditable(false);
             
             colListTable = new Table(composite, SWT.BORDER | SWT.FULL_SELECTION | SWT.CHECK);
             colListTable.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -297,6 +318,7 @@ public class XuguTriggerManager extends SQLTriggerManager<XuguTrigger, XuguTable
 			trigger.setName(DBObjectNameCaseTransformer.transformObjectName(trigger, nameText.getText()));
             trigger.setObjectType(parentTypeText.getText());
             trigger.setTriggerTime(Integer.parseInt(triggerTimingBefore.getData().toString()));
+            trigger.setTriggerCondition(triggerConditionText.getText());
             if(triggerTypeCombo.getSelectionIndex()>-1) {
             	trigger.setTriggerType(triggerTypeCombo.getSelectionIndex()+1);
             }

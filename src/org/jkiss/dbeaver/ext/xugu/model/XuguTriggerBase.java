@@ -61,7 +61,8 @@ public abstract class XuguTriggerBase<PARENT extends DBSObject> extends XuguObje
     private boolean deleted;
     private String define;
     private String allDefine;
-
+    private String triggerCondition;
+    
     public XuguTriggerBase(PARENT parent, String name)
     {
         super(parent, name, false);
@@ -77,6 +78,7 @@ public abstract class XuguTriggerBase<PARENT extends DBSObject> extends XuguObje
         this.triggerType = JDBCUtils.safeGetInt(dbResult, "TRIG_TYPE");
         this.triggeringEvent = JDBCUtils.safeGetInt(dbResult, "TRIG_EVENT");
         this.triggerTime = JDBCUtils.safeGetInt(dbResult, "TRIG_TIME");
+        this.triggerCondition = JDBCUtils.safeGetString(dbResult, "TRIG_COND");
         //根据obj_id获取？是否代表列id？
         if(parent.getType()==0) {
         	this.obj_id = JDBCUtils.safeGetInt(dbResult, "TABLE_ID");
@@ -125,6 +127,15 @@ public abstract class XuguTriggerBase<PARENT extends DBSObject> extends XuguObje
     }
     
     @Property(viewable = true, editable = false, updatable = false, order = 6)
+    public String getTriggerCondition() {
+    	return this.triggerCondition;
+    }
+    
+    public void setTriggerCondition(String condition) {
+    	this.triggerCondition = condition;
+    }
+    
+    @Property(viewable = true, editable = false, updatable = false, order = 7)
     public String getTriggeringEvent()
     {
     	switch(triggeringEvent) {
@@ -153,7 +164,7 @@ public abstract class XuguTriggerBase<PARENT extends DBSObject> extends XuguObje
     	this.triggeringEvent = event;
     }
     
-    @Property(viewable = true, editable = false, updatable = false, order = 7)
+    @Property(viewable = true, editable = false, updatable = false, order = 8)
     public String getTriggerTime()
     {
     	switch(triggerTime) {
