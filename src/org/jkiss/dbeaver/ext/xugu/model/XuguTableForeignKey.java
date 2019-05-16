@@ -32,6 +32,7 @@ import org.jkiss.dbeaver.model.struct.rdb.DBSTableForeignKey;
 import org.jkiss.dbeaver.model.meta.IPropertyValueListProvider;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  * @author Maple4Real
@@ -71,64 +72,72 @@ public class XuguTableForeignKey extends XuguTableConstraintBase implements DBST
             DBSEntityConstraintType.FOREIGN_KEY,
             JDBCUtils.safeGetBoolean(dbResult, "ENABLE") && JDBCUtils.safeGetBoolean(dbResult, "VALID")?XuguObjectStatus.ENABLED:XuguObjectStatus.DISABLED,
             true);
-
-        String refName = JDBCUtils.safeGetString(dbResult, "REF_NAME");
-        String refOwnerName = JDBCUtils.safeGetString(dbResult, "SCHEMA_NAME");
-        String refTableName = JDBCUtils.safeGetString(dbResult, "REF_TABLE_NAME");
-        System.out.println("True foreign info "+refOwnerName+" "+refTableName+" "+refName);
-        log.info("Xugu can get alias filed? "+refTableName+" "+refName);
-        XuguTableBase refTable = XuguTableBase.findTable(
-            monitor,
-            table.getDataSource(),
-            refOwnerName,
-            refTableName);
-        if (refTable == null) {
-            log.warn("Referenced table '" + DBUtils.getSimpleQualifiedName(refOwnerName, refTableName) + "' not found");
-        } else {
-            referencedKey = refTable.getConstraint(monitor, refName);
-            if (referencedKey == null) {
-                log.warn("Referenced constraint '" + refName + "' not found in table '" + refTable.getFullyQualifiedName(DBPEvaluationContext.DDL) + "'");
-                referencedKey = new XuguTableConstraint(refTable, "refName", DBSEntityConstraintType.UNIQUE_KEY, null, XuguObjectStatus.ERROR);
-            }
-        }
-        
-        String updateAction = JDBCUtils.safeGetString(dbResult, "UPDATE_ACTION");
-        switch(updateAction) {
-	        case "n":
-	        	this.updateRule = DBSForeignKeyModifyRule.NO_ACTION;
-	        	break;
-	        case "u":
-	        	this.updateRule = DBSForeignKeyModifyRule.SET_NULL;
-	        	break;
-	        case "d":
-	        	this.updateRule = DBSForeignKeyModifyRule.SET_DEFAULT;
-	        	break;
-	        case "c":
-	        	this.updateRule = DBSForeignKeyModifyRule.CASCADE;
-	        	break;
-	        default:
-	        	this.updateRule = DBSForeignKeyModifyRule.NO_ACTION;
-	        	break;
-        }
-        
-        String deleteAction = JDBCUtils.safeGetString(dbResult, "DELETE_ACTION");
-        switch(deleteAction) {
-	        case "n":
-	        	this.deleteRule = DBSForeignKeyModifyRule.NO_ACTION;
-	        	break;
-	        case "u":
-	        	this.deleteRule = DBSForeignKeyModifyRule.SET_NULL;
-	        	break;
-	        case "d":
-	        	this.deleteRule = DBSForeignKeyModifyRule.SET_DEFAULT;
-	        	break;
-	        case "c":
-	        	this.deleteRule = DBSForeignKeyModifyRule.CASCADE;
-	        	break;
-	        default:
-	        	this.deleteRule = DBSForeignKeyModifyRule.NO_ACTION;
-	        	break;
-        }
+        try {
+	//        String refName = JDBCUtils.safeGetString(dbResult, "REF_NAME");
+	        String refName = dbResult.getString(23);
+	        String refOwnerName = JDBCUtils.safeGetString(dbResult, "SCHEMA_NAME");
+	//        String refTableName = JDBCUtils.safeGetString(dbResult, "REF_TABLE_NAME");
+	        String refTableName;
+			refTableName = dbResult.getString(18);
+		
+	        System.out.println("True foreign info "+refOwnerName+" "+refTableName+" "+refName);
+	        log.info("Xugu can get alias filed? "+refTableName+" "+refName);
+	        XuguTableBase refTable = XuguTableBase.findTable(
+	            monitor,
+	            table.getDataSource(),
+	            refOwnerName,
+	            refTableName);
+	        if (refTable == null) {
+	            log.warn("Referenced table '" + DBUtils.getSimpleQualifiedName(refOwnerName, refTableName) + "' not found");
+	        } else {
+	            referencedKey = refTable.getConstraint(monitor, refName);
+	            if (referencedKey == null) {
+	                log.warn("Referenced constraint '" + refName + "' not found in table '" + refTable.getFullyQualifiedName(DBPEvaluationContext.DDL) + "'");
+	                referencedKey = new XuguTableConstraint(refTable, "refName", DBSEntityConstraintType.UNIQUE_KEY, null, XuguObjectStatus.ERROR);
+	            }
+	        }
+	        
+	        String updateAction = JDBCUtils.safeGetString(dbResult, "UPDATE_ACTION");
+	        switch(updateAction) {
+		        case "n":
+		        	this.updateRule = DBSForeignKeyModifyRule.NO_ACTION;
+		        	break;
+		        case "u":
+		        	this.updateRule = DBSForeignKeyModifyRule.SET_NULL;
+		        	break;
+		        case "d":
+		        	this.updateRule = DBSForeignKeyModifyRule.SET_DEFAULT;
+		        	break;
+		        case "c":
+		        	this.updateRule = DBSForeignKeyModifyRule.CASCADE;
+		        	break;
+		        default:
+		        	this.updateRule = DBSForeignKeyModifyRule.NO_ACTION;
+		        	break;
+	        }
+	        
+	        String deleteAction = JDBCUtils.safeGetString(dbResult, "DELETE_ACTION");
+	        switch(deleteAction) {
+		        case "n":
+		        	this.deleteRule = DBSForeignKeyModifyRule.NO_ACTION;
+		        	break;
+		        case "u":
+		        	this.deleteRule = DBSForeignKeyModifyRule.SET_NULL;
+		        	break;
+		        case "d":
+		        	this.deleteRule = DBSForeignKeyModifyRule.SET_DEFAULT;
+		        	break;
+		        case "c":
+		        	this.deleteRule = DBSForeignKeyModifyRule.CASCADE;
+		        	break;
+		        default:
+		        	this.deleteRule = DBSForeignKeyModifyRule.NO_ACTION;
+		        	break;
+	        }
+        } catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 
     @Property(viewable = true, order = 3)
