@@ -21,6 +21,7 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPEvaluationContext;
 import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
+import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.struct.DBSEntityConstraintType;
 import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 
@@ -135,6 +136,16 @@ public class XuguTableConstraint extends XuguTableConstraintBase {
     public boolean getIsSys() {
     	return this.is_sys;
     }
+    
+    @Property(viewable = true, editable = true, updatable=true, order = 4)
+    public boolean isEnable() {
+    	return this.enable;
+    }
+    
+    public void setEnable(boolean enable) {
+    	this.enable = enable;
+    }
+    
     @NotNull
     @Override
     public String getFullyQualifiedName(DBPEvaluationContext context)

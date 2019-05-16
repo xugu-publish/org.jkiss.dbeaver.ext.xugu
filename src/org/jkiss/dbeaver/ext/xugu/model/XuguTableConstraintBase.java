@@ -64,7 +64,7 @@ public abstract class XuguTableConstraintBase extends JDBCTableConstraint<XuguTa
         return constraintType;
     }
 
-    @Property(viewable = true, editable = false, order = 7)
+    @Property(viewable = false, editable = false, order = 7)
     public XuguObjectStatus getStatus()
     {
         return status;

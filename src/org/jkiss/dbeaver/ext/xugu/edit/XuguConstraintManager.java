@@ -29,6 +29,7 @@ import org.jkiss.dbeaver.model.edit.DBECommandContext;
 import org.jkiss.dbeaver.model.edit.DBEPersistAction;
 import org.jkiss.dbeaver.model.impl.DBSObjectCache;
 import org.jkiss.dbeaver.model.impl.edit.SQLDatabasePersistAction;
+import org.jkiss.dbeaver.model.impl.sql.edit.SQLObjectEditor.*;
 import org.jkiss.dbeaver.model.impl.sql.edit.struct.SQLConstraintManager;
 import org.jkiss.dbeaver.model.messages.ModelMessages;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
@@ -37,6 +38,7 @@ import org.jkiss.dbeaver.model.struct.DBSEntityConstraintType;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.ui.UITask;
 import org.jkiss.dbeaver.ui.editors.object.struct.EditConstraintPage;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 /**
  * @author Maple4Real
@@ -121,7 +123,7 @@ public class XuguConstraintManager extends SQLConstraintManager<XuguTableConstra
     	XuguTableConstraint constraint = (XuguTableConstraint) command.getObject();
     	XuguTableBase table = constraint.getTable();
     	String sql = "ALTER TABLE " + table.getFullyQualifiedName(DBPEvaluationContext.DDL) + " ADD " + getNestedDeclaration(monitor, table, command, options) +
-                " "  + (constraint.getStatus() == XuguObjectStatus.ENABLED ? "ENABLE" : "DISABLE");
+                " "  + (constraint.isEnable()? "ENABLE" : "DISABLE");
     	if(XuguConstants.LOG_PRINT_LEVEL<1) {
         	log.info("Xugu Plugin: Construct create constraint sql: "+sql);
         }
@@ -130,5 +132,18 @@ public class XuguConstraintManager extends SQLConstraintManager<XuguTableConstra
                     ModelMessages.model_jdbc_create_new_constraint, sql
                 	));
     }
-
+    
+    @Override
+    protected void addObjectModifyActions(DBRProgressMonitor monitor, List<DBEPersistAction> actionList, ObjectChangeCommand command, Map<String, Object> options) throws DBException {
+    	XuguTableConstraint constraint = (XuguTableConstraint) command.getObject();
+    	XuguTableBase table = constraint.getTable();
+    	String sql = "ALTER TABLE " + table.getFullyQualifiedName(DBPEvaluationContext.DDL) + (constraint.isEnable()? " ENABLE" : " DISABLE") +" CONSTRAINT "+ constraint.getName();
+    	if(XuguConstants.LOG_PRINT_LEVEL<1) {
+        	log.info("Xugu Plugin: Construct alter constraint sql: "+sql);
+        }
+    	actionList.add(
+                new SQLDatabasePersistAction(
+                		"Alter constraint", sql
+                	));
+    }
 }
