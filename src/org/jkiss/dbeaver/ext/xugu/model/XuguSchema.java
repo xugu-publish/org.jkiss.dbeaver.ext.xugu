@@ -562,6 +562,10 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         	if(object!=null) {
         		sql.append(" AND TABLE_ID = ");
         		sql.append(object.getID());
+        	}else if(objectName!=null) {
+        		sql.append(" AND TABLE_NAME ='");
+        		sql.append(objectName);
+        		sql.append("'");
         	}
         	if(XuguConstants.LOG_PRINT_LEVEL<1) {
         		log.info("Xugu Plugin: Construct select tables sql: "+sql.toString());
