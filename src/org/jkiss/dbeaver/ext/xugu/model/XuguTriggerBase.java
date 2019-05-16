@@ -93,7 +93,7 @@ public abstract class XuguTriggerBase<PARENT extends DBSObject> extends XuguObje
 
     @NotNull
     @Override
-    @Property(viewable = true, editable = true, order = 1)
+    @Property(viewable = true, editable = false, updatable = false, order = 1)
     public String getName()
     {
         return super.getName();
