@@ -339,23 +339,25 @@ public class XuguTablePartitionManager extends SQLObjectEditor<XuguTablePartitio
             	try {
 					Collection<XuguTablePartition> parts = table.getPartitions(monitor);
 					if(parts!=null) {
-						XuguTablePartition part = parts.iterator().next();
-						String partType = part.getPartiType();
-						String partKey = part.getPartiKey();
-						typeCombo.setText(partType);
-						partKey = partKey.replaceAll("\"", "");
-						colText.setText(partKey);
-						typeCombo.setEnabled(false);
-						colCombo.setEnabled(false);
-						colText.setEnabled(false);
-						addCol.setEnabled(false);
-						removeCol.setEnabled(false);
-						if("AUTOMATIC".equals(partType)) {
-							autoTypeCombo.setText(part.getAutoPartiType());
-							autoSpanText.setText(part.getAutoPartiSpan().toString());
+						if(parts.iterator().hasNext()) {
+							XuguTablePartition part = parts.iterator().next();
+							String partType = part.getPartiType();
+							String partKey = part.getPartiKey();
+							typeCombo.setText(partType);
+							partKey = partKey.replaceAll("\"", "");
+							colText.setText(partKey);
+							typeCombo.setEnabled(false);
+							colCombo.setEnabled(false);
+							colText.setEnabled(false);
+							addCol.setEnabled(false);
+							removeCol.setEnabled(false);
+							if("AUTOMATIC".equals(partType)) {
+								autoTypeCombo.setText(part.getAutoPartiType());
+								autoSpanText.setText(part.getAutoPartiSpan().toString());
+							}
+							autoTypeCombo.setEnabled(false);
+							autoSpanText.setEnabled(false);
 						}
-						autoTypeCombo.setEnabled(false);
-						autoSpanText.setEnabled(false);
 					}
 				} catch (DBException e) {
 					// TODO Auto-generated catch block
