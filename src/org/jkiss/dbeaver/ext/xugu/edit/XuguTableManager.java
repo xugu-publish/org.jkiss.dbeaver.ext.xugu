@@ -29,6 +29,7 @@ import org.jkiss.dbeaver.model.edit.DBEObjectRenamer;
 import org.jkiss.dbeaver.model.edit.DBEPersistAction;
 import org.jkiss.dbeaver.model.impl.DBSObjectCache;
 import org.jkiss.dbeaver.model.impl.edit.SQLDatabasePersistAction;
+import org.jkiss.dbeaver.model.impl.sql.edit.SQLObjectEditor.*;
 import org.jkiss.dbeaver.model.impl.sql.edit.struct.SQLTableManager;
 import org.jkiss.dbeaver.model.messages.ModelMessages;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
@@ -99,122 +100,145 @@ public class XuguTableManager extends SQLTableManager<XuguTable, XuguSchema> imp
     
     @Override
     protected void addStructObjectCreateActions(DBRProgressMonitor monitor, List<DBEPersistAction> actions, StructCreateCommand command, Map<String, Object> options) throws DBException {
-    	super.addStructObjectCreateActions(monitor, actions, command, options);
-    	//对字段注释增加额外处理
-    	XuguTable table = command.getObject();
-    	Collection<XuguTableColumn> cols = table.getAttributes(monitor);
-    	if(cols!=null) {
-    		List<String> colComments = new ArrayList<>();
-        	Iterator<XuguTableColumn> it = cols.iterator();
-        	while(it.hasNext()) {
-        		XuguTableColumn col = it.next();
-        		String com = col.getComment(monitor);
-        		//没有注释也用空串占位
-        		if(com==null||"".equals(com)) {
-        			colComments.add("");
-        		}else {
-        			colComments.add(com);
-        		}
-        	}
-        	//重新组装语句
-        	//加上字段注释信息
-    		String tableDef = actions.get(0).getScript();
-    		actions.remove(0);
-    		int start = tableDef.indexOf("(");
-    		int end = tableDef.lastIndexOf(")");
-    		String midDef = tableDef.substring(start+1, end);
-    		String[] midDefs = midDef.split(",");
-    		midDef = "";
-    		for(int i=0; i<colComments.size(); i++) {
-    			if(!"".equals(colComments.get(i))) {
-    				midDefs[i] += " COMMENT '"+colComments.get(i)+"'";
+    	//重写父类的addStructObjectCreateActions方法
+    	final XuguTable table = command.getObject();
+        final NestedObjectCommand tableProps = command.getObjectCommands().get(table);
+        if (tableProps == null) {
+            log.warn("Object change command not found"); //$NON-NLS-1$
+            return;
+        }
+        final String tableName = CommonUtils.getOption(options, DBPScriptObject.OPTION_FULLY_QUALIFIED_NAMES, true) ?
+            table.getFullyQualifiedName(DBPEvaluationContext.DDL) : DBUtils.getQuotedIdentifier(table);
+        final String slComment = SQLUtils.getDialectFromObject(table).getSingleLineComments()[0];
+        final String lineSeparator = GeneralUtils.getDefaultLineSeparator();
+        StringBuilder createQuery = new StringBuilder(100);
+        createQuery.append("CREATE ").append(getCreateTableType(table)).append(" ").append(tableName).append(" (").append(lineSeparator); //$NON-NLS-1$ //$NON-NLS-2$
+        boolean hasNestedDeclarations = false;
+        final Collection<NestedObjectCommand> orderedCommands = getNestedOrderedCommands(command);
+        for (NestedObjectCommand nestedCommand : orderedCommands) {
+            if (nestedCommand.getObject() == table) {
+                continue;
+            }
+            if (excludeFromDDL(nestedCommand, orderedCommands)) {
+                continue;
+            }
+            //对字段注释做额外处理
+            String commentInfo = (String) nestedCommand.getProperty("comment");
+            String realComment = "";
+            if(!"".equals(commentInfo)) {
+            	realComment = " COMMENT '"+commentInfo+"'";
+            }
+            final String nestedDeclaration = nestedCommand.getNestedDeclaration(monitor, table, options)+realComment;
+            if (!CommonUtils.isEmpty(nestedDeclaration)) {
+                // Insert nested declaration
+                if (hasNestedDeclarations) {
+                    // Check for embedded comment
+                    int lastLFPos = createQuery.lastIndexOf(lineSeparator);
+                    int lastCommentPos = createQuery.lastIndexOf(slComment);
+                    if (lastCommentPos != -1) {
+                        while (lastCommentPos > 0 && Character.isWhitespace(createQuery.charAt(lastCommentPos - 1))) {
+                            lastCommentPos--;
+                        }
+                    }
+                    if (lastCommentPos < 0 || lastCommentPos < lastLFPos) {
+                        createQuery.append(","); //$NON-NLS-1$
+                    } else {
+                        createQuery.insert(lastCommentPos, ","); //$NON-NLS-1$
+                    }
+                    createQuery.append(lineSeparator); //$NON-NLS-1$
+                }
+                createQuery.append("\t").append(nestedDeclaration); //$NON-NLS-1$
+                hasNestedDeclarations = true;
+            } else {
+                // This command should be executed separately
+                final DBEPersistAction[] nestedActions = nestedCommand.getPersistActions(monitor, options);
+                if (nestedActions != null) {
+                    Collections.addAll(actions, nestedActions);
+                }
+            }
+        }
+        createQuery.append(lineSeparator).append(")"); //$NON-NLS-1$
+        appendTableModifiers(monitor, table, tableProps, createQuery, false);
+        //再额外对分区逻辑进行处理
+    	Collection<XuguTablePartition> partList = command.getObject().getPartitions(monitor);
+    	Collection<XuguTableSubPartition> subpartList = command.getObject().getSubPartitions(monitor);
+    	String tableDef = createQuery.toString();
+    	if(partList!=null && partList.size()!=0) {
+    		Iterator<XuguTablePartition> iterator = partList.iterator();
+    		boolean flag = true;
+    		String oldName = "";
+    		while(iterator.hasNext()) {
+    			XuguTablePartition part = iterator.next();
+    			//第一次循环设置分区类型和分区键
+    			if(flag) {
+    				//hash分区仅需要设置头部，设置好后跳出循环
+    				if("HASH".equals(part.getPartiType())) {
+    					tableDef += "\nPARTITION BY "+part.getPartiType()+"("+part.getPartiKey()+") PARTITIONS "+part.getPartiValue();
+    					break;
+    				}else if("AUTOMATIC".equals(part.getPartiType())) {
+    					tableDef += "\nPARTITION BY "+"RANGE("+part.getPartiKey()+") INTERVAL "+part.getAutoPartiSpan()+" "+part.getAutoPartiType()
+    					+" PARTITIONS(";
+    				}else {
+    					tableDef += "\nPARTITION BY "+part.getPartiType()+"("+part.getPartiKey()+") PARTITIONS(";
+    				}
+    				oldName = part.getName();
     			}
-    			midDef += midDefs[i];
-    			if(i!=colComments.size()-1) {
-    				midDef += ", ";
+    			//缓存中存在重复部分
+    			if((flag || !oldName.equals(part.getName()))&&!part.isSubPartition()) {
+    				if("LIST".equals(part.getPartiType())) {
+        				tableDef += "\n"+part.getName()+" VALUES('"+part.getPartiValue()+"')";
+        			}else {
+        				tableDef += "\n"+part.getName()+" VALUES LESS THAN("+part.getPartiValue()+")";
+        			}
+        			tableDef += ",";
+        			oldName = part.getName();
     			}
+    			flag = false;
     		}
-    		tableDef = tableDef.substring(0, start+1)+midDef+tableDef.substring(end);
-        	Collection<XuguTablePartition> partList = command.getObject().getPartitions(monitor);
-        	Collection<XuguTableSubPartition> subpartList = command.getObject().getSubPartitions(monitor);
-        	if(partList!=null && partList.size()!=0) {
-        		//替换掉原有的建表语句，在其后加上分区定义语句
-//        		String tableDef = actions.get(0).getScript();
-//        		actions.remove(0);
-        		Iterator<XuguTablePartition> iterator = partList.iterator();
-        		boolean flag = true;
-        		String oldName = "";
-        		while(iterator.hasNext()) {
-        			XuguTablePartition part = iterator.next();
+    		tableDef = tableDef.substring(0, tableDef.length()-1);
+    		tableDef += "\n)";
+    		if(subpartList!=null && subpartList.size()!=0) {
+    			Iterator<XuguTableSubPartition> iterator2 = subpartList.iterator();
+        		boolean flag2 = true;
+        		while(iterator2.hasNext()) {
+        			XuguTableSubPartition part = iterator2.next();
         			//第一次循环设置分区类型和分区键
-        			if(flag) {
+        			if(flag2) {
         				//hash分区仅需要设置头部，设置好后跳出循环
         				if("HASH".equals(part.getPartiType())) {
-        					tableDef += "\nPARTITION BY "+part.getPartiType()+"("+part.getPartiKey()+") PARTITIONS "+part.getPartiValue();
+        					tableDef += "\nSUBPARTITION BY "+part.getPartiType()+"("+part.getPartiKey()+") SUBPARTITIONS "+part.getPartiValue();
         					break;
-        				}else if("AUTOMATIC".equals(part.getPartiType())) {
-        					tableDef += "\nPARTITION BY "+"RANGE("+part.getPartiKey()+") INTERVAL "+part.getAutoPartiSpan()+" "+part.getAutoPartiType()
-        					+" PARTITIONS(";
         				}else {
-        					tableDef += "\nPARTITION BY "+part.getPartiType()+"("+part.getPartiKey()+") PARTITIONS(";
+        					tableDef += "\nSUBPARTITION BY "+part.getPartiType()+"("+part.getPartiKey()+") SUBPARTITIONS(";
         				}
         				oldName = part.getName();
         			}
         			//缓存中存在重复部分
-        			if((flag || !oldName.equals(part.getName()))&&!part.isSubPartition()) {
+        			if((flag2 || !oldName.equals(part.getName()))&&part.isSubPartition()) {
         				if("LIST".equals(part.getPartiType())) {
             				tableDef += "\n"+part.getName()+" VALUES('"+part.getPartiValue()+"')";
             			}else {
             				tableDef += "\n"+part.getName()+" VALUES LESS THAN("+part.getPartiValue()+")";
             			}
-            			tableDef += ",";
+        				tableDef += ",";
             			oldName = part.getName();
         			}
-        			flag = false;
+        			flag2 = false;
         		}
         		tableDef = tableDef.substring(0, tableDef.length()-1);
         		tableDef += "\n)";
-        		if(subpartList!=null && subpartList.size()!=0) {
-        			Iterator<XuguTableSubPartition> iterator2 = subpartList.iterator();
-            		boolean flag2 = true;
-            		while(iterator2.hasNext()) {
-            			XuguTableSubPartition part = iterator2.next();
-            			//第一次循环设置分区类型和分区键
-            			if(flag2) {
-            				//hash分区仅需要设置头部，设置好后跳出循环
-            				if("HASH".equals(part.getPartiType())) {
-            					tableDef += "\nSUBPARTITION BY "+part.getPartiType()+"("+part.getPartiKey()+") SUBPARTITIONS "+part.getPartiValue();
-            					break;
-            				}else {
-            					tableDef += "\nSUBPARTITION BY "+part.getPartiType()+"("+part.getPartiKey()+") SUBPARTITIONS(";
-            				}
-            				oldName = part.getName();
-            			}
-            			//缓存中存在重复部分
-            			if((flag2 || !oldName.equals(part.getName()))&&part.isSubPartition()) {
-            				if("LIST".equals(part.getPartiType())) {
-                				tableDef += "\n"+part.getName()+" VALUES('"+part.getPartiValue()+"')";
-                			}else {
-                				tableDef += "\n"+part.getName()+" VALUES LESS THAN("+part.getPartiValue()+")";
-                			}
-            				tableDef += ",";
-                			oldName = part.getName();
-            			}
-            			flag2 = false;
-            		}
-            		tableDef = tableDef.substring(0, tableDef.length()-1);
-            		tableDef += "\n)";
-        		}
-        		if(XuguConstants.LOG_PRINT_LEVEL<1) {
-                	log.info("Xugu Plugin: Construct create table sql: "+tableDef);
-                }
-        		System.out.println("yes!");
-        	}
-        	actions.add(new SQLDatabasePersistAction("Create table", tableDef));
-        	XuguDataSource source = command.getObject().getDataSource();
-        	XuguSchema schema = command.getObject().getSchema();
-        	source.schemaCache.refreshObject(monitor, source, schema);
+    		}
+    		if(XuguConstants.LOG_PRINT_LEVEL<1) {
+            	log.info("Xugu Plugin: Construct create table sql: "+tableDef);
+            }
+    		System.out.println("yes!");
     	}
+    	actions.add(new SQLDatabasePersistAction("Create table", tableDef));
+    	//刷新缓存
+    	XuguDataSource source = command.getObject().getDataSource();
+    	XuguSchema schema = command.getObject().getSchema();
+    	source.schemaCache.refreshObject(monitor, source, schema);
+    	
     }
     
     @Override
