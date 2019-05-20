@@ -48,6 +48,11 @@ public class XuguMessages extends NLS {
 	public static String dialog_connection_auto_detect;
 	public static String dialog_connection_local_client;
 	public static String dialog_database_name;
+	public static String dialog_database_charset;
+	public static String dialog_database_prefix;
+	public static String dialog_database_warning_null_name;
+	public static String dialog_database_hour;
+	public static String dialog_database_minute;
 	public static String dialog_database_create_title;
 	public static String dialog_database_create_info;
 	public static String dialog_schema_create_title;

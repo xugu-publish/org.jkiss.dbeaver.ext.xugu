@@ -161,16 +161,16 @@ public class XuguDatabaseManager extends SQLObjectEditor<XuguDatabase, XuguDataS
             nameText = UIUtils.createLabelText(composite, XuguMessages.dialog_database_name, null);
             nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             
-            charsetCombo = UIUtils.createLabelCombo(composite, "Charset", 0);
+            charsetCombo = UIUtils.createLabelCombo(composite, XuguMessages.dialog_database_charset, 0);
             for(int i=0; i<XuguConstants.DEFAULT_CHAR_SET.length; i++) {
             	charsetCombo.add(XuguConstants.DEFAULT_CHAR_SET[i]);
             }
             
-            isAddCombo = UIUtils.createLabelCombo(composite, "Add", 0);
+            isAddCombo = UIUtils.createLabelCombo(composite, XuguMessages.dialog_database_prefix, 0);
             isAddCombo.add("+");
             isAddCombo.add("-");
             
-            hourCombo = UIUtils.createLabelCombo(composite, "Hour", 0);
+            hourCombo = UIUtils.createLabelCombo(composite, XuguMessages.dialog_database_hour, 0);
             for(int i=0; i<24; i++) {
             	if(i<10) {
             		hourCombo.add("0"+i);
@@ -179,7 +179,7 @@ public class XuguDatabaseManager extends SQLObjectEditor<XuguDatabase, XuguDataS
             	}
             }
             
-            minuteCombo = UIUtils.createLabelCombo(composite, "Minute", 0);
+            minuteCombo = UIUtils.createLabelCombo(composite, XuguMessages.dialog_database_minute, 0);
             for(int i=0; i<60; i++) {
             	if(i<10) {
             		minuteCombo.add("0"+i);
@@ -207,7 +207,7 @@ public class XuguDatabaseManager extends SQLObjectEditor<XuguDatabase, XuguDataS
         		}
                 super.okPressed();
         	}else {
-        		XuguWarningDialog warn = new XuguWarningDialog(UIUtils.getActiveShell(), "Database name cannot be null!");
+        		XuguWarningDialog warn = new XuguWarningDialog(UIUtils.getActiveShell(), XuguMessages.dialog_database_warning_null_name);
         		warn.open();
         	}
         }
