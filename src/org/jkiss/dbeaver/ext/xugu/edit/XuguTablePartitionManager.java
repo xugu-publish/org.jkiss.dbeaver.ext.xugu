@@ -22,10 +22,12 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.ext.xugu.XuguMessages;
+import org.jkiss.dbeaver.ext.xugu.XuguUtils;
 import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.model.XuguTableColumn;
 import org.jkiss.dbeaver.ext.xugu.model.XuguTablePartition;
 import org.jkiss.dbeaver.ext.xugu.model.XuguTablePhysical;
+import org.jkiss.dbeaver.ext.xugu.views.XuguWarningDialog;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.edit.DBECommandContext;
 import org.jkiss.dbeaver.model.edit.DBEPersistAction;
@@ -399,20 +401,25 @@ public class XuguTablePartitionManager extends SQLObjectEditor<XuguTablePartitio
         @Override
         protected void okPressed()
         {
-        	this.partition = new XuguTablePartition(table, false ,"");
-            partition.setName(DBObjectNameCaseTransformer.transformObjectName(partition, nameText.getText()));
-            partition.setPartiType(DBObjectNameCaseTransformer.transformObjectName(partition, typeCombo.getText()));
-            partition.setPartiValue(DBObjectNameCaseTransformer.transformObjectName(partition,valueText.getText())); 
-            partition.setSubPartition(false);
-            partition.setOnline(true);
-            if(autoTypeCombo.getText()!=null && !"".equals(autoTypeCombo.getText())) {
-            	partition.setPartiKey(DBObjectNameCaseTransformer.transformObjectName(partition, colCombo.getText()));
-            	partition.setAutoPartiType(autoTypeCombo.getText());
-            	partition.setAutoPartiSpan(Integer.parseInt(autoSpanText.getText()));
-            }else {
-            	partition.setPartiKey(DBObjectNameCaseTransformer.transformObjectName(partition, colText.getText()));
-            }
-            super.okPressed();
+    		if(XuguUtils.checkString(nameText.getText())) {
+    			this.partition = new XuguTablePartition(table, false ,"");
+                partition.setName(DBObjectNameCaseTransformer.transformObjectName(partition, nameText.getText()));
+                partition.setPartiType(DBObjectNameCaseTransformer.transformObjectName(partition, typeCombo.getText()));
+                partition.setPartiValue(DBObjectNameCaseTransformer.transformObjectName(partition,valueText.getText())); 
+                partition.setSubPartition(false);
+                partition.setOnline(true);
+                if(autoTypeCombo.getText()!=null && !"".equals(autoTypeCombo.getText())) {
+                	partition.setPartiKey(DBObjectNameCaseTransformer.transformObjectName(partition, colCombo.getText()));
+                	partition.setAutoPartiType(autoTypeCombo.getText());
+                	partition.setAutoPartiSpan(Integer.parseInt(autoSpanText.getText()));
+                }else {
+                	partition.setPartiKey(DBObjectNameCaseTransformer.transformObjectName(partition, colText.getText()));
+                }
+                super.okPressed();
+    		}else {
+    			XuguWarningDialog warnDialog = new XuguWarningDialog(UIUtils.getActiveWorkbenchShell(), "Partition name cannot be null");
+        		warnDialog.open();
+    		}
         }
 
     }

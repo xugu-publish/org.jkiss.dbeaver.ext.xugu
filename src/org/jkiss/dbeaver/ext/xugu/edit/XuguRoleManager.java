@@ -32,6 +32,7 @@ import org.eclipse.swt.widgets.Text;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.ext.xugu.XuguMessages;
+import org.jkiss.dbeaver.ext.xugu.XuguUtils;
 import org.jkiss.dbeaver.ext.xugu.editors.XuguRoleEditor;
 import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.model.XuguDataSource;
@@ -202,7 +203,7 @@ public class XuguRoleManager extends SQLObjectEditor<XuguRole, XuguDataSource>{
         @Override
         protected void okPressed()
         {
-        	if(roleText.getText()!=null && !"".equals(roleText.getText())) {
+        	if(XuguUtils.checkString(roleText.getText())) {
         		role.setName(DBObjectNameCaseTransformer.transformObjectName(role, roleText.getText()));
                 role.setUserDesc(DBObjectNameCaseTransformer.transformObjectName(role,userNameText.getText()));
                 super.okPressed();

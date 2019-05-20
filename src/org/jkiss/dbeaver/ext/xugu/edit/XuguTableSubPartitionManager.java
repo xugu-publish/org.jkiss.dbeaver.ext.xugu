@@ -18,10 +18,12 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.ext.xugu.XuguMessages;
+import org.jkiss.dbeaver.ext.xugu.XuguUtils;
 import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.model.XuguTableColumn;
 import org.jkiss.dbeaver.ext.xugu.model.XuguTablePhysical;
 import org.jkiss.dbeaver.ext.xugu.model.XuguTableSubPartition;
+import org.jkiss.dbeaver.ext.xugu.views.XuguWarningDialog;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.edit.DBECommandContext;
 import org.jkiss.dbeaver.model.edit.DBEPersistAction;
@@ -247,14 +249,19 @@ public class XuguTableSubPartitionManager extends SQLObjectEditor<XuguTableSubPa
         @Override
         protected void okPressed()
         {
-        	this.partition = new XuguTableSubPartition(table, false ,"");
-            partition.setName(DBObjectNameCaseTransformer.transformObjectName(partition, nameText.getText()));
-            partition.setPartiType(DBObjectNameCaseTransformer.transformObjectName(partition, typeCombo.getText()));
-            partition.setPartiValue(DBObjectNameCaseTransformer.transformObjectName(partition,valueText.getText())); 
-            partition.setPartiKey(DBObjectNameCaseTransformer.transformObjectName(partition, colCombo.getText()));
-            partition.setSubPartition(true);
-            partition.setOnline(true);
-            super.okPressed();
+        	if(XuguUtils.checkString(nameText.getText())) {
+        		this.partition = new XuguTableSubPartition(table, false ,"");
+                partition.setName(DBObjectNameCaseTransformer.transformObjectName(partition, nameText.getText()));
+                partition.setPartiType(DBObjectNameCaseTransformer.transformObjectName(partition, typeCombo.getText()));
+                partition.setPartiValue(DBObjectNameCaseTransformer.transformObjectName(partition,valueText.getText())); 
+                partition.setPartiKey(DBObjectNameCaseTransformer.transformObjectName(partition, colCombo.getText()));
+                partition.setSubPartition(true);
+                partition.setOnline(true);
+                super.okPressed();
+        	}else {
+        		XuguWarningDialog warnDialog = new XuguWarningDialog(UIUtils.getActiveWorkbenchShell(), "Table Subpartition name cannot be null");
+        		warnDialog.open();
+        	}
         }
 
     }

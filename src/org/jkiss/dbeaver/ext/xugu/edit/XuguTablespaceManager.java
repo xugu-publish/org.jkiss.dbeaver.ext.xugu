@@ -14,9 +14,11 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.ext.xugu.XuguMessages;
+import org.jkiss.dbeaver.ext.xugu.XuguUtils;
 import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.model.XuguDataSource;
 import org.jkiss.dbeaver.ext.xugu.model.XuguTablespace;
+import org.jkiss.dbeaver.ext.xugu.views.XuguWarningDialog;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.edit.DBECommandContext;
@@ -183,14 +185,19 @@ public class XuguTablespaceManager extends SQLObjectEditor<XuguTablespace, XuguD
         @Override
         protected void okPressed()
         {
-            space.setName(DBObjectNameCaseTransformer.transformObjectName(space, nameText.getText()));
-            space.setFilePath(DBObjectNameCaseTransformer.transformObjectName(space,fileText.getText()));
-            if(nodeText.getText()!=null) {
-            	space.setNodeID(Integer.parseInt(DBObjectNameCaseTransformer.transformObjectName(space,nodeText.getText())));
-            }else {
-            	space.setNodeID(0);
-            }
-            super.okPressed();
+        	if(XuguUtils.checkString(nameText.getText())) {
+        		space.setName(DBObjectNameCaseTransformer.transformObjectName(space, nameText.getText()));
+                space.setFilePath(DBObjectNameCaseTransformer.transformObjectName(space,fileText.getText()));
+                if(nodeText.getText()!=null) {
+                	space.setNodeID(Integer.parseInt(DBObjectNameCaseTransformer.transformObjectName(space,nodeText.getText())));
+                }else {
+                	space.setNodeID(0);
+                }
+                super.okPressed();
+        	}else {
+        		XuguWarningDialog warnDialog = new XuguWarningDialog(UIUtils.getActiveWorkbenchShell(), "Tablespace name cannot be null");
+        		warnDialog.open();
+        	}
         }
 
     }

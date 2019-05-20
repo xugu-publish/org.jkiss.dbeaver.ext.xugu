@@ -207,7 +207,7 @@ public class XuguDatabaseManager extends SQLObjectEditor<XuguDatabase, XuguDataS
         		}
                 super.okPressed();
         	}else {
-        		XuguWarningDialog warn = new XuguWarningDialog(UIUtils.getActiveShell(), "Database name cannot be null");
+        		XuguWarningDialog warn = new XuguWarningDialog(UIUtils.getActiveShell(), "Database name cannot be null!");
         		warn.open();
         	}
         }

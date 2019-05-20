@@ -30,10 +30,12 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.XuguMessages;
+import org.jkiss.dbeaver.ext.xugu.XuguUtils;
 import org.jkiss.dbeaver.ext.xugu.edit.XuguSynonymManager.NewSynonymDialog;
 import org.jkiss.dbeaver.ext.xugu.model.XuguSchema;
 import org.jkiss.dbeaver.ext.xugu.model.XuguSynonym;
 import org.jkiss.dbeaver.ext.xugu.model.XuguView;
+import org.jkiss.dbeaver.ext.xugu.views.XuguWarningDialog;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPEvaluationContext;
 import org.jkiss.dbeaver.model.edit.DBECommandContext;
@@ -245,8 +247,14 @@ public class XuguViewManager extends SQLObjectEditor<XuguView, XuguSchema> {
         @Override
         protected void okPressed()
         {
-            view.setName(DBObjectNameCaseTransformer.transformObjectName(view, nameText.getText()));
-            super.okPressed();
+        	
+    		if(XuguUtils.checkString(nameText.getText())) {
+    			view.setName(DBObjectNameCaseTransformer.transformObjectName(view, nameText.getText()));
+                super.okPressed();
+    		}else {
+    			XuguWarningDialog warnDialog = new XuguWarningDialog(UIUtils.getActiveWorkbenchShell(), "View name cannot be null");
+        		warnDialog.open();
+    		}
         }
 
     }

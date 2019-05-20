@@ -14,9 +14,11 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.ext.xugu.XuguMessages;
+import org.jkiss.dbeaver.ext.xugu.XuguUtils;
 import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.model.XuguSchema;
 import org.jkiss.dbeaver.ext.xugu.model.XuguSynonym;
+import org.jkiss.dbeaver.ext.xugu.views.XuguWarningDialog;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.edit.DBECommandContext;
@@ -156,10 +158,15 @@ public class XuguSynonymManager extends SQLObjectEditor<XuguSynonym, XuguSchema>
         @Override
         protected void okPressed()
         {
-            synonym.setName(DBObjectNameCaseTransformer.transformObjectName(synonym, nameText.getText()));
-            synonym.setTargetName(DBObjectNameCaseTransformer.transformObjectName(synonym, tarNameText.getText()));
-            synonym.setPublic(isPublicButton.getSelection());
-            super.okPressed();
+        	if(XuguUtils.checkString(nameText.getText())) {
+        		synonym.setName(DBObjectNameCaseTransformer.transformObjectName(synonym, nameText.getText()));
+                synonym.setTargetName(DBObjectNameCaseTransformer.transformObjectName(synonym, tarNameText.getText()));
+                synonym.setPublic(isPublicButton.getSelection());
+                super.okPressed();
+        	}else {
+        		XuguWarningDialog warnDialog = new XuguWarningDialog(UIUtils.getActiveWorkbenchShell(), "Synonym name cannot be null");
+        		warnDialog.open();
+        	}
         }
 
     }

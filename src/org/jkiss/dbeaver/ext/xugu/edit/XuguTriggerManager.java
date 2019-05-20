@@ -41,6 +41,7 @@ import org.jkiss.dbeaver.ext.xugu.XuguMessages;
 import org.jkiss.dbeaver.ext.xugu.model.XuguTableBase;
 import org.jkiss.dbeaver.ext.xugu.model.XuguTableColumn;
 import org.jkiss.dbeaver.ext.xugu.model.XuguTrigger;
+import org.jkiss.dbeaver.ext.xugu.views.XuguWarningDialog;
 import org.jkiss.dbeaver.ext.xugu.XuguUtils;
 import org.jkiss.dbeaver.model.DBPEvaluationContext;
 import org.jkiss.dbeaver.model.edit.DBECommandContext;
@@ -320,50 +321,54 @@ public class XuguTriggerManager extends SQLTriggerManager<XuguTrigger, XuguTable
         @Override
         protected void okPressed()
         {
-        	String source = "\nBEGIN\n\nEND";
-            //设置父对象信息
-            this.trigger = new XuguTrigger(table, ""); 
-
-			trigger.setName(DBObjectNameCaseTransformer.transformObjectName(trigger, nameText.getText()));
-            trigger.setObjectType(parentTypeText.getText());
-            //当创建视图触发器时，timing自动设为instead of
-            if(table.getType()!=0) {
-            	trigger.setTriggerTime(2);
-            }else {
-            	trigger.setTriggerTime(triggerTimingCombo.getText());
-            }
-//            trigger.setTriggerTime(Integer.parseInt(triggerTimingBefore.getData().toString()));
-            trigger.setTriggerCondition(triggerConditionText.getText());
-            if(triggerTypeCombo.getSelectionIndex()>-1) {
-            	trigger.setTriggerType(triggerTypeCombo.getSelectionIndex()+1);
-            }
-            int event=0;
-            if(triggerEventInsert.getSelection()) {
-            	event += 1;
-            }
-            if(triggerEventUpdate.getSelection()) {
-            	event += 2;
-            }
-            if(triggerEventDelete.getSelection()) {
-            	event += 4;
-            }
-            trigger.setTriggeringEvent(event);
-            trigger.setObjectDefinitionText(source);
-            //加载列信息
-            TableItem[] cols = colListTable.getItems();
-            if(cols!=null) {
-            	int sum = cols.length;
-                int i=0;
-                ArrayList<String> includeCols = new ArrayList<String>();
-                while(i<sum) {
-                	if(cols[i].getChecked()) {
-                		includeCols.add(cols[i].getText(0));
-                	}
-                	i++;
+        	if(XuguUtils.checkString(nameText.getText())) {
+        		String source = "\nBEGIN\n\nEND";
+                //设置父对象信息
+                this.trigger = new XuguTrigger(table, ""); 
+    			trigger.setName(DBObjectNameCaseTransformer.transformObjectName(trigger, nameText.getText()));
+                trigger.setObjectType(parentTypeText.getText());
+                //当创建视图触发器时，timing自动设为instead of
+                if(table.getType()!=0) {
+                	trigger.setTriggerTime(2);
+                }else {
+                	trigger.setTriggerTime(triggerTimingCombo.getText());
                 }
-                trigger.setIncludeColumns(includeCols);
-            }
-            super.okPressed();
+//                trigger.setTriggerTime(Integer.parseInt(triggerTimingBefore.getData().toString()));
+                trigger.setTriggerCondition(triggerConditionText.getText());
+                if(triggerTypeCombo.getSelectionIndex()>-1) {
+                	trigger.setTriggerType(triggerTypeCombo.getSelectionIndex()+1);
+                }
+                int event=0;
+                if(triggerEventInsert.getSelection()) {
+                	event += 1;
+                }
+                if(triggerEventUpdate.getSelection()) {
+                	event += 2;
+                }
+                if(triggerEventDelete.getSelection()) {
+                	event += 4;
+                }
+                trigger.setTriggeringEvent(event);
+                trigger.setObjectDefinitionText(source);
+                //加载列信息
+                TableItem[] cols = colListTable.getItems();
+                if(cols!=null) {
+                	int sum = cols.length;
+                    int i=0;
+                    ArrayList<String> includeCols = new ArrayList<String>();
+                    while(i<sum) {
+                    	if(cols[i].getChecked()) {
+                    		includeCols.add(cols[i].getText(0));
+                    	}
+                    	i++;
+                    }
+                    trigger.setIncludeColumns(includeCols);
+                }
+                super.okPressed();
+        	}else {
+        		XuguWarningDialog warnDialog = new XuguWarningDialog(UIUtils.getActiveWorkbenchShell(), "Trigger name cannot be null");
+        		warnDialog.open();
+        	}
         }
 
     }

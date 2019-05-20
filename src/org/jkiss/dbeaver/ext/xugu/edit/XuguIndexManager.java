@@ -152,6 +152,7 @@ public class XuguIndexManager extends SQLIndexManager<XuguTableIndex, XuguTableP
         return "DROP INDEX " + PATTERN_ITEM_TABLE + "." + PATTERN_ITEM_INDEX; //$NON-NLS-1$ //$NON-NLS-2$
     }
     
+    //为了设置local属性实现的继承自EditIndexPage的界面类
     private class InnerIndexPage extends EditIndexPage{
     	private Combo globalCombo;
     	private boolean flag;
