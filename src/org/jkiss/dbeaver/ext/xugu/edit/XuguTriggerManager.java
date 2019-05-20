@@ -134,7 +134,8 @@ public class XuguTriggerManager extends SQLTriggerManager<XuguTrigger, XuguTable
             		trigger.getName()+" \n"+
             		timing+" "+event+targetCols+
             		" ON "+trigger.getTable().getName()+" \n"+
-            		type+ " WHEN("+realCondition+") \n"+
+            		type+ 
+            		("FOR EACH ROW".equals(trigger.getTriggerType())?" WHEN("+realCondition+") \n":" \n")+
             		source;
             if(XuguConstants.LOG_PRINT_LEVEL<1) {
             	log.info("Xugu Plugin: Construct create trigger sql: "+source);
@@ -155,8 +156,7 @@ public class XuguTriggerManager extends SQLTriggerManager<XuguTrigger, XuguTable
         private Button triggerEventInsert;
         private Button triggerEventUpdate;
         private Button triggerEventDelete;
-        private Button triggerTimingBefore;
-        private Button triggerTimingAfter;
+        private Combo triggerTimingCombo;
         private Text triggerConditionText;
         private Table colListTable;
         private Collection<XuguTableColumn> colList;
@@ -237,14 +237,23 @@ public class XuguTriggerManager extends SQLTriggerManager<XuguTrigger, XuguTable
 				}
             });
             
-            Composite timeBox = UIUtils.createPlaceholder(composite, 3, 1);
-            timeBox.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-            CLabel timeLabel = UIUtils.createInfoLabel(timeBox, "Trigger Timing:");
-            timeLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-            triggerTimingBefore = UIUtils.createRadioButton(timeBox, "Before", 1, null);
-            triggerTimingBefore.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-            triggerTimingAfter = UIUtils.createRadioButton(timeBox, "After", 2, null);
-            triggerTimingAfter.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+            triggerTimingCombo = UIUtils.createLabelCombo(composite, "Trigger Timing:", 0);
+            triggerTimingCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+            triggerTimingCombo.add("BEFORE");
+            triggerTimingCombo.add("INSTEAD OF");
+            triggerTimingCombo.add("AFTER");
+//            Composite timeBox = UIUtils.createPlaceholder(composite, 3, 1);
+//            timeBox.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+//            CLabel timeLabel = UIUtils.createInfoLabel(timeBox, "Trigger Timing:");
+//            timeLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+//            triggerTimingBefore = UIUtils.createRadioButton(timeBox, "Before", 1, null);
+//            triggerTimingBefore.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+//            triggerTimingAfter = UIUtils.createRadioButton(timeBox, "After", 2, null);
+//            triggerTimingAfter.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+            //当创建视图触发器时，不展示timing界面
+            if(table.getType()!=0) {
+            	triggerTimingCombo.setVisible(false);
+            }
             
             triggerConditionText = UIUtils.createLabelText(composite, "Trigger condition", null);
             triggerConditionText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -317,7 +326,13 @@ public class XuguTriggerManager extends SQLTriggerManager<XuguTrigger, XuguTable
 
 			trigger.setName(DBObjectNameCaseTransformer.transformObjectName(trigger, nameText.getText()));
             trigger.setObjectType(parentTypeText.getText());
-            trigger.setTriggerTime(Integer.parseInt(triggerTimingBefore.getData().toString()));
+            //当创建视图触发器时，timing自动设为instead of
+            if(table.getType()!=0) {
+            	trigger.setTriggerTime(2);
+            }else {
+            	trigger.setTriggerTime(triggerTimingCombo.getText());
+            }
+//            trigger.setTriggerTime(Integer.parseInt(triggerTimingBefore.getData().toString()));
             trigger.setTriggerCondition(triggerConditionText.getText());
             if(triggerTypeCombo.getSelectionIndex()>-1) {
             	trigger.setTriggerType(triggerTypeCombo.getSelectionIndex()+1);

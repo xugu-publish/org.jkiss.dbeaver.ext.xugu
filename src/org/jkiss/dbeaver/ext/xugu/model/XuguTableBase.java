@@ -106,6 +106,7 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
         this.tableType = type;
     }
 
+    // type=0 当前对象为表 type=1 当前对象为视图
     public int getType() {
     	return tableType;
     }
