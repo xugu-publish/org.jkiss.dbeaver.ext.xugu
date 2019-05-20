@@ -171,7 +171,7 @@ public abstract class XuguTriggerBase<PARENT extends DBSObject> extends XuguObje
     	case 1:
     		return "BEFORE";
     	case 2:
-    		return "REPLACE";
+    		return "INSTEAD OF";
     	case 4:
     		return "AFTER";
     	default:
@@ -183,6 +183,19 @@ public abstract class XuguTriggerBase<PARENT extends DBSObject> extends XuguObje
     	this.triggerTime = time;
     }
 
+    public void setTriggerTime(String time) {
+    	switch(time) {
+    	case "BEFORE":
+    		this.triggerTime = 1;
+    	case "INSTEAD OF":
+    		this.triggerTime = 2;
+    	case "AFTER":
+    		this.triggerTime = 4;
+    	default:
+    		this.triggerTime = -1;
+    	}
+    }
+    
     @Nullable
     @Override
     @Property(multiline = true, order = 8)
