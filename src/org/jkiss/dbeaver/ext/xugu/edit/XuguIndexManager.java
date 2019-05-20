@@ -166,7 +166,7 @@ public class XuguIndexManager extends SQLIndexManager<XuguTableIndex, XuguTableP
 	    protected void createContentsBeforeColumns(Composite panel)
 	    {
 			super.createContentsBeforeColumns(panel);
-			 UIUtils.createControlLabel(panel, "Is Local:");
+			 UIUtils.createControlLabel(panel, "Is Local");
 		     globalCombo = new Combo(panel, SWT.DROP_DOWN | SWT.READ_ONLY);
 		     globalCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		     globalCombo.add("GLOBAL");
