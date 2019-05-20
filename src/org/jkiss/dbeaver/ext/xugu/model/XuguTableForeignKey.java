@@ -45,6 +45,7 @@ public class XuguTableForeignKey extends XuguTableConstraintBase implements DBST
     private XuguTableConstraint referencedKey;
     private DBSForeignKeyModifyRule deleteRule;
     private DBSForeignKeyModifyRule updateRule;
+    private boolean enable;
 
     public XuguTableForeignKey(
         @NotNull XuguTableBase xuguTable,
@@ -79,6 +80,7 @@ public class XuguTableForeignKey extends XuguTableConstraintBase implements DBST
 	//        String refTableName = JDBCUtils.safeGetString(dbResult, "REF_TABLE_NAME");
 	        String refTableName;
 			refTableName = dbResult.getString(18);
+			this.enable = JDBCUtils.safeGetBoolean(dbResult, "ENABLE");
 		
 	        System.out.println("True foreign info "+refOwnerName+" "+refTableName+" "+refName);
 	        log.info("Xugu can get alias filed? "+refTableName+" "+refName);
@@ -170,6 +172,15 @@ public class XuguTableForeignKey extends XuguTableConstraintBase implements DBST
         return updateRule;
     }
 
+    @Property(viewable = true, editable = true, updatable=true, order = 4)
+    public boolean isEnable() {
+    	return this.enable;
+    }
+    
+    public void setEnable(boolean enable) {
+    	this.enable = enable;
+    }
+    
     @Override
     public XuguTableBase getAssociatedEntity()
     {
