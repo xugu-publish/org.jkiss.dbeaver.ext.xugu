@@ -16,7 +16,7 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.DBSObjectState;
 import org.jkiss.dbeaver.model.struct.rdb.DBSTrigger;
-
+import org.jkiss.dbeaver.ext.xugu.XuguUtils;
 import java.sql.ResultSet;
 import java.util.Map;
 

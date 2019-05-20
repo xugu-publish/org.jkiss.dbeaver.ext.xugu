@@ -20,23 +20,32 @@ package org.jkiss.dbeaver.ext.xugu.edit;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Text;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.ext.xugu.XuguMessages;
+import org.jkiss.dbeaver.ext.xugu.XuguUtils;
 import org.jkiss.dbeaver.ext.xugu.model.*;
 import org.jkiss.dbeaver.model.DBPEvaluationContext;
 import org.jkiss.dbeaver.model.edit.DBECommandContext;
 import org.jkiss.dbeaver.model.edit.DBEPersistAction;
 import org.jkiss.dbeaver.model.impl.DBSObjectCache;
+import org.jkiss.dbeaver.model.impl.edit.DBECommandAbstract;
 import org.jkiss.dbeaver.model.impl.edit.SQLDatabasePersistAction;
 import org.jkiss.dbeaver.model.impl.sql.edit.SQLObjectEditor.*;
 import org.jkiss.dbeaver.model.impl.sql.edit.struct.SQLConstraintManager;
 import org.jkiss.dbeaver.model.messages.ModelMessages;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.dbeaver.model.struct.DBSEntity;
 import org.jkiss.dbeaver.model.struct.DBSEntityAttribute;
 import org.jkiss.dbeaver.model.struct.DBSEntityConstraintType;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.ui.UITask;
+import org.jkiss.dbeaver.ui.UIUtils;
 import org.jkiss.dbeaver.ui.editors.object.struct.EditConstraintPage;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.ext.xugu.XuguConstants;
@@ -62,12 +71,13 @@ public class XuguConstraintManager extends SQLConstraintManager<XuguTableConstra
         return new UITask<XuguTableConstraint>() {
             @Override
             protected XuguTableConstraint runTask() {
-                EditConstraintPage editPage = new EditConstraintPage(
+            	EditConstraintPage editPage = new EditConstraintPage(
                     XuguMessages.edit_xugu_constraint_manager_dialog_title,
                     parent,
                     new DBSEntityConstraintType[] {
                         DBSEntityConstraintType.PRIMARY_KEY,
-                        DBSEntityConstraintType.UNIQUE_KEY },
+                        DBSEntityConstraintType.UNIQUE_KEY,
+                        DBSEntityConstraintType.CHECK},
                     	true
                     );
                 if (!editPage.edit()) {
@@ -78,7 +88,7 @@ public class XuguConstraintManager extends SQLConstraintManager<XuguTableConstra
                     parent,
                     editPage.getConstraintName(),
                     editPage.getConstraintType(),
-                    null,
+                    editPage.getConstraintExpression(),
                     editPage.isEnableConstraint() ? XuguObjectStatus.ENABLED : XuguObjectStatus.DISABLED);
                 int colIndex = 1;
                 for (DBSEntityAttribute tableColumn : editPage.getSelectedAttributes()) {
@@ -124,6 +134,7 @@ public class XuguConstraintManager extends SQLConstraintManager<XuguTableConstra
     	XuguTableBase table = constraint.getTable();
     	String sql = "ALTER TABLE " + table.getFullyQualifiedName(DBPEvaluationContext.DDL) + " ADD " + getNestedDeclaration(monitor, table, command, options) +
                 " "  + (constraint.isEnable()? "ENABLE" : "DISABLE");
+//                (XuguUtils.checkString(constraint.getSearchCondition())?" CHECK("+constraint.getSearchCondition()+")":"");
     	if(XuguConstants.LOG_PRINT_LEVEL<1) {
         	log.info("Xugu Plugin: Construct create constraint sql: "+sql);
         }
@@ -145,5 +156,13 @@ public class XuguConstraintManager extends SQLConstraintManager<XuguTableConstra
                 new SQLDatabasePersistAction(
                 		"Alter constraint", sql
                 	));
+    }
+    
+    //重写组装check条件的语句
+    @Override
+    protected void appendConstraintDefinition(StringBuilder decl, DBECommandAbstract<XuguTableConstraint> command) {
+    	decl.append(" (");
+    	decl.append(command.getObject().getSearchCondition());
+    	decl.append(")");
     }
 }

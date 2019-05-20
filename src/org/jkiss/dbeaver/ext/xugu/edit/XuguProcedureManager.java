@@ -31,6 +31,7 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.ui.UITask;
 import org.jkiss.dbeaver.ui.editors.object.struct.CreateProcedurePage;
+import org.jkiss.dbeaver.ext.xugu.XuguUtils;
 
 import java.util.List;
 import java.util.Map;

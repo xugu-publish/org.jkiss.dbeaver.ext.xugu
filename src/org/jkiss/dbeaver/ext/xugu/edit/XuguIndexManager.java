@@ -152,6 +152,7 @@ public class XuguIndexManager extends SQLIndexManager<XuguTableIndex, XuguTableP
         return "DROP INDEX " + PATTERN_ITEM_TABLE + "." + PATTERN_ITEM_INDEX; //$NON-NLS-1$ //$NON-NLS-2$
     }
     
+    //为了设置local属性实现的继承自EditIndexPage的界面类
     private class InnerIndexPage extends EditIndexPage{
     	private Combo globalCombo;
     	private boolean flag;
@@ -165,7 +166,7 @@ public class XuguIndexManager extends SQLIndexManager<XuguTableIndex, XuguTableP
 	    protected void createContentsBeforeColumns(Composite panel)
 	    {
 			super.createContentsBeforeColumns(panel);
-			 UIUtils.createControlLabel(panel, "Is Local:");
+			 UIUtils.createControlLabel(panel, "Is Local");
 		     globalCombo = new Combo(panel, SWT.DROP_DOWN | SWT.READ_ONLY);
 		     globalCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		     globalCombo.add("GLOBAL");

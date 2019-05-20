@@ -29,6 +29,7 @@ import org.eclipse.swt.widgets.Text;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.ext.xugu.XuguMessages;
+import org.jkiss.dbeaver.ext.xugu.XuguUtils;
 import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.model.XuguDataSource;
 import org.jkiss.dbeaver.ext.xugu.model.XuguSchema;
@@ -215,7 +216,7 @@ public class XuguSchemaManager extends SQLObjectEditor<XuguSchema, XuguDataSourc
         @Override
         protected void okPressed()
         {
-        	if(nameText.getText()!=null && !"".equals(nameText.getText())) {
+        	if(XuguUtils.checkString(nameText.getText())) {
         		user.setName(DBObjectNameCaseTransformer.transformObjectName(user, schemaOwner.getText()));
                 schema.setName(DBObjectNameCaseTransformer.transformObjectName(schema,nameText.getText()));
                 schema.setUser(user);

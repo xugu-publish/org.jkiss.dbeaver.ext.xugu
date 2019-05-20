@@ -52,9 +52,9 @@ public class XuguTableConstraint extends XuguTableConstraintBase {
     private boolean enable;
     private boolean valid;
     
-    public XuguTableConstraint(XuguTableBase oracleTable, String name, DBSEntityConstraintType constraintType, String searchCondition, XuguObjectStatus status)
+    public XuguTableConstraint(XuguTableBase table, String name, DBSEntityConstraintType constraintType, String searchCondition, XuguObjectStatus status)
     {
-        super(oracleTable, name, constraintType, status, false);
+        super(table, name, constraintType, status, false);
         this.searchCondition = searchCondition;
     }
 
@@ -87,6 +87,7 @@ public class XuguTableConstraint extends XuguTableConstraintBase {
             this.deferrable = JDBCUtils.safeGetBoolean(dbResult, "DEFERRABLE");
             this.initdeferred = JDBCUtils.safeGetBoolean(dbResult, "INITDEFERRED");
             this.define = JDBCUtils.safeGetString(dbResult, "DEFINE");
+            this.searchCondition = this.define;
             String s2 = JDBCUtils.safeGetString(dbResult, "UPDATE_ACTION");
             if(s2!=null) {
             	this.update_act = s2.charAt(0);
@@ -99,6 +100,7 @@ public class XuguTableConstraint extends XuguTableConstraintBase {
         }
     }
     
+    @Property(viewable = true, editable = false, updatable=false, order = 3)
     public String getSearchCondition()
     {
         return this.searchCondition;

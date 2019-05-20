@@ -33,6 +33,7 @@ import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.model.XuguDataSource;
 import org.jkiss.dbeaver.ext.xugu.model.XuguDatabase;
 import org.jkiss.dbeaver.ext.xugu.views.XuguWarningDialog;
+import org.jkiss.dbeaver.ext.xugu.XuguUtils;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.edit.DBECommandContext;
 import org.jkiss.dbeaver.model.edit.DBEObjectRenamer;
@@ -195,11 +196,20 @@ public class XuguDatabaseManager extends SQLObjectEditor<XuguDatabase, XuguDataS
         @Override
         protected void okPressed()
         {
-            database.setName(DBObjectNameCaseTransformer.transformObjectName(database, nameText.getText()));
-            database.setCharset(DBObjectNameCaseTransformer.transformObjectName(database, charsetCombo.getText()));
-            String timeZone = "GMT"+isAddCombo.getText()+hourCombo.getText()+":"+minuteCombo.getText();
-            database.setTimeZone(DBObjectNameCaseTransformer.transformObjectName(database, timeZone));
-            super.okPressed();
+        	if(XuguUtils.checkString(nameText.getText())) {
+        		database.setName(DBObjectNameCaseTransformer.transformObjectName(database, nameText.getText()));
+        		if(XuguUtils.checkString(charsetCombo.getText())) {
+        			database.setCharset(DBObjectNameCaseTransformer.transformObjectName(database, charsetCombo.getText()));
+        		}
+        		if(XuguUtils.checkString(isAddCombo.getText()) && XuguUtils.checkString(hourCombo.getText()) && XuguUtils.checkString(minuteCombo.getText())) {
+        			String timeZone = "GMT"+isAddCombo.getText()+hourCombo.getText()+":"+minuteCombo.getText();
+                    database.setTimeZone(DBObjectNameCaseTransformer.transformObjectName(database, timeZone));
+        		}
+                super.okPressed();
+        	}else {
+        		XuguWarningDialog warn = new XuguWarningDialog(UIUtils.getActiveShell(), "Database name cannot be null!");
+        		warn.open();
+        	}
         }
 
     }
