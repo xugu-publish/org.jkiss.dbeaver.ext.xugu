@@ -119,55 +119,55 @@ public class XuguTableColumnManager extends SQLTableColumnManager<XuguTableColum
         final XuguTableColumn column = command.getObject();
         boolean hasComment = command.getProperty("comment") != null;
         //遍历properties 确定每一项新更改均不为空才进行action添加
-        boolean flag = true;
-        if (!hasComment && command.getProperties().size() > 0) {
+        if (command.getProperties().size() > 0) {
         	Map<Object, Object> props = command.getProperties();
+        	Collection<Object> propKeys = props.keySet();
         	Collection<Object> propValues = props.values();
-        	Iterator<Object> it = propValues.iterator();
-        	while(it.hasNext()) {
-        		if(it.next()==null || "".equals(it.toString())) {
-        			flag = false;
-        			break;
+        	Iterator<Object> it1 = propKeys.iterator();
+        	Iterator<Object> it2 = propValues.iterator();
+        	while(it1.hasNext()) {
+        		String key = it1.next().toString();
+        		Object value = it2.next();
+        		//当value不为空时，添加操作
+        		if(value==null || "".equals(value.toString())) {
+        		}else {
+        			if(key.equals("comment")) {
+        				String sql = "COMMENT ON COLUMN " + column.getTable().getFullyQualifiedName(DBPEvaluationContext.DDL) + "." + DBUtils.getQuotedIdentifier(column) +
+                                " IS '" + column.getComment(new VoidProgressMonitor()) + "'";
+	                	if(XuguConstants.LOG_PRINT_LEVEL<1) {
+	                    	log.info("Xugu Plugin: Construct alter column comment sql: "+sql);
+	                    }
+	                    actionList.add(new SQLDatabasePersistAction(
+	                        "Comment column",sql));
+        			}
+        			else {
+        				String sql = "ALTER TABLE "+column.getTable().getFullyQualifiedName(DBPEvaluationContext.DDL)+" ALTER COLUMN ";
+        				switch(key) {
+	        				case "defaultValue":
+	        					if(command.getProperty("defaultValue").equals("")) {
+	                    			sql += column.getName() + " DROP DEFAULT";
+	                    		}else {
+	                    			sql += column.getName() +" SET DEFAULT '" + command.getProperty("defaultValue")+"'";
+	                    		}
+	        					break;
+	        				case "required":
+	        					if((boolean)command.getProperty("required")) {
+	                    			sql += column.getName() +" SET NOT NULL";
+	                    		}else {
+	                    			sql += column.getName() +" DROP NOT NULL";
+	                    		}
+	        					break;
+	        				default:
+	        					sql += getNestedDeclaration(monitor, column.getTable(), command, options);
+	        					break;
+        				}
+        				if(XuguConstants.LOG_PRINT_LEVEL<1) {
+                        	log.info("Xugu Plugin: Construct alter table column sql: "+sql);
+                        }
+                    	actionList.add(new SQLDatabasePersistAction("Modify column",sql)); 
+        			}
         		}
         	}
-        	if(flag) {
-        		String sql = "ALTER TABLE "+column.getTable().getFullyQualifiedName(DBPEvaluationContext.DDL)+" ALTER COLUMN ";
-        		//修改仅包含默认值做特殊处理(加上set关键字)
-            	if(command.getProperty("defaultValue")!=null) {
-            		if(command.getProperty("defaultValue").equals("")) {
-            			sql += column.getName() + " DROP DEFAULT";
-            		}else {
-            			sql += column.getName() +" SET DEFAULT '" + command.getProperty("defaultValue")+"'";
-            		}
-            	}
-            	//对于非空做特殊处理（与mysql语法不一致）
-            	else if(command.getProperty("required")!=null) {
-            		if((boolean)command.getProperty("required")) {
-            			sql += column.getName() +" SET NOT NULL";
-            		}else {
-            			sql += column.getName() +" DROP NOT NULL";
-            		}
-            	}
-            	else {
-            		sql += getNestedDeclaration(monitor, column.getTable(), command, options);
-            	}
-            	if(XuguConstants.LOG_PRINT_LEVEL<1) {
-                	log.info("Xugu Plugin: Construct alter table column sql: "+sql);
-                }
-            	actionList.add(new SQLDatabasePersistAction("Modify column",sql)); 
-        	}else {
-        		// do nothing
-        	}
-        }
-        //对注释做特殊处理
-        else if (hasComment) {
-        	String sql = "COMMENT ON COLUMN " + column.getTable().getFullyQualifiedName(DBPEvaluationContext.DDL) + "." + DBUtils.getQuotedIdentifier(column) +
-                    " IS '" + column.getComment(new VoidProgressMonitor()) + "'";
-        	if(XuguConstants.LOG_PRINT_LEVEL<1) {
-            	log.info("Xugu Plugin: Construct alter column comment sql: "+sql);
-            }
-            actionList.add(new SQLDatabasePersistAction(
-                "Comment column",sql));
         }
         else {
         	// do nothing

@@ -216,6 +216,10 @@ public class XuguTableIndex extends JDBCTableIndex<XuguSchema, XuguTablePhysical
 		return is_local;
 	}
 
+	public void setIs_local(boolean flag) {
+		this.is_local = flag;
+	}
+	
 	public int getParti_type() {
 		return parti_type;
 	}
