@@ -17,6 +17,12 @@
  */
 package org.jkiss.dbeaver.ext.xugu.edit;
 
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Combo;
+import org.eclipse.swt.widgets.Composite;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.XuguMessages;
@@ -37,11 +43,14 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSEntityAttribute;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.rdb.DBSIndexType;
+import org.jkiss.dbeaver.model.struct.rdb.DBSTable;
 import org.jkiss.dbeaver.ui.UITask;
+import org.jkiss.dbeaver.ui.UIUtils;
 import org.jkiss.dbeaver.ui.editors.object.struct.EditIndexPage;
 import org.jkiss.utils.CommonUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -71,7 +80,7 @@ public class XuguIndexManager extends SQLIndexManager<XuguTableIndex, XuguTableP
             	indexTypes.add(XuguConstants.INDEX_TYPE_BTREE);
             	indexTypes.add(XuguConstants.INDEX_TYPE_RTREE);
             	indexTypes.add(XuguConstants.INDEX_TYPE_FULL_TEXT);
-                EditIndexPage editPage = new EditIndexPage(
+                InnerIndexPage editPage = new InnerIndexPage(
                     XuguMessages.edit_xugu_index_manager_dialog_title,
                     parent,
                     indexTypes);
@@ -89,6 +98,7 @@ public class XuguIndexManager extends SQLIndexManager<XuguTableIndex, XuguTableP
                     DBObjectNameCaseTransformer.transformName(parent.getDataSource(), idxName.toString()),
                     editPage.isUnique(),
                     editPage.getIndexType());
+                index.setIs_local(editPage.isLocal());
                 int colIndex = 1;
                 for (DBSEntityAttribute tableColumn : editPage.getSelectedAttributes()) {
             		index.addColumn(
@@ -102,6 +112,20 @@ public class XuguIndexManager extends SQLIndexManager<XuguTableIndex, XuguTableP
                 return index;
             }
         }.execute();
+    }
+    
+    //重新组装创建index语句，增加local关键字
+    @Override
+    protected void addObjectCreateActions(DBRProgressMonitor monitor, List<DBEPersistAction> actions, ObjectCreateCommand command, Map<String, Object> options)
+    {
+    	super.addObjectCreateActions(monitor, actions, command, options);
+    	String sql = actions.get(0).getScript();
+    	actions.remove(0);
+    	XuguTableIndex index = command.getObject();
+    	if(index.isIs_local()) {
+    		sql += " LOCAL";
+    	}
+    	actions.add(new SQLDatabasePersistAction(ModelMessages.model_jdbc_create_new_index, sql));
     }
     
     @Override
@@ -127,5 +151,46 @@ public class XuguIndexManager extends SQLIndexManager<XuguTableIndex, XuguTableP
     {
         return "DROP INDEX " + PATTERN_ITEM_TABLE + "." + PATTERN_ITEM_INDEX; //$NON-NLS-1$ //$NON-NLS-2$
     }
+    
+    private class InnerIndexPage extends EditIndexPage{
+    	private Combo globalCombo;
+    	private boolean flag;
+    	
+		public InnerIndexPage(String title, DBSTable table, Collection<DBSIndexType> indexTypes) {
+			super(title, table, indexTypes);
+			// TODO Auto-generated constructor stub
+		}
+    	
+		@Override
+	    protected void createContentsBeforeColumns(Composite panel)
+	    {
+			super.createContentsBeforeColumns(panel);
+			 UIUtils.createControlLabel(panel, "Is Local:");
+		     globalCombo = new Combo(panel, SWT.DROP_DOWN | SWT.READ_ONLY);
+		     globalCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		     globalCombo.add("GLOBAL");
+		     globalCombo.add("LOCAL");
+		     globalCombo.addSelectionListener(new SelectionListener() {
 
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					String text = globalCombo.getText();
+					if("GLOBAL".equals(text)) {
+						flag =  false;
+					}else {
+						flag = true;
+					}
+				}
+
+				@Override
+				public void widgetDefaultSelected(SelectionEvent e) {
+				}
+		    	 
+		     });
+	    }
+		
+		protected boolean isLocal() {
+			return flag;
+		}
+    }
 }
