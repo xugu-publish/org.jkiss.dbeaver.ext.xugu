@@ -388,6 +388,32 @@ public class XuguAuthorityEditorBase{
 					keyWord = "存储过程或函数";
 					break;
 				}
+				//重新加载权限下拉框 选定为一级对象权限
+				objectAuthorityCombo.removeAll();
+				String[] authorityList=null;
+				switch(type) {
+				case "TABLE":
+					authorityList = XuguConstants.DEF_TABLE_AUTHORITY_LIST;
+					break;
+				case "VIEW":
+					authorityList = XuguConstants.DEF_VIEW_AUTHORITY_LIST;
+					break;
+				case "SEQUENCE":
+					authorityList = XuguConstants.DEF_SEQUENCE_AUTHORITY_LIST;
+					break;
+				case "PACKAGE":
+					authorityList = XuguConstants.DEF_PACKAGE_AUTHORITY_LIST;
+					break;
+				case "PROCEDURE":
+					authorityList = XuguConstants.DEF_PROCEDURE_AUTHORITY_LIST;
+					break;
+				}
+				if(authorityList!=null) {
+					objectAuthorityCombo.removeAll();
+					for(int i=0, l=authorityList.length; i<l; i++) {
+						objectAuthorityCombo.add(authorityList[i]);
+					}
+				}
 				//加载符合条件的已有权限
 				objectAuthorityList.removeAll();
 				Iterator<String> it = objectAuthorities.iterator();
@@ -396,7 +422,6 @@ public class XuguAuthorityEditorBase{
 					if(temp.contains(keyWord) && temp.contains("\""+schema+"\".\""+object+"\"")) {
 						objectAuthorityList.add(temp.substring(0, temp.indexOf(":")));
 					}
-					
 				}
 				//当一级对象改变时二级对象权限随之清空
 				subObjectCombo.removeAll();
