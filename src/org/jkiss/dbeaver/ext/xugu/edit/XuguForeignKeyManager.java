@@ -17,11 +17,20 @@
  */
 package org.jkiss.dbeaver.ext.xugu.edit;
 
+import java.util.List;
+import java.util.Map;
+
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.XuguMessages;
 import org.jkiss.dbeaver.ext.xugu.model.*;
+import org.jkiss.dbeaver.model.DBPEvaluationContext;
 import org.jkiss.dbeaver.model.edit.DBECommandContext;
+import org.jkiss.dbeaver.model.edit.DBEPersistAction;
 import org.jkiss.dbeaver.model.impl.DBSObjectCache;
+import org.jkiss.dbeaver.model.impl.edit.SQLDatabasePersistAction;
+import org.jkiss.dbeaver.model.impl.sql.edit.SQLObjectEditor.*;
 import org.jkiss.dbeaver.model.impl.sql.edit.struct.SQLForeignKeyManager;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSObject;
@@ -81,5 +90,19 @@ public class XuguForeignKeyManager extends SQLForeignKeyManager<XuguTableForeign
                 return foreignKey;
             }
         }.execute();
+    }
+    
+    @Override
+    protected void addObjectModifyActions(DBRProgressMonitor monitor, List<DBEPersistAction> actionList, ObjectChangeCommand command, Map<String, Object> options) throws DBException {
+    	XuguTableForeignKey fk = (XuguTableForeignKey) command.getObject();
+    	XuguTableBase table = fk.getTable();
+    	String sql = "ALTER TABLE " + table.getFullyQualifiedName(DBPEvaluationContext.DDL) + (fk.isEnable()? " ENABLE" : " DISABLE") +" CONSTRAINT "+ fk.getName();
+    	if(XuguConstants.LOG_PRINT_LEVEL<1) {
+        	log.info("Xugu Plugin: Construct alter foreign key sql: "+sql);
+        }
+    	actionList.add(
+                new SQLDatabasePersistAction(
+                		"Alter foreign key", sql
+                	));
     }
 }
