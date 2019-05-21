@@ -80,6 +80,18 @@ public class XuguMessages extends NLS {
 	public static String dialog_tablePartition_col_AutoType_label;
 	public static String dialog_tablePartition_col_AutoSpan_label;
 	
+	public static String dialog_trigger_create_title;
+	public static String dialog_trigger_name;
+	public static String dialog_trigger_parent_type;
+	public static String dialog_trigger_parent_name;
+	public static String dialog_trigger_event;
+	public static String dialog_trigger_event_insert;
+	public static String dialog_trigger_event_update;
+	public static String dialog_trigger_event_delete;
+	public static String dialog_trigger_type;
+	public static String dialog_trigger_timing;
+	public static String dialog_trigger_condition;
+	public static String dialog_trigger_label;
 	
 	public static String dialog_synonym_create_title;
 	public static String dialog_synonym_name;

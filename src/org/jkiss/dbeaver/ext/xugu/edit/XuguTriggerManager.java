@@ -195,31 +195,31 @@ public class XuguTriggerManager extends SQLTriggerManager<XuguTrigger, XuguTable
             Composite composite = UIUtils.createPlaceholder((Composite) container, 1, 5);
             composite.setLayoutData(new GridData(GridData.FILL_BOTH));
             
-            nameText = UIUtils.createLabelText(composite, "Trigger name", null);
+            nameText = UIUtils.createLabelText(composite, XuguMessages.dialog_trigger_name, null);
             nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             
-            parentTypeText = UIUtils.createLabelText(composite, "PARENT TYPE", null);
+            parentTypeText = UIUtils.createLabelText(composite, XuguMessages.dialog_trigger_parent_type, null);
             parentTypeText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             parentTypeText.setText(table.getType()==0?"TABLE":"VIEW");
             parentTypeText.setEditable(false);
             
-            parentNameText = UIUtils.createLabelText(composite, "PARENT NAME", null);
+            parentNameText = UIUtils.createLabelText(composite, XuguMessages.dialog_trigger_parent_name, null);
             parentNameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             parentNameText.setText(table.getName());
             parentNameText.setEditable(false);
             
             Composite eventBox = UIUtils.createPlaceholder(composite, 4, 1);
             eventBox.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-            CLabel eventLabel = UIUtils.createInfoLabel(eventBox, "Trigger Event:");
+            CLabel eventLabel = UIUtils.createInfoLabel(eventBox, XuguMessages.dialog_trigger_event);
             eventLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-            triggerEventInsert = UIUtils.createCheckbox(eventBox, "Insert", false);
+            triggerEventInsert = UIUtils.createCheckbox(eventBox, XuguMessages.dialog_trigger_event_insert, false);
             triggerEventInsert.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-            triggerEventUpdate = UIUtils.createCheckbox(eventBox, "Update", false);
+            triggerEventUpdate = UIUtils.createCheckbox(eventBox, XuguMessages.dialog_trigger_event_update, false);
             triggerEventUpdate.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-            triggerEventDelete = UIUtils.createCheckbox(eventBox, "Delete", false);
+            triggerEventDelete = UIUtils.createCheckbox(eventBox, XuguMessages.dialog_trigger_event_delete, false);
             triggerEventDelete.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             
-            triggerTypeCombo = UIUtils.createLabelCombo(composite, "TYPE", 0);
+            triggerTypeCombo = UIUtils.createLabelCombo(composite, XuguMessages.dialog_trigger_type, 0);
             triggerTypeCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             triggerTypeCombo.add("ROW");
             triggerTypeCombo.add("STATEMENT");
@@ -238,7 +238,7 @@ public class XuguTriggerManager extends SQLTriggerManager<XuguTrigger, XuguTable
 				}
             });
             
-            triggerTimingCombo = UIUtils.createLabelCombo(composite, "Trigger Timing:", 0);
+            triggerTimingCombo = UIUtils.createLabelCombo(composite, XuguMessages.dialog_trigger_timing, 0);
             triggerTimingCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             triggerTimingCombo.add("BEFORE");
             triggerTimingCombo.add("INSTEAD OF");
@@ -256,7 +256,7 @@ public class XuguTriggerManager extends SQLTriggerManager<XuguTrigger, XuguTable
             	triggerTimingCombo.setVisible(false);
             }
             
-            triggerConditionText = UIUtils.createLabelText(composite, "Trigger condition", null);
+            triggerConditionText = UIUtils.createLabelText(composite, XuguMessages.dialog_trigger_condition, null);
             triggerConditionText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             triggerConditionText.setEditable(false);
             
@@ -313,7 +313,7 @@ public class XuguTriggerManager extends SQLTriggerManager<XuguTrigger, XuguTable
 				public void widgetDefaultSelected(SelectionEvent e) {
 				}
             });
-            UIUtils.createInfoLabel(composite, "Set Trigger settings", GridData.FILL_HORIZONTAL, 2);
+            UIUtils.createInfoLabel(composite, XuguMessages.dialog_trigger_label, GridData.FILL_HORIZONTAL, 2);
 
             return parent;
         }
