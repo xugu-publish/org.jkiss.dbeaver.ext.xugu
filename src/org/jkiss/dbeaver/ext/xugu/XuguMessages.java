@@ -93,6 +93,9 @@ public class XuguMessages extends NLS {
 	public static String dialog_trigger_condition;
 	public static String dialog_trigger_label;
 	
+	public static String dialog_view_create_title;
+	public static String dialog_view_name;
+	
 	public static String dialog_synonym_create_title;
 	public static String dialog_synonym_name;
 	public static String dialog_synonym_target;

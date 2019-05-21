@@ -232,13 +232,13 @@ public class XuguViewManager extends SQLObjectEditor<XuguView, XuguSchema> {
         @Override
         protected Control createDialogArea(Composite parent)
         {
-            getShell().setText(XuguMessages.dialog_synonym_create_title);
+            getShell().setText(XuguMessages.dialog_view_create_title);
 
             Control container = super.createDialogArea(parent);
             Composite composite = UIUtils.createPlaceholder((Composite) container, 2, 5);
             composite.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-            nameText = UIUtils.createLabelText(composite, "View Name", null);
+            nameText = UIUtils.createLabelText(composite, XuguMessages.dialog_view_name, null);
             nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
             return parent;
