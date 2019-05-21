@@ -147,7 +147,6 @@ public class XuguViewManager extends SQLObjectEditor<XuguView, XuguSchema> {
         		view.setViewText(newText);
         	}
         }
-        
         if(force) {
         	//增加force关键字的语句
         	if(view.getViewText().toUpperCase().indexOf("FORCE")==-1) {
@@ -193,12 +192,6 @@ public class XuguViewManager extends SQLObjectEditor<XuguView, XuguSchema> {
                 "Comment table",
                 sql));
         }
-        // 做一次刷新操作
-        try {
-			view.getSchema().viewCache.refreshObject(monitor, view.getSchema(), view);
-		} catch (DBException e) {
-			e.printStackTrace();
-		}
         System.out.println("VVVView "+view.getName());
     }
     

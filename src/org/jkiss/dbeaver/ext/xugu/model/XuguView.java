@@ -99,7 +99,7 @@ public class XuguView extends XuguTableBase implements XuguSourceObject
     {
         return XuguSourceType.VIEW;
     }
-
+    
     @Override
     @Property(hidden = true, editable = true, updatable = true, order = -1)
     public String getObjectDefinitionText(DBRProgressMonitor monitor, Map<String, Object> options) throws DBException
@@ -113,7 +113,7 @@ public class XuguView extends XuguTableBase implements XuguSourceObject
         this.viewText = source;
     }
 
-    @Property(viewable=true, editable=true, updatable=true, order=2)
+    @Property(viewable = true, editable=true, updatable=true, order=2)
     public boolean isReplace() {
     	return this.replace;
     }
@@ -122,7 +122,7 @@ public class XuguView extends XuguTableBase implements XuguSourceObject
     	this.replace = replace;
     }
     
-    @Property(viewable=true, editable=true, updatable=true, order=3)
+    @Property(viewable = true, editable=true, updatable=true, order=3)
     public boolean isForce() {
     	return this.force;
     }

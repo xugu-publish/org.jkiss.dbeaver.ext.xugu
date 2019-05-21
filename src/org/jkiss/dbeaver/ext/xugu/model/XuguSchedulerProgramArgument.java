@@ -26,7 +26,7 @@ import org.jkiss.dbeaver.model.struct.DBSTypedObject;
 import java.sql.ResultSet;
 
 /**
- * OracleSchedulerProgramArgument
+ * XuguSchedulerProgramArgument
  */
 public class XuguSchedulerProgramArgument implements DBSParameter
 {

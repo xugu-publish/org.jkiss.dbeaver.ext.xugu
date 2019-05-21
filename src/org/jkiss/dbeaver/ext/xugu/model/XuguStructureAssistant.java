@@ -204,21 +204,21 @@ public class XuguStructureAssistant implements DBSStructureAssistant
         throws SQLException, DBException
     {
         StringBuilder objectTypeClause = new StringBuilder(100);
-        final List<XuguObjectType> oracleObjectTypes = new ArrayList<>(objectTypes.length + 2);
+        final List<XuguObjectType> xuguObjectTypes = new ArrayList<>(objectTypes.length + 2);
         for (DBSObjectType objectType : objectTypes) {
             if (objectType instanceof XuguObjectType) {
-                oracleObjectTypes.add((XuguObjectType) objectType);
+            	xuguObjectTypes.add((XuguObjectType) objectType);
                 if (objectType == XuguObjectType.PROCEDURE) {
-                    oracleObjectTypes.add(XuguObjectType.FUNCTION);
+                	xuguObjectTypes.add(XuguObjectType.FUNCTION);
                 } else if (objectType == XuguObjectType.TABLE) {
-                    oracleObjectTypes.add(XuguObjectType.VIEW);
-                    oracleObjectTypes.add(XuguObjectType.MATERIALIZED_VIEW);
+                	xuguObjectTypes.add(XuguObjectType.VIEW);
+                	xuguObjectTypes.add(XuguObjectType.MATERIALIZED_VIEW);
                 }
             } else if (DBSProcedure.class.isAssignableFrom(objectType.getTypeClass())) {
-                oracleObjectTypes.add(XuguObjectType.FUNCTION);
+            	xuguObjectTypes.add(XuguObjectType.FUNCTION);
             }
         }
-        for (XuguObjectType objectType : oracleObjectTypes) {
+        for (XuguObjectType objectType : xuguObjectTypes) {
             if (objectTypeClause.length() > 0) {
             	objectTypeClause.append(",");
             }
@@ -258,7 +258,7 @@ public class XuguStructureAssistant implements DBSStructureAssistant
                     final String objectName = JDBCUtils.safeGetString(dbResult, "OBJECT_NAME");
                     final String objectTypeName = JDBCUtils.safeGetString(dbResult, "OBJECT_TYPE");
                     final XuguObjectType objectType = XuguObjectType.getByType(objectTypeName);
-                    if (objectType != null && objectType != XuguObjectType.SYNONYM && objectType.isBrowsable() && oracleObjectTypes.contains(objectType)) {
+                    if (objectType != null && objectType != XuguObjectType.SYNONYM && objectType.isBrowsable() && xuguObjectTypes.contains(objectType)) {
                         XuguSchema objectSchema = dataSource.getSchema(session.getProgressMonitor(), schemaName);
                         if (objectSchema == null) {
                             log.debug("Schema '" + schemaName + "' not found. Probably was filtered");

@@ -30,7 +30,7 @@ import java.sql.SQLXML;
 
 /**
  * Xugu XML wrapper.
- * Actual type of xmlType object is oracle.xdb.XMLType
+ * Actual type of xmlType object is xugu.xdb.XMLType
  */
 public class XuguXMLWrapper implements SQLXML {
 

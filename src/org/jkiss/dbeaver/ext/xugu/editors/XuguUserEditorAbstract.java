@@ -21,8 +21,6 @@ import org.eclipse.jface.action.IContributionManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.jkiss.dbeaver.DBException;
-//import org.jkiss.dbeaver.ext.xugu.MySQLMessages;
-//import org.jkiss.dbeaver.ext.xugu.model.MySQLGrant;
 import org.jkiss.dbeaver.ext.xugu.model.XuguUser;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.load.DatabaseLoadService;
@@ -50,22 +48,11 @@ public abstract class XuguUserEditorAbstract extends AbstractDatabaseObjectEdito
     }
 
     protected abstract UserPageControl getPageControl();
-//    protected abstract void processGrants(List<MySQLGrant> grants);
-//
+
     protected class UserPageControl extends ObjectEditorPageControl {
         public UserPageControl(Composite parent) {
             super(parent, SWT.NONE, XuguUserEditorAbstract.this);
         }
-
-//        public ProgressVisualizer<List<MySQLGrant>> createGrantsLoadVisualizer() {
-//            return new ProgressVisualizer<List<MySQLGrant>>() {
-//                @Override
-//                public void completeLoading(List<MySQLGrant> grants) {
-//                    super.completeLoading(grants);
-//                    processGrants(grants);
-//                }
-//            };
-//        }
 
         @Override
         public void fillCustomActions(IContributionManager contributionManager) {

@@ -36,7 +36,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
- * OracleContentOpaque
+ * XuguContentOpaque
  *
  * @author Serge Rider
  */
@@ -95,7 +95,7 @@ public abstract class XuguContentOpaque<OPAQUE_TYPE extends Object> extends JDBC
     {
         try {
             if (storage != null) {
-                preparedStatement.setObject(paramIndex, createNewOracleObject(session.getOriginal()));
+                preparedStatement.setObject(paramIndex, createNewXuguObject(session.getOriginal()));
             } else if (opaque != null) {
                 preparedStatement.setObject(paramIndex, opaque);
             } else {
@@ -127,7 +127,7 @@ public abstract class XuguContentOpaque<OPAQUE_TYPE extends Object> extends JDBC
     @Override
     protected abstract XuguContentOpaque createNewContent();
 
-    protected abstract OPAQUE_TYPE createNewOracleObject(Connection connection)
+    protected abstract OPAQUE_TYPE createNewXuguObject(Connection connection)
         throws DBCException, IOException, SQLException;
 
     protected abstract DBDContentStorage makeStorageFromOpaque(DBRProgressMonitor monitor, OPAQUE_TYPE opaque) throws DBCException;
