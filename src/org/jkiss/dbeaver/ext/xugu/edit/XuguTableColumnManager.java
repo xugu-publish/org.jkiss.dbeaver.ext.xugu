@@ -90,8 +90,8 @@ public class XuguTableColumnManager extends SQLTableColumnManager<XuguTableColum
     		 DEFAULT = getNestedDeclaration(monitor, table, command, options).toString().split(" DEFAULT ");   		
 		}    
     	 DBPDataKind dataKind = command.getObject().getDataKind();
-    	 if (dataKind == DBPDataKind.STRING) {
-        	 query = "ALTER TABLE " + table.getFullyQualifiedName(DBPEvaluationContext.DDL) + " ADD "  + DEFAULT[0] + " DEFAULT " + "'" + DEFAULT[1] + "'";
+    	 if (dataKind == DBPDataKind.STRING && DEFAULT.length>1) {
+    		 query = "ALTER TABLE " + table.getFullyQualifiedName(DBPEvaluationContext.DDL) + " ADD "  + DEFAULT[0] + " DEFAULT " + "'" + DEFAULT[1] + "'";
 		}else {
 			 query = "ALTER TABLE " + table.getFullyQualifiedName(DBPEvaluationContext.DDL) + " ADD "  + getNestedDeclaration(monitor, table, command, options);			
 		}
