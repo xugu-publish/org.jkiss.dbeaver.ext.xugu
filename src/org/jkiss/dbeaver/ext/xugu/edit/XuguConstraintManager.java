@@ -134,7 +134,6 @@ public class XuguConstraintManager extends SQLConstraintManager<XuguTableConstra
     	XuguTableBase table = constraint.getTable();
     	String sql = "ALTER TABLE " + table.getFullyQualifiedName(DBPEvaluationContext.DDL) + " ADD " + getNestedDeclaration(monitor, table, command, options) +
                 " "  + (constraint.isEnable()? "ENABLE" : "DISABLE");
-//                (XuguUtils.checkString(constraint.getSearchCondition())?" CHECK("+constraint.getSearchCondition()+")":"");
     	if(XuguConstants.LOG_PRINT_LEVEL<1) {
         	log.info("Xugu Plugin: Construct create constraint sql: "+sql);
         }

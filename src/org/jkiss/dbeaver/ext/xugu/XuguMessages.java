@@ -48,6 +48,11 @@ public class XuguMessages extends NLS {
 	public static String dialog_connection_auto_detect;
 	public static String dialog_connection_local_client;
 	public static String dialog_database_name;
+	public static String dialog_database_charset;
+	public static String dialog_database_prefix;
+	public static String dialog_database_warning_null_name;
+	public static String dialog_database_hour;
+	public static String dialog_database_minute;
 	public static String dialog_database_create_title;
 	public static String dialog_database_create_info;
 	public static String dialog_schema_create_title;
@@ -75,6 +80,21 @@ public class XuguMessages extends NLS {
 	public static String dialog_tablePartition_col_AutoType_label;
 	public static String dialog_tablePartition_col_AutoSpan_label;
 	
+	public static String dialog_trigger_create_title;
+	public static String dialog_trigger_name;
+	public static String dialog_trigger_parent_type;
+	public static String dialog_trigger_parent_name;
+	public static String dialog_trigger_event;
+	public static String dialog_trigger_event_insert;
+	public static String dialog_trigger_event_update;
+	public static String dialog_trigger_event_delete;
+	public static String dialog_trigger_type;
+	public static String dialog_trigger_timing;
+	public static String dialog_trigger_condition;
+	public static String dialog_trigger_label;
+	
+	public static String dialog_view_create_title;
+	public static String dialog_view_name;
 	
 	public static String dialog_synonym_create_title;
 	public static String dialog_synonym_name;

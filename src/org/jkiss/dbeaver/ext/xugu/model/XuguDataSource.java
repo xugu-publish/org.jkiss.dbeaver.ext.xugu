@@ -1008,6 +1008,9 @@ public class XuguDataSource extends JDBCDataSource
 	        	sql.append(owner.getRoleFlag());
 	        	sql.append("_USERS WHERE IS_ROLE=true");
 	        	sql.append(" AND DB_ID=");
+	        	log.info(owner.databaseCache==null?"DB cache is null":"DB cache is not null");
+	        	log.info(session.getProgressMonitor()==null?"Monitor is null":"Monitor is not null");
+	        	log.info(owner.databaseCache.getObject(session.getProgressMonitor(), owner, dbName)==null?"Object is null":"WTF??????");
 				sql.append(owner.databaseCache.getObject(session.getProgressMonitor(), owner, dbName).getID());
 			} catch (DBException e) {
 				// TODO Auto-generated catch block
