@@ -152,7 +152,8 @@ public class XuguSequence extends XuguSchemaObject implements DBSSequence {
         this.flagCycle = flagCycle;
     }
 
-    @Property(viewable = true, editable = true, updatable = true, order = 8)
+    //由于测试时，有序设置在服务端没有效果，暂时隐藏有序属性的展示 
+    @Property(hidden = true, editable = true, updatable = true, order = 8)
     public boolean isOrder()
     {
         return flagOrder;
