@@ -24,7 +24,7 @@ import org.jkiss.dbeaver.model.DBPStatefulObject;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 
 /**
- * OracleStatefulObject
+ * XuguStatefulObject
  */
 public interface XuguStatefulObject extends DBSObject, DBPStatefulObject
 {

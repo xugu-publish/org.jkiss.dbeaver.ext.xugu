@@ -95,6 +95,8 @@ public class XuguMessages extends NLS {
 	
 	public static String dialog_view_create_title;
 	public static String dialog_view_name;
+	public static String dialog_view_replace;
+	public static String dialog_view_force;
 	
 	public static String dialog_synonym_create_title;
 	public static String dialog_synonym_name;
@@ -211,7 +213,6 @@ public class XuguMessages extends NLS {
 	public static String editors_xugu_session_editor_title_disconnect_session;
 	public static String dialog_connection_service;
 	public static String dialog_connection_sid;
-	public static String editors_oracle_session_editor_action__session;
 	public static String tools_script_execute_wizard_page_name;
 	public static String tools_script_execute_wizard_error_sqlplus_not_found;
 	public static String tools_script_execute_wizard_page_settings_page_name;

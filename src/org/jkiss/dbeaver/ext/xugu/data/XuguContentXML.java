@@ -91,16 +91,6 @@ public class XuguContentXML extends JDBCContentXML {
     }
 
 /*
-    @Override
-    protected XMLType createNewOracleObject(Connection connection) throws DBCException, IOException, SQLException
-    {
-        final InputStream contentStream = storage.getContentStream();
-        try {
-            return XMLType.createXML(connection, contentStream);
-        } finally {
-            ContentUtils.close(contentStream);
-        }
-    }
 
     @Override
     protected DBDContentStorage makeStorageFromOpaque(DBRProgressMonitor monitor, XMLType opaque) throws DBCException

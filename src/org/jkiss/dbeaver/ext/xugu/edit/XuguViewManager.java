@@ -97,7 +97,9 @@ public class XuguViewManager extends SQLObjectEditor<XuguView, XuguSchema> {
                     return null;
                 }
             	XuguView newView = dialog.getView();
-            	newView.setViewText("CREATE VIEW " + newView.getFullyQualifiedName(DBPEvaluationContext.DDL) + " AS\nSELECT");
+            	boolean replace = newView.isReplace();
+            	boolean force = newView.isForce();
+            	newView.setViewText("CREATE " + (replace?"OR REPLACE ":"") + (force?"FORCE ":"") + "VIEW " +newView.getFullyQualifiedName(DBPEvaluationContext.DDL) + " AS\nSELECT");
                 return newView;
             }
         }.execute();
@@ -130,6 +132,7 @@ public class XuguViewManager extends SQLObjectEditor<XuguView, XuguSchema> {
     private void createOrReplaceViewQuery(DBRProgressMonitor monitor, List<DBEPersistAction> actions, DBECommandComposite<XuguView, PropertyHandler> command)
     {
         XuguView view = command.getObject();
+
         boolean replace = view.isReplace();
         boolean force = view.isForce();
         if (replace) {
@@ -147,7 +150,6 @@ public class XuguViewManager extends SQLObjectEditor<XuguView, XuguSchema> {
         		view.setViewText(newText);
         	}
         }
-        
         if(force) {
         	//增加force关键字的语句
         	if(view.getViewText().toUpperCase().indexOf("FORCE")==-1) {
@@ -193,12 +195,6 @@ public class XuguViewManager extends SQLObjectEditor<XuguView, XuguSchema> {
                 "Comment table",
                 sql));
         }
-        // 做一次刷新操作
-        try {
-			view.getSchema().viewCache.refreshObject(monitor, view.getSchema(), view);
-		} catch (DBException e) {
-			e.printStackTrace();
-		}
         System.out.println("VVVView "+view.getName());
     }
     
@@ -206,6 +202,8 @@ public class XuguViewManager extends SQLObjectEditor<XuguView, XuguSchema> {
     	
     	private XuguView view;
         private Text nameText;
+        private Button replaceCheck;
+        private Button forceCheck;
 
         public NewViewDialog(Shell parentShell, XuguSchema dataSource)
         {
@@ -240,7 +238,13 @@ public class XuguViewManager extends SQLObjectEditor<XuguView, XuguSchema> {
 
             nameText = UIUtils.createLabelText(composite, XuguMessages.dialog_view_name, null);
             nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
+            
+            replaceCheck = UIUtils.createLabelCheckbox(composite, XuguMessages.dialog_view_replace, false);
+            replaceCheck.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+            
+            forceCheck = UIUtils.createLabelCheckbox(composite, XuguMessages.dialog_view_force, false);
+            forceCheck.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+            
             return parent;
         }
 
@@ -250,6 +254,8 @@ public class XuguViewManager extends SQLObjectEditor<XuguView, XuguSchema> {
         	
     		if(XuguUtils.checkString(nameText.getText())) {
     			view.setName(DBObjectNameCaseTransformer.transformObjectName(view, nameText.getText()));
+    			view.setForce(forceCheck.getSelection());
+    			view.setReplace(replaceCheck.getSelection());
                 super.okPressed();
     		}else {
     			XuguWarningDialog warnDialog = new XuguWarningDialog(UIUtils.getActiveWorkbenchShell(), "View name cannot be null");
