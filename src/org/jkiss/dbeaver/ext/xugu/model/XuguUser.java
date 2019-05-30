@@ -173,8 +173,8 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
 		}
 		if(resultSet!=null) {
 			//加载权限
-//			Vector<Object> authorities = new LoadPermission().loadPermission(conn, this.user_name, 0);
-			Vector<Object> authorities = new LoadPermission().loadPermission(conn, this.user_name);
+			Vector<Object> authorities = new LoadPermission().loadPermission(conn, this.user_name, 0);
+//			Vector<Object> authorities = new LoadPermission().loadPermission(conn, this.user_name);
 			userAuthorities = new ArrayList<>();
 			Iterator<Object> it = authorities.iterator();
 			while(it.hasNext()) {

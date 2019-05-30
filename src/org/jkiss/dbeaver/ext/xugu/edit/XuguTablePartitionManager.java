@@ -74,7 +74,6 @@ public class XuguTablePartitionManager extends SQLObjectEditor<XuguTablePartitio
 	                    	newTablePartition.setPartiKey(model.getPartiKey());
 	                    }
 	                }
-                	System.out.println("Cache one 1");
 	                return newTablePartition;
 	            }
 			}.execute();

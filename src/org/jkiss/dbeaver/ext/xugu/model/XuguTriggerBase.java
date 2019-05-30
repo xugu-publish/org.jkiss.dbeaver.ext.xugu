@@ -187,10 +187,13 @@ public abstract class XuguTriggerBase<PARENT extends DBSObject> extends XuguObje
     	switch(time) {
     	case "BEFORE":
     		this.triggerTime = 1;
+    		break;
     	case "INSTEAD OF":
     		this.triggerTime = 2;
+    		break;
     	case "AFTER":
     		this.triggerTime = 4;
+    		break;
     	default:
     		this.triggerTime = -1;
     	}
