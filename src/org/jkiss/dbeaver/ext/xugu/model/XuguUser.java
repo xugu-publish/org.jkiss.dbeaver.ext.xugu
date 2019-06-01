@@ -491,9 +491,10 @@ public class XuguUser extends XuguGlobalObject implements DBAUser, DBPRefreshabl
 			if(triList!=null && triList.size()>0) {
 				String res = "";
 				Iterator<XuguTrigger> it = triList.iterator();
-				XuguTrigger trigger = it.next();
+//				XuguTrigger trigger = it.next();
 				while(it.hasNext()) {
-					res += trigger.getTable().getName()+"."+trigger.getName()+",";
+//					res += trigger.getTable().getName()+"."+trigger.getName()+",";
+					res += it.next().getName()+",";;
 				}
 				if(res.length()>0) {
 					res = res.substring(0, res.length()-1);

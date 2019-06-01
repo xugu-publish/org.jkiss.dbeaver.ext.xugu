@@ -31,6 +31,7 @@ import org.jkiss.dbeaver.ext.xugu.XuguMessages;
 import org.jkiss.dbeaver.ext.xugu.XuguUtils;
 import org.jkiss.dbeaver.ext.xugu.model.*;
 import org.jkiss.dbeaver.model.DBPEvaluationContext;
+import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.edit.DBECommandContext;
 import org.jkiss.dbeaver.model.edit.DBEPersistAction;
 import org.jkiss.dbeaver.model.impl.DBSObjectCache;
@@ -40,8 +41,10 @@ import org.jkiss.dbeaver.model.impl.sql.edit.SQLObjectEditor.*;
 import org.jkiss.dbeaver.model.impl.sql.edit.struct.SQLConstraintManager;
 import org.jkiss.dbeaver.model.messages.ModelMessages;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSEntity;
 import org.jkiss.dbeaver.model.struct.DBSEntityAttribute;
+import org.jkiss.dbeaver.model.struct.DBSEntityAttributeRef;
 import org.jkiss.dbeaver.model.struct.DBSEntityConstraintType;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.ui.UITask;
@@ -160,8 +163,25 @@ public class XuguConstraintManager extends SQLConstraintManager<XuguTableConstra
     //重写组装check条件的语句
     @Override
     protected void appendConstraintDefinition(StringBuilder decl, DBECommandAbstract<XuguTableConstraint> command) {
+    	String type[] = decl.toString().split(" ");
     	decl.append(" (");
-    	decl.append(command.getObject().getSearchCondition());
+    	if (type[2].equals("CHECK")) {
+    		decl.append(command.getObject().getSearchCondition());
+		} else {
+			List<? extends DBSEntityAttributeRef> attrs = command.getObject().getAttributeReferences(new VoidProgressMonitor());
+			if (attrs != null) {
+				boolean firstColumn = true;
+				for (DBSEntityAttributeRef constraintColumn : attrs) {
+					final DBSEntityAttribute attribute = constraintColumn.getAttribute();
+					if (attribute == null) {
+						continue;
+					}
+					if (!firstColumn) decl.append(","); //$NON-NLS-1$
+					firstColumn = false;
+					decl.append(DBUtils.getQuotedIdentifier(attribute));
+				}
+			}			
+		}
     	decl.append(")");
     }
 }

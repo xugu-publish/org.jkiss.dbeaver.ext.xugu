@@ -109,7 +109,7 @@ public class XuguConstants {
     public static final int DATA_TYPE_TIMESTAMP_WITH_LOCAL_TIMEZONE = 102;
     
     public static final String XMLTYPE_CLASS_NAME = "XMLType";
-    public static final String[] DEFAULT_CHAR_SET = {"GBK", "GB2312", "UTF-8"};
+    public static final String[] DEFAULT_CHAR_SET = {"GBK", "GB2312", "UTF8"};
     public static final String DEF_PASSWORD_VALUE = "**********"; //$NON-NLS-1$
     public static final String DEF_UNTIL_TIME = "1970-1-1 07:00:00.933";
     
