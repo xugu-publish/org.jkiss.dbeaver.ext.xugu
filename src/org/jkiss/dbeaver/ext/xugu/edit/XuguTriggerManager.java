@@ -103,7 +103,6 @@ public class XuguTriggerManager extends SQLTriggerManager<XuguTrigger, XuguTable
         );
     }
 
-    @Override
     protected void createOrReplaceTriggerQuery(List<DBEPersistAction> actions, XuguTrigger trigger)
     {
         String source = XuguUtils.normalizeSourceName(trigger, false);
@@ -372,6 +371,12 @@ public class XuguTriggerManager extends SQLTriggerManager<XuguTrigger, XuguTable
         }
 
     }
+
+	@Override
+	protected void createOrReplaceTriggerQuery(List<DBEPersistAction> actions, XuguTrigger trigger, boolean create) {
+		// TODO Auto-generated method stub
+		
+	}
 
 }
 

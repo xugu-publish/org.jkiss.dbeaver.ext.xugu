@@ -59,7 +59,6 @@ public class XuguProcedureStandalone extends XuguProcedureBase<XuguSchema> imple
             DBSProcedureType.valueOf(JDBCUtils.safeGetString(dbResult, "RET_TYPE")==null?"PROCEDURE":"FUNCTION"));
         
         this.valid = JDBCUtils.safeGetBoolean(dbResult, "VALID");
-        System.out.println(JDBCUtils.safeGetString(dbResult, "PROC_NAME"));
         //通过define字段手动解析参数列表（仅支持查看）
         this.sourceDeclaration = JDBCUtils.safeGetString(dbResult, "DEFINE");
         if(this.sourceDeclaration!=null) {
@@ -90,7 +89,6 @@ public class XuguProcedureStandalone extends XuguProcedureBase<XuguSchema> imple
                         	}
                         	String[] duals = params[i].split(" ");
                         	procParams.add(new XuguProcedureParameter(monitor, this,duals[0], duals[duals.length-1], mode));
-                        	System.out.println(JDBCUtils.safeGetString(dbResult, "PROC_NAME")+" proc params :"+duals[0]+" "+duals[duals.length-1]);
                         }
                 	}
                 }

@@ -115,7 +115,6 @@ public class XuguRoleManager extends SQLObjectEditor<XuguRole, XuguDataSource>{
 			  }
         	}.execute();
         }
-        System.out.println("Create1 ??");
 //        commandContext.addCommand(new CommandCreateUser(newUser), new CreateObjectReflector<>(this), true);
         return newRole;
 //		

@@ -75,7 +75,6 @@ public class XuguTableSubPartitionManager extends SQLObjectEditor<XuguTableSubPa
 	                if(newTablePartition.isSubPartition()) {
 	                	parent.subPartitionCache.cacheObject(newTablePartition);
 	                }
-                	System.out.println("Cache one 1");
 	                return newTablePartition;
 	            }
 			}.execute();
@@ -148,7 +147,6 @@ public class XuguTableSubPartitionManager extends SQLObjectEditor<XuguTableSubPa
             }
         	actionList.add(new SQLDatabasePersistAction("Alter Partition", sql.toString()));
     	}
-    	System.out.println("No Online Option");
     }
     
     static class WarningDialog extends Dialog{

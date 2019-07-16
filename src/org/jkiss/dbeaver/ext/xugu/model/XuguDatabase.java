@@ -45,7 +45,6 @@ public class XuguDatabase extends XuguGlobalObject
     	super(dataSource, true);
         this.dataSource = dataSource;
         this.name = name;
-        System.out.println("DB name "+name);
     }
     
     public XuguDatabase(XuguDataSource dataSource, ResultSet dbResult)
@@ -57,7 +56,6 @@ public class XuguDatabase extends XuguGlobalObject
             this.name = JDBCUtils.safeGetString(dbResult, "DB_NAME");
             this.charset = JDBCUtils.safeGetString(dbResult, "CHAR_SET");
             this.timeZone = JDBCUtils.safeGetString(dbResult, "TIME_ZONE");
-            System.out.println("DB name "+name);
             persisted = true;
         } else {
             persisted = false;

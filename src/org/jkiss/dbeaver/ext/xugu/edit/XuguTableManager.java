@@ -83,7 +83,6 @@ public class XuguTableManager extends SQLTableManager<XuguTable, XuguSchema> imp
     @Override
     protected void setTableName(DBRProgressMonitor monitor,  XuguSchema parent, XuguTable table) throws DBException {
         table.setName(getNewChildName(monitor, parent, "NEWTABLE"));
-        System.out.println("prepare create table "+table.getName());
     }
 
     @Override
@@ -231,7 +230,6 @@ public class XuguTableManager extends SQLTableManager<XuguTable, XuguSchema> imp
     		if(XuguConstants.LOG_PRINT_LEVEL<1) {
             	log.info("Xugu Plugin: Construct create table sql: "+tableDef);
             }
-    		System.out.println("yes!");
     	}
     	actions.add(new SQLDatabasePersistAction("Create table", tableDef));
     	//刷新缓存

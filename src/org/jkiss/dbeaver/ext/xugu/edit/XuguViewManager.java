@@ -67,9 +67,7 @@ public class XuguViewManager extends SQLObjectEditor<XuguView, XuguSchema> {
         return FEATURE_EDITOR_ON_CREATE;
     }
 
-    @Override
-    protected void validateObjectProperties(ObjectChangeCommand command)
-        throws DBException
+    protected void validateObjectProperties(ObjectChangeCommand command) throws DBException
     {
         if (CommonUtils.isEmpty(command.getObject().getName())) {
             throw new DBException("View name cannot be empty");
@@ -195,7 +193,6 @@ public class XuguViewManager extends SQLObjectEditor<XuguView, XuguSchema> {
                 "Comment table",
                 sql));
         }
-        System.out.println("VVVView "+view.getName());
     }
     
     static class NewViewDialog extends Dialog {

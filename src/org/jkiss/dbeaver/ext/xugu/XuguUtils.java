@@ -38,7 +38,6 @@ import org.jkiss.dbeaver.model.DBPEvent;
 import org.jkiss.dbeaver.model.DBPScriptObject;
 import org.jkiss.dbeaver.model.DBPScriptObjectExt;
 import org.jkiss.dbeaver.model.DBUtils;
-import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.edit.DBEPersistAction;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.exec.jdbc.JDBCPreparedStatement;
@@ -49,10 +48,7 @@ import org.jkiss.dbeaver.model.impl.DBObjectNameCaseTransformer;
 import org.jkiss.dbeaver.model.impl.edit.SQLDatabasePersistAction;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
-import org.jkiss.dbeaver.utils.RuntimeUtils;
-
 import com.xugu.ddl.Parsing;
-
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -63,8 +59,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Xugu utils
- * 提供常用方法
+ * @author 
+  * 提供常用方法
  * some new comments
  */
 public class XuguUtils {

@@ -37,7 +37,6 @@ public class XuguSequenceManager extends SQLObjectEditor<XuguSequence, XuguSchem
         return FEATURE_EDITOR_ON_CREATE;
     }
 
-    @Override
     protected void validateObjectProperties(ObjectChangeCommand command) throws DBException
     {
         if (CommonUtils.isEmpty(command.getObject().getName())) {

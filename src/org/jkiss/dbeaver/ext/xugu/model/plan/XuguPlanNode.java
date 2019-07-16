@@ -37,7 +37,7 @@ package org.jkiss.dbeaver.ext.xugu.model.plan;
 import org.jkiss.dbeaver.ext.xugu.model.XuguDataSource;
 
 import org.jkiss.dbeaver.model.exec.plan.DBCPlanNode;
-
+import org.jkiss.dbeaver.model.exec.plan.DBCPlanNodeKind;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
 
 import org.jkiss.dbeaver.model.meta.Property;
@@ -76,7 +76,6 @@ public class XuguPlanNode implements DBCPlanNode {
     	this.dataSource = dataSource;
     	if(dbResult!=null) {
     		this.planPath = JDBCUtils.safeGetString(dbResult, "plan_path");
-    		System.out.println("PPPPPPPPPath "+this.planPath);
     		this.objectName = "plan path";
     		this.parent = null;
     		this.nested = null;
@@ -115,4 +114,34 @@ public class XuguPlanNode implements DBCPlanNode {
     {
         return planPath;
     }
+
+	@Override
+	public DBCPlanNodeKind getNodeKind() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getNodeName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getNodeType() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getNodeCondition() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getNodeDescription() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

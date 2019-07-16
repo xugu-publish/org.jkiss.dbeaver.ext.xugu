@@ -87,7 +87,6 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
     protected XuguTableBase(XuguSchema schema, String name, boolean persisted)
     {
         super(schema, name, persisted);
-        System.out.println("new table! "+name);
     }
 
     protected XuguTableBase(XuguSchema xuguSchema, ResultSet dbResult, int type)
@@ -160,7 +159,6 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
         throws DBException
     {
         if (comment == null) {
-        	System.out.println("CCCComents "+getTableTypeName());
         	int tableType = 0;
         	if("VIEW".equals(getTableTypeName())) {
         		tableType = 1;

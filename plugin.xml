@@ -171,7 +171,8 @@
                       defaultPort="5138"
                       description="Xugu JDBC driver."
                       icon="icons/xugu_icon.png"
-                      id="Xugu SQL Server 10.0"
+                      iconBig="icons/xugu_icon_big.png"
+                      id="Xugu SQL Server"
                       label="Xugu"
                       promoted="true"
                       sampleURL="jdbc:xugu://{host}[:{port}]/{database}"
@@ -195,12 +196,14 @@
 
                     <!--<file path="maven:/com.Xugu.jdbc:ojdbc8:RELEASE" type="jar"/>-->
 
-                    <fileSource url="https://github.com/xugu-publish/jdbc-driver/tree/master/libsrc" name="Xugu 10 drivers">
+                    <fileSource url="https://github.com/xugu-publish/jdbc-driver/tree/master/libsrc" name="Xugu JDBC drivers">
                         <file name="cloudjdbc-10.0.0.jar" description="Xugu JDBC driver."/>
+                        <file name="cloudjdbc-10.2.0.jar" description="Xugu JDBC driver."/>
+                        <file name="cloudjdbc-11.0.0.jar" description="Xugu JDBC driver."/>
                     </fileSource>
                    
                     <file type="license" path="drivers/xugu/LICENSE.txt" bundle="drivers.xugu"/>
-                    <file type="jar" path="drivers/xugu/cloudjdbc-10.0.0.jar" bundle="drivers.xugu"/>
+                    <file type="jar" path="drivers/xugu/cloudjdbc-11.0.0.jar" bundle="drivers.xugu"/>
 
                 </driver>
             </drivers>
@@ -308,7 +311,6 @@
             <datasource id="xugu"/>
 
             <type name="XMLTYPE"/>
-            <type name="SYS.XMLTYPE"/>
             <type kind="CONTENT"/>
             <type kind="DATETIME"/>
             <type name="TIMESTAMP"/>

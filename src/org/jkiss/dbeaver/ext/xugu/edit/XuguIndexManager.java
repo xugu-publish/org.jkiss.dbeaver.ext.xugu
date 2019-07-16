@@ -143,7 +143,6 @@ public class XuguIndexManager extends SQLIndexManager<XuguTableIndex, XuguTableP
                 .replace(PATTERN_ITEM_TABLE, command.getObject().getTable().getFullyQualifiedName(DBPEvaluationContext.DDL))
                 .replace(PATTERN_ITEM_INDEX, command.getObject().getName())
                 .replace(PATTERN_ITEM_INDEX_SHORT, DBUtils.getQuotedIdentifier(command.getObject()));
-        System.out.println("DDDrop index "+t);
     }
 
     @Override

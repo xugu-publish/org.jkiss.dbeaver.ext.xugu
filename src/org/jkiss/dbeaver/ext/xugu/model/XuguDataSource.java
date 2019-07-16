@@ -194,7 +194,6 @@ public class XuguDataSource extends JDBCDataSource
     				public void run() {
     					while(true) {
     						try {
-    							System.out.println("daemon running");
     							if(metaSession!=null && metaSession.getExecutionContext()!=null) {
     								Statement stmt = metaSession.getExecutionContext().getConnection(monitor).createStatement();
         							stmt.executeQuery("select 1 from dual");
@@ -207,8 +206,7 @@ public class XuguDataSource extends JDBCDataSource
     							}
     							Thread.sleep(def_time);
     						} catch (SQLException | InterruptedException e) {
-    							System.out.println("Connection down!");
-    							e.printStackTrace();
+    							log.debug("Connection is closed!", e);
     						}finally {
     							if(metaSession!=null) {
     								metaSession.close();
@@ -364,7 +362,6 @@ public class XuguDataSource extends JDBCDataSource
     @Association
     public XuguSchema getSchema(DBRProgressMonitor monitor, String name) throws DBException {
         if (publicSchema != null && publicSchema.getName().equals(name)) {
-        	System.out.println("inhere 2");
             return publicSchema;
         }
         return schemaCache.getObject(monitor, this, name);
@@ -403,7 +400,6 @@ public class XuguDataSource extends JDBCDataSource
 
 //        OutJarClass ooo = new OutJarClass();
 //        String tempStr = ooo.printInfo("world");
-//        System.out.println("WWWWWWWWWWWWTFFFFFFFFFF"+tempStr);
 //        log.info("WWWWWWWWWWWWTFFFFFFFFFF"+tempStr);
         DBPConnectionConfiguration connectionInfo = getContainer().getConnectionConfiguration();
         
@@ -881,7 +877,6 @@ public class XuguDataSource extends JDBCDataSource
         	}
             JDBCPreparedStatement dbStat = session.prepareStatement(schemasQuery.toString());
             
-            System.out.println("find schemas stmt "+dbStat.getQueryString());
             return dbStat;
         }
 
@@ -1008,13 +1003,10 @@ public class XuguDataSource extends JDBCDataSource
 	        	sql.append(owner.getRoleFlag());
 	        	sql.append("_USERS WHERE IS_ROLE=true");
 	        	sql.append(" AND DB_ID=");
-	        	log.info(owner.databaseCache==null?"DB cache is null":"DB cache is not null");
-	        	log.info(session.getProgressMonitor()==null?"Monitor is null":"Monitor is not null");
-	        	log.info(owner.databaseCache.getObject(session.getProgressMonitor(), owner, dbName)==null?"Object is null":"WTF??????");
 				sql.append(owner.databaseCache.getObject(session.getProgressMonitor(), owner, dbName).getID());
 			} catch (DBException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				log.debug("Error in XuguDataSource.RoleCache.prepareObjectsStatement()", e);
 			}
         	return session.prepareStatement(sql.toString());      
         }

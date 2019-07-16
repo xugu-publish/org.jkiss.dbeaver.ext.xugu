@@ -83,7 +83,6 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
     public XuguSchema(XuguDataSource dataSource, long id, String name)
     {
         super(dataSource, id > 0);
-        System.out.println("new Schema!1 "+name);
         this.id = id;
         this.name = name;
         this.roleFlag = dataSource.getRoleFlag();
@@ -97,7 +96,6 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
      */
     public XuguSchema(@NotNull XuguDataSource dataSource, XuguDatabase parent, ResultSet dbResult) {
     	super(dataSource, true);
-    	System.out.println("new Schema!2 "+JDBCUtils.safeGetString(dbResult, "SCHEMA_NAME"));
     	this.id = JDBCUtils.safeGetLong(dbResult, "SCHEMA_ID");
         this.name = JDBCUtils.safeGetString(dbResult, "SCHEMA_NAME");
         this.roleFlag = dataSource.getRoleFlag();
@@ -116,7 +114,6 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
     public XuguSchema(@NotNull XuguDataSource dataSource, @NotNull ResultSet dbResult)
     {
         super(dataSource, true);
-        System.out.println("new Schema!3 "+JDBCUtils.safeGetString(dbResult, "SCHEMA_NAME"));
         this.id = JDBCUtils.safeGetLong(dbResult, "SCHEMA_ID");
         this.name = JDBCUtils.safeGetString(dbResult, "SCHEMA_NAME");
         this.roleFlag = dataSource.getRoleFlag();
@@ -430,7 +427,6 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
     {
         XuguTableBase table = tableCache.getObject(monitor, this, childName);
         if (table != null) {
-            System.out.println("TTTTTTTTt "+table.getName()+" ");
             return table;
         }
         XuguSynonym synonym = synonymCache.getObject(monitor, this, childName);
@@ -568,10 +564,9 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         		sql.append("'");
         	}
         	if(XuguConstants.LOG_PRINT_LEVEL<1) {
-        		log.info("Xugu Plugin: Construct select tables sql: "+sql.toString());
+        		log.debug("Xugu table metadata: "+sql.toString());
         	}
         	JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
-        	System.out.println("find tables stmt "+dbStat.getQueryString());
             return dbStat;
         }
 
@@ -687,11 +682,9 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
                 	if(colName.indexOf("(")!=-1) {
                 		colName = colName.substring(colName.indexOf("(")+1, colName.indexOf(")"));
                 	}
-                	System.out.println("CCCCCCCCoLLLLLL "+colName);
                 	String[] colNames = colName.split(",");
                 	XuguTableConstraintColumn[] con_cols = new XuguTableConstraintColumn[colNames.length];
                 	for(int i=0; i<colNames.length; i++) {
-                		System.out.println("SSingle col "+colNames[i]);
                 		XuguTableColumn tableColumn = getTableColumn(session, parent, colNames[i]);
                 		con_cols[i] = new XuguTableConstraintColumn(
                                 object,
@@ -810,11 +803,9 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
             	//处理多列的情况
             	if(colName.indexOf("(")!=-1) {
                 	colName = colName.substring(colName.indexOf("(")+1, colName.indexOf(")"));
-                	System.out.println("CCCCCCCCoLLLLLL2 "+colName);
                 	String[] colNames = colName.split(",");
                 	XuguTableForeignKeyColumn[] con_cols = new XuguTableForeignKeyColumn[colNames.length];
                 	for(int i=0; i<colNames.length; i++) {
-                		System.out.println("SSingle col "+colNames[i]);
                 		XuguTableColumn tableColumn = getTableColumn(session, parent, colNames[i]);
                 		con_cols[i] = new XuguTableForeignKeyColumn(
                                 object,
@@ -956,7 +947,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         	sql.append(owner.getDBID(owner, session));
         	sql.append(" ORDER BY SEQ_NAME");
         	if(XuguConstants.LOG_PRINT_LEVEL<1) {
-        		log.info("Xugu Plugin: Construct select sequences sql: "+sql.toString());
+        		log.debug("Xugu sequence metadata: "+sql.toString());
         	}
             JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
             return dbStat;
@@ -991,7 +982,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         		sql.append(object.getObjectId());
         	}
         	if(XuguConstants.LOG_PRINT_LEVEL<1) {
-        		log.info("Xugu Plugin: Construct select procedures sql: "+sql.toString());
+        		log.debug("Xugu procedure metadata: "+sql.toString());
         	}
         	JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
             return dbStat;
@@ -1023,7 +1014,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         	sql.append(" AND DB_ID=");
         	sql.append(owner.getDBID(owner, session));
         	if(XuguConstants.LOG_PRINT_LEVEL<1) {
-        		log.info("Xugu Plugin: Construct select packages sql: "+sql.toString());
+        		log.debug("Xugu package metadata: "+sql.toString());
         	}
             JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
             return dbStat;
@@ -1056,7 +1047,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         	sql.append(" AND DB_ID=");
         	sql.append(owner.getDBID(owner, session));
         	if(XuguConstants.LOG_PRINT_LEVEL<1) {
-        		log.info("Xugu Plugin: Construct select synonyms sql: "+sql.toString());
+        		log.debug("Xugu synonyms metadata: "+sql.toString());
         	}
             JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
             return dbStat;
@@ -1085,7 +1076,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         	sql.append(" AND DB_ID=");
         	sql.append(owner.getDBID(owner, session));
         	if(XuguConstants.LOG_PRINT_LEVEL<1) {
-        		log.info("Xugu Plugin: Construct select UDTs sql: "+sql.toString());
+        		log.debug("Xugu udt metadata: "+sql.toString());
         	}
             JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
             return dbStat;
@@ -1114,7 +1105,6 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
 				String objectName)
             throws SQLException
         {
-        	System.out.println("select all views");
         	//xfc 修改了获取所有视图信息的sql
         	StringBuilder sql = new StringBuilder();
         	sql.append("SELECT * FROM ");
@@ -1128,7 +1118,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         		sql.append(object.getId());
         	}
         	if(XuguConstants.LOG_PRINT_LEVEL<1) {
-        		log.info("Xugu Plugin: Construct select views sql: "+sql.toString());
+        		log.debug("Xugu view metadata: "+sql.toString());
         	}
             JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
             return dbStat;
