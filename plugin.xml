@@ -177,7 +177,8 @@
                       promoted="true"
                       sampleURL="jdbc:xugu://{host}[:{port}]/{database}"
                       useURL="false"
-                      webURL="https://github.com/xugu-publish/jdbc-driver/tree/master/libsrc/">
+                      webURL="https://github.com/xugu-publish/jdbc-driver/tree/master/libsrc/"
+                      categories="sql">
                     <replace provider="generic" driver="xugu"/>
                     <replace provider="xugu" driver="xugu"/>
                     <replace provider="xugu" driver="xugu_oci"/>
