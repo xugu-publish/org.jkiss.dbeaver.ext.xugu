@@ -84,9 +84,7 @@ public class XuguUserManager extends SQLObjectEditor<XuguUser, XuguDataSource> i
         //创建新用户
         else {
         	newUser.setPersisted(false);
-        	System.out.println(" ?? "+newUser.isPersisted());
         }
-        System.out.println("Create1 ??");
 //        commandContext.addCommand(new CommandCreateUser(newUser), new CreateObjectReflector<>(this), true);
         return newUser;
     }
@@ -111,7 +109,7 @@ public class XuguUserManager extends SQLObjectEditor<XuguUser, XuguDataSource> i
         		user.setName(name);
         		user.setPassword(key1);
         		user.setRoleList(roleList);
-        		user.setUntil_time(command.getProperties().get(UserPropertyHandler.UNTIL_TIME.toString()).toString());
+//        		user.setUntil_time(command.getProperties().get(UserPropertyHandler.UNTIL_TIME.toString()).toString());
         		user.setPersisted(true);
         		StringBuilder sql = new StringBuilder();
         		sql.append("CREATE USER ");
@@ -129,11 +127,11 @@ public class XuguUserManager extends SQLObjectEditor<XuguUser, XuguDataSource> i
         				}
         			}
         		}
-        		if(user.getUntil_time()!=null) {
-        			sql.append("\nVALID UNTIL '");
-        			sql.append(user.getUntil_time());
-        			sql.append("'");
-        		}
+//        		if(user.getUntil_time()!=null) {
+//        			sql.append("\nVALID UNTIL '");
+//        			sql.append(user.getUntil_time());
+//        			sql.append("'");
+//        		}
         		sql.append(user.isLocked()?" ACCOUNT LOCK":"");
         		sql.append(user.isExpired()?" PASSWORD EXPIRED":"");
         		if(XuguConstants.LOG_PRINT_LEVEL<1) {
@@ -160,7 +158,7 @@ public class XuguUserManager extends SQLObjectEditor<XuguUser, XuguDataSource> i
     protected void addObjectModifyActions(DBRProgressMonitor monitor, List<DBEPersistAction> actionList, ObjectChangeCommand command, Map<String, Object> options)
     {
     	for(String k:options.keySet()) {
-    		System.out.println(options.get(k));
+    		log.debug(options.get(k));
     	}
     	String sql = "ALTER USER " + command.getObject().getName() + " IDENTIFIED BY ";
     	if(XuguConstants.LOG_PRINT_LEVEL<1) {
@@ -173,7 +171,7 @@ public class XuguUserManager extends SQLObjectEditor<XuguUser, XuguDataSource> i
     @Override
     public void filterCommands(DBECommandQueue<XuguUser> queue)
     {
-    	System.out.println("Create3 ??"+queue.toString());
+    	
     }
 
 }

@@ -38,7 +38,6 @@ import org.jkiss.dbeaver.model.DBPEvent;
 import org.jkiss.dbeaver.model.DBPScriptObject;
 import org.jkiss.dbeaver.model.DBPScriptObjectExt;
 import org.jkiss.dbeaver.model.DBUtils;
-import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.edit.DBEPersistAction;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.exec.jdbc.JDBCPreparedStatement;
@@ -49,10 +48,7 @@ import org.jkiss.dbeaver.model.impl.DBObjectNameCaseTransformer;
 import org.jkiss.dbeaver.model.impl.edit.SQLDatabasePersistAction;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
-import org.jkiss.dbeaver.utils.RuntimeUtils;
-
 import com.xugu.ddl.Parsing;
-
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -281,7 +277,7 @@ public class XuguUtils {
         log.info("get new object");
         Parsing pp = new Parsing();
         log.info("use out method");
-        String ddl = pp.loadDDL((com.xugu.cloudjdbc.Connection)conn, object.getSchema().getName(), object.getName());
+        String ddl = pp.loadDDL(conn, object.getSchema().getName(), object.getName());
         log.info("out method done");
         return ddl;
     }

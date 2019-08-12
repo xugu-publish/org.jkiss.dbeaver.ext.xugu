@@ -47,7 +47,6 @@ public class XuguCommandChangeUser extends DBECommandComposite<XuguUser, UserPro
     protected XuguCommandChangeUser(XuguUser user)
     {
         super(user, XuguMessages.edit_command_change_user_name);
-        System.out.println("in user command change");
     }
 
     @Override
@@ -137,7 +136,7 @@ public class XuguCommandChangeUser extends DBECommandComposite<XuguUser, UserPro
     				//没有新角色则直接删除
     				if(newRoleList==null || newRoleList.length==0) {
     					actions.add(new SQLDatabasePersistAction("Revoke old role from user", 
-    							"REVOKE ROLE "+oldRoleList[i]+" TO "+getObject().getName()));
+    							"REVOKE ROLE "+oldRoleList[i]+" FROM "+getObject().getName()));
     				}
     				//否则需要检查旧角色是否还保有
     				else {
