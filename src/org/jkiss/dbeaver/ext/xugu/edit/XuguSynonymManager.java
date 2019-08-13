@@ -46,12 +46,13 @@ public class XuguSynonymManager extends SQLObjectEditor<XuguSynonym, XuguSchema>
     }
 	
 	@Override
-	protected XuguSynonym createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context,
-			final XuguSchema parent, Object copyFrom) throws DBException {
+	protected XuguSynonym createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final Object container, Object from, Map<String, Object> options) throws DBException 
+	{
+		XuguSchema schema = (XuguSchema)container;
 		return new UITask<XuguSynonym>() {
             @Override
             protected XuguSynonym runTask() {
-                NewSynonymDialog dialog = new NewSynonymDialog(UIUtils.getActiveWorkbenchShell(), parent);
+                NewSynonymDialog dialog = new NewSynonymDialog(UIUtils.getActiveWorkbenchShell(), schema);
                 if (dialog.open() != IDialogConstants.OK_ID) {
                     return null;
                 }

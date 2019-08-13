@@ -66,8 +66,10 @@ public class XuguTableColumnManager extends SQLTableColumnManager<XuguTableColum
     }
 
     @Override
-    protected XuguTableColumn createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, XuguTableBase parent, Object copyFrom)
+    protected XuguTableColumn createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final Object container, Object from, Map<String, Object> options)
     {
+    	XuguTableBase parent = (XuguTableBase)container;
+    	
         DBSDataType columnType = findBestDataType(parent.getDataSource(), "varchar2"); //$NON-NLS-1$
 
         final XuguTableColumn column = new XuguTableColumn(parent);

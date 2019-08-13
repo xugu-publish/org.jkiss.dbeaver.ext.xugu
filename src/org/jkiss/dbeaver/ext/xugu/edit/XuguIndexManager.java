@@ -43,12 +43,11 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSEntityAttribute;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.rdb.DBSIndexType;
-import org.jkiss.dbeaver.model.struct.rdb.DBSTable;
+import org.jkiss.dbeaver.model.struct.rdb.DBSTableIndex;
 import org.jkiss.dbeaver.ui.UITask;
 import org.jkiss.dbeaver.ui.UIUtils;
 import org.jkiss.dbeaver.ui.editors.object.struct.EditIndexPage;
 import org.jkiss.utils.CommonUtils;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -69,10 +68,16 @@ public class XuguIndexManager extends SQLIndexManager<XuguTableIndex, XuguTableP
     }
 
     @Override
-    protected XuguTableIndex createDatabaseObject(
-        DBRProgressMonitor monitor, DBECommandContext context, final XuguTablePhysical parent,
-        Object from)
+    protected XuguTableIndex createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final Object container,Object from,  Map<String, Object> options)
     {
+    	XuguTablePhysical table = (XuguTablePhysical) container;
+    	
+    	final XuguTableIndex index = new XuguTableIndex(
+            table.getSchema(),
+            table,
+            "INDEX",
+            true,
+            DBSIndexType.UNKNOWN);
         return new UITask<XuguTableIndex>() {
             @Override
             protected XuguTableIndex runTask() {
@@ -80,25 +85,21 @@ public class XuguIndexManager extends SQLIndexManager<XuguTableIndex, XuguTableP
             	indexTypes.add(XuguConstants.INDEX_TYPE_BTREE);
             	indexTypes.add(XuguConstants.INDEX_TYPE_RTREE);
             	indexTypes.add(XuguConstants.INDEX_TYPE_FULL_TEXT);
-                InnerIndexPage editPage = new InnerIndexPage(
+            	EditIndexPage editPage = new EditIndexPage(
                     XuguMessages.edit_xugu_index_manager_dialog_title,
-                    parent,
+                    index,
                     indexTypes);
                 if (!editPage.edit()) {
                     return null;
                 }
 
                 StringBuilder idxName = new StringBuilder(64);
-                idxName.append(CommonUtils.escapeIdentifier(parent.getName())).append("_") //$NON-NLS-1$
+                idxName.append(CommonUtils.escapeIdentifier(table.getName())).append("_") //$NON-NLS-1$
                     .append(CommonUtils.escapeIdentifier(editPage.getSelectedAttributes().iterator().next().getName()))
                     .append("_IDX"); //$NON-NLS-1$
-                final XuguTableIndex index = new XuguTableIndex(
-                    parent.getSchema(),
-                    parent,
-                    DBObjectNameCaseTransformer.transformName(parent.getDataSource(), idxName.toString()),
-                    editPage.isUnique(),
-                    editPage.getIndexType());
-                index.setIs_local(editPage.isLocal());
+                index.setName(DBObjectNameCaseTransformer.transformName(table.getDataSource(), idxName.toString()));
+                index.setUnique(editPage.isUnique());
+                index.setIndexType(editPage.getIndexType());
                 int colIndex = 1;
                 for (DBSEntityAttribute tableColumn : editPage.getSelectedAttributes()) {
             		index.addColumn(
@@ -156,8 +157,8 @@ public class XuguIndexManager extends SQLIndexManager<XuguTableIndex, XuguTableP
     	private Combo globalCombo;
     	private boolean flag;
     	
-		public InnerIndexPage(String title, DBSTable table, Collection<DBSIndexType> indexTypes) {
-			super(title, table, indexTypes);
+		public InnerIndexPage(String title, DBSTableIndex index, Collection<DBSIndexType> indexTypes) {
+			super(title, index, indexTypes);
 			// TODO Auto-generated constructor stub
 		}
     	

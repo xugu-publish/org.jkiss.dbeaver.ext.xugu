@@ -58,18 +58,19 @@ public class XuguPackageManager extends SQLObjectEditor<XuguPackage, XuguSchema>
     }
 
     @Override
-    protected XuguPackage createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final XuguSchema parent, Object copyFrom)
+    protected XuguPackage createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final Object container,Object from,  Map<String, Object> options)
     {
+    	XuguSchema schema = (XuguSchema)container;
         return new UITask<XuguPackage>() {
             @Override
             protected XuguPackage runTask() {
-                EntityEditPage editPage = new EntityEditPage(parent.getDataSource(), DBSEntityType.PACKAGE);
+                EntityEditPage editPage = new EntityEditPage(schema.getDataSource(), DBSEntityType.PACKAGE);
                 if (!editPage.edit()) {
                     return null;
                 }
                 String packName = editPage.getEntityName();
                 XuguPackage xuguPackage = new XuguPackage(
-                    parent,
+                	schema,
                     packName);
                 xuguPackage.setObjectDefinitionText(
                     "CREATE OR REPLACE PACKAGE " + packName + "\n" +

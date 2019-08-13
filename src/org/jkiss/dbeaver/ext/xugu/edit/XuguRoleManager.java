@@ -19,10 +19,6 @@ package org.jkiss.dbeaver.ext.xugu.edit;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CLabel;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -30,22 +26,16 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.jkiss.code.Nullable;
-import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.ext.xugu.XuguMessages;
 import org.jkiss.dbeaver.ext.xugu.XuguUtils;
-import org.jkiss.dbeaver.ext.xugu.editors.XuguRoleEditor;
 import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.model.XuguDataSource;
-import org.jkiss.dbeaver.ext.xugu.model.XuguDatabase;
 import org.jkiss.dbeaver.ext.xugu.model.XuguRole;
-import org.jkiss.dbeaver.ext.xugu.model.XuguSchema;
-import org.jkiss.dbeaver.ext.xugu.model.XuguUser;
 import org.jkiss.dbeaver.ext.xugu.views.XuguWarningDialog;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.edit.DBEPersistAction;
 import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.edit.DBECommandContext;
-import org.jkiss.dbeaver.model.edit.DBEObjectRenamer;
 import org.jkiss.dbeaver.model.impl.DBObjectNameCaseTransformer;
 import org.jkiss.dbeaver.model.impl.DBSObjectCache;
 import org.jkiss.dbeaver.model.impl.edit.SQLDatabasePersistAction;
@@ -54,8 +44,6 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.ui.UITask;
 import org.jkiss.dbeaver.ui.UIUtils;
-import org.jkiss.utils.CommonUtils;
-
 import java.util.List;
 import java.util.Map;
 
@@ -74,12 +62,6 @@ public class XuguRoleManager extends SQLObjectEditor<XuguRole, XuguDataSource>{
     }
 
     @Override
-    public boolean canCreateObject(XuguDataSource parent)
-    {
-        return true;
-    }
-
-    @Override
     public boolean canDeleteObject(XuguRole object)
     {
         return true;
@@ -93,12 +75,13 @@ public class XuguRoleManager extends SQLObjectEditor<XuguRole, XuguDataSource>{
     }
     
     @Override
-    protected XuguRole createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final XuguDataSource parent, Object copyFrom)
+    protected XuguRole createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final Object container, Object from, Map<String, Object> options)
     {
+    	XuguDataSource parent = (XuguDataSource)container;
     	XuguRole newRole = new XuguRole(parent, monitor, null);
     	//修改已存在用户
-        if (copyFrom instanceof XuguRole) {
-            XuguRole tplRole = (XuguRole)copyFrom;
+        if (from instanceof XuguRole) {
+            XuguRole tplRole = (XuguRole)from;
             newRole.setName(tplRole.getName());
         }
         //创建新用户

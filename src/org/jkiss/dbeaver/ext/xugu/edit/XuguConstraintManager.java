@@ -19,16 +19,9 @@ package org.jkiss.dbeaver.ext.xugu.edit;
 
 import java.util.List;
 import java.util.Map;
-
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Text;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.ext.xugu.XuguMessages;
-import org.jkiss.dbeaver.ext.xugu.XuguUtils;
 import org.jkiss.dbeaver.ext.xugu.model.*;
 import org.jkiss.dbeaver.model.DBPEvaluationContext;
 import org.jkiss.dbeaver.model.DBUtils;
@@ -37,18 +30,15 @@ import org.jkiss.dbeaver.model.edit.DBEPersistAction;
 import org.jkiss.dbeaver.model.impl.DBSObjectCache;
 import org.jkiss.dbeaver.model.impl.edit.DBECommandAbstract;
 import org.jkiss.dbeaver.model.impl.edit.SQLDatabasePersistAction;
-import org.jkiss.dbeaver.model.impl.sql.edit.SQLObjectEditor.*;
 import org.jkiss.dbeaver.model.impl.sql.edit.struct.SQLConstraintManager;
 import org.jkiss.dbeaver.model.messages.ModelMessages;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
-import org.jkiss.dbeaver.model.struct.DBSEntity;
 import org.jkiss.dbeaver.model.struct.DBSEntityAttribute;
 import org.jkiss.dbeaver.model.struct.DBSEntityAttributeRef;
 import org.jkiss.dbeaver.model.struct.DBSEntityConstraintType;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.ui.UITask;
-import org.jkiss.dbeaver.ui.UIUtils;
 import org.jkiss.dbeaver.ui.editors.object.struct.EditConstraintPage;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.ext.xugu.XuguConstants;
@@ -67,10 +57,10 @@ public class XuguConstraintManager extends SQLConstraintManager<XuguTableConstra
     }
 
     @Override
-    protected XuguTableConstraint createDatabaseObject(
-        DBRProgressMonitor monitor, DBECommandContext context, final XuguTableBase parent,
-        Object from)
+    protected XuguTableConstraint createDatabaseObject( DBRProgressMonitor monitor, DBECommandContext context, final Object container,Object from,  Map<String, Object> options)
     {
+    	XuguTableBase parent = (XuguTableBase) container;
+    	 
         return new UITask<XuguTableConstraint>() {
             @Override
             protected XuguTableConstraint runTask() {

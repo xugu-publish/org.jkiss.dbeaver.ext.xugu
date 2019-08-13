@@ -54,12 +54,6 @@ public class XuguUserManager extends SQLObjectEditor<XuguUser, XuguDataSource> i
     }
 
     @Override
-    public boolean canCreateObject(XuguDataSource parent)
-    {
-        return true;
-    }
-
-    @Override
     public boolean canDeleteObject(XuguUser object)
     {
         return true;
@@ -67,15 +61,15 @@ public class XuguUserManager extends SQLObjectEditor<XuguUser, XuguDataSource> i
 
     //新建用户界面显示前的准备工作
     @Override
-    protected XuguUser createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context,
-                                               final XuguDataSource source,
-                                               Object copyFrom) {
+    protected XuguUser createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final Object container, Object from, Map<String, Object> options) 
+    {
+    	XuguDataSource parent = (XuguDataSource)container;
     	context.getUserParams();
-    	XuguUser newUser = new XuguUser(source, null, monitor);
+    	XuguUser newUser = new XuguUser(parent, null, monitor);
     	        
         //修改已存在用户
-        if (copyFrom instanceof XuguUser) {
-            XuguUser tplUser = (XuguUser)copyFrom;
+        if (from instanceof XuguUser) {
+            XuguUser tplUser = (XuguUser)from;
             newUser.setName(tplUser.getName());
             newUser.setPassword(tplUser.getPassword());
             newUser.setLocked(tplUser.isLocked());

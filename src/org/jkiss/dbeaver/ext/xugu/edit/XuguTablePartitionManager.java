@@ -54,8 +54,9 @@ public class XuguTablePartitionManager extends SQLObjectEditor<XuguTablePartitio
 	}
 	
 	@Override
-    protected XuguTablePartition createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final XuguTablePhysical parent, Object copyFrom)
+    protected XuguTablePartition createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final Object container, Object from, Map<String, Object> options)
     {
+		XuguTablePhysical parent = (XuguTablePhysical)container;
 		//禁止对没有分区定义的表进行添加分区操作
 		if(parent.partitionCache!=null || parent.isPersisted()==false) {
 			return new UITask<XuguTablePartition>() {

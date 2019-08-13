@@ -67,11 +67,7 @@ public class XuguTableIndex extends JDBCTableIndex<XuguSchema, XuguTablePhysical
     private boolean nologging;
     private boolean valid;
     
-    public XuguTableIndex(
-        XuguSchema schema,
-        XuguTablePhysical table,
-        String indexName,
-        ResultSet dbResult)
+    public XuguTableIndex(XuguSchema schema,XuguTablePhysical table,String indexName,ResultSet dbResult)
     {
         super(schema, table, indexName, null, true);
         if(dbResult!=null) {
@@ -210,6 +206,10 @@ public class XuguTableIndex extends JDBCTableIndex<XuguSchema, XuguTablePhysical
 	public boolean isIs_unique() {
 		return is_unique;
 	}
+	
+	public void setUnique(boolean unique) {
+        this.is_unique = unique;
+    }
 
 	@Property(viewable = true, order = 6)
 	public boolean isIs_local() {
