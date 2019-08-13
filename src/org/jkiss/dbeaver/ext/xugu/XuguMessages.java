@@ -226,4 +226,5 @@ public class XuguMessages extends NLS {
 	public static String views_xugu_compiler_dialog_message_compile_unit;
 	public static String views_xugu_compiler_dialog_message_compilation_error;
 	public static String views_xugu_compiler_dialog_message_compilation_success;
+	public static String unsupported_methods;
 }

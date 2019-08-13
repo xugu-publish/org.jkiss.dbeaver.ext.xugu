@@ -373,11 +373,11 @@ public class XuguTriggerManager extends SQLTriggerManager<XuguTrigger, XuguTable
 
     }
 
-//	@Override
-//	protected void createOrReplaceTriggerQuery(List<DBEPersistAction> actions, XuguTrigger trigger, boolean create) {
-//		// TODO Auto-generated method stub
-//		
-//	}
+	@Override
+	protected void createOrReplaceTriggerQuery(List<DBEPersistAction> actions, XuguTrigger trigger, boolean create) {
+		// TODO Auto-generated method stub
+		XuguUtils.createDBException(XuguMessages.unsupported_methods);
+	}
 
 }
 
