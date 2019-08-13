@@ -23,5 +23,5 @@ Bundle-Vendor: %Bundle-Vendor
 Bundle-ClassPath: .,
  lib/xugu-permission-meta-1.0.jar,
  lib/out-jar-1.0.jar,
- lib/cloudjdbcV1002.jar,
+ lib/cloudjdbc-11.0.0.jar,
  lib/xugu-table-ddl-1.0.jar
