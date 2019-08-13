@@ -37,7 +37,7 @@ package org.jkiss.dbeaver.ext.xugu.model.plan;
 import org.jkiss.dbeaver.ext.xugu.model.XuguDataSource;
 
 import org.jkiss.dbeaver.model.exec.plan.DBCPlanNode;
-import org.jkiss.dbeaver.model.exec.plan.DBCPlanNodeKind;
+//import org.jkiss.dbeaver.model.exec.plan.DBCPlanNodeKind;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
 
 import org.jkiss.dbeaver.model.meta.Property;

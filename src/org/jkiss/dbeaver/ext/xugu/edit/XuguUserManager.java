@@ -103,7 +103,7 @@ public class XuguUserManager extends SQLObjectEditor<XuguUser, XuguDataSource> i
         		user.setName(name);
         		user.setPassword(key1);
         		user.setRoleList(roleList);
-        		user.setUntil_time(command.getProperties().get(UserPropertyHandler.UNTIL_TIME.toString()).toString());
+//        		user.setUntil_time(command.getProperties().get(UserPropertyHandler.UNTIL_TIME.toString()).toString());
         		user.setPersisted(true);
         		StringBuilder sql = new StringBuilder();
         		sql.append("CREATE USER ");
@@ -121,11 +121,11 @@ public class XuguUserManager extends SQLObjectEditor<XuguUser, XuguDataSource> i
         				}
         			}
         		}
-        		if(user.getUntil_time()!=null) {
-        			sql.append("\nVALID UNTIL '");
-        			sql.append(user.getUntil_time());
-        			sql.append("'");
-        		}
+//        		if(user.getUntil_time()!=null) {
+//        			sql.append("\nVALID UNTIL '");
+//        			sql.append(user.getUntil_time());
+//        			sql.append("'");
+//        		}
         		sql.append(user.isLocked()?" ACCOUNT LOCK":"");
         		sql.append(user.isExpired()?" PASSWORD EXPIRED":"");
         		if(XuguConstants.LOG_PRINT_LEVEL<1) {

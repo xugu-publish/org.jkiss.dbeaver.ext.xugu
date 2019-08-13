@@ -79,13 +79,11 @@ public class XuguPlanAnalyser implements DBCPlan {
         }
     }
 
-	@Override
 	public Object getPlanFeature(String feature) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
 	public List<? extends DBCPlanNode> getPlanNodes(Map<String, Object> options) {
 		// TODO Auto-generated method stub
 		return null;
