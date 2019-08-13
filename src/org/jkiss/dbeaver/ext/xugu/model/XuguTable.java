@@ -137,7 +137,6 @@ public class XuguTable extends XuguTablePhysical implements DBPScriptObject
             this.acl_mask = JDBCUtils.safeGetInt(dbResult, "ACL_MASK");
             this.create_time = JDBCUtils.safeGetDate(dbResult, "CREATE_TIME");
             this.comments = JDBCUtils.safeGetString(dbResult, "COMMENTS");
-            System.out.println("Xugu table load success "+ this.table_name + " " +this.valid + " " + this.deleted);
         }
     }
 

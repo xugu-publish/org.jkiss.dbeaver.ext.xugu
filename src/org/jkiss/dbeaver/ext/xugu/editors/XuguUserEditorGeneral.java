@@ -264,7 +264,6 @@ public class XuguUserEditorGeneral extends XuguUserEditorAbstract
     @Override
     public void dispose()
     {
-    	System.out.println("dispose ");
         if (commandlistener != null) {
             getEditorInput().getCommandContext().removeCommandListener(commandlistener);
         }

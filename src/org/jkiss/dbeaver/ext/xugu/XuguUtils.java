@@ -59,8 +59,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Xugu utils
- * 提供常用方法
+ * @author 
+  * 提供常用方法
  * some new comments
  */
 public class XuguUtils {

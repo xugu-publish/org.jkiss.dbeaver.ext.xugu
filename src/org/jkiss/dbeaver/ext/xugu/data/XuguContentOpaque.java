@@ -24,12 +24,12 @@ import org.jkiss.dbeaver.model.data.DBDDisplayFormat;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.exec.jdbc.JDBCSession;
 import org.jkiss.dbeaver.model.exec.jdbc.JDBCPreparedStatement;
+import org.jkiss.dbeaver.model.impl.edit.AbstractObjectManager;
 import org.jkiss.dbeaver.model.impl.jdbc.data.JDBCContentLOB;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSTypedObject;
 import org.jkiss.dbeaver.utils.ContentUtils;
 import org.jkiss.dbeaver.utils.MimeTypes;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
@@ -42,7 +42,7 @@ import java.sql.SQLException;
  */
 public abstract class XuguContentOpaque<OPAQUE_TYPE extends Object> extends JDBCContentLOB {
 
-    private static final Log log = Log.getLog(XuguContentOpaque.class);
+    protected static final Log log = Log.getLog(AbstractObjectManager.class);
 
     private OPAQUE_TYPE opaque;
     private InputStream tmpStream;
@@ -123,9 +123,6 @@ public abstract class XuguContentOpaque<OPAQUE_TYPE extends Object> extends JDBC
     }
 
     protected abstract String getOpaqueType();
-
-    @Override
-    protected abstract XuguContentOpaque createNewContent();
 
     protected abstract OPAQUE_TYPE createNewXuguObject(Connection connection)
         throws DBCException, IOException, SQLException;

@@ -17,7 +17,6 @@
 package org.jkiss.dbeaver.ext.xugu.data;
 
 import org.jkiss.dbeaver.ext.xugu.XuguConstants;
-import org.jkiss.dbeaver.ext.xugu.model.XuguDataSource;
 import org.jkiss.dbeaver.model.DBPDataKind;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.data.DBDPreferences;

@@ -84,7 +84,6 @@ public abstract class XuguProcedureBase<PARENT extends DBSObjectContainer> exten
         @Override
         protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguProcedureBase procedure) throws SQLException
         {
-        	System.out.println("Select all arguments");
         	JDBCPreparedStatement dbStat = session.prepareStatement(
                     "SELECT DEFINE FROM ALL_PROCEDURES " +
                     "WHERE PROC_ID=" + procedure.getObjectId());

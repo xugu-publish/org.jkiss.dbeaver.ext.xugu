@@ -239,7 +239,6 @@ public class XuguSchedulerJob extends XuguSchemaObject implements XuguStatefulOb
     @Association
     public Collection<XuguProcedureParameter> getArguments(DBRProgressMonitor monitor) throws DBException
     {
-    	System.out.println("real return the params");
         return this.procParams;
     }
 

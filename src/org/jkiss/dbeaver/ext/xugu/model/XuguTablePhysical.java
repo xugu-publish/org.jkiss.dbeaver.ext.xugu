@@ -75,7 +75,6 @@ public abstract class XuguTablePhysical extends XuguTableBase implements DBSObje
         this.partitioned = JDBCUtils.safeGetInteger(dbResult, "PARTI_TYPE");
         this.partitionCache = new PartitionCache();
         this.subPartitionCache = new SubPartitionCache();
-        System.out.println("yes");
     }
 
     @Override

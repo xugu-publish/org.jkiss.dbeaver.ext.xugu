@@ -65,7 +65,6 @@ public class XuguCommandChangeUser extends DBECommandComposite<XuguUser, UserPro
         }
     }
 
-    @Override
     public void validateCommand() throws DBException
     {
         String passValue = CommonUtils.toString(getProperty(UserPropertyHandler.PASSWORD));

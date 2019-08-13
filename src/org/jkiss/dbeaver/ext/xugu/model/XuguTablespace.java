@@ -99,7 +99,6 @@ public class XuguTablespace extends XuguGlobalObject implements DBPRefreshableOb
     protected XuguTablespace(XuguDataSource dataSource, ResultSet dbResult) throws SQLException
     {
         super(dataSource, true);
-        System.out.println("TTTTable space ?? "+dbResult.getStatement().toString());
         this.name = JDBCUtils.safeGetString(dbResult, "SPACE_NAME");
         this.nodeID = JDBCUtils.safeGetInt(dbResult, "NODEID");
         this.space_ID = JDBCUtils.safeGetLong(dbResult, "SPACE_ID");

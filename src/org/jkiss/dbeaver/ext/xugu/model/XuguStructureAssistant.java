@@ -281,5 +281,11 @@ public class XuguStructureAssistant implements DBSStructureAssistant
         }
     }
 
+//	@Override
+//	public DBSObjectType[] getSearchObjectTypes() {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
+
 
 }
