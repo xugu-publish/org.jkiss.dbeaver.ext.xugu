@@ -64,6 +64,20 @@ public class XuguTableColumnManager extends SQLTableColumnManager<XuguTableColum
     {
         return new ColumnModifier[] {DataTypeModifier, DefaultModifier, NullNotNullModifierConditional};
     }
+    
+    protected XuguTableColumn createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, XuguTableBase container, Object from)
+    {
+        DBSDataType columnType = findBestDataType(container.getDataSource(), "varchar2"); //$NON-NLS-1$
+
+        final XuguTableColumn column = new XuguTableColumn(container);
+        column.setName(getNewColumnName(monitor, context, container));
+        column.setDataType((XuguDataType) columnType);
+        column.setTypeName(columnType == null ? "INTEGER" : columnType.getName()); //$NON-NLS-1$
+        column.setMaxLength(columnType != null && columnType.getDataKind() == DBPDataKind.STRING ? 100 : 0);
+        column.setValueType(columnType == null ? Types.INTEGER : columnType.getTypeID());
+        column.setOrdinalPosition(-1);
+        return column;
+    }
 
     @Override
     protected XuguTableColumn createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final Object container, Object from, Map<String, Object> options)

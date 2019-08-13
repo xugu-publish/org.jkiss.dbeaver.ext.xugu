@@ -63,6 +63,23 @@ public class XuguTablespaceManager extends SQLObjectEditor<XuguTablespace, XuguD
 		return object.getDataSource().getTablespaceCache();
 	}
 	
+	protected XuguTablespace createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, XuguDataSource container, Object from)
+    {
+        return new UITask<XuguTablespace>() {
+            @Override
+            protected XuguTablespace runTask() {
+                NewTablespaceDialog dialog = new NewTablespaceDialog(UIUtils.getActiveWorkbenchShell(), container);
+                if (dialog.open() != IDialogConstants.OK_ID) {
+                    return null;
+                }
+                XuguTablespace newTablespace = dialog.getTableSpace();
+//                XuguDataFile newDataFile = new XuguDataFile(newTablespace, null, false);
+                return newTablespace;
+            }
+        }.execute();
+    }
+
+	
 	@Override
     protected XuguTablespace createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final Object container, Object from, Map<String, Object> options)
     {

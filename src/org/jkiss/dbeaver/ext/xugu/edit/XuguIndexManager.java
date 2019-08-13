@@ -66,6 +66,7 @@ public class XuguIndexManager extends SQLIndexManager<XuguTableIndex, XuguTableP
     {
         return object.getParentObject().getSchema().indexCache;
     }
+    
 
     @Override
     protected XuguTableIndex createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final Object container,Object from,  Map<String, Object> options)

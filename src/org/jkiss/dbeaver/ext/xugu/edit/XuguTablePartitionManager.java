@@ -53,6 +53,43 @@ public class XuguTablePartitionManager extends SQLObjectEditor<XuguTablePartitio
 		return FEATURE_SAVE_IMMEDIATELY;
 	}
 	
+	protected XuguTablePartition createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, XuguTablePhysical container, Object from)
+    {
+		//禁止对没有分区定义的表进行添加分区操作
+		if(container.partitionCache!=null || container.isPersisted()==false) {
+			return new UITask<XuguTablePartition>() {
+	            @Override
+	            protected XuguTablePartition runTask() {
+	            	NewTablePartitionDialog dialog = new NewTablePartitionDialog(UIUtils.getActiveWorkbenchShell(), monitor, container);
+	                if (dialog.open() != IDialogConstants.OK_ID) {
+	                    return null;
+	                }
+	                XuguTablePartition newTablePartition = dialog.getTablePartition();
+	                if(container.isPersisted()) {
+	                	ArrayList<XuguTablePartition> partList = (ArrayList<XuguTablePartition>) container.partitionCache.getCachedObjects();
+	                    if(partList.size()!=0) {
+	                    	XuguTablePartition model = partList.get(0);
+	                    	newTablePartition.setPartiType(model.getPartiType());
+	                    	newTablePartition.setPartiKey(model.getPartiKey());
+	                    }
+	                }
+	                return newTablePartition;
+	            }
+			}.execute();
+		}
+		new UITask<String>() {
+			@Override
+			protected String runTask() {
+				WarningDialog dialog2 = new WarningDialog(UIUtils.getActiveWorkbenchShell(), "You can not add partition on a table without any partitions");       
+                if (dialog2.open() != IDialogConstants.OK_ID) {
+                    return null;
+                }
+				return null;
+			}
+    	}.execute();   
+    	return null;
+    }
+	
 	@Override
     protected XuguTablePartition createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final Object container, Object from, Map<String, Object> options)
     {

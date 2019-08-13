@@ -49,6 +49,48 @@ public class XuguTableSubPartitionManager extends SQLObjectEditor<XuguTableSubPa
 		return FEATURE_SAVE_IMMEDIATELY;
 	}
 	
+	protected XuguTableSubPartition createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, XuguTablePhysical container, Object from)
+    {
+		//仅允许对新创建的表进行添加二级分区操作
+		if(container.isPersisted()==false) {
+			return new UITask<XuguTableSubPartition>() {
+	            @Override
+	            protected XuguTableSubPartition runTask() {
+	            	NewTablePartitionDialog dialog = new NewTablePartitionDialog(UIUtils.getActiveWorkbenchShell(), monitor, container);
+	                if (dialog.open() != IDialogConstants.OK_ID) {
+	                    return null;
+	                }
+	                XuguTableSubPartition newTablePartition = dialog.getTablePartition();
+	                if(container.isPersisted()) {
+	                	ArrayList<XuguTableSubPartition> partList = (ArrayList<XuguTableSubPartition>) container.subPartitionCache.getCachedObjects();
+	                    if(partList.size()!=0) {
+	                    	XuguTableSubPartition model = partList.get(0);
+	                    	newTablePartition.setPartiType(model.getPartiType());
+	                    	newTablePartition.setPartiKey(model.getPartiKey());
+	                    }
+	                }else {
+	                	// 创建新表
+	                }
+	                if(newTablePartition.isSubPartition()) {
+	                	container.subPartitionCache.cacheObject(newTablePartition);
+	                }
+	                return newTablePartition;
+	            }
+			}.execute();
+		}
+		new UITask<String>() {
+			@Override
+			protected String runTask() {
+				WarningDialog dialog2 = new WarningDialog(UIUtils.getActiveWorkbenchShell(), "You can not add partition on a table without any partitions");       
+                if (dialog2.open() != IDialogConstants.OK_ID) {
+                    return null;
+                }
+				return null;
+			}
+    	}.execute();   
+    	return null;
+    }
+	
 	@Override
     protected XuguTableSubPartition createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final Object container, Object from, Map<String, Object> options)
     {

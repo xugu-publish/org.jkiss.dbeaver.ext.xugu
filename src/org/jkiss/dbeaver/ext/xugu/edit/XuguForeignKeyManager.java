@@ -51,6 +51,50 @@ public class XuguForeignKeyManager extends SQLForeignKeyManager<XuguTableForeign
     {
         return object.getParentObject().getSchema().foreignKeyCache;
     }
+    
+    protected XuguTableForeignKey createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, XuguTableBase container, Object from)
+    {
+        return new UITask<XuguTableForeignKey>() {
+            @Override
+            protected XuguTableForeignKey runTask() {
+                EditForeignKeyPage editPage = new EditForeignKeyPage(
+                    XuguMessages.edit_xugu_foreign_key_manager_dialog_title,
+                    new XuguTableForeignKey(
+                    		container,
+                            null,
+                            null,
+                            null,
+                            DBSForeignKeyModifyRule.NO_ACTION,
+                            DBSForeignKeyModifyRule.NO_ACTION),
+                    new DBSForeignKeyModifyRule[] {
+                        DBSForeignKeyModifyRule.NO_ACTION,
+                        DBSForeignKeyModifyRule.CASCADE,
+                        DBSForeignKeyModifyRule.SET_NULL,
+                        DBSForeignKeyModifyRule.SET_DEFAULT });
+                if (!editPage.edit()) {
+                    return null;
+                }
+
+                final XuguTableForeignKey foreignKey = new XuguTableForeignKey(
+                		container,
+                    null,
+                    null,
+                    (XuguTableConstraint) editPage.getUniqueConstraint(),
+                    editPage.getOnDeleteRule(),
+                    editPage.getOnUpdateRule());
+                foreignKey.setName(getNewConstraintName(monitor, foreignKey));
+                int colIndex = 1;
+                for (EditForeignKeyPage.FKColumnInfo tableColumn : editPage.getColumns()) {
+                    foreignKey.addColumn(
+                        new XuguTableForeignKeyColumn(
+                            foreignKey,
+                            (XuguTableColumn) tableColumn.getOwnColumn(),
+                            colIndex++));
+                }
+                return foreignKey;
+            }
+        }.execute();
+    }
 
     @Override
     protected XuguTableForeignKey createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final Object container, Object from, Map<String, Object> options)

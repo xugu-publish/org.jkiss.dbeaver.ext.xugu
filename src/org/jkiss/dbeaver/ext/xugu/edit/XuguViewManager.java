@@ -81,6 +81,24 @@ public class XuguViewManager extends SQLObjectEditor<XuguView, XuguSchema> {
     {
         return (DBSObjectCache) object.getSchema().viewCache;
     }
+    
+    protected XuguView createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, XuguSchema container,Object from)
+    {
+    	return new UITask<XuguView>() {
+            @Override
+            protected XuguView runTask() {
+                NewViewDialog dialog = new NewViewDialog(UIUtils.getActiveWorkbenchShell(), container);
+                if (dialog.open() != IDialogConstants.OK_ID) {
+                    return null;
+                }
+            	XuguView newView = dialog.getView();
+            	boolean replace = newView.isReplace();
+            	boolean force = newView.isForce();
+            	newView.setViewText("CREATE " + (replace?"OR REPLACE ":"") + (force?"FORCE ":"") + "VIEW " +newView.getFullyQualifiedName(DBPEvaluationContext.DDL) + " AS\nSELECT");
+                return newView;
+            }
+        }.execute();
+    }
 
     @Override
     protected XuguView createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final Object container,Object from,  Map<String, Object> options)

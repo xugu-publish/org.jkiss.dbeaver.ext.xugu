@@ -68,6 +68,21 @@ public class XuguDatabaseManager extends SQLObjectEditor<XuguDatabase, XuguDataS
     {
         return object.getDataSource().databaseCache;
     }
+    
+    protected XuguDatabase createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, XuguDataSource container, Object from)
+    {
+    	return new UITask<XuguDatabase>() {
+            @Override
+            protected XuguDatabase runTask() {
+                NewDBDialog dialog = new NewDBDialog(UIUtils.getActiveWorkbenchShell(), container);
+                if (dialog.open() != IDialogConstants.OK_ID) {
+                    return null;
+                }
+                XuguDatabase newDB = dialog.getDB();
+                return newDB;
+            }
+        }.execute();
+    }
 
     @Override
     protected XuguDatabase createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final Object container, Object from,  Map<String, Object> options)

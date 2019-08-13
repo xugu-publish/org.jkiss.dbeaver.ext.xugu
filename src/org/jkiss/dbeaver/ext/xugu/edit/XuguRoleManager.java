@@ -74,6 +74,33 @@ public class XuguRoleManager extends SQLObjectEditor<XuguRole, XuguDataSource>{
         return object.getDataSource().roleCache;
     }
     
+    protected XuguRole createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, XuguDataSource container, Object from)
+    {
+    	XuguRole newRole = new XuguRole(container, monitor, null);
+    	//修改已存在用户
+        if (from instanceof XuguRole) {
+            XuguRole tplRole = (XuguRole)from;
+            newRole.setName(tplRole.getName());
+        }
+        //创建新用户
+        else {
+        	return new UITask<XuguRole>() {
+			  @Override
+			  protected XuguRole runTask() {
+			  	innerDialog dialog = new innerDialog(UIUtils.getActiveWorkbenchShell(), monitor, container);
+			      if (dialog.open() != IDialogConstants.OK_ID) {
+			          return null;
+			      }
+			      XuguRole newRole = dialog.getRole();
+			      return newRole;
+			  }
+        	}.execute();
+        }
+//        commandContext.addCommand(new CommandCreateUser(newUser), new CreateObjectReflector<>(this), true);
+        return newRole;
+//		
+    }
+    
     @Override
     protected XuguRole createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final Object container, Object from, Map<String, Object> options)
     {

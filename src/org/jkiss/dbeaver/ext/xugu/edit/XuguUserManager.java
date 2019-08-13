@@ -58,6 +58,27 @@ public class XuguUserManager extends SQLObjectEditor<XuguUser, XuguDataSource> i
     {
         return true;
     }
+    
+    protected XuguUser createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, XuguDataSource container, Object from) 
+    {
+    	context.getUserParams();
+    	XuguUser newUser = new XuguUser(container, null, monitor);
+    	        
+        //修改已存在用户
+        if (from instanceof XuguUser) {
+            XuguUser tplUser = (XuguUser)from;
+            newUser.setName(tplUser.getName());
+            newUser.setPassword(tplUser.getPassword());
+            newUser.setLocked(tplUser.isLocked());
+            newUser.setExpired(tplUser.isExpired());
+        }
+        //创建新用户
+        else {
+        	newUser.setPersisted(false);
+        }
+//        commandContext.addCommand(new CommandCreateUser(newUser), new CreateObjectReflector<>(this), true);
+        return newUser;
+    }
 
     //新建用户界面显示前的准备工作
     @Override
