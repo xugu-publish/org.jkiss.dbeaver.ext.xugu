@@ -45,21 +45,6 @@ public class XuguSynonymManager extends SQLObjectEditor<XuguSynonym, XuguSchema>
         return FEATURE_EDITOR_ON_CREATE;
     }
 	
-	protected XuguSynonym createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, XuguSchema container, Object from) throws DBException 
-	{
-		return new UITask<XuguSynonym>() {
-            @Override
-            protected XuguSynonym runTask() {
-                NewSynonymDialog dialog = new NewSynonymDialog(UIUtils.getActiveWorkbenchShell(), container);
-                if (dialog.open() != IDialogConstants.OK_ID) {
-                    return null;
-                }
-            	XuguSynonym newSynonym = dialog.getSynonym();
-                return newSynonym;
-            }
-        }.execute();
-	}
-	
 	@Override
 	protected XuguSynonym createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final Object container, Object from, Map<String, Object> options) throws DBException 
 	{

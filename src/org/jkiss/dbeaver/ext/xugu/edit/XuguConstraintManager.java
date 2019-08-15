@@ -56,44 +56,6 @@ public class XuguConstraintManager extends SQLConstraintManager<XuguTableConstra
         return object.getParentObject().getSchema().constraintCache;
     }
     
-    protected XuguTableConstraint createDatabaseObject( DBRProgressMonitor monitor, DBECommandContext context, XuguTableBase container,Object from)
-    {
-    	 
-        return new UITask<XuguTableConstraint>() {
-            @Override
-            protected XuguTableConstraint runTask() {
-            	EditConstraintPage editPage = new EditConstraintPage(
-                    XuguMessages.edit_xugu_constraint_manager_dialog_title,
-                    container,
-                    new DBSEntityConstraintType[] {
-                        DBSEntityConstraintType.PRIMARY_KEY,
-                        DBSEntityConstraintType.UNIQUE_KEY,
-                        DBSEntityConstraintType.CHECK},
-                    	true
-                    );
-                if (!editPage.edit()) {
-                    return null;
-                }
-
-                final XuguTableConstraint constraint = new XuguTableConstraint(
-                	container,
-                    editPage.getConstraintName(),
-                    editPage.getConstraintType(),
-                    editPage.getConstraintExpression(),
-                    editPage.isEnableConstraint() ? XuguObjectStatus.ENABLED : XuguObjectStatus.DISABLED);
-                int colIndex = 1;
-                for (DBSEntityAttribute tableColumn : editPage.getSelectedAttributes()) {
-                    constraint.addColumn(
-                        new XuguTableConstraintColumn(
-                            constraint,
-                            (XuguTableColumn) tableColumn,
-                            colIndex++));
-                }
-                return constraint;
-            }
-        }.execute();
-    }
-
     @Override
     protected XuguTableConstraint createDatabaseObject( DBRProgressMonitor monitor, DBECommandContext context, final Object container,Object from,  Map<String, Object> options)
     {

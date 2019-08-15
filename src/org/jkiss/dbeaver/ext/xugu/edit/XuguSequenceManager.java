@@ -51,25 +51,6 @@ public class XuguSequenceManager extends SQLObjectEditor<XuguSequence, XuguSchem
         return object.getSchema().sequenceCache;
     }
     
-    protected XuguSequence createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context,XuguSchema container, Object copyFrom)
-    {
-        return new UITask<XuguSequence>() {
-            @Override
-            protected XuguSequence runTask() {
-                EntityEditPage page = new EntityEditPage(container.getDataSource(), DBSEntityType.SEQUENCE);
-                if (!page.edit()) {
-                    return null;
-                }
-
-                final XuguSequence sequence = new XuguSequence(container, page.getEntityName());
-                sequence.setIncrementBy(new BigDecimal(1));
-                sequence.setMinValue(new BigDecimal(0));
-                sequence.setCycle(false);
-                return sequence;
-            }
-        }.execute();
-    }
-
     @Override
     protected XuguSequence createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context,
             final Object container,

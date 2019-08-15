@@ -101,9 +101,10 @@ public class XuguConstants {
     public static final String PREF_DISABLE_SCRIPT_ESCAPE_PROCESSING = "xugu.disable.script.escape";
     public static final String PREF_KEY_DDL_FORMAT = "xugu.ddl.format";
     
-    public static final DBSEntityConstraintType CONSTRAINT_DEFAULT = new DBSEntityConstraintType("D","Constraint that indicates a default value", null, false, false, false);
-    public static final DBSEntityConstraintType CONSTRAINT_NOT_NULL = new DBSEntityConstraintType("N","Constraint that indicates this column can not be null", null, false, false, false);
-    public static final DBSEntityConstraintType CONSTRAINT_REF_COLUMN = new DBSEntityConstraintType("F", "Constraint that involves a REF column", null, false, false, false);
+    // 默认值约束
+    public static final DBSEntityConstraintType CONSTRAINT_DEFAULT = new DBSEntityConstraintType("xugu.default", "DEFAULT", XuguMessages.model_struct_default, false, false, false, false); //$NON-NLS-1$
+    // 引用外键约束
+    public static final DBSEntityConstraintType CONSTRAINT_REF_COLUMN = new DBSEntityConstraintType("xugu.ref.column", "Referential integrity", XuguMessages.model_struct_ref_column, false, false, false, false); //$NON-NLS-1$
 
     public static final int DATA_TYPE_TIMESTAMP_WITH_TIMEZONE = 101;
     public static final int DATA_TYPE_TIMESTAMP_WITH_LOCAL_TIMEZONE = 102;

@@ -75,21 +75,6 @@ public class XuguTriggerManager extends SQLTriggerManager<XuguTrigger, XuguTable
         return object.getTable().triggerCache;
     }
     
-    protected XuguTrigger createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, XuguTableBase container, Object from)
-    {
-        return new UITask<XuguTrigger>() {
-            @Override
-            protected XuguTrigger runTask() {
-            	NewTriggerDialog dialog = new NewTriggerDialog(UIUtils.getActiveWorkbenchShell(), container, monitor);
-                if (dialog.open() != IDialogConstants.OK_ID) {
-                    return null;
-                }
-                XuguTrigger newTrigger = dialog.getTrigger();
-                return newTrigger;
-            }
-        }.execute();
-    }
-
     @Override
     protected XuguTrigger createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final Object container, Object from, Map<String, Object> options)
     {

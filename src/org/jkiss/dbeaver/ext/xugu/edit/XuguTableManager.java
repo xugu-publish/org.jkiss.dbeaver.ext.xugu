@@ -67,17 +67,6 @@ public class XuguTableManager extends SQLTableManager<XuguTable, XuguSchema> imp
         return (DBSObjectCache) object.getSchema().tableCache;
     }
     
-    protected XuguTable createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context,XuguSchema container,Object from)
-    {
-        XuguTable table = new XuguTable(container, "");
-        try {
-            setTableName(monitor, container, table);
-        } catch (DBException e) {
-            log.error(e);
-        }
-        return table; //$NON-NLS-1$
-    }
-
     // 在打开新建表窗口前的准备
     @Override
     protected XuguTable createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context,final Object container,Object from,  Map<String, Object> options)

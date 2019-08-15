@@ -74,22 +74,6 @@ public class XuguSchemaManager extends SQLObjectEditor<XuguSchema, XuguDataSourc
         return object.getDataSource().schemaCache;
     }
 
-    protected XuguSchema createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, XuguDataSource container, Object from)
-    {
-        return new UITask<XuguSchema>() {
-            @Override
-            protected XuguSchema runTask() {
-                NewUserDialog dialog = new NewUserDialog(UIUtils.getActiveWorkbenchShell(), container, monitor);
-                if (dialog.open() != IDialogConstants.OK_ID) {
-                    return null;
-                }
-                XuguSchema newSchema = new XuguSchema(container, -1, dialog.getSchema().getName());
-                newSchema.setUser(dialog.getUser());
-                return newSchema;
-            }
-        }.execute();
-    }
-    
     @Override
     protected XuguSchema createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final Object container, Object from, Map<String, Object> options)
     {

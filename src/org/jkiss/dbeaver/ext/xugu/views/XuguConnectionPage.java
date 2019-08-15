@@ -322,7 +322,9 @@ public class XuguConnectionPage extends ConnectionPageAbstract implements ICompo
 	@Override
 	public IDialogPage[] getSubPages(boolean extrasOnly) {
 		// TODO Auto-generated method stub
-		return getSubPages();
+		return new IDialogPage[] {
+            new DriverPropertiesDialogPage(this)
+        };
 	}
 
 }

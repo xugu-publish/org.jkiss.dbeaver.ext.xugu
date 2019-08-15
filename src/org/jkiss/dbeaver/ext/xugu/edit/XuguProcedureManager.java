@@ -52,27 +52,6 @@ public class XuguProcedureManager extends SQLObjectEditor<XuguProcedureStandalon
         return object.getSchema().proceduresCache;
     }
     
-    protected XuguProcedureStandalone createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, XuguSchema container, Object from)
-    {
-    	XuguProcedureStandalone procedure = new XuguProcedureStandalone(
-            container,
-            "PROC",
-            DBSProcedureType.PROCEDURE);
-        return new UITask<XuguProcedureStandalone>() {
-            @Override
-            protected XuguProcedureStandalone runTask() {
-                CreateProcedurePage editPage = new CreateProcedurePage(procedure);
-                if (!editPage.edit()) {
-                    return null;
-                }
-                
-                procedure.setName(editPage.getProcedureName());
-                procedure.setValid(true);
-                return procedure;
-            }
-        }.execute();
-    }
-
     @Override
     protected XuguProcedureStandalone createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final Object container, Object from, Map<String, Object> options)
     {
