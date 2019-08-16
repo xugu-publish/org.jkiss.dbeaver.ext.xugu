@@ -161,20 +161,20 @@ public class XuguTableConstraint extends XuguTableConstraintBase {
     public static DBSEntityConstraintType getConstraintType(String code)
     {
         switch (code) {
+	        case "C":
+	        	return DBSEntityConstraintType.CHECK;
+	        case "P":
+	        	return DBSEntityConstraintType.PRIMARY_KEY;
+	        case "U":
+	        	return DBSEntityConstraintType.UNIQUE_KEY;
 	        case "F":
 	            return DBSEntityConstraintType.FOREIGN_KEY;
+	        case "N":
+	        	return DBSEntityConstraintType.NOT_NULL;
+	        case "D":
+	        	return XuguConstants.CONSTRAINT_DEFAULT;
 	        case "R":
                 return XuguConstants.CONSTRAINT_REF_COLUMN;
-	        case "C":
-                return DBSEntityConstraintType.CHECK;
-	        case "D":
-                return XuguConstants.CONSTRAINT_DEFAULT;
-	        case "U":
-                return DBSEntityConstraintType.UNIQUE_KEY;
-            case "P":
-                return DBSEntityConstraintType.PRIMARY_KEY;
-            case "N":
-                return XuguConstants.CONSTRAINT_NOT_NULL;
             default:
                 log.debug("Unsupported Xugu constraint type: " + code);
                 return DBSEntityConstraintType.CHECK;

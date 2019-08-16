@@ -74,10 +74,11 @@ public class XuguTriggerManager extends SQLTriggerManager<XuguTrigger, XuguTable
     {
         return object.getTable().triggerCache;
     }
-
+    
     @Override
-    protected XuguTrigger createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final XuguTableBase parent, Object copyFrom)
+    protected XuguTrigger createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final Object container, Object from, Map<String, Object> options)
     {
+    	XuguTableBase parent = (XuguTableBase)container;
         return new UITask<XuguTrigger>() {
             @Override
             protected XuguTrigger runTask() {
@@ -372,11 +373,11 @@ public class XuguTriggerManager extends SQLTriggerManager<XuguTrigger, XuguTable
 
     }
 
-//	@Override
-//	protected void createOrReplaceTriggerQuery(List<DBEPersistAction> actions, XuguTrigger trigger, boolean create) {
-//		// TODO Auto-generated method stub
-//		
-//	}
+	@Override
+	protected void createOrReplaceTriggerQuery(List<DBEPersistAction> actions, XuguTrigger trigger, boolean create) {
+		// TODO Auto-generated method stub
+		XuguUtils.createDBException(XuguMessages.unsupported_methods);
+	}
 
 }
 

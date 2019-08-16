@@ -33,17 +33,18 @@ public class XuguUDTManager extends SQLObjectEditor<XuguUDT, XuguSchema>{
     }
 	
 	@Override
-	protected XuguUDT createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context,
-			final XuguSchema parent, Object copyFrom) throws DBException {
+	protected XuguUDT createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final Object container, Object from, Map<String, Object> options) throws DBException 
+	{
+		XuguSchema schema = (XuguSchema)container;
 		return new UITask<XuguUDT>() {
             @Override
             protected XuguUDT runTask() {
-            	EntityEditPage page = new EntityEditPage(parent.getDataSource(), DBSEntityType.TYPE);
+            	EntityEditPage page = new EntityEditPage(schema.getDataSource(), DBSEntityType.TYPE);
                 if (!page.edit()) {
                     return null;
                 }
 
-                final XuguUDT udt = new XuguUDT(parent, null);
+                final XuguUDT udt = new XuguUDT(schema, null);
                 udt.setTypeHead("CREATE TYPE "+page.getEntityName()+" AS OBJECT");
                 udt.setTypeBody("CREATE TYPE "+page.getEntityName()+" AS ");
                 udt.setName(page.getEntityName());

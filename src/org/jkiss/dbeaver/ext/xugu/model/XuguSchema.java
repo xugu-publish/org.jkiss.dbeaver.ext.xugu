@@ -847,7 +847,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         {
         	//xfc 修改了获取索引信息的sql
             StringBuilder sql = new StringBuilder();
-            sql.append("SELECT DISTINCT *, KEYS AS COL_NAME FROM ");
+            sql.append("SELECT DISTINCT * FROM ");
             sql.append(owner.roleFlag);
             sql.append("_INDEXES");
             sql.append(" WHERE DB_ID=");

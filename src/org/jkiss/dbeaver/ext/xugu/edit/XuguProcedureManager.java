@@ -29,10 +29,10 @@ import org.jkiss.dbeaver.model.impl.edit.SQLDatabasePersistAction;
 import org.jkiss.dbeaver.model.impl.sql.edit.SQLObjectEditor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSObject;
+import org.jkiss.dbeaver.model.struct.rdb.DBSProcedureType;
 import org.jkiss.dbeaver.ui.UITask;
 import org.jkiss.dbeaver.ui.editors.object.struct.CreateProcedurePage;
 import org.jkiss.dbeaver.ext.xugu.XuguUtils;
-
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -51,23 +51,25 @@ public class XuguProcedureManager extends SQLObjectEditor<XuguProcedureStandalon
     {
         return object.getSchema().proceduresCache;
     }
-
+    
     @Override
-    protected XuguProcedureStandalone createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final XuguSchema parent, Object copyFrom)
+    protected XuguProcedureStandalone createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final Object container, Object from, Map<String, Object> options)
     {
+    	XuguProcedureStandalone procedure = new XuguProcedureStandalone(
+            (XuguSchema) container,
+            "PROC",
+            DBSProcedureType.PROCEDURE);
         return new UITask<XuguProcedureStandalone>() {
             @Override
             protected XuguProcedureStandalone runTask() {
-                CreateProcedurePage editPage = new CreateProcedurePage(parent);
+                CreateProcedurePage editPage = new CreateProcedurePage(procedure);
                 if (!editPage.edit()) {
                     return null;
                 }
-                XuguProcedureStandalone proc = new XuguProcedureStandalone(
-                        parent,
-                        editPage.getProcedureName(),
-                        editPage.getProcedureType());
-                proc.setValid(true);
-                return proc;
+                
+                procedure.setName(editPage.getProcedureName());
+                procedure.setValid(true);
+                return procedure;
             }
         }.execute();
     }

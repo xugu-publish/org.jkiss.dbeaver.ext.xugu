@@ -50,12 +50,13 @@ public class XuguSequenceManager extends SQLObjectEditor<XuguSequence, XuguSchem
     {
         return object.getSchema().sequenceCache;
     }
-
+    
     @Override
     protected XuguSequence createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context,
-                                               final XuguSchema schema,
-                                               Object copyFrom)
+            final Object container,
+            Object copyFrom, Map<String, Object> options)
     {
+    	XuguSchema schema = (XuguSchema) container;
         return new UITask<XuguSequence>() {
             @Override
             protected XuguSequence runTask() {

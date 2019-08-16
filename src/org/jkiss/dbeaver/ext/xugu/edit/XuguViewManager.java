@@ -31,9 +31,7 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.XuguMessages;
 import org.jkiss.dbeaver.ext.xugu.XuguUtils;
-import org.jkiss.dbeaver.ext.xugu.edit.XuguSynonymManager.NewSynonymDialog;
 import org.jkiss.dbeaver.ext.xugu.model.XuguSchema;
-import org.jkiss.dbeaver.ext.xugu.model.XuguSynonym;
 import org.jkiss.dbeaver.ext.xugu.model.XuguView;
 import org.jkiss.dbeaver.ext.xugu.views.XuguWarningDialog;
 import org.jkiss.dbeaver.model.DBPDataSource;
@@ -83,14 +81,15 @@ public class XuguViewManager extends SQLObjectEditor<XuguView, XuguSchema> {
     {
         return (DBSObjectCache) object.getSchema().viewCache;
     }
-
+    
     @Override
-    protected XuguView createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, XuguSchema parent, Object copyFrom)
+    protected XuguView createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final Object container,Object from,  Map<String, Object> options)
     {
+    	XuguSchema schema = (XuguSchema)container;
     	return new UITask<XuguView>() {
             @Override
             protected XuguView runTask() {
-                NewViewDialog dialog = new NewViewDialog(UIUtils.getActiveWorkbenchShell(), parent);
+                NewViewDialog dialog = new NewViewDialog(UIUtils.getActiveWorkbenchShell(), schema);
                 if (dialog.open() != IDialogConstants.OK_ID) {
                     return null;
                 }

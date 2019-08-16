@@ -199,7 +199,7 @@
                     <fileSource url="https://github.com/xugu-publish/jdbc-driver/tree/master/libsrc" name="Xugu JDBC drivers">
                         <file name="cloudjdbc-10.0.0.jar" description="Xugu JDBC driver."/>
                         <file name="cloudjdbc-10.2.0.jar" description="Xugu JDBC driver."/>
-                        <file name="cloudjdbc-11.0.0.jar" description="Xugu JDBC driver."/>
+                        <file name="cloudjdbc-11.0.2.jar" description="Xugu JDBC driver."/>
                     </fileSource>
                    
                     <file type="license" path="drivers/xugu/LICENSE.txt" bundle="drivers.xugu"/>

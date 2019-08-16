@@ -30,7 +30,6 @@ import org.jkiss.dbeaver.model.edit.DBECommandContext;
 import org.jkiss.dbeaver.model.edit.DBEPersistAction;
 import org.jkiss.dbeaver.model.impl.DBSObjectCache;
 import org.jkiss.dbeaver.model.impl.edit.SQLDatabasePersistAction;
-import org.jkiss.dbeaver.model.impl.sql.edit.SQLObjectEditor.*;
 import org.jkiss.dbeaver.model.impl.sql.edit.struct.SQLForeignKeyManager;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSObject;
@@ -52,16 +51,23 @@ public class XuguForeignKeyManager extends SQLForeignKeyManager<XuguTableForeign
     {
         return object.getParentObject().getSchema().foreignKeyCache;
     }
-
+    
     @Override
-    protected XuguTableForeignKey createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final XuguTableBase table, Object from)
+    protected XuguTableForeignKey createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final Object container, Object from, Map<String, Object> options)
     {
+    	XuguTableBase table = (XuguTableBase)container;
         return new UITask<XuguTableForeignKey>() {
             @Override
             protected XuguTableForeignKey runTask() {
                 EditForeignKeyPage editPage = new EditForeignKeyPage(
                     XuguMessages.edit_xugu_foreign_key_manager_dialog_title,
-                    table,
+                    new XuguTableForeignKey(
+                            table,
+                            null,
+                            null,
+                            null,
+                            DBSForeignKeyModifyRule.NO_ACTION,
+                            DBSForeignKeyModifyRule.NO_ACTION),
                     new DBSForeignKeyModifyRule[] {
                         DBSForeignKeyModifyRule.NO_ACTION,
                         DBSForeignKeyModifyRule.CASCADE,

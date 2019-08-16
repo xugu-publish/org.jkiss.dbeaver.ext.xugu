@@ -48,7 +48,6 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.ui.UITask;
 import org.jkiss.dbeaver.ui.UIUtils;
-
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -76,8 +75,9 @@ public class XuguSchemaManager extends SQLObjectEditor<XuguSchema, XuguDataSourc
     }
 
     @Override
-    protected XuguSchema createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final XuguDataSource parent, Object copyFrom)
+    protected XuguSchema createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final Object container, Object from, Map<String, Object> options)
     {
+    	XuguDataSource parent = (XuguDataSource)container;
         return new UITask<XuguSchema>() {
             @Override
             protected XuguSchema runTask() {

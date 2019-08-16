@@ -33,6 +33,8 @@ import org.jkiss.dbeaver.model.struct.rdb.DBSProcedure;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.dbeaver.ext.xugu.XuguConstants;
+import org.jkiss.dbeaver.ext.xugu.XuguMessages;
+import org.jkiss.dbeaver.ext.xugu.XuguUtils;
 
 import java.sql.SQLException;
 import java.util.*;
@@ -284,6 +286,7 @@ public class XuguStructureAssistant implements DBSStructureAssistant
 	@Override
 	public DBSObjectType[] getSearchObjectTypes() {
 		// TODO Auto-generated method stub
+		XuguUtils.createDBException(XuguMessages.unsupported_methods);
 		return null;
 	}
 

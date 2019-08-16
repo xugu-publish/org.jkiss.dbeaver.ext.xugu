@@ -22,7 +22,6 @@ import org.jkiss.dbeaver.ext.xugu.views.XuguWarningDialog;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.edit.DBECommandContext;
-import org.jkiss.dbeaver.model.edit.DBEObjectRenamer;
 import org.jkiss.dbeaver.model.edit.DBEPersistAction;
 import org.jkiss.dbeaver.model.impl.DBObjectNameCaseTransformer;
 import org.jkiss.dbeaver.model.impl.DBSObjectCache;
@@ -64,9 +63,11 @@ public class XuguTablespaceManager extends SQLObjectEditor<XuguTablespace, XuguD
 		return object.getDataSource().getTablespaceCache();
 	}
 	
+	
 	@Override
-    protected XuguTablespace createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final XuguDataSource parent, Object copyFrom)
+    protected XuguTablespace createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final Object container, Object from, Map<String, Object> options)
     {
+		XuguDataSource parent = (XuguDataSource)container;
         return new UITask<XuguTablespace>() {
             @Override
             protected XuguTablespace runTask() {
