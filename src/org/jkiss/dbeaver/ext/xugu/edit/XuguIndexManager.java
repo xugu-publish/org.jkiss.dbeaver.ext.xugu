@@ -85,6 +85,7 @@ public class XuguIndexManager extends SQLIndexManager<XuguTableIndex, XuguTableP
             	indexTypes.add(XuguConstants.INDEX_TYPE_BTREE);
             	indexTypes.add(XuguConstants.INDEX_TYPE_RTREE);
             	indexTypes.add(XuguConstants.INDEX_TYPE_FULL_TEXT);
+            	indexTypes.add(XuguConstants.INDEX_TYPE_BITMAP);
             	EditIndexPage editPage = new EditIndexPage(
                     XuguMessages.edit_xugu_index_manager_dialog_title,
                     index,
@@ -120,13 +121,25 @@ public class XuguIndexManager extends SQLIndexManager<XuguTableIndex, XuguTableP
     protected void addObjectCreateActions(DBRProgressMonitor monitor, List<DBEPersistAction> actions, ObjectCreateCommand command, Map<String, Object> options)
     {
     	super.addObjectCreateActions(monitor, actions, command, options);
-    	String sql = actions.get(0).getScript();
+    	StringBuilder decl = new StringBuilder(40);
+    	decl.append(actions.get(0).getScript());
     	actions.remove(0);
     	XuguTableIndex index = command.getObject();
+    	// 虛谷索引类型
+    	appendXuguIndexType(index, decl);
+    	// 局部或全局索引
     	if(index.isIs_local()) {
-    		sql += " LOCAL";
+    		decl.append(" LOCAL");
+    	} else {
+    		decl.append(" GLOBAL");
     	}
-    	actions.add(new SQLDatabasePersistAction(ModelMessages.model_jdbc_create_new_index, sql));
+    	actions.add(new SQLDatabasePersistAction(ModelMessages.model_jdbc_create_new_index, decl.toString()));
+    }
+    
+    // 重写虛谷索引数据类型语法
+    protected void appendXuguIndexType(XuguTableIndex index, StringBuilder decl) {
+    	decl.append(" INDEXTYPE IS ");
+    	decl.append(index.getIndexType().getName());
     }
     
     @Override

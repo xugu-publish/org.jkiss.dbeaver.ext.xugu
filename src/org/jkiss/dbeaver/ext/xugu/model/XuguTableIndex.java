@@ -71,14 +71,19 @@ public class XuguTableIndex extends JDBCTableIndex<XuguSchema, XuguTablePhysical
         super(schema, table, indexName, null, true);
         if(dbResult!=null) {
 	        this.index_typeNum = JDBCUtils.safeGetInteger(dbResult, "INDEX_TYPE");
-	        if (XuguConstants.INDEX_TYPE_BTREE.getId().equals(this.index_typeNum+"")) {
-	            indexType = XuguConstants.INDEX_TYPE_BTREE;
-	        } else if (XuguConstants.INDEX_TYPE_RTREE.getId().equals(this.index_typeNum+"")) {
-	            indexType = XuguConstants.INDEX_TYPE_RTREE;
-	        } else if (XuguConstants.INDEX_TYPE_FULL_TEXT.getId().equals(this.index_typeNum+"")) {
-	            indexType = XuguConstants.INDEX_TYPE_FULL_TEXT;
-	        } else {
-	            indexType = DBSIndexType.OTHER;
+	        
+	        switch(this.index_typeNum) 
+	        {
+	        case 0:
+	        	indexType = XuguConstants.INDEX_TYPE_BTREE;
+	        case 1:
+	        	indexType = XuguConstants.INDEX_TYPE_RTREE;
+	        case 2:
+	        	indexType = XuguConstants.INDEX_TYPE_FULL_TEXT;
+	        case 3:
+	        	indexType = XuguConstants.INDEX_TYPE_BITMAP;
+	        default:
+	        	indexType = XuguConstants.INDEX_TYPE_BTREE;
 	        }
         
         	this.index_id = JDBCUtils.safeGetInt(dbResult, "INDEX_ID");

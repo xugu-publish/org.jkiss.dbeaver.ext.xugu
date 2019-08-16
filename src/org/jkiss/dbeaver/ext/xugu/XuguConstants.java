@@ -85,6 +85,7 @@ public class XuguConstants {
     public static final DBSIndexType INDEX_TYPE_BTREE = new DBSIndexType("0", "BTree");
     public static final DBSIndexType INDEX_TYPE_RTREE = new DBSIndexType("1", "RTree");
     public static final DBSIndexType INDEX_TYPE_FULL_TEXT = new DBSIndexType("2","Full text");
+    public static final DBSIndexType INDEX_TYPE_BITMAP = new DBSIndexType("3","Bitmap");
     
     public static final String COL_OWNER = "OWNER";
     public static final String COL_TABLE_NAME = "TABLE_NAME";
