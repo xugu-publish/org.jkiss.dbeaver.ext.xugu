@@ -38,7 +38,6 @@ import java.util.List;
  */
 public class XuguTableIndex extends JDBCTableIndex<XuguSchema, XuguTablePhysical>
 {
-    private boolean nonUnique;
     private List<XuguTableIndexColumn> columns;
 
 	private int index_id;
@@ -67,16 +66,11 @@ public class XuguTableIndex extends JDBCTableIndex<XuguSchema, XuguTablePhysical
     private boolean nologging;
     private boolean valid;
     
-    public XuguTableIndex(
-        XuguSchema schema,
-        XuguTablePhysical table,
-        String indexName,
-        ResultSet dbResult)
+    public XuguTableIndex(XuguSchema schema,XuguTablePhysical table,String indexName,ResultSet dbResult)
     {
         super(schema, table, indexName, null, true);
         if(dbResult!=null) {
 	        this.index_typeNum = JDBCUtils.safeGetInteger(dbResult, "INDEX_TYPE");
-	//        this.nonUnique = !"UNIQUE".equals(JDBCUtils.safeGetString(dbResult, "UNIQUENESS"));
 	        if (XuguConstants.INDEX_TYPE_BTREE.getId().equals(this.index_typeNum+"")) {
 	            indexType = XuguConstants.INDEX_TYPE_BTREE;
 	        } else if (XuguConstants.INDEX_TYPE_RTREE.getId().equals(this.index_typeNum+"")) {
@@ -117,7 +111,7 @@ public class XuguTableIndex extends JDBCTableIndex<XuguSchema, XuguTablePhysical
     public XuguTableIndex(XuguSchema schema, XuguTablePhysical parent, String name, boolean unique, DBSIndexType indexType)
     {
         super(schema, parent, name, indexType, false);
-        this.nonUnique = !unique;
+        this.is_unique = unique;
 
     }
 
@@ -132,7 +126,7 @@ public class XuguTableIndex extends JDBCTableIndex<XuguSchema, XuguTablePhysical
     @Property(viewable = true, order = 5)
     public boolean isUnique()
     {
-        return !nonUnique;
+        return is_unique;
     }
 
     @Nullable
@@ -183,10 +177,6 @@ public class XuguTableIndex extends JDBCTableIndex<XuguSchema, XuguTablePhysical
         return getFullyQualifiedName(DBPEvaluationContext.UI);
     }
     
-    public boolean isNonUnique() {
-		return nonUnique;
-	}
-
 	public List<XuguTableIndexColumn> getColumns() {
 		return columns;
 	}
@@ -207,9 +197,9 @@ public class XuguTableIndex extends JDBCTableIndex<XuguSchema, XuguTablePhysical
 		return is_primary;
 	}
 
-	public boolean isIs_unique() {
-		return is_unique;
-	}
+	public void setUnique(boolean unique) {
+        this.is_unique = unique;
+    }
 
 	@Property(viewable = true, order = 6)
 	public boolean isIs_local() {
