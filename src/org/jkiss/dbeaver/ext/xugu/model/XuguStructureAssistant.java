@@ -290,4 +290,5 @@ public class XuguStructureAssistant implements DBSStructureAssistant
 		return null;
 	}
 
+
 }
