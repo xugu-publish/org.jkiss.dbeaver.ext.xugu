@@ -46,6 +46,11 @@ public class XuguTablespaceManager extends SQLObjectEditor<XuguTablespace, XuguD
 	}
 	
 	@Override
+    public boolean canCreateObject(Object container) {
+        return false;
+    }
+	
+	@Override
     public boolean canEditObject(XuguTablespace object)
     {
         return false;
@@ -200,6 +205,5 @@ public class XuguTablespaceManager extends SQLObjectEditor<XuguTablespace, XuguD
         		warnDialog.open();
         	}
         }
-
     }
 }

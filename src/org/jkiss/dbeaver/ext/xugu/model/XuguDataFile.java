@@ -19,13 +19,11 @@ package org.jkiss.dbeaver.ext.xugu.model;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
 import org.jkiss.dbeaver.model.meta.Property;
-import org.jkiss.utils.CommonUtils;
-
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 
 /**
- * Xugu tablespace file
+ * 虚谷表空间文件
  */
 public class XuguDataFile extends XuguObject<XuguTablespace> {
 
@@ -63,10 +61,7 @@ public class XuguDataFile extends XuguObject<XuguTablespace> {
 
     protected XuguDataFile(XuguTablespace tablespace, ResultSet dbResult, boolean temporary)
     {
-        super(
-            tablespace,
-            JDBCUtils.safeGetString(dbResult, "PATH").substring(JDBCUtils.safeGetString(dbResult, "PATH").lastIndexOf("/")+1),
-            true);
+        super(tablespace,JDBCUtils.safeGetString(dbResult, "PATH").substring(JDBCUtils.safeGetString(dbResult, "PATH").lastIndexOf("/")+1),true);
         this.tablespace = tablespace;
         this.temporary = temporary;
         this.nodeID = JDBCUtils.safeGetLong(dbResult, "NODEID");
@@ -80,7 +75,7 @@ public class XuguDataFile extends XuguObject<XuguTablespace> {
 //        }
     }
 
-    public XuguTablespace getTablespace()
+	public XuguTablespace getTablespace()
     {
         return tablespace;
     }
@@ -105,7 +100,7 @@ public class XuguDataFile extends XuguObject<XuguTablespace> {
         return spaceID;
     }
 
-    @Property(order = 3)
+    @Property(order = 4)
     public int getFileNo()
     {
         return fileNo;
@@ -122,6 +117,11 @@ public class XuguDataFile extends XuguObject<XuguTablespace> {
     {
         return step_size;
     }
+
+    @Property(viewable = true, order = 8)
+    public String getPath() {
+		return path;
+	}
 
     @Property(order = 14)
     public boolean isTemporary()
