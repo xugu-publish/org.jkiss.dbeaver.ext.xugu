@@ -36,6 +36,7 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.sql.SQLConstants;
 import org.jkiss.dbeaver.model.sql.SQLQueryResult;
 import org.jkiss.dbeaver.model.sql.SQLState;
+import org.jkiss.dbeaver.model.sql.SQLUtils;
 import org.jkiss.dbeaver.model.struct.*;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.BeanUtils;
@@ -826,13 +827,22 @@ public class XuguDataSource extends JDBCDataSource
 				XuguDatabase forDB) throws SQLException {
 			//xfc 修改了获取列信息的sql
             StringBuilder sql = new StringBuilder(500);
-            sql.append("SELECT * FROM ");
+        	
+        	sql.append("select s.schema_id,s.schema_name,u.user_name,s.comments from ");
         	sql.append(owner.roleFlag);
-        	sql.append("_SCHEMAS");
+        	sql.append("_SCHEMAS s");
+        	sql.append(",");
+        	sql.append(owner.roleFlag);
+        	sql.append("_USERS s");
+        	sql.append(" where s.user_id=u.user_id ");
         	if (forDB != null) {
-                sql.append(" where DB_ID=");
+                sql.append(" and s.db_id=");
+                sql.append(forDB.getID());
+                sql.append(" and u.db_id=");
                 sql.append(forDB.getID());
             }
+        	sql.append(" order by s.schema_id asc");
+        	
         	JDBCStatement dbStat = session.prepareStatement(sql.toString());
 			return dbStat;
 		}
@@ -856,25 +866,34 @@ public class XuguDataSource extends JDBCDataSource
             StringBuilder schemasQuery = new StringBuilder();
             String dbName = owner.connection.getCatalog();
         	//xfc 根据owner的用户角色选取不同的语句来查询schema
-        	schemasQuery.append("SELECT * FROM ");
+        	schemasQuery.append("select s.schema_id,s.schema_name,u.user_name,s.comments from ");
         	try {
 	        	if(owner.getRoleFlag()!=null && !"NULL".equals(owner.getRoleFlag())) {
 	        		schemasQuery.append(owner.getRoleFlag());
 	        	}else {
 	        		schemasQuery.append("ALL");
 	        	}
-	        	schemasQuery.append("_SCHEMAS");
-	        	schemasQuery.append(" WHERE DB_ID=");
+	        	schemasQuery.append("_SCHEMAS s");
+	        	schemasQuery.append(",");
+	        	if(owner.getRoleFlag()!=null && !"NULL".equals(owner.getRoleFlag())) {
+	        		schemasQuery.append(owner.getRoleFlag());
+	        	}else {
+	        		schemasQuery.append("ALL");
+	        	}
+	        	schemasQuery.append("_USERS u");
+	        	schemasQuery.append(" where s.user_id=u.user_id and s.db_id=");
 				schemasQuery.append(owner.databaseCache.getObject(session.getProgressMonitor(), owner, dbName).getID());
+				if(schema!=null) {
+					schemasQuery.append(" and s.schema_name =");
+					schemasQuery.append(SQLUtils.quoteString(schema, schema.getName()));
+				}
+				schemasQuery.append(" order by s.schema_id asc");
+				log.debug("模式信息："+schemasQuery.toString());
 			} catch (DBException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-        	if(schema!=null) {
-        		schemasQuery.append(" AND SCHEMA_ID = '");
-        		schemasQuery.append(schema.getID());
-        		schemasQuery.append("'");
-        	}
+        	
             JDBCPreparedStatement dbStat = session.prepareStatement(schemasQuery.toString());
             
             return dbStat;

@@ -45,18 +45,20 @@ import org.jkiss.dbeaver.model.impl.DBSObjectCache;
 import org.jkiss.dbeaver.model.impl.edit.SQLDatabasePersistAction;
 import org.jkiss.dbeaver.model.impl.sql.edit.SQLObjectEditor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.dbeaver.model.sql.SQLUtils;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.ui.UITask;
 import org.jkiss.dbeaver.ui.UIUtils;
+import org.jkiss.utils.CommonUtils;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 /**
- * @author Maple4Real
+ * @author xugu-publish
  * 模式管理器
- * 进行模式的创建和删除，修改仅支持重命名
+ * 进行模式的创建和删除，修改(重命名或添加注释信息)
  * 包含一个内部界面类，用于进行属性设定
  */
 public class XuguSchemaManager extends SQLObjectEditor<XuguSchema, XuguDataSource> implements DBEObjectRenamer<XuguSchema> {
@@ -65,6 +67,14 @@ public class XuguSchemaManager extends SQLObjectEditor<XuguSchema, XuguDataSourc
     public long getMakerOptions(DBPDataSource dataSource)
     {
         return FEATURE_SAVE_IMMEDIATELY;
+    }
+    
+    protected void validateObjectProperties(ObjectChangeCommand command) throws DBException
+    {
+        if (CommonUtils.isEmpty(command.getObject().getName())) 
+        {
+            throw new DBException("Schema name cannot be empty");
+        }
     }
 
     @Nullable
@@ -78,11 +88,13 @@ public class XuguSchemaManager extends SQLObjectEditor<XuguSchema, XuguDataSourc
     protected XuguSchema createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final Object container, Object from, Map<String, Object> options)
     {
     	XuguDataSource parent = (XuguDataSource)container;
-        return new UITask<XuguSchema>() {
+        return new UITask<XuguSchema>() 
+        {
             @Override
             protected XuguSchema runTask() {
                 NewUserDialog dialog = new NewUserDialog(UIUtils.getActiveWorkbenchShell(), parent, monitor);
-                if (dialog.open() != IDialogConstants.OK_ID) {
+                if (dialog.open() != IDialogConstants.OK_ID) 
+                {
                     return null;
                 }
                 XuguSchema newSchema = new XuguSchema(parent, -1, dialog.getSchema().getName());
@@ -98,50 +110,79 @@ public class XuguSchemaManager extends SQLObjectEditor<XuguSchema, XuguDataSourc
     	//xfc 修改了创建模式的sql语句 暂时不支持设置数据库
         XuguUser user = command.getObject().getUser();
         XuguSchema schema = command.getObject();
-        String sql = "CREATE SCHEMA " + schema.getName();
-        if(user.getName()!=null && !"".equals(user.getName())) {
-        	sql += " AUTHORIZATION " +user.getName();
+        StringBuilder desc = new StringBuilder();
+        
+        if (!CommonUtils.isEmpty(schema.getName())) 
+        {
+            desc.append("CREATE SCHEMA ");
+            desc.append(DBUtils.getQuotedIdentifier(command.getObject().getDataSource(), schema.getName()));
+            if(!CommonUtils.isEmpty(user.getName())) 
+            {
+            	desc.append(" AUTHORIZATION ");
+            	desc.append(DBUtils.getQuotedIdentifier(command.getObject().getDataSource(), user.getName()));
+            }
         }
-        if(XuguConstants.LOG_PRINT_LEVEL<1) {
-        	log.info("Xugu Plugin: Construct create schema sql: "+sql);
+        if(XuguConstants.LOG_PRINT_LEVEL<1) 
+        {
+        	log.info("Xugu Plugin: Construct create schema sql: " + desc.toString());
         }
-        actions.add(new SQLDatabasePersistAction("Create schema", sql));
+        
+        actions.add(new SQLDatabasePersistAction("create schema", desc.toString()));
     }
 
+	// 修改模式名称
     @Override
-    protected void addObjectRenameActions(DBRProgressMonitor monitor, List<DBEPersistAction> actions, ObjectRenameCommand command, Map<String, Object> options)
+    protected void addObjectRenameActions(DBRProgressMonitor monitor, List<DBEPersistAction> actionList, ObjectRenameCommand command, Map<String, Object> options)
     { 
-    	String sql = "ALTER SCHEMA " + DBUtils.getQuotedIdentifier(command.getObject().getDataSource(), command.getOldName()) + //$NON-NLS-1$
-                " RENAME TO " + DBUtils.getQuotedIdentifier(command.getObject().getDataSource(), command.getNewName());
-    	if(XuguConstants.LOG_PRINT_LEVEL<1) {
-        	log.info("Xugu Plugin: Construct rename schema sql: "+sql);
+    	StringBuilder desc = new StringBuilder(100);
+    	if (!CommonUtils.isEmpty(command.getNewName())) 
+        {
+            desc.append("ALTER SCHEMA ");
+            desc.append(DBUtils.getQuotedIdentifier(command.getObject().getDataSource(), command.getOldName()));
+            desc.append(" RENAME TO ");
+            desc.append(DBUtils.getQuotedIdentifier(command.getObject().getDataSource(), command.getNewName().toUpperCase()));
         }
-        actions.add(
-            new SQLDatabasePersistAction(
-                "Rename schema",sql) //$NON-NLS-1$
-        );
+    	
+    	if(XuguConstants.LOG_PRINT_LEVEL<1) 
+    	{
+        	log.info("Xugu Plugin: Construct rename schema sql: " + desc.toString());
+        }
+    	
+    	actionList.add(new SQLDatabasePersistAction("rename schema", desc.toString()));
     }
 
-    // 对模式的修改只能是重命名
-    protected void addObjectModifyActions(DBRProgressMonitor monitor, List<DBEPersistAction> actionList, ObjectChangeCommand command, Map<String, Object> options) throws DBException {
-    	// do nothing
+    // 对模式的修改只能是添加注释信息
+    @Override
+    protected void addObjectModifyActions(DBRProgressMonitor monitor, List<DBEPersistAction> actionList, ObjectChangeCommand command, Map<String, Object> options) throws DBException 
+    {
+        String comment = buildComment(command.getObject());
+        if (comment != null) 
+        {
+        	if(XuguConstants.LOG_PRINT_LEVEL<1) 
+        	{
+            	log.info("Xugu Plugin: Construct alter schema comment sql: "+comment);
+            }
+            actionList.add(new SQLDatabasePersistAction("Comment on Schema", comment));
+        }
     }
     
     @Override
-	public void renameObject(DBECommandContext commandContext, XuguSchema object, String newName) throws DBException {		
+	public void renameObject(DBECommandContext commandContext, XuguSchema object, String newName) throws DBException 
+    {		
     	processObjectRename(commandContext, object, newName);
     	//在执行完重命名后，修改对象名称（用于前台数据刷新）
     	object.setName(newName);
 	}
 
 	@Override
-	protected void addObjectDeleteActions(List<DBEPersistAction> actions,
-			SQLObjectEditor<XuguSchema, XuguDataSource>.ObjectDeleteCommand command, Map<String, Object> options) {
-		String sql = "DROP SCHEMA " + command.getObject().getName();
-		if(XuguConstants.LOG_PRINT_LEVEL<1) {
+	protected void addObjectDeleteActions(List<DBEPersistAction> actions, SQLObjectEditor<XuguSchema, XuguDataSource>.ObjectDeleteCommand command, Map<String, Object> options) 
+	{
+		String sql = "DROP SCHEMA " + DBUtils.getQuotedIdentifier(command.getObject().getDataSource(), command.getObject().getName());
+		if(XuguConstants.LOG_PRINT_LEVEL<1) 
+		{
         	log.info("Xugu Plugin: Construct drop schema sql: "+sql);
         }
-        actions.add(new SQLDatabasePersistAction("Create schema", sql));
+        actions.add(new SQLDatabasePersistAction("drop schema", sql));
 	}
     
     static class NewUserDialog extends Dialog {
@@ -199,7 +240,8 @@ public class XuguSchemaManager extends SQLObjectEditor<XuguSchema, XuguDataSourc
             try {
 				Collection<XuguUser> userList = this.dataSource.userCache.getAllObjects(monitor, this.dataSource);
 				Iterator<XuguUser> it = userList.iterator();
-				while(it.hasNext()) {
+				while(it.hasNext()) 
+				{
 					XuguUser user = it.next();
 					schemaOwner.add(user.getName());
 				}
@@ -216,17 +258,27 @@ public class XuguSchemaManager extends SQLObjectEditor<XuguSchema, XuguDataSourc
         @Override
         protected void okPressed()
         {
-        	if(XuguUtils.checkString(nameText.getText())) {
+        	if(XuguUtils.checkString(nameText.getText())) 
+        	{
         		user.setName(DBObjectNameCaseTransformer.transformObjectName(user, schemaOwner.getText()));
                 schema.setName(DBObjectNameCaseTransformer.transformObjectName(schema,nameText.getText()));
                 schema.setUser(user);
                 super.okPressed();
-        	}else {
+        	} else {
         		XuguWarningDialog warnDialog = new XuguWarningDialog(UIUtils.getActiveWorkbenchShell(), "Schema name cannot be null!");
         		warnDialog.open();
         	}
         }
 
+    }
+    
+    private String buildComment(XuguSchema schema)
+    {
+        if (!CommonUtils.isEmpty(schema.getComment())) 
+        {
+            return "COMMENT ON SCHEMA " + schema.getName() + " IS " + SQLUtils.quoteString(schema, schema.getComment());
+        }
+        return null;
     }
 }
 

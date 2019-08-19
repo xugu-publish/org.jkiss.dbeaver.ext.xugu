@@ -117,7 +117,7 @@ public class XuguSchedulerJob extends XuguSchemaObject implements XuguStatefulOb
                     	sql.append("SELECT * FROM ");
                     	sql.append(schema.getRoleFlag());
                     	sql.append("_PROCEDURES WHERE SCHEMA_ID=");
-                    	sql.append(schema.getID());
+                    	sql.append(schema.getId());
                     	sql.append(" AND PROC_NAME = '");
                 		sql.append(targetPro);
                 		sql.append("'");

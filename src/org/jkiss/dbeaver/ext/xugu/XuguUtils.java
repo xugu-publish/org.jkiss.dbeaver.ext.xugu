@@ -376,7 +376,7 @@ public class XuguUtils {
                 "SELECT * FROM ALL_OBJECTS WHERE OBJ_TYPE=? AND SCHEMA_ID=? AND OBJ_NAME=?")) {
                 //在xugu数据库中 obj_type字段为int类型
             	dbStat.setInt(1, Integer.parseInt(objectType.getTypeName()));
-                dbStat.setLong(2, object.getSchema().getID());
+                dbStat.setLong(2, object.getSchema().getId());
                 dbStat.setString(3, DBObjectNameCaseTransformer.transformObjectName(object, object.getName()));
                 try (JDBCResultSet dbResult = dbStat.executeQuery()) {
                     if (dbResult.next()) {

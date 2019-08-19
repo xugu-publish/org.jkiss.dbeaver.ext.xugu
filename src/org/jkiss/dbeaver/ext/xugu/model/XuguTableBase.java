@@ -342,7 +342,7 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
         		builder.append("SELECT *, tr.OBJ_ID AS TABLE_ID\nFROM ");
             	builder.append(owner.getDataSource().getRoleFlag());
             	builder.append("_TRIGGERS tr WHERE SCHEMA_ID=");
-            	builder.append(owner.getSchema().getID());
+            	builder.append(owner.getSchema().getId());
             	builder.append(" AND TABLE_ID=");
             	builder.append(owner.getID());
             	builder.append("\n ORDER BY TRIG_NAME");
@@ -352,7 +352,7 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
         		builder.append("SELECT *, tr.OBJ_ID AS VIEW_ID\nFROM ");
             	builder.append(owner.getDataSource().getRoleFlag());
             	builder.append("_TRIGGERS tr WHERE SCHEMA_ID=");
-            	builder.append(owner.getSchema().getID());
+            	builder.append(owner.getSchema().getId());
             	builder.append(" AND VIEW_ID=");
             	builder.append(owner.getID());
             	builder.append("\n ORDER BY TRIG_NAME");

@@ -70,9 +70,11 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
 
     private long id;
     private String name;
+    private String owner;
+	private String comment;
     private String roleFlag;
     private XuguDatabase parent;
-    private transient XuguUser user;
+	private transient XuguUser user;
 
     /**
      * 通过指定模式ID和模式名称构造一个新的模式对象
@@ -98,6 +100,8 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
     	super(dataSource, true);
     	this.id = JDBCUtils.safeGetLong(dbResult, "SCHEMA_ID");
         this.name = JDBCUtils.safeGetString(dbResult, "SCHEMA_NAME");
+        this.owner = JDBCUtils.safeGetString(dbResult, "USER_NAME");
+        this.comment = JDBCUtils.safeGetString(dbResult, "COMMENT");
         this.roleFlag = dataSource.getRoleFlag();
         this.parent = parent;
         if (CommonUtils.isEmpty(this.name)) {
@@ -116,6 +120,8 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         super(dataSource, true);
         this.id = JDBCUtils.safeGetLong(dbResult, "SCHEMA_ID");
         this.name = JDBCUtils.safeGetString(dbResult, "SCHEMA_NAME");
+        this.owner = JDBCUtils.safeGetString(dbResult, "USER_NAME");
+        this.comment = JDBCUtils.safeGetString(dbResult, "COMMENTS");
         this.roleFlag = dataSource.getRoleFlag();
         if (CommonUtils.isEmpty(this.name)) {
             log.warn("Empty schema name fetched");
@@ -129,8 +135,9 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         return XuguConstants.USER_PUBLIC.equals(this.name);
     }
 
-    @Property(order = 200)
-    public long getID()
+    @NotNull
+    @Property(viewable = true, editable = false, order = 200)
+    public long getId()
     {
         return id;
     }
@@ -148,6 +155,25 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         this.name = name;
     }
 
+    @NotNull
+    @Property(viewable = true, editable = false, order = 2)
+    public String getOwner() {
+		return owner;
+	}
+
+	public void setOwner(String owner) {
+		this.owner = owner;
+	}
+
+	@Property(viewable = true, editable = true, updatable = true, order = 3)
+	public String getComment() {
+		return comment;
+	}
+
+	public void setComment(String comment) {
+		this.comment = comment;
+	}
+
     public int getDBID(XuguSchema schema, JDBCSession session) {
     	try {
 	    	String dbName = schema.getDataSource().connection.getCatalog();
@@ -159,12 +185,20 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
 			return -1;
 		}
     }
-    
+
+    public XuguDatabase getParent() {
+		return parent;
+	}
+
+	public void setParent(XuguDatabase parent) {
+		this.parent = parent;
+	}
+
     @Nullable
     @Override
     public String getDescription()
     {
-        return null;
+        return this.comment;
     }
 
     public XuguUser getUser()
@@ -395,7 +429,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         return list;
     }
 
-    @Property(order = 90)
+    //@Property(viewable = false, editable = false, order = 90)
     public XuguUser getSchemaUser(DBRProgressMonitor monitor) throws DBException {
         return getDataSource().getUser(monitor, name);
     }
@@ -1110,7 +1144,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         	sql.append("SELECT * FROM ");
         	sql.append(owner.roleFlag);
         	sql.append("_VIEWS WHERE SCHEMA_ID=");
-        	sql.append(owner.getID());
+        	sql.append(owner.getId());
         	sql.append(" AND DB_ID=");
         	sql.append(owner.getDBID(owner, session));
         	if(object!=null) {
