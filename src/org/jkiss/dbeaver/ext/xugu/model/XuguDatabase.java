@@ -86,7 +86,7 @@ public class XuguDatabase extends XuguGlobalObject
     }
 
     @Property(viewable = true, editable = false, order = 1)
-    public int getID()
+    public int getId()
     {
         return id;
     }

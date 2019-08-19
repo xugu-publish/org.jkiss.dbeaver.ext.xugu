@@ -177,7 +177,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
     public int getDBID(XuguSchema schema, JDBCSession session) {
     	try {
 	    	String dbName = schema.getDataSource().connection.getCatalog();
-	        int dbID = schema.getDataSource().databaseCache.getObject(session.getProgressMonitor(), schema.getDataSource(), dbName).getID();
+	        int dbID = schema.getDataSource().databaseCache.getObject(session.getProgressMonitor(), schema.getDataSource(), dbName).getId();
             return dbID;
         } catch (DBException | SQLException e) {
 			// TODO Auto-generated catch block

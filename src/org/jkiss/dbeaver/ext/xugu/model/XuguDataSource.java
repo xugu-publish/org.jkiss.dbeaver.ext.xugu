@@ -837,9 +837,9 @@ public class XuguDataSource extends JDBCDataSource
         	sql.append(" where s.user_id=u.user_id ");
         	if (forDB != null) {
                 sql.append(" and s.db_id=");
-                sql.append(forDB.getID());
+                sql.append(forDB.getId());
                 sql.append(" and u.db_id=");
-                sql.append(forDB.getID());
+                sql.append(forDB.getId());
             }
         	sql.append(" order by s.schema_id asc");
         	
@@ -882,7 +882,7 @@ public class XuguDataSource extends JDBCDataSource
 	        	}
 	        	schemasQuery.append("_USERS u");
 	        	schemasQuery.append(" where s.user_id=u.user_id and s.db_id=");
-				schemasQuery.append(owner.databaseCache.getObject(session.getProgressMonitor(), owner, dbName).getID());
+				schemasQuery.append(owner.databaseCache.getObject(session.getProgressMonitor(), owner, dbName).getId());
 				if(schema!=null) {
 					schemasQuery.append(" and s.schema_name =");
 					schemasQuery.append(SQLUtils.quoteString(schema, schema.getName()));
@@ -983,7 +983,7 @@ public class XuguDataSource extends JDBCDataSource
 				sql.append(owner.getRoleFlag());
 	        	sql.append("_USERS");
 	        	sql.append(" WHERE IS_ROLE=FALSE AND DB_ID=");
-				sql.append(owner.databaseCache.getObject(session.getProgressMonitor(), owner, dbName).getID());
+				sql.append(owner.databaseCache.getObject(session.getProgressMonitor(), owner, dbName).getId());
 			} catch (DBException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -1022,7 +1022,7 @@ public class XuguDataSource extends JDBCDataSource
 	        	sql.append(owner.getRoleFlag());
 	        	sql.append("_USERS WHERE IS_ROLE=true");
 	        	sql.append(" AND DB_ID=");
-				sql.append(owner.databaseCache.getObject(session.getProgressMonitor(), owner, dbName).getID());
+				sql.append(owner.databaseCache.getObject(session.getProgressMonitor(), owner, dbName).getId());
 			} catch (DBException e) {
 				// TODO Auto-generated catch block
 				log.debug("Error in XuguDataSource.RoleCache.prepareObjectsStatement()", e);
