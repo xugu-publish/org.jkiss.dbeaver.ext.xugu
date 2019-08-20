@@ -1072,13 +1072,18 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         {
         	//xfc 修改了获取同义词信息的语句
         	StringBuilder sql = new StringBuilder();
-        	sql.append("SELECT * FROM ");
+        	sql.append("select syn.*,sch.schema_name from ");
         	sql.append(owner.roleFlag);
-        	sql.append("_SYNONYMS WHERE SCHEMA_ID=");
+        	sql.append("_SYNONYMS syn ");
+        	sql.append("left join ");
+        	sql.append(owner.roleFlag);
+        	sql.append("_SCHEMAS sch ");
+        	sql.append("on syn.targ_sche_id=sch.schema_id ");
+        	sql.append("WHERE SYN.SCHEMA_ID=");
         	sql.append(owner.id);
         	//加上公有的同义词
-        	sql.append(" OR SCHEMA_ID=0");
-        	sql.append(" AND DB_ID=");
+        	sql.append(" OR SYN.SCHEMA_ID=0");
+        	sql.append(" AND SYN.DB_ID=");
         	sql.append(owner.getDBID(owner, session));
         	if(XuguConstants.LOG_PRINT_LEVEL<1) {
         		log.debug("Xugu synonyms metadata: "+sql.toString());
@@ -1090,7 +1095,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         @Override
         protected XuguSynonym fetchObject(@NotNull JDBCSession session, @NotNull XuguSchema owner, @NotNull JDBCResultSet resultSet) throws SQLException, DBException
         {
-            return new XuguSynonym(owner, resultSet);
+            return new XuguSynonym(session.getProgressMonitor(), session, owner, resultSet);
         }
     }
     
