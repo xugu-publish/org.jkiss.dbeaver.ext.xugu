@@ -46,11 +46,7 @@ public abstract class XuguProcedureBase<PARENT extends DBSObjectContainer> exten
     private DBSProcedureType procedureType;
     private final ArgumentsCache argumentsCache = new ArgumentsCache();
 
-    public XuguProcedureBase(
-        PARENT parent,
-        String name,
-        long objectId,
-        DBSProcedureType procedureType)
+    public XuguProcedureBase(PARENT parent,String name,long objectId,DBSProcedureType procedureType)
     {
         super(parent, name, objectId, true);
         this.procedureType = procedureType;

@@ -19,6 +19,7 @@ package org.jkiss.dbeaver.ext.xugu.edit;
 
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.ext.xugu.model.*;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPEvaluationContext;
@@ -28,10 +29,13 @@ import org.jkiss.dbeaver.model.impl.DBSObjectCache;
 import org.jkiss.dbeaver.model.impl.edit.SQLDatabasePersistAction;
 import org.jkiss.dbeaver.model.impl.sql.edit.SQLObjectEditor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.dbeaver.model.sql.SQLUtils;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.rdb.DBSProcedureType;
 import org.jkiss.dbeaver.ui.UITask;
 import org.jkiss.dbeaver.ui.editors.object.struct.CreateProcedurePage;
+import org.jkiss.dbeaver.utils.GeneralUtils;
+import org.jkiss.utils.CommonUtils;
 import org.jkiss.dbeaver.ext.xugu.XuguUtils;
 import java.util.List;
 import java.util.Map;
@@ -39,11 +43,24 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * @author Maple4Real
+ * @author xugu-publish
  * 存储过程管理器
  * 进行存储过程的创建和删除（修改等同于创建并替换）
  */
 public class XuguProcedureManager extends SQLObjectEditor<XuguProcedureStandalone, XuguSchema> {
+
+    @Override
+    public long getMakerOptions(DBPDataSource dataSource)
+    {
+        return FEATURE_EDITOR_ON_CREATE;
+    }
+
+    protected void validateObjectProperties(ObjectChangeCommand command) throws DBException
+    {
+        if (CommonUtils.isEmpty(command.getObject().getName())) {
+            throw new DBException("Procedure name cannot be empty");
+        }
+    }
 
     @Nullable
     @Override
@@ -57,7 +74,7 @@ public class XuguProcedureManager extends SQLObjectEditor<XuguProcedureStandalon
     {
     	XuguProcedureStandalone procedure = new XuguProcedureStandalone(
             (XuguSchema) container,
-            "PROC",
+            "",
             DBSProcedureType.PROCEDURE);
         return new UITask<XuguProcedureStandalone>() {
             @Override
@@ -67,7 +84,38 @@ public class XuguProcedureManager extends SQLObjectEditor<XuguProcedureStandalon
                     return null;
                 }
                 
+                StringBuilder desc = new StringBuilder(100);
+                desc.append("CREATE OR REPLACE ");
+                desc.append(editPage.getProcedureType());
+                desc.append(" ");
+                desc.append(editPage.getProcedureName());
+                if(editPage.getProcedureType().equals(DBSProcedureType.PROCEDURE)) 
+                {
+                	desc.append(GeneralUtils.getDefaultLineSeparator());
+                	desc.append("IS ");
+                	desc.append(GeneralUtils.getDefaultLineSeparator());
+                	desc.append("BEGIN ");
+                } else {
+                	desc.append(GeneralUtils.getDefaultLineSeparator());
+                	desc.append("-- Return DataType --");
+                	desc.append(GeneralUtils.getDefaultLineSeparator());
+                	desc.append("RETURN ");
+                	desc.append(GeneralUtils.getDefaultLineSeparator());
+                	desc.append("AS ");
+                	desc.append(GeneralUtils.getDefaultLineSeparator());
+                	desc.append("-- Variable Declaration --");
+                	desc.append(GeneralUtils.getDefaultLineSeparator());
+                	desc.append("BEGIN ");
+                }
+                desc.append(GeneralUtils.getDefaultLineSeparator());
+                desc.append("-- Procedure/Function body --");
+                desc.append(GeneralUtils.getDefaultLineSeparator());
+                desc.append("END ");
+                desc.append(editPage.getProcedureName());
+                desc.append(";");
+                
                 procedure.setName(editPage.getProcedureName());
+                procedure.setObjectDefinitionText(desc.toString());
                 procedure.setValid(true);
                 return procedure;
             }
@@ -81,6 +129,30 @@ public class XuguProcedureManager extends SQLObjectEditor<XuguProcedureStandalon
     }
 
     @Override
+    protected void addObjectModifyActions(DBRProgressMonitor monitor, List<DBEPersistAction> actionList, ObjectChangeCommand command, Map<String, Object> options)
+    {
+    	if (command.getProperty("objectDefinitionText") != null) 
+    	{
+    		createOrReplaceProcedureQuery(actionList, command.getObject());
+    	}
+    }
+
+    @Override
+    protected void addObjectExtraActions(DBRProgressMonitor monitor, List<DBEPersistAction> actions, NestedObjectCommand<XuguProcedureStandalone, PropertyHandler> command, Map<String, Object> options) {
+        if (command.getProperty("comment") != null) {
+        	StringBuilder desc = new StringBuilder(100);
+        	desc.append("COMMENT ON PROCEDURE ");
+        	desc.append(command.getObject().getName());
+        	desc.append(" IS ");
+        	desc.append(SQLUtils.quoteString(command.getObject(), command.getObject().getComment()));
+        	if(XuguConstants.LOG_PRINT_LEVEL<1) {
+            	log.info("Xugu Plugin: Construct add procedure comment sql: " + desc.toString());
+            }
+            actions.add(new SQLDatabasePersistAction("Comment Procedure", desc.toString()));
+        }
+    }
+    
+    @Override
     protected void addObjectDeleteActions(List<DBEPersistAction> actions, ObjectDeleteCommand objectDeleteCommand, Map<String, Object> options)
     {
         final XuguProcedureStandalone object = objectDeleteCommand.getObject();
@@ -88,21 +160,7 @@ public class XuguProcedureManager extends SQLObjectEditor<XuguProcedureStandalon
         if(XuguConstants.LOG_PRINT_LEVEL<1) {
         	log.info("Xugu Plugin: Construct drop procedure sql: "+sql);
         }
-        actions.add(
-            new SQLDatabasePersistAction("Drop procedure",sql) //$NON-NLS-1$ //$NON-NLS-2$
-        );
-    }
-
-    @Override
-    protected void addObjectModifyActions(DBRProgressMonitor monitor, List<DBEPersistAction> actionList, ObjectChangeCommand objectChangeCommand, Map<String, Object> options)
-    {
-        createOrReplaceProcedureQuery(actionList, objectChangeCommand.getObject());
-    }
-
-    @Override
-    public long getMakerOptions(DBPDataSource dataSource)
-    {
-        return FEATURE_EDITOR_ON_CREATE;
+        actions.add(new SQLDatabasePersistAction("Drop procedure",sql));
     }
 
     private void createOrReplaceProcedureQuery(List<DBEPersistAction> actionList, XuguProcedureStandalone procedure)
@@ -112,7 +170,7 @@ public class XuguProcedureManager extends SQLObjectEditor<XuguProcedureStandalon
             return;
         }
         //强制增加CREATE OR REPLACE关键字
-        String keyWord = "PROCEDURE".equals(procedure.getProcedureType().toString())?"PROCEDURE":"FUNCTION";
+        String keyWord = XuguObjectType.PROCEDURE.getTypeName().equals(procedure.getProcedureType().toString())?XuguObjectType.PROCEDURE.getTypeName():XuguObjectType.FUNCTION.getTypeName();
     	Pattern p = Pattern.compile("("+keyWord+")", Pattern.CASE_INSENSITIVE);
         Matcher m = p.matcher(source);
         if(m.find()) {
