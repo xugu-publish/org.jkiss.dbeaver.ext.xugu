@@ -47,8 +47,6 @@ import org.jkiss.dbeaver.model.exec.plan.DBCPlanStyle;
 import org.jkiss.dbeaver.model.exec.plan.DBCQueryPlanner;
 import org.jkiss.dbeaver.ext.xugu.model.plan.XuguPlanAnalyser;
 import org.jkiss.dbeaver.ext.xugu.XuguUtils;
-import com.xugu.outjar.OutJarClass;
-
 import java.io.PrintWriter;
 import java.sql.*;
 import java.util.*;

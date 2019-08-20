@@ -591,7 +591,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         	//当有检索条件时 只查询指定表 用于新建表之后的刷新工作
         	if(object!=null) {
         		sql.append(" AND TABLE_ID = ");
-        		sql.append(object.getID());
+        		sql.append(object.getId());
         	}else if(objectName!=null) {
         		sql.append(" AND TABLE_NAME ='");
         		sql.append(objectName);
@@ -631,7 +631,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         	sql.append(owner.getDBID(owner, session));
             if (forTable != null) {
                 sql.append(" AND TABLE_ID=");
-                sql.append(forTable.getID());
+                sql.append(forTable.getId());
                 sql.append(" AND DB_ID=");
                 sql.append(owner.getDBID(owner, session));
             }
@@ -682,7 +682,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
             sql.append("_TABLES t USING(SCHEMA_ID) ");
             if (forTable != null) {
                 sql.append("WHERE TABLE_ID=");
-                sql.append(forTable.getID());
+                sql.append(forTable.getId());
             }
             sql.append(") USING(TABLE_ID)");
             sql.append(" WHERE DB_ID=");
@@ -800,7 +800,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
             sql.append("_TABLES t USING(SCHEMA_ID) ");
             if (forTable != null) {
                 sql.append("WHERE TABLE_ID=");
-                sql.append(forTable.getID());
+                sql.append(forTable.getId());
             }
             sql.append(") USING(TABLE_ID) INNER JOIN (SELECT t2.TABLE_NAME, t2.TABLE_ID FROM ");
             sql.append(owner.roleFlag);
@@ -888,7 +888,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
             sql.append(owner.getDBID(owner, session));
             if (forTable != null) {
                 sql.append(" AND TABLE_ID=");
-                sql.append(forTable.getID());
+                sql.append(forTable.getId());
             }
             if(XuguConstants.LOG_PRINT_LEVEL<1) {
         		log.info("Xugu Plugin: Construct select indexes sql: "+sql.toString());
@@ -1165,7 +1165,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
             return new XuguView(session.getProgressMonitor(), session, owner, dbResult);
         }
         
-     // 获取列信息
+        // 获取视图列信息
         @Override
         protected JDBCStatement prepareChildrenStatement(@NotNull JDBCSession session, @NotNull XuguSchema owner, @Nullable XuguView forView)
             throws SQLException

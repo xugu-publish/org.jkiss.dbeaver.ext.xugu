@@ -80,7 +80,7 @@ public abstract class XuguTriggerBase<PARENT extends DBSObject> extends XuguObje
         this.triggerTime = JDBCUtils.safeGetInt(dbResult, "TRIG_TIME");
         this.triggerCondition = JDBCUtils.safeGetString(dbResult, "TRIG_COND");
         //根据obj_id获取？是否代表列id？
-        if(parent.getType()==0) {
+        if(parent.getType().getTypeName().equals(XuguObjectType.TABLE.getTypeName())) {
         	this.obj_id = JDBCUtils.safeGetInt(dbResult, "TABLE_ID");
         }else {
         	this.obj_id = JDBCUtils.safeGetInt(dbResult, "VIEW_ID");

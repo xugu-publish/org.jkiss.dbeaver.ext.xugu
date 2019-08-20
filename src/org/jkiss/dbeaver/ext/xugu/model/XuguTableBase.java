@@ -33,7 +33,6 @@ import org.jkiss.dbeaver.model.impl.DBObjectNameCaseTransformer;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
 import org.jkiss.dbeaver.model.impl.jdbc.cache.JDBCStructCache;
 import org.jkiss.dbeaver.model.impl.jdbc.struct.JDBCTable;
-import org.jkiss.dbeaver.model.impl.jdbc.struct.JDBCTableColumn;
 import org.jkiss.dbeaver.model.meta.Association;
 import org.jkiss.dbeaver.model.meta.IPropertyCacheValidator;
 import org.jkiss.dbeaver.model.meta.LazyProperty;
@@ -46,9 +45,9 @@ import org.jkiss.dbeaver.model.struct.rdb.DBSTableIndex;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.XuguUtils;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.Map;
 
@@ -62,7 +61,13 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
     private static final Log log = Log.getLog(XuguTableBase.class);
 
     private int id;
-    private int tableType;
+    protected boolean valid;
+    private String comment;
+    private Timestamp createTime;
+    private XuguObjectType tableType;
+    
+    public final TriggerCache triggerCache = new TriggerCache();
+    protected abstract String getTableTypeName();
     
     public static class TableAdditionalInfo {
         volatile boolean loaded = false;
@@ -78,41 +83,35 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
         }
     }
 
-    public final TriggerCache triggerCache = new TriggerCache();
-    protected abstract String getTableTypeName();
-
-    protected boolean valid;
-    private String comment;
-
-    protected XuguTableBase(XuguSchema schema, String name, boolean persisted)
+	protected XuguTableBase(XuguSchema schema, String name, boolean persisted)
     {
         super(schema, name, persisted);
     }
 
-    protected XuguTableBase(XuguSchema xuguSchema, ResultSet dbResult, int type)
+    protected XuguTableBase(XuguSchema xuguSchema, ResultSet dbResult, XuguObjectType type)
     {
         super(xuguSchema, true);
-        // type=0 当前对象为表
-        if(type==0) {
+        if(type.getTypeName().equals(XuguObjectType.TABLE.getTypeName()))
+        {
         	setName(JDBCUtils.safeGetString(dbResult, "TABLE_NAME"));
-            this.id = JDBCUtils.safeGetInt(dbResult, "TABLE_ID");
-        }
-        // type=1 当前对象为视图
-        else {
+        	this.id = JDBCUtils.safeGetInt(dbResult, "TABLE_ID");
+        } else {
         	setName(JDBCUtils.safeGetString(dbResult, "VIEW_NAME"));
         	this.id = JDBCUtils.safeGetInt(dbResult, "VIEW_ID");
         }
         this.valid = JDBCUtils.safeGetBoolean(dbResult, "VALID");
+        this.createTime = JDBCUtils.safeGetTimestamp(dbResult, "CREATE_TIME");
+        this.comment = JDBCUtils.safeGetString(dbResult, "COMMENTS");
         this.tableType = type;
     }
 
-    // type=0 当前对象为表 type=1 当前对象为视图
-    public int getType() {
+	// 对象类型(表或试图)
+    public XuguObjectType getType() {
     	return tableType;
     }
     
     @Override
-    public JDBCStructCache<XuguSchema, ? extends JDBCTable, ? extends JDBCTableColumn> getCache()
+    public JDBCStructCache<XuguSchema, XuguTableBase, XuguTableColumn> getCache()
     {
         return getContainer().tableCache;
     }
@@ -125,6 +124,12 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
     }
 
     @NotNull
+    @Property(viewable = false, editable = false, valueTransformer = DBObjectNameCaseTransformer.class, order = -1)
+	public int getId() {
+		return id;
+	}
+
+    @NotNull
     @Override
     @Property(viewable = true, editable = true, valueTransformer = DBObjectNameCaseTransformer.class, order = 1)
     public String getName()
@@ -132,6 +137,25 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
         return super.getName();
     }
 
+    @NotNull
+    @Property(viewable = true, editable = true, updatable = true, valueTransformer = DBObjectNameCaseTransformer.class, order = 2)
+    public String getComment()
+    {
+    	return comment;
+    }
+    
+    @NotNull
+    @Property(viewable = true, editable = false, valueTransformer = DBObjectNameCaseTransformer.class, order = 3)
+    public Timestamp getCreateTime() {
+    	return createTime;
+    }
+    
+    @NotNull
+    @Property(viewable = true, editable = false, valueTransformer = DBObjectNameCaseTransformer.class, order = 4)
+    public boolean isValid() {
+    	return valid;
+    }
+    
     @Nullable
     @Override
     public String getDescription()
@@ -148,10 +172,11 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
             this);
     }
 
-    public int getID() {
-    	return this.id;
+    public void setComment(String comment)
+    {
+        this.comment = comment;
     }
-    
+
     //获取表注释信息
     @Property(viewable = true, editable = true, updatable = true, multiline = true, order = 100)
     @LazyProperty(cacheValidator = CommentsValidator.class)
@@ -168,7 +193,7 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
                     session,
                     "SELECT COMMENTS FROM "+this.getDataSource().getRoleFlag()+
                     "_TABLES WHERE TABLE_ID=? AND TABLE_TYPE=? AND DB_ID=?",
-                    getID(),
+                    getId(),
                     tableType,
                     this.getSchema().getDBID(this.getSchema(), session));
                 if (comment == null) {
@@ -187,7 +212,7 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
             try (JDBCSession session = DBUtils.openMetaSession(monitor, this, "Load table column comments")) {
                 try (JDBCPreparedStatement stat = session.prepareStatement("SELECT COL_NAME,COMMENTS FROM "+
             this.getDataSource().getRoleFlag()+"_COLUMNS cc WHERE cc.TABLE_ID=? AND DB_ID=?")) {
-                    stat.setInt(1, getID());
+                    stat.setInt(1, getId());
                     stat.setInt(2, this.getSchema().getDBID(this.getSchema(), session));
                     try (JDBCResultSet resultSet = stat.executeQuery()) {
                         while (resultSet.next()) {
@@ -211,16 +236,6 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
         }
     }
 
-    public String getComment()
-    {
-        return comment;
-    }
-
-    public void setComment(String comment)
-    {
-        this.comment = comment;
-    }
-
     @Override
     public Collection<XuguTableColumn> getAttributes(@NotNull DBRProgressMonitor monitor)
         throws DBException
@@ -240,7 +255,7 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
     {
         getContainer().constraintCache.clearObjectCache(this);
         //刷新表
-        if(this.tableType==0) {
+        if(this.tableType.getTypeName().equals(XuguObjectType.TABLE.getTypeName())) {
         	return getContainer().tableCache.refreshObject(monitor, getContainer(), this);
         }
         //刷新视图
@@ -338,13 +353,13 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
         {
     		StringBuilder builder = new StringBuilder();
         	//对象类型为table
-        	if(owner.getType()==0) {
+        	if(owner.getType().getTypeName().equals(XuguObjectType.TABLE.getTypeName())) {
         		builder.append("SELECT *, tr.OBJ_ID AS TABLE_ID\nFROM ");
             	builder.append(owner.getDataSource().getRoleFlag());
             	builder.append("_TRIGGERS tr WHERE SCHEMA_ID=");
             	builder.append(owner.getSchema().getId());
             	builder.append(" AND TABLE_ID=");
-            	builder.append(owner.getID());
+            	builder.append(owner.getId());
             	builder.append("\n ORDER BY TRIG_NAME");
         	}
         	//对象类型为view
@@ -354,7 +369,7 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
             	builder.append("_TRIGGERS tr WHERE SCHEMA_ID=");
             	builder.append(owner.getSchema().getId());
             	builder.append(" AND VIEW_ID=");
-            	builder.append(owner.getID());
+            	builder.append(owner.getId());
             	builder.append("\n ORDER BY TRIG_NAME");
         	}
         	if(XuguConstants.LOG_PRINT_LEVEL<1) {
@@ -381,7 +396,7 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
         	sql.append("SELECT * FROM "+ owner.getDataSource().getRoleFlag() +"_COLUMNS WHERE ");
         	//columns系统表中只有table_id字段 不需要区分view
         	sql.append("TABLE_ID=");
-    		sql.append(owner.getID());
+    		sql.append(owner.getId());
         	//指定了特殊字段则仅查询指定字段，若没有则直接查该表的所有列
         	if(i1!=-1) {
         		cols = cols.substring(i1+4, i2);

@@ -38,6 +38,7 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.XuguMessages;
+import org.jkiss.dbeaver.ext.xugu.model.XuguObjectType;
 import org.jkiss.dbeaver.ext.xugu.model.XuguTableBase;
 import org.jkiss.dbeaver.ext.xugu.model.XuguTableColumn;
 import org.jkiss.dbeaver.ext.xugu.model.XuguTrigger;
@@ -200,7 +201,7 @@ public class XuguTriggerManager extends SQLTriggerManager<XuguTrigger, XuguTable
             
             parentTypeText = UIUtils.createLabelText(composite, XuguMessages.dialog_trigger_parent_type, null);
             parentTypeText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-            parentTypeText.setText(table.getType()==0?"TABLE":"VIEW");
+            parentTypeText.setText(table.getType().getTypeName());
             parentTypeText.setEditable(false);
             
             parentNameText = UIUtils.createLabelText(composite, XuguMessages.dialog_trigger_parent_name, null);
@@ -252,7 +253,7 @@ public class XuguTriggerManager extends SQLTriggerManager<XuguTrigger, XuguTable
 //            triggerTimingAfter = UIUtils.createRadioButton(timeBox, "After", 2, null);
 //            triggerTimingAfter.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             //当创建视图触发器时，不展示timing界面
-            if(table.getType()!=0) {
+            if(table.getType().getTypeName().equals(XuguObjectType.VIEW.getTypeName())) {
             	triggerTimingCombo.setVisible(false);
             }
             
@@ -328,7 +329,7 @@ public class XuguTriggerManager extends SQLTriggerManager<XuguTrigger, XuguTable
     			trigger.setName(DBObjectNameCaseTransformer.transformObjectName(trigger, nameText.getText()));
                 trigger.setObjectType(parentTypeText.getText());
                 //当创建视图触发器时，timing自动设为instead of
-                if(table.getType()!=0) {
+                if(table.getType().getTypeName().equals(XuguObjectType.VIEW.getTypeName())) {
                 	trigger.setTriggerTime(2);
                 }else {
                 	trigger.setTriggerTime(triggerTimingCombo.getText());

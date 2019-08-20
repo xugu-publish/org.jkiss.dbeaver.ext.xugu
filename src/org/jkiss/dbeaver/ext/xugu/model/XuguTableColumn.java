@@ -92,7 +92,7 @@ public class XuguTableColumn extends JDBCTableColumn<XuguTableBase> implements D
         //根据表和视图区分要获取的字段
         if(dbResult!=null) {
         	//type=0时为表 type=1时为视图
-        	if(table.getType()==0) {
+        	if(table.getType().getTypeName().equals(XuguObjectType.TABLE.getTypeName())) {
         		this.dbID = JDBCUtils.safeGetInt(dbResult, "DB_ID");
                 this.tableID = JDBCUtils.safeGetInt(dbResult, "TABLE_ID");
                 this.colNo = JDBCUtils.safeGetInt(dbResult, "COL_NO");

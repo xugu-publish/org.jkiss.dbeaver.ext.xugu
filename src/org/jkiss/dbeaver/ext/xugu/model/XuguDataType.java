@@ -41,7 +41,6 @@ import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.*;
 import org.jkiss.utils.CommonUtils;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -50,7 +49,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Xugu data type
+ * 虚谷数据类型
  */
 public class XuguDataType extends XuguObject<DBSObject>
     implements DBSDataType, DBSEntity, DBPQualifiedObject, XuguSourceObject, DBPScriptObjectExt {
@@ -215,7 +214,6 @@ public class XuguDataType extends XuguObject<DBSObject>
     }
 
     @Override
-    @Property(hidden = true, editable = true, updatable = true, order = -1)
     public String getObjectDefinitionText(DBRProgressMonitor monitor, Map<String, Object> options) throws DBCException
     {
         return sourceDeclaration;
@@ -239,7 +237,6 @@ public class XuguDataType extends XuguObject<DBSObject>
     }
 
     @Override
-    @Property(hidden = true, editable = true, updatable = true, order = -1)
     public String getExtendedDefinitionText(DBRProgressMonitor monitor) throws DBException
     {
         return sourceDefinition;
