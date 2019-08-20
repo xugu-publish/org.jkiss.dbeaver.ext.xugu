@@ -40,9 +40,9 @@ import org.jkiss.dbeaver.model.struct.DBSObjectState;
 import org.jkiss.dbeaver.model.struct.rdb.DBSPackage;
 import org.jkiss.dbeaver.model.struct.rdb.DBSProcedureContainer;
 import org.jkiss.utils.CommonUtils;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.*;
 
 /**
@@ -53,16 +53,23 @@ public class XuguPackage extends XuguSchemaObject
     implements XuguSourceObject, DBPScriptObjectExt, DBSObjectContainer, DBSPackage, DBPRefreshableObject, DBSProcedureContainer
 {
     private final ProceduresCache proceduresCache = new ProceduresCache();
-    private boolean valid;
-    private String sourceDeclaration;
+    protected boolean valid;
+    private String comment;
+    private Timestamp createTime;
+	private String sourceDeclaration;
     private String sourceDefinition;
 
-    public XuguPackage(
-        XuguSchema schema,
-        ResultSet dbResult)
+    public XuguPackage(XuguSchema schema, String name)
+    {
+        super(schema, name, false);
+    }
+
+    public XuguPackage(XuguSchema schema, ResultSet dbResult)
     {
         super(schema, JDBCUtils.safeGetString(dbResult, "PACK_NAME"), true);
         this.valid = JDBCUtils.safeGetBoolean(dbResult, "VALID");
+        this.comment = JDBCUtils.safeGetString(dbResult, "COMMENTS");
+        this.createTime = JDBCUtils.safeGetTimestamp(dbResult, "CREATE_TIME");
         this.sourceDeclaration = JDBCUtils.safeGetString(dbResult, "SPEC");
         this.sourceDefinition = JDBCUtils.safeGetString(dbResult, "BODY");
         if(this.sourceDeclaration == null) {
@@ -73,18 +80,23 @@ public class XuguPackage extends XuguSchemaObject
         }
     }
 
-    public XuguPackage(XuguSchema schema, String name)
-    {
-        super(schema, name, false);
-    }
-
     @Override
     @Property(viewable = true, editable = false, updatable = false, order=1)
     public String getName() {
     	return this.name;
     }
     
-    @Property(viewable = true, order = 3)
+    @Property(viewable = true, editable = true, updatable = true, order=2)
+    public String getComment() {
+    	return comment;
+    }
+    
+    @Property(viewable = true, editable = false, updatable = false, order=3)
+    public Timestamp getCreateTime() {
+    	return createTime;
+    }
+    
+    @Property(viewable = true, order = 4)
     public boolean isValid()
     {
         return valid;
@@ -94,6 +106,14 @@ public class XuguPackage extends XuguSchemaObject
     	this.valid = valid;
     }
     
+	public void setComment(String comment) {
+		this.comment = comment;
+	}
+
+	public void setCreateTime(Timestamp createTime) {
+		this.createTime = createTime;
+	}
+
     @Override
     public XuguSourceType getSourceType()
     {

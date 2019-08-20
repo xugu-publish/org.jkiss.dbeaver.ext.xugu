@@ -31,12 +31,12 @@ import org.jkiss.dbeaver.model.impl.edit.SQLDatabasePersistAction;
 import org.jkiss.dbeaver.model.impl.sql.edit.SQLObjectEditor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
+import org.jkiss.dbeaver.model.sql.SQLUtils;
 import org.jkiss.dbeaver.model.struct.DBSEntityType;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.ui.UITask;
 import org.jkiss.dbeaver.ui.editors.object.struct.EntityEditPage;
 import org.jkiss.utils.CommonUtils;
-
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -50,7 +50,21 @@ import java.util.regex.Pattern;
 public class XuguPackageManager extends SQLObjectEditor<XuguPackage, XuguSchema> {
 	private final static Pattern PATTERN_OR = Pattern.compile("(OR)", Pattern.CASE_INSENSITIVE);
 	private final static Pattern PATTERN_PACKAGE = Pattern.compile("(PACKAGE)", Pattern.CASE_INSENSITIVE);
-    @Nullable
+
+    @Override
+    public long getMakerOptions(DBPDataSource dataSource)
+    {
+        return FEATURE_EDITOR_ON_CREATE;
+    }
+
+    protected void validateObjectProperties(ObjectChangeCommand command) throws DBException
+    {
+        if (CommonUtils.isEmpty(command.getObject().getName())) {
+            throw new DBException("Package name cannot be empty");
+        }
+    }
+
+	@Nullable
     @Override
     public DBSObjectCache<? extends DBSObject, XuguPackage> getObjectsCache(XuguPackage object)
     {
@@ -95,6 +109,30 @@ public class XuguPackageManager extends SQLObjectEditor<XuguPackage, XuguSchema>
     }
 
     @Override
+    protected void addObjectModifyActions(DBRProgressMonitor monitor, List<DBEPersistAction> actionList, ObjectChangeCommand command, Map<String, Object> options)
+    {
+    	if (command.getProperty("objectDefinitionText") != null || command.getProperty("extendedDefinitionText") != null) 
+    	{
+    		createOrReplaceProcedureQuery(actionList, command.getObject());
+    	}
+    }
+
+    @Override
+    protected void addObjectExtraActions(DBRProgressMonitor monitor, List<DBEPersistAction> actions, NestedObjectCommand<XuguPackage, PropertyHandler> command, Map<String, Object> options) {
+        if (command.getProperty("comment") != null) {
+        	StringBuilder desc = new StringBuilder(100);
+        	desc.append("COMMENT ON PACKAGE ");
+        	desc.append(command.getObject().getName());
+        	desc.append(" IS ");
+        	desc.append(SQLUtils.quoteString(command.getObject(), command.getObject().getComment()));
+        	if(XuguConstants.LOG_PRINT_LEVEL<1) {
+            	log.info("Xugu Plugin: Construct add package comment sql: " + desc.toString());
+            }
+            actions.add(new SQLDatabasePersistAction("Comment Package", desc.toString()));
+        }
+    }
+    
+    @Override
     protected void addObjectDeleteActions(List<DBEPersistAction> actions, ObjectDeleteCommand objectDeleteCommand, Map<String, Object> options)
     {
         final XuguPackage object = objectDeleteCommand.getObject();
@@ -102,26 +140,11 @@ public class XuguPackageManager extends SQLObjectEditor<XuguPackage, XuguSchema>
         if(XuguConstants.LOG_PRINT_LEVEL<1) {
         	log.info("Xugu Plugin: Construct drop package sql: "+sql.toString());
         }
-        actions.add(
-            new SQLDatabasePersistAction("Drop package",sql) //$NON-NLS-1$
-        );
-    }
-
-    @Override
-    protected void addObjectModifyActions(DBRProgressMonitor monitor, List<DBEPersistAction> actionList, ObjectChangeCommand objectChangeCommand, Map<String, Object> options)
-    {
-        createOrReplaceProcedureQuery(actionList, objectChangeCommand.getObject());
-    }
-
-    @Override
-    public long getMakerOptions(DBPDataSource dataSource)
-    {
-        return FEATURE_EDITOR_ON_CREATE;
+        actions.add(new SQLDatabasePersistAction("Drop package",sql));
     }
 
     private void createOrReplaceProcedureQuery(List<DBEPersistAction> actionList, XuguPackage pack)
     {
-    	
         try {
             String header = pack.getObjectDefinitionText(new VoidProgressMonitor(), DBPScriptObject.EMPTY_OPTIONS);
             //对header进行预处理
@@ -188,8 +211,6 @@ public class XuguPackageManager extends SQLObjectEditor<XuguPackage, XuguSchema>
         } catch (DBException e) {
             log.warn(e);
         }
-//        XuguUtils.addSchemaChangeActions(actionList, pack);
     }
-
 }
 
