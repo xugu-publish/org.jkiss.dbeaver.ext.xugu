@@ -19,8 +19,6 @@ import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.ui.UITask;
 import org.jkiss.dbeaver.ui.editors.object.struct.EntityEditPage;
 import org.jkiss.utils.CommonUtils;
-
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -65,10 +63,8 @@ public class XuguSequenceManager extends SQLObjectEditor<XuguSequence, XuguSchem
                     return null;
                 }
 
-                final XuguSequence sequence = new XuguSequence(schema, page.getEntityName());
-                sequence.setIncrementBy(new BigDecimal(1));
-                sequence.setMinValue(new BigDecimal(0));
-                sequence.setCycle(false);
+                XuguSequence sequence = new XuguSequence(schema, page.getEntityName());
+                sequence.setSeqName(page.getEntityName());
                 return sequence;
             }
         }.execute();
@@ -82,34 +78,36 @@ public class XuguSequenceManager extends SQLObjectEditor<XuguSequence, XuguSchem
         	log.info("Xugu Plugin: Construct create sequence sql: "+sql);
         }
         actions.add(new SQLDatabasePersistAction("Create Sequence", sql));
-
-        String comment = buildComment(command.getObject());
-        if (comment != null) {
-        	if(XuguConstants.LOG_PRINT_LEVEL<1) {
-            	log.info("Xugu Plugin: Construct add comment to sequence sql: "+comment);
-            }
-            actions.add(new SQLDatabasePersistAction("Comment on Sequence", comment));
-        }
     }
 
     @Override
     protected void addObjectModifyActions(DBRProgressMonitor monitor, List<DBEPersistAction> actionList, ObjectChangeCommand command, Map<String, Object> options)
     {
-        String sql = buildStatement(command.getObject(), true);
-        if(XuguConstants.LOG_PRINT_LEVEL<1) {
-        	log.info("Xugu Plugin: Construct alter sequence sql: "+sql.toString());
-        }
-        actionList.add(new SQLDatabasePersistAction("Alter Sequence", sql));
-
-        String comment = buildComment(command.getObject());
-        if (comment != null) {
-        	if(XuguConstants.LOG_PRINT_LEVEL<1) {
-            	log.info("Xugu Plugin: Construct alter sequence comment sql: "+comment);
-            }
-            actionList.add(new SQLDatabasePersistAction("Comment on Sequence", comment));
-        }
+    	if (command.getProperties().size() > 1 || command.getProperty("comment") == null) 
+    	{
+    		String sql = buildStatement(command.getObject(), true);
+    		if(XuguConstants.LOG_PRINT_LEVEL<1) {
+    			log.info("Xugu Plugin: Construct alter sequence sql: "+sql.toString());
+    		}
+    		actionList.add(new SQLDatabasePersistAction("Alter Sequence", sql));
+    	}
     }
 
+    @Override
+    protected void addObjectExtraActions(DBRProgressMonitor monitor, List<DBEPersistAction> actions, NestedObjectCommand<XuguSequence, PropertyHandler> command, Map<String, Object> options) {
+        if (command.getProperty("comment") != null) {
+        	StringBuilder desc = new StringBuilder(100);
+        	desc.append("COMMENT ON SEQUENCE ");
+        	desc.append(command.getObject().getName());
+        	desc.append(" IS ");
+        	desc.append(SQLUtils.quoteString(command.getObject(), command.getObject().getComment()));
+        	if(XuguConstants.LOG_PRINT_LEVEL<1) {
+            	log.info("Xugu Plugin: Construct add sequence comment sql: " + desc.toString());
+            }
+            actions.add(new SQLDatabasePersistAction("Comment Sequence", desc.toString()));
+        }
+    }
+    
     @Override
     protected void addObjectDeleteActions(List<DBEPersistAction> actions, ObjectDeleteCommand command, Map<String, Object> options)
     {
@@ -131,9 +129,6 @@ public class XuguSequenceManager extends SQLObjectEditor<XuguSequence, XuguSchem
         }
         sb.append(sequence.getFullyQualifiedName(DBPEvaluationContext.DDL)).append(" ");
 
-        if (sequence.getIncrementBy() != null) {
-            sb.append("INCREMENT BY ").append(sequence.getIncrementBy()).append(" ");
-        }
         if (sequence.getMinValue() != null) {
             sb.append("MINVALUE ").append(sequence.getMinValue()).append(" ");
         }
@@ -141,12 +136,18 @@ public class XuguSequenceManager extends SQLObjectEditor<XuguSequence, XuguSchem
             sb.append("MAXVALUE ").append(sequence.getMaxValue()).append(" ");
         }
 
+        if (sequence.getCurValue() != null) {
+        	sb.append("START WITH ").append(sequence.getCurValue()).append(" ");
+        }
+        if (sequence.getIncrementBy() != null) {
+        	sb.append("INCREMENT BY ").append(sequence.getIncrementBy()).append(" ");
+        }
         if (sequence.isCycle()) {
             sb.append("CYCLE ");
         } else {
             sb.append("NOCYCLE ");
         }
-        if (sequence.getCacheValue() > 0) {
+        /*if (sequence.getCacheValue() > 0) {
             sb.append("CACHE ").append(sequence.getCacheValue()).append(" ");
         } else {
             sb.append("NOCACHE ");
@@ -155,17 +156,8 @@ public class XuguSequenceManager extends SQLObjectEditor<XuguSequence, XuguSchem
             sb.append("ORDER ");
         } else {
             sb.append("NOORDER ");
-        }
+        }*/
 
         return sb.toString();
     }
-
-    private String buildComment(XuguSequence sequence)
-    {
-        if (!CommonUtils.isEmpty(sequence.getDescription())) {
-            return "COMMENT ON SEQUENCE " + sequence.getFullyQualifiedName(DBPEvaluationContext.DDL) + " IS " + SQLUtils.quoteString(sequence, sequence.getDescription());
-        }
-        return null;
-    }
-
 }
