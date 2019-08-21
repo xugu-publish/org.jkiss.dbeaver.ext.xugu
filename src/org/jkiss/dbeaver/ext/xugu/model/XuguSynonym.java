@@ -16,6 +16,7 @@
  */
 package org.jkiss.dbeaver.ext.xugu.model;
 
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.exec.jdbc.JDBCSession;
 import org.jkiss.dbeaver.model.impl.DBObjectNameCaseTransformer;
@@ -65,13 +66,19 @@ public class XuguSynonym extends XuguSchemaObject implements DBSAlias {
         this.createTime = JDBCUtils.safeGetTimestamp(dbResult, "CREATE_TIME");
     }
 
+    @NotNull
     @Override
-    @Property(viewable = true, editable = false, updatable = false, order=1)
-    public String getName()
-    {
-        return this.name;
+    @Property(hidden=true, viewable = false, editable = false, updatable = false, order=1)
+    public String getName() {
+    	return super.name;
     }
     
+    @NotNull
+    @Property(viewable = true, editable = false, updatable = false, order=1)
+	public String getObjectName() {
+		return objectName;
+	}
+
     @Property(viewable = true, editable = false, updatable=false, valueTransformer = DBObjectNameCaseTransformer.class, order = 2)
     public String getTargetSchemaName() {
     	return targetSchemaName;
@@ -148,10 +155,6 @@ public class XuguSynonym extends XuguSchemaObject implements DBSAlias {
 
 	public void setObjectUserID(int objectUserID) {
 		this.objectUserID = objectUserID;
-	}
-
-	public String getObjectName() {
-		return objectName;
 	}
 
 	public void setObjectName(String objectName) {
