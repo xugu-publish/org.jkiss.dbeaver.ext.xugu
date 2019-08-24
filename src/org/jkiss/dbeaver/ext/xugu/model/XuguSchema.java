@@ -1108,11 +1108,14 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         {
         	//xfc 修改了获取同义词信息的语句
         	StringBuilder sql = new StringBuilder();
-        	sql.append("SELECT * FROM ");
+        	sql.append("SELECT t.*,s.schema_name FROM ");
         	sql.append(owner.roleFlag);
-        	sql.append("_TYPES WHERE SCHEMA_ID=");
+        	sql.append("_TYPES t left join ");
+        	sql.append(owner.roleFlag);
+        	sql.append("_SCHEMAS s on t.schema_id=s.schema_id ");
+        	sql.append("WHERE t.SCHEMA_ID=");
         	sql.append(owner.id);
-        	sql.append(" AND DB_ID=");
+        	sql.append(" AND t.DB_ID=");
         	sql.append(owner.getDBID(owner, session));
         	if(XuguConstants.LOG_PRINT_LEVEL<1) {
         		log.debug("Xugu udt metadata: "+sql.toString());

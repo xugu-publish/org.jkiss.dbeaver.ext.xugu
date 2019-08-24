@@ -18,58 +18,102 @@ package org.jkiss.dbeaver.ext.xugu.model;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.ext.xugu.XuguUtils;
+import org.jkiss.dbeaver.ext.xugu.model.XuguSchema.UDTCache;
+import org.jkiss.dbeaver.ext.xugu.model.source.XuguSourceObject;
 import org.jkiss.dbeaver.model.DBPDataKind;
+import org.jkiss.dbeaver.model.DBPEvaluationContext;
+import org.jkiss.dbeaver.model.DBPRefreshableObject;
+import org.jkiss.dbeaver.model.DBPScriptObjectExt;
+import org.jkiss.dbeaver.model.edit.DBEPersistAction;
+import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.exec.DBCLogicalOperator;
 import org.jkiss.dbeaver.model.impl.DBObjectNameCaseTransformer;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSDataType;
+import org.jkiss.dbeaver.model.struct.DBSObject;
+import org.jkiss.dbeaver.model.struct.DBSObjectContainer;
+import org.jkiss.dbeaver.model.struct.DBSObjectState;
 import org.jkiss.dbeaver.model.struct.DBSTypedObject;
-
+import org.jkiss.utils.CommonUtils;
 import java.sql.ResultSet;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 /**
- * @author Maple4Real
- *  自定义类型信息类
+ * @author xugu-publish
+   *  自定义类型信息类
  */
-public class XuguUDT extends XuguSchemaObject implements DBSDataType{
+public class XuguUDT extends XuguSchemaObject 
+	implements XuguSourceObject,DBPScriptObjectExt, DBSObjectContainer, DBSDataType, DBPRefreshableObject
+{
 
+	private final UDTCache udtCache = new UDTCache();
+	private int    typeId;
 	private String typeName;
 	private String objectSchemaName;
+	protected boolean valid;
+    private String    comment;
+    private Timestamp createTime;
 	private String typeHead;
 	private String typeBody;
 
-    public XuguUDT(XuguSchema schema, ResultSet dbResult)
+    public XuguUDT(XuguSchema schema, String name)
     {
-        super(schema, dbResult!=null?JDBCUtils.safeGetString(dbResult, "TYPE_NAME"):"NEW_TYPE", true);
-        if(dbResult!=null) {
-        	this.typeName = JDBCUtils.safeGetString(dbResult, "TYPE_NAME");
-        	this.typeHead = JDBCUtils.safeGetString(dbResult, "SPEC");
-        	this.typeBody = JDBCUtils.safeGetString(dbResult, "BODY");
-        }
+        super(schema, name, false);
     }
 
+    public XuguUDT(XuguSchema schema, ResultSet dbResult)
+    {
+        super(schema, JDBCUtils.safeGetString(dbResult, "TYPE_NAME"), true);
+        this.typeId = JDBCUtils.safeGetInt(dbResult, "TYPE_ID");
+        this.typeName = JDBCUtils.safeGetString(dbResult, "TYPE_NAME");
+        this.valid = JDBCUtils.safeGetBoolean(dbResult, "VALID");
+        this.comment = JDBCUtils.safeGetString(dbResult, "COMMENTS");
+        this.createTime = JDBCUtils.safeGetTimestamp(dbResult, "CREATE_TIME");
+        this.objectSchemaName = JDBCUtils.safeGetString(dbResult, "SCHEMA_NAME");
+        this.typeHead = JDBCUtils.safeGetString(dbResult, "SPEC");
+        this.typeBody = JDBCUtils.safeGetString(dbResult, "BODY");
+    }
+
+    @Property(viewable = true, editable = false, order = 1)
+    public int getTypeId() {
+    	return typeId;
+    }
+    
     @NotNull
     @Override
-    @Property(viewable = true, editable = false, valueTransformer = DBObjectNameCaseTransformer.class, order = 1)
+    @Property(viewable = true, editable = true, valueTransformer = DBObjectNameCaseTransformer.class, order = 2)
     public String getName()
     {
         return this.typeName;
     }
     
-    @Property(viewable = true, editable = true, updatable=true, multiline = true, valueTransformer = DBObjectNameCaseTransformer.class, order = 2)
-    public String getTypeHead()
-    {
-        return this.typeHead;
+    @Property(viewable = true, editable = false, order = 3)
+	public String getObjectSchemaName() {
+		return objectSchemaName;
+	}
+
+    @Property(viewable = true, editable = true, updatable = true, order = 18)
+	public String getComment() {
+		return comment;
+	}
+
+    @Property(viewable = true, editable = false, order = 5)
+	public Timestamp getCreateTime() {
+		return createTime;
+	}
+
+    @Property(viewable = true, editable = false, order = 6)
+    public boolean isValid() {
+    	return valid;
     }
     
-    @Property(viewable = true, editable = true, updatable=true, multiline = true, valueTransformer = DBObjectNameCaseTransformer.class, order = 3)
-    public String getTypeBody()
-    {
-        return this.typeBody;
-    }
-
     public Object getObjectOwner()
     {
         final XuguSchema schema = getDataSource().schemaCache.getCachedObject(objectSchemaName);
@@ -82,12 +126,34 @@ public class XuguUDT extends XuguSchemaObject implements DBSDataType{
     	this.typeName = name;
     }
     
-    public void setTypeHead(String head) {
-    	this.typeHead = head;
-    }
-    
-    public void setTypeBody(String body) {
-    	this.typeBody = body;
+	public void setTypeId(int typeId) {
+		this.typeId = typeId;
+	}
+
+	public void setObjectSchemaName(String objectSchemaName) {
+		this.objectSchemaName = objectSchemaName;
+	}
+
+	public void setValid(boolean valid) {
+		this.valid = valid;
+	}
+
+	public void setComment(String comment) {
+		this.comment = comment;
+	}
+
+	public void setCreateTime(Timestamp createTime) {
+		this.createTime = createTime;
+	}
+
+	public void setTypeName(String typeName) {
+		this.typeName = typeName;
+	}
+
+    @Override
+    public XuguSourceType getSourceType()
+    {
+        return XuguSourceType.TYPE;
     }
 
     public Object getObject(DBRProgressMonitor monitor) throws DBException {
@@ -102,10 +168,10 @@ public class XuguUDT extends XuguSchemaObject implements DBSDataType{
 
 	@Override
 	public String getTypeName() {
-		if(typeName.indexOf(".")!=-1) {
-			return typeName.split(".")[1];
+		if(this.name.indexOf(".")!=-1) {
+			return this.name.split(".")[1];
 		}else {
-			return typeName;
+			return this.name;
 		}
 	}
 
@@ -116,7 +182,7 @@ public class XuguUDT extends XuguSchemaObject implements DBSDataType{
 
 	@Override
 	public int getTypeID() {
-		return 0;
+		return typeId;
 	}
 
 	@Override
@@ -163,5 +229,96 @@ public class XuguUDT extends XuguSchemaObject implements DBSDataType{
 	@Override
 	public DBCLogicalOperator[] getSupportedOperators(DBSTypedObject attribute) {
 		return null;
+	}
+
+	@Override
+    @Property(hidden = false, editable = true, updatable = true, order = 15)
+	public String getObjectDefinitionText(DBRProgressMonitor monitor, Map<String, Object> options) throws DBException {
+		// TODO Auto-generated method stub
+		return typeHead;
+	}
+
+	@Override
+    @Property(hidden = false, editable = true, updatable = true, order = 16)
+	public String getExtendedDefinitionText(DBRProgressMonitor monitor) throws DBException {
+		// TODO Auto-generated method stub
+		return typeBody;
+	}
+
+	@Override
+	public void setObjectDefinitionText(String typeHead) {
+		// TODO Auto-generated method stub
+		this.typeHead = typeHead;
+	}
+	
+	public void setExtendedDefinitionText(String typeBody)
+    {
+        this.typeBody = typeBody;
+    }
+
+	@Override
+	public Collection<? extends DBSObject> getChildren(DBRProgressMonitor monitor) throws DBException {
+		// TODO Auto-generated method stub
+		return udtCache.getAllObjects(monitor, this.parent);
+	}
+
+	@Override
+	public DBSObject getChild(DBRProgressMonitor monitor, String childName) throws DBException {
+		// TODO Auto-generated method stub
+		return udtCache.getObject(monitor, this.parent, childName);
+	}
+
+	@Override
+	public Class<? extends DBSObject> getChildType(DBRProgressMonitor monitor) throws DBException {
+		// TODO Auto-generated method stub
+		return XuguDataType.class;
+	}
+
+	@Override
+	public void cacheStructure(DBRProgressMonitor monitor, int scope) throws DBException {
+		// TODO Auto-generated method stub
+		udtCache.getAllObjects(monitor, this.getSchema());
+	}
+
+	@Override
+	public DBSObjectState getObjectState() {
+		// TODO Auto-generated method stub
+		return valid ? DBSObjectState.NORMAL : DBSObjectState.INVALID;
+	}
+
+	@Override
+	public void refreshObjectState(DBRProgressMonitor monitor) throws DBCException {
+		// TODO Auto-generated method stub
+		this.valid = XuguUtils.getObjectStatus(monitor, this, XuguObjectType.UDT);
+	}
+
+	@Override
+	public DBSObject refreshObject(DBRProgressMonitor monitor) throws DBException {
+		// TODO Auto-generated method stub
+		this.udtCache.clearCache();
+        return this;
+	}
+
+	@Override
+	public DBEPersistAction[] getCompileActions() {
+		// TODO Auto-generated method stub
+		List<DBEPersistAction> actions = new ArrayList<>();
+        /*if (!CommonUtils.isEmpty(sourceDeclaration)) */{
+            actions.add(
+                new XuguObjectPersistAction(
+                    XuguObjectType.PACKAGE,
+                    "Compile udt head",
+                    "ALTER TYPE " + getFullyQualifiedName(DBPEvaluationContext.DDL) + " COMPILE"
+                ));
+        }
+        if (!CommonUtils.isEmpty(typeHead)) {
+            actions.add(
+                new XuguObjectPersistAction(
+                    XuguObjectType.PACKAGE_BODY,
+                    "Compile udt body",
+                    "ALTER TYPE " + getFullyQualifiedName(DBPEvaluationContext.DDL) + " COMPILE BODY"
+                ));
+        }
+        return actions.toArray(new DBEPersistAction[actions.size()]);
 	}
 }
