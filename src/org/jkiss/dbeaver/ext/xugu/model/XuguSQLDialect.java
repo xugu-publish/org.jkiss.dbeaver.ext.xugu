@@ -19,6 +19,7 @@ package org.jkiss.dbeaver.ext.xugu.model;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.ext.xugu.data.XuguBinaryFormatter;
+import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.DBPDataKind;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.data.DBDBinaryFormatter;
@@ -351,7 +352,12 @@ class XuguSQLDialect extends JDBCSQLDialect {
     	String ret = null;
     	ret = super.getColumnTypeModifiers(dataSource, column, typeName, dataKind);
     	typeName = CommonUtils.notEmpty(typeName).toUpperCase(Locale.ENGLISH);
-        if (dataKind == DBPDataKind.DATETIME) {
+    	if (dataKind == DBPDataKind.STRING) {
+    		int precision = CommonUtils.toInt(column.getPrecision());
+            if (precision > 1) {
+                ret = "(" + precision + ')';
+            }
+        } else if (dataKind == DBPDataKind.DATETIME) {
             if (typeName.equals("INTERVAL SECOND") 
             		|| typeName.equals("INTERVAL DAY TO SECOND") 
             		|| typeName.equals("INTERVAL HOUR TO SECOND") 
@@ -370,7 +376,8 @@ class XuguSQLDialect extends JDBCSQLDialect {
                 if (scale != null && scale >= 0 && precision >= 0 && !(scale == 0 && precision == 0)) {
                     ret = "(" + precision + ',' + scale + ')';
                 }
-            } else if (typeName.equals("INTERVAL YEAR")
+            } else if (typeName.equals("TIMESTAMP")
+            		|| typeName.equals("INTERVAL YEAR")
             		|| typeName.equals("INTERVAL MONTH")
             		|| typeName.equals("INTERVAL DAY")
             		|| typeName.equals("INTERVAL HOUR")

@@ -151,18 +151,23 @@ public class XuguTableColumn extends JDBCTableColumn<XuguTableBase> implements D
             if (this.type != null) {
                 this.typeName = type.getFullyQualifiedName(DBPEvaluationContext.DDL);
                 this.valueType = type.getTypeID();
-//                this.maxLength = this.type.getLength();
                 if("NUMERIC".equals(this.typeName)){
                 	this.scale = JDBCUtils.safeGetInt(dbResult, "SCALE")%65536;
                 	this.precision = (JDBCUtils.safeGetInt(dbResult, "SCALE")-this.scale)/65536;
                 	this.maxLength = this.precision;
                 }else if("CHAR".equals(this.typeName)||"VARCHAR".equals(this.typeName)) {
                 	this.precision = JDBCUtils.safeGetInt(dbResult, "SCALE");
-                	this.maxLength = this.precision;
+                	if (precision <= 0) {
+                		this.precision = null;
+                	}
                 	this.scale = null;
                 }else if(this.typeName.matches("INTERVAL(.*)")) {
                 	this.scale = JDBCUtils.safeGetInt(dbResult, "SCALE")%65536;
                 	this.precision = (JDBCUtils.safeGetInt(dbResult, "SCALE")-this.scale)/65536;
+                }else if(this.typeName.matches("TIMESTAMP")) {
+                	this.precision = JDBCUtils.safeGetInt(dbResult, "SCALE")%65536;
+                	this.maxLength = this.precision;
+                	this.scale = null;
                 }else {
                 	this.precision = this.type.getPrecision();
                 	this.scale = this.type.getMaxScale();
