@@ -54,7 +54,7 @@ public class XuguTableConstraintColumn extends AbstractTableConstraintColumn
     {
         return tableColumn;
     }
-
+    
     @Override
     @Property(viewable = false, order = 2)
     public int getOrdinalPosition()

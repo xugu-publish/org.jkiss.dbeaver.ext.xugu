@@ -80,6 +80,7 @@ public class XuguTableConstraint extends XuguTableConstraintBase {
         	this.enable = JDBCUtils.safeGetBoolean(dbResult, "ENABLE");
         	this.valid = JDBCUtils.safeGetBoolean(dbResult, "VALID");
         	this.cons_name = JDBCUtils.safeGetString(dbResult, "CONS_NAME");
+        	
             String s1 = JDBCUtils.safeGetString(dbResult, "MATCH_TYPE");
             if(s1!=null) {
             	this.match_type = s1.charAt(0);
