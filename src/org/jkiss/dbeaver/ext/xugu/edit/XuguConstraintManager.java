@@ -40,6 +40,7 @@ import org.jkiss.dbeaver.model.struct.DBSEntityConstraintType;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.ui.UITask;
 import org.jkiss.dbeaver.ui.editors.object.struct.EditConstraintPage;
+import org.jkiss.utils.CommonUtils;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 /**
@@ -83,6 +84,7 @@ public class XuguConstraintManager extends SQLConstraintManager<XuguTableConstra
                     editPage.getConstraintType(),
                     editPage.getConstraintExpression(),
                     editPage.isEnableConstraint() ? XuguObjectStatus.ENABLED : XuguObjectStatus.DISABLED);
+                constraint.setEnable(constraint.getStatus() == XuguObjectStatus.ENABLED);
                 int colIndex = 1;
                 for (DBSEntityAttribute tableColumn : editPage.getSelectedAttributes()) {
                     constraint.addColumn(
@@ -94,20 +96,6 @@ public class XuguConstraintManager extends SQLConstraintManager<XuguTableConstra
                 return constraint;
             }
         }.execute();
-    }
-
-    @Override
-    protected String getDropConstraintPattern(XuguTableConstraint constraint)
-    {
-        String clause = "CONSTRAINT"; //$NON-NLS-1$;
-/*
-        if (constraint.getConstraintType() == DBSEntityConstraintType.PRIMARY_KEY) {
-            clause = "PRIMARY KEY"; //$NON-NLS-1$
-        } else {
-            clause = "CONSTRAINT"; //$NON-NLS-1$
-        }
-*/
-        return "ALTER TABLE " + PATTERN_ITEM_TABLE +" DROP " + clause + " " + PATTERN_ITEM_CONSTRAINT; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
 
     @NotNull
@@ -125,15 +113,23 @@ public class XuguConstraintManager extends SQLConstraintManager<XuguTableConstra
     {
     	XuguTableConstraint constraint = (XuguTableConstraint) command.getObject();
     	XuguTableBase table = constraint.getTable();
-    	String sql = "ALTER TABLE " + table.getFullyQualifiedName(DBPEvaluationContext.DDL) + " ADD " + getNestedDeclaration(monitor, table, command, options) +
-                " "  + (constraint.isEnable()? "ENABLE" : "DISABLE");
+    	StringBuilder decl = new StringBuilder(100);
+    	decl.append("ALTER TABLE ");
+    	decl.append(table.getFullyQualifiedName(DBPEvaluationContext.DDL));
+    	decl.append(" ADD ");
+    	decl.append(getNestedDeclaration(monitor, table, command, options));
+    	decl.append(";");
+    	decl.append(CommonUtils.getLineSeparator());
+    	
+    	decl.append("ALTER TABLE ");
+    	decl.append(table.getFullyQualifiedName(DBPEvaluationContext.DDL));
+    	decl.append(constraint.isEnable()? " ENABLE" : " DISABLE");
+    	decl.append(" CONSTRAINT ");
+    	decl.append(constraint.getName());
     	if(XuguConstants.LOG_PRINT_LEVEL<1) {
-        	log.info("Xugu Plugin: Construct create constraint sql: "+sql);
+        	log.info("Xugu Plugin: Construct create constraint sql: "+ decl.toString());
         }
-        actions.add(
-                new SQLDatabasePersistAction(
-                    ModelMessages.model_jdbc_create_new_constraint, sql
-                	));
+        actions.add(new SQLDatabasePersistAction(ModelMessages.model_jdbc_create_new_constraint, decl.toString()));
     }
     
     @Override

@@ -37,13 +37,13 @@ import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSDataType;
 import org.jkiss.dbeaver.model.struct.DBSEntity;
+import org.jkiss.dbeaver.model.struct.DBSEntityConstraintType;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.rdb.DBSProcedureContainer;
 import org.jkiss.dbeaver.model.struct.rdb.DBSSchema;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.dbeaver.ext.xugu.XuguConstants;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
@@ -711,6 +711,9 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         {
             //处理多列的情况
             String colName = JDBCUtils.safeGetStringTrimmed(dbResult, "DEFINE");
+            if(XuguTableConstraint.getConstraintType(JDBCUtils.safeGetString(dbResult, "CONS_TYPE")) == DBSEntityConstraintType.CHECK) {
+            	return null;
+            }
             if(colName!=null && !colName.equals("")) {
             	if(colName.indexOf(",")!=-1) {
                 	if(colName.indexOf("(")!=-1) {
@@ -836,24 +839,30 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
             	String colName = JDBCUtils.safeGetStringTrimmed(dbResult, "DEFINE");
             	//处理多列的情况
             	if(colName.indexOf("(")!=-1) {
+            		String refColName = colName.substring(colName.lastIndexOf("(")+1, colName.lastIndexOf(")"));
                 	colName = colName.substring(colName.indexOf("(")+1, colName.indexOf(")"));
                 	String[] colNames = colName.split(",");
+                	String[] refColNames = refColName.split(",");
                 	XuguTableForeignKeyColumn[] con_cols = new XuguTableForeignKeyColumn[colNames.length];
                 	for(int i=0; i<colNames.length; i++) {
                 		XuguTableColumn tableColumn = getTableColumn(session, parent, colNames[i]);
+                		XuguTableColumn fkRefColumn = getTableColumn(session, object.getReferencedConstraint().getTable(), refColNames[i]);
                 		con_cols[i] = new XuguTableForeignKeyColumn(
                                 object,
                                 tableColumn,
-                                tableColumn.getOrdinalPosition());
+                                tableColumn.getOrdinalPosition(),
+                                fkRefColumn);
                 	}
                 	return con_cols;
                 }
             }
             XuguTableColumn column = getTableColumn(session, parent, dbResult);
+            XuguTableColumn refColumn = getTableColumn(session, object.getReferencedConstraint().getTable(), dbResult);
             return column == null ? null : new XuguTableForeignKeyColumn[] { new XuguTableForeignKeyColumn(
                 object,
                 column,
-                JDBCUtils.safeGetInt(dbResult, "POSITION")) };
+                JDBCUtils.safeGetInt(dbResult, "POSITION"),
+                refColumn) };
         }
 
         @Override

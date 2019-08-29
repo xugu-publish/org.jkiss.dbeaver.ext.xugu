@@ -86,7 +86,7 @@ public class XuguDataType extends XuguObject<DBSObject>
     	PREDEFINED_TYPES.put("INTEGER", new TypeDesc(DBPDataKind.NUMERIC, Types.INTEGER, 10, 0, 0, 0));
     	PREDEFINED_TYPES.put("BIGINT", new TypeDesc(DBPDataKind.NUMERIC, Types.BIGINT, 19, 0, 0, 0));
     	PREDEFINED_TYPES.put("FLOAT", new TypeDesc(DBPDataKind.NUMERIC, Types.FLOAT, 38, 0, 6, 0));
-    	PREDEFINED_TYPES.put("DOUBLE", new TypeDesc(DBPDataKind.NUMERIC, Types.DOUBLE, 308, 0, 6, 0));
+    	PREDEFINED_TYPES.put("DOUBLE", new TypeDesc(DBPDataKind.NUMERIC, Types.DOUBLE, 38, 0, 6, 0));
     	PREDEFINED_TYPES.put("TINYINT", new TypeDesc(DBPDataKind.NUMERIC, Types.TINYINT, 3, 0, 0, 0));
     	PREDEFINED_TYPES.put("SMALLINT", new TypeDesc(DBPDataKind.NUMERIC, Types.SMALLINT, 5, 0, 0, 0));
     	PREDEFINED_TYPES.put("NUMERIC", new TypeDesc(DBPDataKind.NUMERIC, Types.NUMERIC, 0, 0, 0, 0));
@@ -94,7 +94,7 @@ public class XuguDataType extends XuguObject<DBSObject>
     	PREDEFINED_TYPES.put("VARCHAR", new TypeDesc(DBPDataKind.STRING, Types.VARCHAR, 0, 0, 0, 0));
     	PREDEFINED_TYPES.put("CLOB", new TypeDesc(DBPDataKind.CONTENT, Types.CLOB, 0, 0, 0, 0));
     	PREDEFINED_TYPES.put("BOOLEAN", new TypeDesc(DBPDataKind.BOOLEAN, Types.BOOLEAN, 0, 0, 0, 0));
-    	PREDEFINED_TYPES.put("BLOB", new TypeDesc(DBPDataKind.CONTENT, Types.BLOB, 0, 0, 0, 0));
+    	PREDEFINED_TYPES.put("BLOB", new TypeDesc(DBPDataKind.BINARY, Types.BLOB, 0, 0, 0, 0));
         
     	PREDEFINED_TYPES.put("GUID", new TypeDesc(DBPDataKind.ROWID, Types.ROWID, 0, 0, 0, 0));
     	PREDEFINED_TYPES.put("ROWVERSION", new TypeDesc(DBPDataKind.ROWID, Types.ROWID, 0, 0, 0, 0));

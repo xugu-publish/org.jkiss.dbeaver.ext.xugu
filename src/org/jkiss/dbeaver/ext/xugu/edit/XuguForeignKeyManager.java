@@ -31,11 +31,13 @@ import org.jkiss.dbeaver.model.edit.DBEPersistAction;
 import org.jkiss.dbeaver.model.impl.DBSObjectCache;
 import org.jkiss.dbeaver.model.impl.edit.SQLDatabasePersistAction;
 import org.jkiss.dbeaver.model.impl.sql.edit.struct.SQLForeignKeyManager;
+import org.jkiss.dbeaver.model.messages.ModelMessages;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.rdb.DBSForeignKeyModifyRule;
 import org.jkiss.dbeaver.ui.UITask;
 import org.jkiss.dbeaver.ui.editors.object.struct.EditForeignKeyPage;
+import org.jkiss.utils.CommonUtils;
 
 /**
  * @author Maple4Real
@@ -64,7 +66,7 @@ public class XuguForeignKeyManager extends SQLForeignKeyManager<XuguTableForeign
                     new XuguTableForeignKey(
                             table,
                             null,
-                            null,
+                            XuguObjectStatus.ENABLED,
                             null,
                             DBSForeignKeyModifyRule.NO_ACTION,
                             DBSForeignKeyModifyRule.NO_ACTION),
@@ -80,22 +82,52 @@ public class XuguForeignKeyManager extends SQLForeignKeyManager<XuguTableForeign
                 final XuguTableForeignKey foreignKey = new XuguTableForeignKey(
                     table,
                     null,
-                    null,
+                    XuguObjectStatus.ENABLED,
                     (XuguTableConstraint) editPage.getUniqueConstraint(),
                     editPage.getOnDeleteRule(),
                     editPage.getOnUpdateRule());
                 foreignKey.setName(getNewConstraintName(monitor, foreignKey));
+                foreignKey.setEnable(foreignKey.getStatus() == XuguObjectStatus.ENABLED);
                 int colIndex = 1;
                 for (EditForeignKeyPage.FKColumnInfo tableColumn : editPage.getColumns()) {
                     foreignKey.addColumn(
                         new XuguTableForeignKeyColumn(
                             foreignKey,
                             (XuguTableColumn) tableColumn.getOwnColumn(),
-                            colIndex++));
+                            colIndex++,
+                            (XuguTableColumn) tableColumn.getRefColumn()));
                 }
                 return foreignKey;
             }
         }.execute();
+    }
+    
+    @Override
+    protected void addObjectCreateActions(DBRProgressMonitor monitor, List<DBEPersistAction> actions, ObjectCreateCommand command, Map<String, Object> options)
+    {
+    	XuguTableForeignKey foreignKey = (XuguTableForeignKey)command.getObject();
+        XuguTableBase table = command.getObject().getTable();
+        
+        StringBuilder decl = new StringBuilder(100);
+    	decl.append("ALTER TABLE ");
+    	decl.append(table.getFullyQualifiedName(DBPEvaluationContext.DDL));
+    	decl.append(" ADD ");
+    	decl.append(getNestedDeclaration(monitor, table, command, options));
+    	decl.append(";");
+    	decl.append(CommonUtils.getLineSeparator());
+    	
+    	decl.append("ALTER TABLE ");
+    	decl.append(table.getFullyQualifiedName(DBPEvaluationContext.DDL));
+    	decl.append(foreignKey.isEnable()? " ENABLE" : " DISABLE");
+    	decl.append(" CONSTRAINT ");
+    	decl.append(foreignKey.getName());
+    	if(XuguConstants.LOG_PRINT_LEVEL<1) {
+        	log.info("Xugu Plugin: Construct create foreign key sql: "+ decl.toString());
+        }
+    	
+        actions.add(
+            new SQLDatabasePersistAction(ModelMessages.model_jdbc_create_new_foreign_key, decl.toString()) //$NON-NLS-1$ //$NON-NLS-2$
+        );
     }
     
     @Override
@@ -106,9 +138,6 @@ public class XuguForeignKeyManager extends SQLForeignKeyManager<XuguTableForeign
     	if(XuguConstants.LOG_PRINT_LEVEL<1) {
         	log.info("Xugu Plugin: Construct alter foreign key sql: "+sql);
         }
-    	actionList.add(
-                new SQLDatabasePersistAction(
-                		"Alter foreign key", sql
-                	));
+    	actionList.add(new SQLDatabasePersistAction("Alter foreign key", sql));
     }
 }
