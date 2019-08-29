@@ -2,7 +2,6 @@ package org.jkiss.dbeaver.ext.xugu.edit;
 
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
-import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.model.XuguSchema;
 import org.jkiss.dbeaver.ext.xugu.model.XuguSequence;
 import org.jkiss.dbeaver.model.DBPDataSource;
@@ -74,9 +73,8 @@ public class XuguSequenceManager extends SQLObjectEditor<XuguSequence, XuguSchem
     protected void addObjectCreateActions(DBRProgressMonitor monitor, List<DBEPersistAction> actions, ObjectCreateCommand command, Map<String, Object> options)
     {
         String sql = buildStatement(command.getObject(), false);
-        if(XuguConstants.LOG_PRINT_LEVEL<1) {
-        	log.info("Xugu Plugin: Construct create sequence sql: "+sql);
-        }
+        
+        log.debug("[Xugu] Construct create sequence sql: "+sql);
         actions.add(new SQLDatabasePersistAction("Create Sequence", sql));
     }
 
@@ -86,9 +84,8 @@ public class XuguSequenceManager extends SQLObjectEditor<XuguSequence, XuguSchem
     	if (command.getProperties().size() > 1 || command.getProperty("comment") == null) 
     	{
     		String sql = buildStatement(command.getObject(), true);
-    		if(XuguConstants.LOG_PRINT_LEVEL<1) {
-    			log.info("Xugu Plugin: Construct alter sequence sql: "+sql.toString());
-    		}
+    		
+    		log.debug("[Xugu] Construct alter sequence sql: "+sql.toString());
     		actionList.add(new SQLDatabasePersistAction("Alter Sequence", sql));
     	}
     }
@@ -101,9 +98,8 @@ public class XuguSequenceManager extends SQLObjectEditor<XuguSequence, XuguSchem
         	desc.append(command.getObject().getName());
         	desc.append(" IS ");
         	desc.append(SQLUtils.quoteString(command.getObject(), command.getObject().getComment()));
-        	if(XuguConstants.LOG_PRINT_LEVEL<1) {
-            	log.info("Xugu Plugin: Construct add sequence comment sql: " + desc.toString());
-            }
+        	
+        	log.debug("[Xugu] Construct add sequence comment sql: " + desc.toString());
             actions.add(new SQLDatabasePersistAction("Comment Sequence", desc.toString()));
         }
     }
@@ -112,9 +108,8 @@ public class XuguSequenceManager extends SQLObjectEditor<XuguSequence, XuguSchem
     protected void addObjectDeleteActions(List<DBEPersistAction> actions, ObjectDeleteCommand command, Map<String, Object> options)
     {
         String sql = "DROP SEQUENCE " + command.getObject().getFullyQualifiedName(DBPEvaluationContext.DDL);
-        if(XuguConstants.LOG_PRINT_LEVEL<1) {
-        	log.info("Xugu Plugin: Construct drop sequence sql: "+sql);
-        }
+        
+        log.debug("[Xugu] Construct drop sequence sql: "+sql);
         DBEPersistAction action = new SQLDatabasePersistAction("Drop Sequence", sql);
         actions.add(action);
     }

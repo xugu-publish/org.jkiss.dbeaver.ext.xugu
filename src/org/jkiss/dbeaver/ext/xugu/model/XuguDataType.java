@@ -122,12 +122,16 @@ public class XuguDataType extends XuguObject<DBSObject>
        
 //    	PREDEFINED_TYPES.put("NULL", new TypeDesc(DBPDataKind.STRING, Types.NULL, 0, 0, 0, 0));
     	PREDEFINED_TYPES.put("GEOMETRY", new TypeDesc(DBPDataKind.OBJECT, Types.JAVA_OBJECT, 0, 0, 0, 0));
-    	PREDEFINED_TYPES.put("POINT", new TypeDesc(DBPDataKind.OBJECT, Types.JAVA_OBJECT, 0, 0, 0, 0));
+    	PREDEFINED_TYPES.put("POINT", new TypeDesc(DBPDataKind.OBJECT, Types.OTHER, 0, 0, 0, 0));
     	PREDEFINED_TYPES.put("BOX", new TypeDesc(DBPDataKind.OBJECT, Types.JAVA_OBJECT, 0, 0, 0, 0));
     	PREDEFINED_TYPES.put("POLYLINE", new TypeDesc(DBPDataKind.OBJECT, Types.JAVA_OBJECT, 0, 0, 0, 0));
     	PREDEFINED_TYPES.put("POLYGON", new TypeDesc(DBPDataKind.OBJECT, Types.JAVA_OBJECT, 0, 0, 0, 0));
     	PREDEFINED_TYPES.put("ROWID", new TypeDesc(DBPDataKind.ROWID, Types.ROWID, 0, 0, 0, 0));
     	
+    	//PREDEFINED_TYPES.put("NAMED COLLECTION", new TypeDesc(DBPDataKind.ARRAY, Types.ARRAY, 0, 0, 0, 0));
+        //PREDEFINED_TYPES.put("NAMED OBJECT", new TypeDesc(DBPDataKind.OBJECT, Types.STRUCT, 0, 0, 0, 0));
+    	//PREDEFINED_TYPES.put("VARRAY", new TypeDesc(DBPDataKind.ARRAY, Types.ARRAY, 0, 0, 0, 0));
+    	//PREDEFINED_TYPES.put("REF CURSOR", new TypeDesc(DBPDataKind.OBJECT, Types.REF_CURSOR, -10, 0, 0, 0));
         for (TypeDesc type : PREDEFINED_TYPES.values()) {
             PREDEFINED_TYPE_IDS.put(type.valueType, type);
         }

@@ -104,9 +104,8 @@ public class XuguDatabaseManager extends SQLObjectEditor<XuguDatabase, XuguDataS
         if(database.getTimeZone()!=null) {
         	sql +=" TIME ZONE '"+database.getTimeZone()+"'";
         }
-        if(XuguConstants.LOG_PRINT_LEVEL<1) {
-        	log.info("Xugu Plugin: Construct create database sql: "+sql.toString());
-        }
+
+        log.debug("[Xugu] Construct create database sql: "+sql.toString());
         actions.add(new SQLDatabasePersistAction("Create database", sql));
     }
 

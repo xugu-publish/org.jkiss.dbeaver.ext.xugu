@@ -38,8 +38,6 @@ public class XuguConstants {
     public static final int DEFAULT_PORT = 5138;
     public static final String DEFAULT_HOST = "localhost";
     public static final String CMD_COMPILE = "org.jkiss.dbeaver.ext.xugu.code.compile"; //$NON-NLS-1$
-    //日志打印级别 0输出所有 大于1则不输出info类型日志
-    public static final int LOG_PRINT_LEVEL = 0;
 
     public static final String SCHEMA_SYS = "SYS";
     public static final String VIEW_ALL_SOURCE = "ALL_SOURCE";

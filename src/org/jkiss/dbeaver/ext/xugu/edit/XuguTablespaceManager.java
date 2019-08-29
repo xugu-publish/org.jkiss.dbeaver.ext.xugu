@@ -3,7 +3,6 @@ package org.jkiss.dbeaver.ext.xugu.edit;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
-
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.graphics.Point;
@@ -15,7 +14,6 @@ import org.eclipse.swt.widgets.Text;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.ext.xugu.XuguMessages;
 import org.jkiss.dbeaver.ext.xugu.XuguUtils;
-import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.model.XuguDataSource;
 import org.jkiss.dbeaver.ext.xugu.model.XuguTablespace;
 import org.jkiss.dbeaver.ext.xugu.views.XuguWarningDialog;
@@ -99,9 +97,8 @@ public class XuguTablespaceManager extends SQLObjectEditor<XuguTablespace, XuguD
         	sql += " ON ALL NODE";
         }
         sql += " DATAFILE '"+tablespace.getFilePath()+"'";
-        if(XuguConstants.LOG_PRINT_LEVEL<1) {
-        	log.info("Xugu Plugin: Construct add tablespace sql: "+sql);
-        }
+        
+        log.debug("[Xugu] Construct add tablespace sql: "+sql);
         actions.add(new SQLDatabasePersistAction("Create Tablespace", sql));
     }
 
@@ -109,9 +106,8 @@ public class XuguTablespaceManager extends SQLObjectEditor<XuguTablespace, XuguD
     protected void addObjectDeleteActions(List<DBEPersistAction> actions, ObjectDeleteCommand command, Map<String, Object> options)
     {
     	String sql = "DROP TABLESPACE " + DBUtils.getQuotedIdentifier(command.getObject());
-    	if(XuguConstants.LOG_PRINT_LEVEL<1) {
-        	log.info("Xugu Plugin: Construct drop tablespace sql: "+sql);
-        }
+    	
+    	log.debug("[Xugu] Construct drop tablespace sql: "+sql);
         actions.add(
             new SQLDatabasePersistAction("Drop Tablespace",
                sql) //$NON-NLS-2$
@@ -124,9 +120,8 @@ public class XuguTablespaceManager extends SQLObjectEditor<XuguTablespace, XuguD
     	if (command.getProperties().size() > 1 || command.getProperty("comment") == null) {
             StringBuilder query = new StringBuilder("ALTER TABLESPACE "); //$NON-NLS-1$
             query.append(command.getObject().getName()).append(" "); //$NON-NLS-1$
-            if(XuguConstants.LOG_PRINT_LEVEL<1) {
-            	log.info("Xugu Plugin: Construct alter tablespace sql: "+query.toString());
-            }
+            
+            log.debug("[Xugu] Construct alter tablespace sql: "+query.toString());
             actionList.add(new SQLDatabasePersistAction(query.toString()));
         }
     }

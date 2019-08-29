@@ -20,41 +20,29 @@ package org.jkiss.dbeaver.ext.xugu.editors;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
-import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.widgets.*;
-import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.ext.xugu.XuguMessages;
 //import org.jkiss.dbeaver.ext.xugu.controls.PrivilegeTableControl;
 //import org.jkiss.dbeaver.ext.xugu.edit.XuguCommandGrantPrivilege;
 import org.jkiss.dbeaver.ext.xugu.edit.UserPropertyHandler;
 import org.jkiss.dbeaver.ext.xugu.XuguConstants;
-import org.jkiss.dbeaver.ext.xugu.model.XuguRole;
-import org.jkiss.dbeaver.ext.xugu.model.XuguSchema;
 //import org.jkiss.dbeaver.ext.xugu.model.XuguGrant;
 //import org.jkiss.dbeaver.ext.xugu.model.XuguPrivilege;
-import org.jkiss.dbeaver.ext.xugu.model.XuguUser;
 import org.jkiss.dbeaver.ext.xugu.model.XuguUserAuthority;
-import org.jkiss.dbeaver.model.edit.DBECommandReflector;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.ui.LoadingJob;
-import org.jkiss.dbeaver.ui.editors.AbstractDatabaseObjectEditor;
 import org.jkiss.dbeaver.ui.editors.ControlPropertyCommandListener;
 import org.jkiss.dbeaver.model.impl.edit.DBECommandAdapter;
 import org.jkiss.dbeaver.model.runtime.load.DatabaseLoadService;
 import org.jkiss.dbeaver.ui.UIUtils;
-
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Vector;
 
 /**
  * @author Maple4Real

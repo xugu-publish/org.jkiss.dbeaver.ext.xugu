@@ -28,7 +28,6 @@ import org.eclipse.swt.widgets.Text;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.ext.xugu.XuguMessages;
 import org.jkiss.dbeaver.ext.xugu.XuguUtils;
-import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.model.XuguDataSource;
 import org.jkiss.dbeaver.ext.xugu.model.XuguRole;
 import org.jkiss.dbeaver.ext.xugu.views.XuguWarningDialog;
@@ -113,9 +112,8 @@ public class XuguRoleManager extends SQLObjectEditor<XuguRole, XuguDataSource>{
         if(user!=null && !user.equals("")) {
         	sql += " INIT USER "+user;
         }		
-        if(XuguConstants.LOG_PRINT_LEVEL<1) {
-        	log.info("Xugu Plugin: Construct create role sql: "+sql);
-        }
+        
+        log.debug("[Xugu] Construct create role sql: "+sql);
         actions.add(new SQLDatabasePersistAction("Create role", sql));
     }
 
@@ -123,9 +121,8 @@ public class XuguRoleManager extends SQLObjectEditor<XuguRole, XuguDataSource>{
     protected void addObjectDeleteActions(List<DBEPersistAction> actions, ObjectDeleteCommand command, Map<String, Object> options)
     {
     	String sql = "DROP ROLE " + DBUtils.getQuotedIdentifier(command.getObject());
-        if(XuguConstants.LOG_PRINT_LEVEL<1) {
-        	log.info("Xugu Plugin: Construct drop role sql: "+sql);
-        }
+        
+        log.debug("[Xugu] Construct drop role sql: "+sql);
         actions.add(
             new SQLDatabasePersistAction("Drop role", sql) //$NON-NLS-2$
         );

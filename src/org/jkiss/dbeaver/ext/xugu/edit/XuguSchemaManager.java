@@ -30,7 +30,6 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.ext.xugu.XuguMessages;
 import org.jkiss.dbeaver.ext.xugu.XuguUtils;
-import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.model.XuguDataSource;
 import org.jkiss.dbeaver.ext.xugu.model.XuguSchema;
 import org.jkiss.dbeaver.ext.xugu.model.XuguUser;
@@ -122,11 +121,8 @@ public class XuguSchemaManager extends SQLObjectEditor<XuguSchema, XuguDataSourc
             	desc.append(DBUtils.getQuotedIdentifier(command.getObject().getDataSource(), user.getName()));
             }
         }
-        if(XuguConstants.LOG_PRINT_LEVEL<1) 
-        {
-        	log.info("Xugu Plugin: Construct create schema sql: " + desc.toString());
-        }
         
+        log.debug("[Xugu] Construct create schema sql: " + desc.toString());
         actions.add(new SQLDatabasePersistAction("create schema", desc.toString()));
     }
 
@@ -143,11 +139,7 @@ public class XuguSchemaManager extends SQLObjectEditor<XuguSchema, XuguDataSourc
             desc.append(DBUtils.getQuotedIdentifier(command.getObject().getDataSource(), command.getNewName().toUpperCase()));
         }
     	
-    	if(XuguConstants.LOG_PRINT_LEVEL<1) 
-    	{
-        	log.info("Xugu Plugin: Construct rename schema sql: " + desc.toString());
-        }
-    	
+    	log.debug("[Xugu] Construct rename schema sql: " + desc.toString());
     	actionList.add(new SQLDatabasePersistAction("rename schema", desc.toString()));
     }
 
@@ -158,10 +150,7 @@ public class XuguSchemaManager extends SQLObjectEditor<XuguSchema, XuguDataSourc
         String comment = buildComment(command.getObject());
         if (comment != null) 
         {
-        	if(XuguConstants.LOG_PRINT_LEVEL<1) 
-        	{
-            	log.info("Xugu Plugin: Construct alter schema comment sql: "+comment);
-            }
+        	log.debug("[Xugu] Construct alter schema comment sql: "+comment);
             actionList.add(new SQLDatabasePersistAction("Comment on Schema", comment));
         }
     }
@@ -178,10 +167,8 @@ public class XuguSchemaManager extends SQLObjectEditor<XuguSchema, XuguDataSourc
 	protected void addObjectDeleteActions(List<DBEPersistAction> actions, SQLObjectEditor<XuguSchema, XuguDataSource>.ObjectDeleteCommand command, Map<String, Object> options) 
 	{
 		String sql = "DROP SCHEMA " + DBUtils.getQuotedIdentifier(command.getObject().getDataSource(), command.getObject().getName());
-		if(XuguConstants.LOG_PRINT_LEVEL<1) 
-		{
-        	log.info("Xugu Plugin: Construct drop schema sql: "+sql);
-        }
+
+		log.debug("[Xugu] Construct drop schema sql: "+sql);
         actions.add(new SQLDatabasePersistAction("drop schema", sql));
 	}
     

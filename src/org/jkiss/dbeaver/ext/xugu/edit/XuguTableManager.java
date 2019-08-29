@@ -29,7 +29,6 @@ import org.jkiss.dbeaver.model.edit.DBEObjectRenamer;
 import org.jkiss.dbeaver.model.edit.DBEPersistAction;
 import org.jkiss.dbeaver.model.impl.DBSObjectCache;
 import org.jkiss.dbeaver.model.impl.edit.SQLDatabasePersistAction;
-import org.jkiss.dbeaver.model.impl.sql.edit.SQLObjectEditor.*;
 import org.jkiss.dbeaver.model.impl.sql.edit.struct.SQLTableManager;
 import org.jkiss.dbeaver.model.messages.ModelMessages;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
@@ -37,9 +36,6 @@ import org.jkiss.dbeaver.model.sql.SQLUtils;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.CommonUtils;
-import org.jkiss.dbeaver.ext.xugu.XuguConstants;
-
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -228,9 +224,7 @@ public class XuguTableManager extends SQLTableManager<XuguTable, XuguSchema> imp
         		tableDef = tableDef.substring(0, tableDef.length()-1);
         		tableDef += "\n)";
     		}
-    		if(XuguConstants.LOG_PRINT_LEVEL<1) {
-            	log.info("Xugu Plugin: Construct create table sql: "+tableDef);
-            }
+    		log.debug("[Xugu] Construct create table sql: "+tableDef);
     	}
     	actions.add(new SQLDatabasePersistAction("Create table", tableDef));
     	//刷新缓存
@@ -247,9 +241,8 @@ public class XuguTableManager extends SQLTableManager<XuguTable, XuguSchema> imp
             StringBuilder query = new StringBuilder("ALTER TABLE "); //$NON-NLS-1$
             query.append(command.getObject().getFullyQualifiedName(DBPEvaluationContext.DDL)).append(" "); //$NON-NLS-1$
             appendTableModifiers(monitor, command.getObject(), command, query, true);
-            if(XuguConstants.LOG_PRINT_LEVEL<1) {
-            	log.info("Xugu Plugin: Construct alter table sql: "+query.toString());
-            }
+
+            log.debug("[Xugu] Construct alter table sql: "+query.toString());
             actionList.add(new SQLDatabasePersistAction(query.toString()));
         	XuguSchema schema = command.getObject().getSchema();
         	try {
@@ -265,9 +258,8 @@ public class XuguTableManager extends SQLTableManager<XuguTable, XuguSchema> imp
         if (command.getProperty("comment") != null) {
         	String sql = "COMMENT ON TABLE " + command.getObject().getFullyQualifiedName(DBPEvaluationContext.DDL) +
                     " IS " + SQLUtils.quoteString(command.getObject(), command.getObject().getComment());
-        	if(XuguConstants.LOG_PRINT_LEVEL<1) {
-            	log.info("Xugu Plugin: Construct add table comment sql: "+sql);
-            }
+        	
+        	log.debug("[Xugu] Construct add table comment sql: "+sql);
             actions.add(new SQLDatabasePersistAction(
                 "Comment table",
                 sql));
@@ -296,9 +288,8 @@ public class XuguTableManager extends SQLTableManager<XuguTable, XuguSchema> imp
     {
     	String sql = "ALTER TABLE " + DBUtils.getQuotedIdentifier(command.getObject().getSchema()) + "." + DBUtils.getQuotedIdentifier(command.getObject().getDataSource(), command.getOldName()) + //$NON-NLS-1$
                 " RENAME TO " + DBUtils.getQuotedIdentifier(command.getObject().getDataSource(), command.getNewName());
-    	if(XuguConstants.LOG_PRINT_LEVEL<1) {
-        	log.info("Xugu Plugin: Construct rename table sql: "+sql);
-        }
+    	
+    	log.debug("[Xugu] Construct rename table sql: "+sql);
         actions.add(
             new SQLDatabasePersistAction(
                 "Rename table",
@@ -314,9 +305,8 @@ public class XuguTableManager extends SQLTableManager<XuguTable, XuguSchema> imp
         String sql = "DROP " + (object.isView() ? "VIEW" : "TABLE") +  //$NON-NLS-2$
                 " " + object.getFullyQualifiedName(DBPEvaluationContext.DDL) +
                 (!object.isView() && CommonUtils.getOption(options, OPTION_DELETE_CASCADE) ? " CASCADE CONSTRAINTS" : "");
-        if(XuguConstants.LOG_PRINT_LEVEL<1) {
-        	log.info("Xugu Plugin: Construct drop table sql: "+sql);
-        }
+        
+        log.debug("[Xugu] Construct drop table sql: "+sql);
         actions.add(
             new SQLDatabasePersistAction(
                 ModelMessages.model_jdbc_drop_table,

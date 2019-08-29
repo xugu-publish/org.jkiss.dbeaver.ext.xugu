@@ -74,15 +74,12 @@ public class XuguTableForeignKey extends XuguTableConstraintBase implements DBST
             JDBCUtils.safeGetBoolean(dbResult, "ENABLE") && JDBCUtils.safeGetBoolean(dbResult, "VALID")?XuguObjectStatus.ENABLED:XuguObjectStatus.DISABLED,
             true);
         try {
-	//        String refName = JDBCUtils.safeGetString(dbResult, "REF_NAME");
-	        String refName = dbResult.getString(23);
+	        String refName = dbResult.getString("REF_NAME");
 	        String refOwnerName = JDBCUtils.safeGetString(dbResult, "SCHEMA_NAME");
-	//        String refTableName = JDBCUtils.safeGetString(dbResult, "REF_TABLE_NAME");
-	        String refTableName;
-			refTableName = dbResult.getString(18);
+	        String refTableName = dbResult.getString("REF_TABLE_NAME");
 			this.enable = JDBCUtils.safeGetBoolean(dbResult, "ENABLE");
 		
-	        log.info("Xugu can get alias filed? "+refTableName+" "+refName);
+	        log.debug("Xugu can get alias filed? "+refTableName+" "+refName);
 	        XuguTableBase refTable = XuguTableBase.findTable(
 	            monitor,
 	            table.getDataSource(),

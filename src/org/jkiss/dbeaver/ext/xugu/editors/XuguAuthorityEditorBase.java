@@ -3,7 +3,6 @@ package org.jkiss.dbeaver.ext.xugu.editors;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -12,20 +11,15 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.List;
 import org.jkiss.dbeaver.ext.xugu.XuguMessages;
 import org.jkiss.dbeaver.ext.xugu.edit.RolePropertyHandler;
 import org.jkiss.dbeaver.ext.xugu.edit.UserPropertyHandler;
-import org.jkiss.dbeaver.ext.xugu.model.XuguAuthorityBase;
 import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.model.XuguGlobalObject;
 import org.jkiss.dbeaver.ext.xugu.model.XuguRole;
-import org.jkiss.dbeaver.ext.xugu.model.XuguRoleAuthority;
 import org.jkiss.dbeaver.ext.xugu.model.XuguSchema;
 import org.jkiss.dbeaver.ext.xugu.model.XuguUser;
-import org.jkiss.dbeaver.ext.xugu.model.XuguUserAuthority;
 import org.jkiss.dbeaver.ui.UIUtils;
-import org.jkiss.dbeaver.ui.editors.AbstractDatabaseObjectEditor;
 import org.jkiss.dbeaver.ui.editors.ControlPropertyCommandListener;
 /**
  * @author Maple4Real
@@ -57,7 +51,6 @@ public class XuguAuthorityEditorBase{
     private Button addObjectAuthority;
     private Button removeObjectAuthority;
     
-    Collection<XuguAuthorityBase> authorities;
 	ArrayList<String> databaseAuthorities;
 	ArrayList<String> objectAuthorities;
 	

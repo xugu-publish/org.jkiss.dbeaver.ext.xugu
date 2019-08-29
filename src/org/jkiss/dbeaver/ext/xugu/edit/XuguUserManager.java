@@ -18,7 +18,6 @@
 package org.jkiss.dbeaver.ext.xugu.edit;
 
 import org.jkiss.code.Nullable;
-import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.model.XuguDataSource;
 import org.jkiss.dbeaver.ext.xugu.model.XuguUser;
 import org.jkiss.dbeaver.model.DBPDataSource;
@@ -28,7 +27,6 @@ import org.jkiss.dbeaver.model.impl.edit.SQLDatabasePersistAction;
 import org.jkiss.dbeaver.model.impl.sql.edit.SQLObjectEditor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSObject;
-
 import java.util.List;
 import java.util.Map;
 
@@ -128,9 +126,8 @@ public class XuguUserManager extends SQLObjectEditor<XuguUser, XuguDataSource> i
 //        		}
         		sql.append(user.isLocked()?" ACCOUNT LOCK":"");
         		sql.append(user.isExpired()?" PASSWORD EXPIRED":"");
-        		if(XuguConstants.LOG_PRINT_LEVEL<1) {
-                	log.info("Xugu Plugin: Construct create user sql: "+sql.toString());
-                }
+        		
+        		log.debug("[Xugu] Construct create user sql: "+sql.toString());
                 DBEPersistAction action = new SQLDatabasePersistAction("Create User", sql.toString());
                 actions.add(action);
         	}
@@ -141,9 +138,8 @@ public class XuguUserManager extends SQLObjectEditor<XuguUser, XuguDataSource> i
     protected void addObjectDeleteActions(List<DBEPersistAction> actions, ObjectDeleteCommand command, Map<String, Object> options)
     {
     	String sql = "DROP USER " + command.getObject().getName();
-    	if(XuguConstants.LOG_PRINT_LEVEL<1) {
-        	log.info("Xugu Plugin: Construct drop user sql: "+sql);
-        }
+    	
+    	log.debug("[Xugu] Construct drop user sql: "+sql);
         DBEPersistAction action = new SQLDatabasePersistAction("Drop User", sql);
         actions.add(action);
     }
@@ -155,9 +151,8 @@ public class XuguUserManager extends SQLObjectEditor<XuguUser, XuguDataSource> i
     		log.debug(options.get(k));
     	}
     	String sql = "ALTER USER " + command.getObject().getName() + " IDENTIFIED BY ";
-    	if(XuguConstants.LOG_PRINT_LEVEL<1) {
-        	log.info("Xugu Plugin: Construct alter user sql: "+sql);
-        }
+    	
+    	log.debug("[Xugu] Construct alter user sql: "+sql);
         DBEPersistAction action = new SQLDatabasePersistAction("Alter User", sql);
         actionList.add(action);
     }

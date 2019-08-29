@@ -14,7 +14,6 @@ import org.eclipse.swt.widgets.Text;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.ext.xugu.XuguMessages;
 import org.jkiss.dbeaver.ext.xugu.XuguUtils;
-import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.model.XuguSchema;
 import org.jkiss.dbeaver.ext.xugu.model.XuguSynonym;
 import org.jkiss.dbeaver.ext.xugu.views.XuguWarningDialog;
@@ -83,9 +82,8 @@ public class XuguSynonymManager extends SQLObjectEditor<XuguSynonym, XuguSchema>
 			sql += "PUBLIC ";
 		}
 		sql += "SYNONYM " + synonym.getName() + " FOR " + synonym.getTargetName();
-		if(XuguConstants.LOG_PRINT_LEVEL<1) {
-        	log.info("Xugu Plugin: Construct create synonym sql: "+sql);
-        }
+		
+		log.debug("[Xugu] Construct create synonym sql: "+sql);
 		actions.add(new SQLDatabasePersistAction("Create synonym", sql));
 	}
 	
@@ -98,9 +96,8 @@ public class XuguSynonymManager extends SQLObjectEditor<XuguSynonym, XuguSchema>
 			sql += "PUBLIC ";
 		}
 		sql+="SYNONYM " + DBUtils.getQuotedIdentifier(synonym);
-		if(XuguConstants.LOG_PRINT_LEVEL<1) {
-        	log.info("Xugu Plugin: Construct drop synonym sql: "+ sql);
-        }
+		
+		log.debug("[Xugu] Construct drop synonym sql: "+ sql);
 		actions.add(new SQLDatabasePersistAction("Drop synonym", sql));
 	}
 
