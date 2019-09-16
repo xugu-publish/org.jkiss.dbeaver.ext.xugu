@@ -69,13 +69,12 @@ public abstract class XuguTablePhysical extends XuguTableBase implements DBSObje
         XuguSchema schema,
         ResultSet dbResult)
     {
-        super(schema, dbResult, 0);
+        super(schema, dbResult, XuguObjectType.TABLE);
 
         //加载表分区信息
         this.partitioned = JDBCUtils.safeGetInteger(dbResult, "PARTI_TYPE");
         this.partitionCache = new PartitionCache();
         this.subPartitionCache = new SubPartitionCache();
-        System.out.println("yes");
     }
 
     @Override

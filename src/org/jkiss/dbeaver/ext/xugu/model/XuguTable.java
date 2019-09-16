@@ -24,8 +24,6 @@ import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
 import org.jkiss.dbeaver.model.meta.Association;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSObject;
-
-import java.sql.Date;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -80,11 +78,8 @@ public class XuguTable extends XuguTablePhysical implements DBPScriptObject
     private boolean on_commit_del;
     private boolean ena_trans;
     private boolean ena_logging;
-    private boolean valid;
     private boolean deleted;
     private int acl_mask;
-    private Date create_time;
-    private String comments;
 
     public XuguTable(XuguSchema schema, String name)
     {
@@ -133,18 +128,14 @@ public class XuguTable extends XuguTablePhysical implements DBPScriptObject
             this.on_commit_del = JDBCUtils.safeGetBoolean(dbResult, "ON_COMMIT_DEL");
             this.ena_trans = JDBCUtils.safeGetBoolean(dbResult, "ENA_TRANS");
             this.ena_logging = JDBCUtils.safeGetBoolean(dbResult, "ENA_LOGGING");
-            this.valid = JDBCUtils.safeGetBoolean(dbResult, "VALID");
             this.acl_mask = JDBCUtils.safeGetInt(dbResult, "ACL_MASK");
-            this.create_time = JDBCUtils.safeGetDate(dbResult, "CREATE_TIME");
-            this.comments = JDBCUtils.safeGetString(dbResult, "COMMENTS");
-            System.out.println("Xugu table load success "+ this.table_name + " " +this.valid + " " + this.deleted);
         }
     }
 
     @Override
     protected String getTableTypeName()
     {
-        return "TABLE";
+        return XuguObjectType.TABLE.getTypeName();
     }
 
     @Override
@@ -297,24 +288,12 @@ public class XuguTable extends XuguTablePhysical implements DBPScriptObject
 		return ena_logging;
 	}
 
-	public boolean isValid() {
-		return valid;
-	}
-
 	public boolean isDeleted() {
 		return deleted;
 	}
 
 	public int getAcl_mask() {
 		return acl_mask;
-	}
-
-	public Date getCreate_time() {
-		return create_time;
-	}
-
-	public String getComments() {
-		return comments;
 	}
 
     @Override

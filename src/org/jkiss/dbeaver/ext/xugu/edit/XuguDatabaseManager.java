@@ -27,7 +27,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.jkiss.code.Nullable;
-import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.ext.xugu.XuguMessages;
 import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.model.XuguDataSource;
@@ -36,7 +35,6 @@ import org.jkiss.dbeaver.ext.xugu.views.XuguWarningDialog;
 import org.jkiss.dbeaver.ext.xugu.XuguUtils;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.edit.DBECommandContext;
-import org.jkiss.dbeaver.model.edit.DBEObjectRenamer;
 import org.jkiss.dbeaver.model.edit.DBEPersistAction;
 import org.jkiss.dbeaver.model.impl.DBObjectNameCaseTransformer;
 import org.jkiss.dbeaver.model.impl.DBSObjectCache;
@@ -70,10 +68,11 @@ public class XuguDatabaseManager extends SQLObjectEditor<XuguDatabase, XuguDataS
     {
         return object.getDataSource().databaseCache;
     }
-
+    
     @Override
-    protected XuguDatabase createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final XuguDataSource parent, Object copyFrom)
+    protected XuguDatabase createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final Object container, Object from,  Map<String, Object> options)
     {
+    	XuguDataSource parent = (XuguDataSource)container;
     	return new UITask<XuguDatabase>() {
             @Override
             protected XuguDatabase runTask() {
@@ -105,9 +104,8 @@ public class XuguDatabaseManager extends SQLObjectEditor<XuguDatabase, XuguDataS
         if(database.getTimeZone()!=null) {
         	sql +=" TIME ZONE '"+database.getTimeZone()+"'";
         }
-        if(XuguConstants.LOG_PRINT_LEVEL<1) {
-        	log.info("Xugu Plugin: Construct create database sql: "+sql.toString());
-        }
+
+        log.debug("[Xugu] Construct create database sql: "+sql.toString());
         actions.add(new SQLDatabasePersistAction("Create database", sql));
     }
 

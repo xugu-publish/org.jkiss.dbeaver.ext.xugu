@@ -18,6 +18,7 @@ package org.jkiss.dbeaver.ext.xugu.model;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPRefreshableObject;
 import org.jkiss.dbeaver.model.exec.jdbc.JDBCPreparedStatement;
 import org.jkiss.dbeaver.model.exec.jdbc.JDBCResultSet;
@@ -28,8 +29,8 @@ import org.jkiss.dbeaver.model.impl.jdbc.cache.JDBCObjectCache;
 import org.jkiss.dbeaver.model.meta.Association;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.dbeaver.model.sql.SQLUtils;
 import org.jkiss.dbeaver.model.struct.DBSObject;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
@@ -41,6 +42,8 @@ import java.util.Collection;
 public class XuguTablespace extends XuguGlobalObject implements DBPRefreshableObject
 {
 
+	private static final Log log = Log.getLog(XuguTablespace.class);
+	
     public enum Status {
         ONLINE,
         OFFLINE,
@@ -99,7 +102,6 @@ public class XuguTablespace extends XuguGlobalObject implements DBPRefreshableOb
     protected XuguTablespace(XuguDataSource dataSource, ResultSet dbResult) throws SQLException
     {
         super(dataSource, true);
-        System.out.println("TTTTable space ?? "+dbResult.getStatement().toString());
         this.name = JDBCUtils.safeGetString(dbResult, "SPACE_NAME");
         this.nodeID = JDBCUtils.safeGetInt(dbResult, "NODEID");
         this.space_ID = JDBCUtils.safeGetLong(dbResult, "SPACE_ID");
@@ -112,9 +114,17 @@ public class XuguTablespace extends XuguGlobalObject implements DBPRefreshableOb
         @Override
         protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguTablespace owner) throws SQLException
         {
-            final JDBCPreparedStatement dbStat = session.prepareStatement(
-                "SELECT * FROM " + owner.getDataSource().getRoleFlag() + "_DATAFILES " +
-                    " WHERE SPACE_ID=" + owner.getSpaceID());
+        	StringBuilder desc = new StringBuilder(100);
+        	desc.append("SELECT * FROM ");
+        	desc.append(owner.getDataSource().getRoleFlag());
+        	desc.append("_DATAFILES");
+        	SQLUtils.appendFirstClause(desc, true);
+        	desc.append("SPACE_ID=");
+        	desc.append(owner.getSpaceID());
+            
+            log.debug("[Xugu] Construct view tablespace sql: "+ desc.toString());
+            JDBCPreparedStatement dbStat = session.prepareStatement(desc.toString());
+            
             return dbStat;
         }
 
@@ -188,7 +198,6 @@ public class XuguTablespace extends XuguGlobalObject implements DBPRefreshableOb
         return fileCache.getAllObjects(monitor, this);
     }
 	
-	@Property(order = 7)
     public XuguDataFile getFile()
     {
         return file;

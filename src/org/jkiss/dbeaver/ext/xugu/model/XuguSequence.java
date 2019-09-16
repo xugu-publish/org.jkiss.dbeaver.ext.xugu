@@ -21,42 +21,38 @@ import org.jkiss.dbeaver.model.impl.DBObjectNameCaseTransformer;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.struct.rdb.DBSSequence;
-
 import java.math.BigDecimal;
-import java.sql.Date;
 import java.sql.ResultSet;
+import java.sql.Timestamp;
 
 /**
- * @author Maple4Real
- *   序列信息类，包含序列相关的基本信息
+ * @author xugu-publish
+ * 序列信息类，包含序列相关的基本信息
  */
 public class XuguSequence extends XuguSchemaObject implements DBSSequence {
 
-    private long cacheSize;
-    private BigDecimal lastValue;
-    
-    private int seq_id;
-    private String seq_name;
-    private boolean flagCycle;
-    private boolean flagOrder;
-    private int cacheVal;
+    private int seqId;
+    private String seqName;
     private BigDecimal curVal;
     private BigDecimal minValue;
     private BigDecimal maxValue;
     private BigDecimal incrementBy;
-    private Date createTime;
-    private boolean is_sys;
-    private boolean valid;
+    private int cacheVal;
+    
+    private boolean flagCycle;
+    private boolean flagOrder;
+    private boolean isSys;
+	private boolean valid;
     private boolean deleted;
-    private String comments;
+    private Timestamp createTime;
+    private String comment;
     
     public XuguSequence(XuguSchema schema, String name) {
         super(schema, name, false);
-        this.minValue = null;
-        this.maxValue = null;
-        this.incrementBy = new BigDecimal(0);
-        this.cacheSize = 0;
-        this.lastValue = new BigDecimal(0);
+        this.curVal   = new BigDecimal(1);
+        this.minValue = new BigDecimal(1);
+        this.maxValue = new BigDecimal(9223372036854775807L);
+        this.incrementBy = new BigDecimal(1);
         this.flagCycle = false;
         this.flagOrder = false;
     }
@@ -64,39 +60,38 @@ public class XuguSequence extends XuguSchemaObject implements DBSSequence {
     public XuguSequence(XuguSchema schema, ResultSet dbResult)
     {
         super(schema, JDBCUtils.safeGetString(dbResult, "SEQ_NAME"), true);
+        
+        this.seqId = JDBCUtils.safeGetInt(dbResult, "SEQ_ID");
+        this.seqName = JDBCUtils.safeGetString(dbResult, "SEQ_NAME");
+
+        this.curVal = JDBCUtils.safeGetBigDecimal(dbResult, "CURR_VAL");
         this.minValue = JDBCUtils.safeGetBigDecimal(dbResult, "MIN_VAL");
         this.maxValue = JDBCUtils.safeGetBigDecimal(dbResult, "MAX_VAL");
         this.incrementBy = JDBCUtils.safeGetBigDecimal(dbResult, "STEP_VAL");
+        this.cacheVal = JDBCUtils.safeGetInt(dbResult, "CACHE_VAL");
         
         this.flagCycle = JDBCUtils.safeGetBoolean(dbResult, "IS_CYCLE");
         this.flagOrder = JDBCUtils.safeGetBoolean(dbResult, "IS_ORDER");
-        this.seq_id = JDBCUtils.safeGetInt(dbResult, "SEQ_ID");
-        this.seq_name = JDBCUtils.safeGetString(dbResult, "SEQ_NAME");
-        this.cacheVal = JDBCUtils.safeGetInt(dbResult, "CACHE_VAL");
-        this.curVal = JDBCUtils.safeGetBigDecimal(dbResult, "CURR_VAL");
-        this.createTime = JDBCUtils.safeGetDate(dbResult, "CREATE_TIME");
-        this.is_sys = JDBCUtils.safeGetBoolean(dbResult, "IS_SYS");
+        this.isSys = JDBCUtils.safeGetBoolean(dbResult, "IS_SYS");
         this.valid = JDBCUtils.safeGetBoolean(dbResult, "VALID");
         this.deleted = JDBCUtils.safeGetBoolean(dbResult, "DELETED");
-        this.comments = JDBCUtils.safeGetString(dbResult, "COMMENTS");
+
+        this.createTime = JDBCUtils.safeGetTimestamp(dbResult, "CREATE_TIME");
+        this.comment = JDBCUtils.safeGetString(dbResult, "COMMENTS");
     }
 
     @NotNull
     @Override
-    @Property(viewable = true, editable = false, updatable = false,  valueTransformer = DBObjectNameCaseTransformer.class, order = 1)
+    @Property(viewable = true, editable = false, valueTransformer = DBObjectNameCaseTransformer.class, order = 1)
     public String getName()
     {
-        return super.getName();
+        return seqName;
     }
 
     @Property(viewable = true, editable = true, updatable = true, order = 2)
     public BigDecimal getCurValue()
     {
         return curVal;
-    }
-
-    public void setCurValue(BigDecimal curVal) {
-        this.curVal = curVal;
     }
 
     @Override
@@ -106,19 +101,11 @@ public class XuguSequence extends XuguSchemaObject implements DBSSequence {
         return minValue;
     }
 
-    public void setMinValue(BigDecimal minValue) {
-        this.minValue = minValue;
-    }
-
     @Override
     @Property(viewable = true, editable = true, updatable = true, order = 4)
     public BigDecimal getMaxValue()
     {
         return maxValue;
-    }
-
-    public void setMaxValue(BigDecimal maxValue) {
-        this.maxValue = maxValue;
     }
 
     @Override
@@ -128,40 +115,112 @@ public class XuguSequence extends XuguSchemaObject implements DBSSequence {
         return incrementBy;
     }
 
-    public void setIncrementBy(BigDecimal incrementBy) {
-        this.incrementBy = incrementBy;
+    @Property(viewable = true, editable = true, updatable = true, order = 6)
+	public String getComment() {
+		return comment;
+	}
+
+    @Property(viewable = true, editable = false, order = 7)
+    public int getSeqId() {
+		return seqId;
+	}
+
+    @Property(viewable = true, editable = false, order = 8)
+    public Timestamp getCreateTime() {
+    	return createTime;
+    }
+    
+    @Property(viewable = true, editable = true, updatable = true, order = 9)
+    public boolean isCycle()
+    {
+        return flagCycle;
     }
 
-    @Property(viewable = true, editable = true, updatable = true, order = 6)
+    @Property(hidden = true, viewable = false, editable = false, order = 10)
+    public boolean isValid() {
+    	return valid;
+    }
+    
+    @Property(hidden = true, editable = false, order = 11)
     public int getCacheValue()
     {
-        return cacheVal;
+    	return cacheVal;
+    }
+    
+    //由于测试时，有序设置在服务端没有效果，暂时隐藏有序属性的展示 
+    @Property(hidden = true, editable = false, order = 12)
+    public boolean isOrder()
+    {
+        return flagOrder;
+    }
+
+    public void setCurValue(BigDecimal curVal) {
+        this.curVal = curVal;
+    }
+
+    public void setMinValue(BigDecimal minValue) {
+        this.minValue = minValue;
+    }
+
+    public void setMaxValue(BigDecimal maxValue) {
+        this.maxValue = maxValue;
+    }
+
+    public void setIncrementBy(BigDecimal incrementBy) {
+        this.incrementBy = incrementBy;
     }
 
     public void setCacheValue(int cacheVal) {
         this.cacheVal = cacheVal;
     }
 
-    @Property(viewable = true, editable = true, updatable = true, order = 7)
-    public boolean isCycle()
-    {
-        return flagCycle;
-    }
-
     public void setCycle(boolean flagCycle) {
         this.flagCycle = flagCycle;
-    }
-
-    //由于测试时，有序设置在服务端没有效果，暂时隐藏有序属性的展示 
-    @Property(hidden = true, editable = true, updatable = true, order = 8)
-    public boolean isOrder()
-    {
-        return flagOrder;
     }
 
     public void setOrder(boolean flagOrder) {
         this.flagOrder = flagOrder;
     }
+
+	public void setSeqId(int seqId) {
+		this.seqId = seqId;
+	}
+
+	public String getSeqName() {
+		return seqName;
+	}
+
+	public void setSeqName(String seqName) {
+		this.seqName = seqName;
+	}
+
+	public boolean isSys() {
+		return isSys;
+	}
+
+	public void setSys(boolean isSys) {
+		this.isSys = isSys;
+	}
+
+	public void setValid(boolean valid) {
+		this.valid = valid;
+	}
+
+	public boolean isDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(boolean deleted) {
+		this.deleted = deleted;
+	}
+
+	public void setCreateTime(Timestamp createTime) {
+		this.createTime = createTime;
+	}
+
+	public void setComment(String comment) {
+		this.comment = comment;
+	}
 
 	@Override
 	public Number getLastValue() {

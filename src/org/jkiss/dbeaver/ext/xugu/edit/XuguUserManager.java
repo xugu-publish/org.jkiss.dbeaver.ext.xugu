@@ -18,7 +18,6 @@
 package org.jkiss.dbeaver.ext.xugu.edit;
 
 import org.jkiss.code.Nullable;
-import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.model.XuguDataSource;
 import org.jkiss.dbeaver.ext.xugu.model.XuguUser;
 import org.jkiss.dbeaver.model.DBPDataSource;
@@ -28,7 +27,6 @@ import org.jkiss.dbeaver.model.impl.edit.SQLDatabasePersistAction;
 import org.jkiss.dbeaver.model.impl.sql.edit.SQLObjectEditor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSObject;
-
 import java.util.List;
 import java.util.Map;
 
@@ -54,28 +52,22 @@ public class XuguUserManager extends SQLObjectEditor<XuguUser, XuguDataSource> i
     }
 
     @Override
-    public boolean canCreateObject(XuguDataSource parent)
-    {
-        return true;
-    }
-
-    @Override
     public boolean canDeleteObject(XuguUser object)
     {
         return true;
     }
-
+    
     //新建用户界面显示前的准备工作
     @Override
-    protected XuguUser createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context,
-                                               final XuguDataSource source,
-                                               Object copyFrom) {
+    protected XuguUser createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final Object container, Object from, Map<String, Object> options) 
+    {
+    	XuguDataSource parent = (XuguDataSource)container;
     	context.getUserParams();
-    	XuguUser newUser = new XuguUser(source, null, monitor);
+    	XuguUser newUser = new XuguUser(parent, null, monitor);
     	        
         //修改已存在用户
-        if (copyFrom instanceof XuguUser) {
-            XuguUser tplUser = (XuguUser)copyFrom;
+        if (from instanceof XuguUser) {
+            XuguUser tplUser = (XuguUser)from;
             newUser.setName(tplUser.getName());
             newUser.setPassword(tplUser.getPassword());
             newUser.setLocked(tplUser.isLocked());
@@ -84,9 +76,7 @@ public class XuguUserManager extends SQLObjectEditor<XuguUser, XuguDataSource> i
         //创建新用户
         else {
         	newUser.setPersisted(false);
-        	System.out.println(" ?? "+newUser.isPersisted());
         }
-        System.out.println("Create1 ??");
 //        commandContext.addCommand(new CommandCreateUser(newUser), new CreateObjectReflector<>(this), true);
         return newUser;
     }
@@ -111,7 +101,7 @@ public class XuguUserManager extends SQLObjectEditor<XuguUser, XuguDataSource> i
         		user.setName(name);
         		user.setPassword(key1);
         		user.setRoleList(roleList);
-        		user.setUntil_time(command.getProperties().get(UserPropertyHandler.UNTIL_TIME.toString()).toString());
+//        		user.setUntil_time(command.getProperties().get(UserPropertyHandler.UNTIL_TIME.toString()).toString());
         		user.setPersisted(true);
         		StringBuilder sql = new StringBuilder();
         		sql.append("CREATE USER ");
@@ -129,16 +119,15 @@ public class XuguUserManager extends SQLObjectEditor<XuguUser, XuguDataSource> i
         				}
         			}
         		}
-        		if(user.getUntil_time()!=null) {
-        			sql.append("\nVALID UNTIL '");
-        			sql.append(user.getUntil_time());
-        			sql.append("'");
-        		}
+//        		if(user.getUntil_time()!=null) {
+//        			sql.append("\nVALID UNTIL '");
+//        			sql.append(user.getUntil_time());
+//        			sql.append("'");
+//        		}
         		sql.append(user.isLocked()?" ACCOUNT LOCK":"");
         		sql.append(user.isExpired()?" PASSWORD EXPIRED":"");
-        		if(XuguConstants.LOG_PRINT_LEVEL<1) {
-                	log.info("Xugu Plugin: Construct create user sql: "+sql.toString());
-                }
+        		
+        		log.debug("[Xugu] Construct create user sql: "+sql.toString());
                 DBEPersistAction action = new SQLDatabasePersistAction("Create User", sql.toString());
                 actions.add(action);
         	}
@@ -149,9 +138,8 @@ public class XuguUserManager extends SQLObjectEditor<XuguUser, XuguDataSource> i
     protected void addObjectDeleteActions(List<DBEPersistAction> actions, ObjectDeleteCommand command, Map<String, Object> options)
     {
     	String sql = "DROP USER " + command.getObject().getName();
-    	if(XuguConstants.LOG_PRINT_LEVEL<1) {
-        	log.info("Xugu Plugin: Construct drop user sql: "+sql);
-        }
+    	
+    	log.debug("[Xugu] Construct drop user sql: "+sql);
         DBEPersistAction action = new SQLDatabasePersistAction("Drop User", sql);
         actions.add(action);
     }
@@ -160,12 +148,11 @@ public class XuguUserManager extends SQLObjectEditor<XuguUser, XuguDataSource> i
     protected void addObjectModifyActions(DBRProgressMonitor monitor, List<DBEPersistAction> actionList, ObjectChangeCommand command, Map<String, Object> options)
     {
     	for(String k:options.keySet()) {
-    		System.out.println(options.get(k));
+    		log.debug(options.get(k));
     	}
     	String sql = "ALTER USER " + command.getObject().getName() + " IDENTIFIED BY ";
-    	if(XuguConstants.LOG_PRINT_LEVEL<1) {
-        	log.info("Xugu Plugin: Construct alter user sql: "+sql);
-        }
+    	
+    	log.debug("[Xugu] Construct alter user sql: "+sql);
         DBEPersistAction action = new SQLDatabasePersistAction("Alter User", sql);
         actionList.add(action);
     }
@@ -173,7 +160,7 @@ public class XuguUserManager extends SQLObjectEditor<XuguUser, XuguDataSource> i
     @Override
     public void filterCommands(DBECommandQueue<XuguUser> queue)
     {
-    	System.out.println("Create3 ??"+queue.toString());
+    	
     }
 
 }

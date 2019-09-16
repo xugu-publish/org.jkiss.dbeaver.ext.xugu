@@ -15,12 +15,8 @@
  * limitations under the License.
  */
 package org.jkiss.dbeaver.ext.xugu.model;
-
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.struct.rdb.DBSTableForeignKeyColumn;
-import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
-
-import java.util.List;
 
 /**
  * @author Maple4Real
@@ -29,27 +25,23 @@ import java.util.List;
 public class XuguTableForeignKeyColumn extends XuguTableConstraintColumn implements DBSTableForeignKeyColumn
 {
 
+	private XuguTableColumn referencedColumn;
+
     public XuguTableForeignKeyColumn(
         XuguTableForeignKey constraint,
         XuguTableColumn tableColumn,
-        int ordinalPosition)
+        int ordinalPosition,
+        XuguTableColumn referencedColumn)
     {
         super(constraint, tableColumn, ordinalPosition);
+        this.referencedColumn = referencedColumn;
     }
 
     @Override
     @Property(id = "reference", viewable = true, order = 4)
     public XuguTableColumn getReferencedColumn()
     {
-        XuguTableConstraint referencedConstraint = ((XuguTableForeignKey) getParentObject()).getReferencedConstraint();
-        if (referencedConstraint != null) {
-            List<XuguTableConstraintColumn> ar = referencedConstraint.getAttributeReferences(new VoidProgressMonitor());
-            //修改了列下标位置计算方式
-            if (ar != null) {
-                return ar.get(getOrdinalPosition()).getAttribute();
-            }
-        }
-        return null;
+        return referencedColumn;
     }
 
 }

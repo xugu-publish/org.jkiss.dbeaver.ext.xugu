@@ -3,47 +3,25 @@ package org.jkiss.dbeaver.ext.xugu.editors;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-
 import org.eclipse.jface.action.IContributionManager;
-import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.jkiss.dbeaver.ext.xugu.XuguMessages;
-import org.jkiss.dbeaver.ext.xugu.edit.RolePropertyHandler;
-import org.jkiss.dbeaver.ext.xugu.edit.UserPropertyHandler;
-import org.jkiss.dbeaver.ext.xugu.editors.XuguUserEditorAbstract.UserPageControl;
-import org.jkiss.dbeaver.ext.xugu.model.XuguAuthorityBase;
-import org.jkiss.dbeaver.ext.xugu.XuguConstants;
-import org.jkiss.dbeaver.ext.xugu.model.XuguDataSource;
 import org.jkiss.dbeaver.ext.xugu.model.XuguRole;
 import org.jkiss.dbeaver.ext.xugu.model.XuguRoleAuthority;
-import org.jkiss.dbeaver.ext.xugu.model.XuguSchema;
-import org.jkiss.dbeaver.ext.xugu.model.XuguUserAuthority;
-import org.jkiss.dbeaver.ext.xugu.views.XuguWarningDialog;
-import org.jkiss.dbeaver.model.impl.DBObjectNameCaseTransformer;
 import org.jkiss.dbeaver.model.impl.edit.DBECommandAdapter;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.load.DatabaseLoadService;
 import org.jkiss.dbeaver.ui.LoadingJob;
 import org.jkiss.dbeaver.ui.UIUtils;
 import org.jkiss.dbeaver.ui.controls.ObjectEditorPageControl;
-import org.jkiss.dbeaver.ui.controls.ProgressPageControl.ProgressVisualizer;
 import org.jkiss.dbeaver.ui.editors.AbstractDatabaseObjectEditor;
-import org.jkiss.dbeaver.ui.editors.ControlPropertyCommandListener;
 import org.jkiss.dbeaver.ui.editors.DatabaseEditorUtils;
 
 public class XuguRoleEditor extends AbstractDatabaseObjectEditor<XuguRole>{
@@ -131,7 +109,6 @@ public class XuguRoleEditor extends AbstractDatabaseObjectEditor<XuguRole>{
     @Override
     public void dispose()
     {
-    	System.out.println("dispose ");
         if (commandlistener != null) {
             getEditorInput().getCommandContext().removeCommandListener(commandlistener);
         }

@@ -31,9 +31,8 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.DBSObjectState;
 import org.jkiss.dbeaver.model.struct.rdb.DBSProcedureType;
-import org.jkiss.dbeaver.utils.GeneralUtils;
-
 import java.sql.ResultSet;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
@@ -46,6 +45,8 @@ public class XuguProcedureStandalone extends XuguProcedureBase<XuguSchema> imple
 {
 
     private boolean valid;
+    private String comment;
+    private Timestamp createTime;
     private String sourceDeclaration;
     private Collection<XuguProcedureParameter> procParams;
     public XuguProcedureStandalone(DBRProgressMonitor monitor,
@@ -59,7 +60,8 @@ public class XuguProcedureStandalone extends XuguProcedureBase<XuguSchema> imple
             DBSProcedureType.valueOf(JDBCUtils.safeGetString(dbResult, "RET_TYPE")==null?"PROCEDURE":"FUNCTION"));
         
         this.valid = JDBCUtils.safeGetBoolean(dbResult, "VALID");
-        System.out.println(JDBCUtils.safeGetString(dbResult, "PROC_NAME"));
+        this.comment = JDBCUtils.safeGetString(dbResult, "COMMENTS");
+        this.createTime = JDBCUtils.safeGetTimestamp(dbResult, "CREATE_TIME");
         //通过define字段手动解析参数列表（仅支持查看）
         this.sourceDeclaration = JDBCUtils.safeGetString(dbResult, "DEFINE");
         if(this.sourceDeclaration!=null) {
@@ -90,7 +92,6 @@ public class XuguProcedureStandalone extends XuguProcedureBase<XuguSchema> imple
                         	}
                         	String[] duals = params[i].split(" ");
                         	procParams.add(new XuguProcedureParameter(monitor, this,duals[0], duals[duals.length-1], mode));
-                        	System.out.println(JDBCUtils.safeGetString(dbResult, "PROC_NAME")+" proc params :"+duals[0]+" "+duals[duals.length-1]);
                         }
                 	}
                 }
@@ -101,12 +102,6 @@ public class XuguProcedureStandalone extends XuguProcedureBase<XuguSchema> imple
     public XuguProcedureStandalone(XuguSchema xuguSchema, String name, DBSProcedureType procedureType)
     {
         super(xuguSchema, name, 0L, procedureType);
-        sourceDeclaration =
-        	"CREATE OR REPLACE "+procedureType.name() + " " + name + GeneralUtils.getDefaultLineSeparator() +
-        	("NULL".equals(procedureType.toString())?"":"PROCEDURE".equals(procedureType.toString())?"":"RETURN ")+
-            "IS" + GeneralUtils.getDefaultLineSeparator() +
-            "BEGIN" + GeneralUtils.getDefaultLineSeparator() +
-            "END " + name + ";" + GeneralUtils.getDefaultLineSeparator();
     }
 
     @Override
@@ -115,7 +110,17 @@ public class XuguProcedureStandalone extends XuguProcedureBase<XuguSchema> imple
         return this.procParams;
     }
     
-    @Property(viewable = true, order = 3)
+    @Property(viewable = true, editable = true, updatable = true, order=2)
+    public String getComment() {
+    	return comment;
+    }
+    
+    @Property(viewable = true, editable = false, updatable = false, order=3)
+    public Timestamp getCreateTime() {
+    	return createTime;
+    }
+    
+    @Property(viewable = true, order = 4)
     public boolean isValid()
     {
         return valid;
@@ -125,6 +130,14 @@ public class XuguProcedureStandalone extends XuguProcedureBase<XuguSchema> imple
     	this.valid = valid;
     }
     
+	public void setComment(String comment) {
+		this.comment = comment;
+	}
+
+	public void setCreateTime(Timestamp createTime) {
+		this.createTime = createTime;
+	}
+
     @Override
     public XuguSchema getSchema()
     {

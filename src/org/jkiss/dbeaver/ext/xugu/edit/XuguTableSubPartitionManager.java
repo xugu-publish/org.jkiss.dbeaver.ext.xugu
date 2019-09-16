@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.graphics.Point;
@@ -19,7 +18,6 @@ import org.eclipse.swt.widgets.Text;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.ext.xugu.XuguMessages;
 import org.jkiss.dbeaver.ext.xugu.XuguUtils;
-import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.model.XuguTableColumn;
 import org.jkiss.dbeaver.ext.xugu.model.XuguTablePhysical;
 import org.jkiss.dbeaver.ext.xugu.model.XuguTableSubPartition;
@@ -50,8 +48,10 @@ public class XuguTableSubPartitionManager extends SQLObjectEditor<XuguTableSubPa
 	}
 	
 	@Override
-    protected XuguTableSubPartition createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final XuguTablePhysical parent, Object copyFrom)
+    protected XuguTableSubPartition createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final Object container, Object from, Map<String, Object> options)
     {
+		XuguTablePhysical parent = (XuguTablePhysical)container;
+		
 		//仅允许对新创建的表进行添加二级分区操作
 		if(parent.isPersisted()==false) {
 			return new UITask<XuguTableSubPartition>() {
@@ -75,7 +75,6 @@ public class XuguTableSubPartitionManager extends SQLObjectEditor<XuguTableSubPa
 	                if(newTablePartition.isSubPartition()) {
 	                	parent.subPartitionCache.cacheObject(newTablePartition);
 	                }
-                	System.out.println("Cache one 1");
 	                return newTablePartition;
 	            }
 			}.execute();
@@ -143,12 +142,10 @@ public class XuguTableSubPartitionManager extends SQLObjectEditor<XuguTableSubPa
         	sql.append(" SET SUBPARTITION ");
         	sql.append(command.getObject().getName());
         	sql.append((boolean)command.getProperty("online")?" ONLINE":" OFFLINE");
-        	if(XuguConstants.LOG_PRINT_LEVEL<1) {
-            	log.info("Xugu Plugin: Construct add subpartition sql: "+sql.toString());
-            }
+        	
+        	log.debug("[Xugu] Construct add subpartition sql: "+sql.toString());
         	actionList.add(new SQLDatabasePersistAction("Alter Partition", sql.toString()));
     	}
-    	System.out.println("No Online Option");
     }
     
     static class WarningDialog extends Dialog{

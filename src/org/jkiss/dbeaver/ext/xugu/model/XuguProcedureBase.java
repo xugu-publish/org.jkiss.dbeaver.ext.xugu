@@ -46,11 +46,7 @@ public abstract class XuguProcedureBase<PARENT extends DBSObjectContainer> exten
     private DBSProcedureType procedureType;
     private final ArgumentsCache argumentsCache = new ArgumentsCache();
 
-    public XuguProcedureBase(
-        PARENT parent,
-        String name,
-        long objectId,
-        DBSProcedureType procedureType)
+    public XuguProcedureBase(PARENT parent,String name,long objectId,DBSProcedureType procedureType)
     {
         super(parent, name, objectId, true);
         this.procedureType = procedureType;
@@ -84,7 +80,6 @@ public abstract class XuguProcedureBase<PARENT extends DBSObjectContainer> exten
         @Override
         protected JDBCStatement prepareObjectsStatement(@NotNull JDBCSession session, @NotNull XuguProcedureBase procedure) throws SQLException
         {
-        	System.out.println("Select all arguments");
         	JDBCPreparedStatement dbStat = session.prepareStatement(
                     "SELECT DEFINE FROM ALL_PROCEDURES " +
                     "WHERE PROC_ID=" + procedure.getObjectId());

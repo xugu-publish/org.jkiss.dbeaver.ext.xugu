@@ -38,7 +38,6 @@ import org.jkiss.dbeaver.model.DBPEvent;
 import org.jkiss.dbeaver.model.DBPScriptObject;
 import org.jkiss.dbeaver.model.DBPScriptObjectExt;
 import org.jkiss.dbeaver.model.DBUtils;
-import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.edit.DBEPersistAction;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.exec.jdbc.JDBCPreparedStatement;
@@ -49,10 +48,7 @@ import org.jkiss.dbeaver.model.impl.DBObjectNameCaseTransformer;
 import org.jkiss.dbeaver.model.impl.edit.SQLDatabasePersistAction;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
-import org.jkiss.dbeaver.utils.RuntimeUtils;
-
 import com.xugu.ddl.Parsing;
-
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -63,8 +59,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Xugu utils
- * 提供常用方法
+ * @author 
+  * 提供常用方法
  * some new comments
  */
 public class XuguUtils {
@@ -278,11 +274,14 @@ public class XuguUtils {
         String objectFullName = DBUtils.getObjectFullName(object, DBPEvaluationContext.DDL);
         monitor.beginTask("Load sources for " + objectType + " '" + objectFullName + "'...", 1);
         Connection conn = object.getDataSource().getConnection();
-        log.info("get new object");
         Parsing pp = new Parsing();
+<<<<<<< HEAD
         log.info("use out method");
         String ddl = pp.loadDDL(conn, object.getSchema().getName(), object.getName());
         log.info("out method done");
+=======
+        String ddl = pp.loadDDL((com.xugu.cloudjdbc.Connection)conn, object.getSchema().getName(), object.getName());
+>>>>>>> refs/remotes/origin/master
         return ddl;
     }
 
@@ -379,8 +378,8 @@ public class XuguUtils {
             try (JDBCPreparedStatement dbStat = session.prepareStatement(
                 "SELECT * FROM ALL_OBJECTS WHERE OBJ_TYPE=? AND SCHEMA_ID=? AND OBJ_NAME=?")) {
                 //在xugu数据库中 obj_type字段为int类型
-            	dbStat.setInt(1, Integer.parseInt(objectType.getTypeName()));
-                dbStat.setLong(2, object.getSchema().getID());
+            	dbStat.setString(1, objectType.getTypeName());
+                dbStat.setLong(2, object.getSchema().getId());
                 dbStat.setString(3, DBObjectNameCaseTransformer.transformObjectName(object, object.getName()));
                 try (JDBCResultSet dbResult = dbStat.executeQuery()) {
                     if (dbResult.next()) {
@@ -530,5 +529,10 @@ public class XuguUtils {
 			e.printStackTrace();
 		}
 		return "";
+    }
+    
+    public static DBException createDBException(String reason) 
+    {
+    	return new DBException(reason);
     }
 }

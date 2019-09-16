@@ -36,6 +36,7 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.sql.SQLConstants;
 import org.jkiss.dbeaver.model.sql.SQLQueryResult;
 import org.jkiss.dbeaver.model.sql.SQLState;
+import org.jkiss.dbeaver.model.sql.SQLUtils;
 import org.jkiss.dbeaver.model.struct.*;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.BeanUtils;
@@ -46,8 +47,6 @@ import org.jkiss.dbeaver.model.exec.plan.DBCPlanStyle;
 import org.jkiss.dbeaver.model.exec.plan.DBCQueryPlanner;
 import org.jkiss.dbeaver.ext.xugu.model.plan.XuguPlanAnalyser;
 import org.jkiss.dbeaver.ext.xugu.XuguUtils;
-import com.xugu.outjar.OutJarClass;
-
 import java.io.PrintWriter;
 import java.sql.*;
 import java.util.*;
@@ -194,7 +193,6 @@ public class XuguDataSource extends JDBCDataSource
     				public void run() {
     					while(true) {
     						try {
-    							System.out.println("daemon running");
     							if(metaSession!=null && metaSession.getExecutionContext()!=null) {
     								Statement stmt = metaSession.getExecutionContext().getConnection(monitor).createStatement();
         							stmt.executeQuery("select 1 from dual");
@@ -207,8 +205,7 @@ public class XuguDataSource extends JDBCDataSource
     							}
     							Thread.sleep(def_time);
     						} catch (SQLException | InterruptedException e) {
-    							System.out.println("Connection down!");
-    							e.printStackTrace();
+    							log.debug("Connection is closed!", e);
     						}finally {
     							if(metaSession!=null) {
     								metaSession.close();
@@ -364,7 +361,6 @@ public class XuguDataSource extends JDBCDataSource
     @Association
     public XuguSchema getSchema(DBRProgressMonitor monitor, String name) throws DBException {
         if (publicSchema != null && publicSchema.getName().equals(name)) {
-        	System.out.println("inhere 2");
             return publicSchema;
         }
         return schemaCache.getObject(monitor, this, name);
@@ -403,8 +399,6 @@ public class XuguDataSource extends JDBCDataSource
 
 //        OutJarClass ooo = new OutJarClass();
 //        String tempStr = ooo.printInfo("world");
-//        System.out.println("WWWWWWWWWWWWTFFFFFFFFFF"+tempStr);
-//        log.info("WWWWWWWWWWWWTFFFFFFFFFF"+tempStr);
         DBPConnectionConfiguration connectionInfo = getContainer().getConnectionConfiguration();
         
         {
@@ -808,7 +802,7 @@ public class XuguDataSource extends JDBCDataSource
     static class DatabaseCache extends JDBCStructLookupCache<XuguDataSource, XuguDatabase, XuguSchema> {
         
         public DatabaseCache() {
-			super("DATABASE_NAME");
+			super("DB_NAME");
 		}
         
         //缓存库信息
@@ -830,13 +824,22 @@ public class XuguDataSource extends JDBCDataSource
 				XuguDatabase forDB) throws SQLException {
 			//xfc 修改了获取列信息的sql
             StringBuilder sql = new StringBuilder(500);
-            sql.append("SELECT * FROM ");
+        	
+        	sql.append("select s.schema_id,s.schema_name,u.user_name,s.comments from ");
         	sql.append(owner.roleFlag);
-        	sql.append("_SCHEMAS");
+        	sql.append("_SCHEMAS s");
+        	sql.append(",");
+        	sql.append(owner.roleFlag);
+        	sql.append("_USERS s");
+        	sql.append(" where s.user_id=u.user_id ");
         	if (forDB != null) {
-                sql.append(" where DB_ID=");
-                sql.append(forDB.getID());
+                sql.append(" and s.db_id=");
+                sql.append(forDB.getId());
+                sql.append(" and u.db_id=");
+                sql.append(forDB.getId());
             }
+        	sql.append(" order by s.schema_id asc");
+        	
         	JDBCStatement dbStat = session.prepareStatement(sql.toString());
 			return dbStat;
 		}
@@ -860,28 +863,36 @@ public class XuguDataSource extends JDBCDataSource
             StringBuilder schemasQuery = new StringBuilder();
             String dbName = owner.connection.getCatalog();
         	//xfc 根据owner的用户角色选取不同的语句来查询schema
-        	schemasQuery.append("SELECT * FROM ");
+        	schemasQuery.append("select s.schema_id,s.schema_name,u.user_name,s.comments from ");
         	try {
 	        	if(owner.getRoleFlag()!=null && !"NULL".equals(owner.getRoleFlag())) {
 	        		schemasQuery.append(owner.getRoleFlag());
 	        	}else {
 	        		schemasQuery.append("ALL");
 	        	}
-	        	schemasQuery.append("_SCHEMAS");
-	        	schemasQuery.append(" WHERE DB_ID=");
-				schemasQuery.append(owner.databaseCache.getObject(session.getProgressMonitor(), owner, dbName).getID());
+	        	schemasQuery.append("_SCHEMAS s");
+	        	schemasQuery.append(",");
+	        	if(owner.getRoleFlag()!=null && !"NULL".equals(owner.getRoleFlag())) {
+	        		schemasQuery.append(owner.getRoleFlag());
+	        	}else {
+	        		schemasQuery.append("ALL");
+	        	}
+	        	schemasQuery.append("_USERS u");
+	        	schemasQuery.append(" where s.user_id=u.user_id and s.db_id=");
+				schemasQuery.append(owner.databaseCache.getObject(session.getProgressMonitor(), owner, dbName).getId());
+				if(schema!=null) {
+					schemasQuery.append(" and s.schema_name =");
+					schemasQuery.append(SQLUtils.quoteString(schema, schema.getName()));
+				}
+				schemasQuery.append(" order by s.schema_id asc");
+				log.debug("模式信息："+schemasQuery.toString());
 			} catch (DBException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-        	if(schema!=null) {
-        		schemasQuery.append(" AND SCHEMA_ID = '");
-        		schemasQuery.append(schema.getID());
-        		schemasQuery.append("'");
-        	}
+        	
             JDBCPreparedStatement dbStat = session.prepareStatement(schemasQuery.toString());
             
-            System.out.println("find schemas stmt "+dbStat.getQueryString());
             return dbStat;
         }
 
@@ -969,7 +980,7 @@ public class XuguDataSource extends JDBCDataSource
 				sql.append(owner.getRoleFlag());
 	        	sql.append("_USERS");
 	        	sql.append(" WHERE IS_ROLE=FALSE AND DB_ID=");
-				sql.append(owner.databaseCache.getObject(session.getProgressMonitor(), owner, dbName).getID());
+				sql.append(owner.databaseCache.getObject(session.getProgressMonitor(), owner, dbName).getId());
 			} catch (DBException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -1008,13 +1019,10 @@ public class XuguDataSource extends JDBCDataSource
 	        	sql.append(owner.getRoleFlag());
 	        	sql.append("_USERS WHERE IS_ROLE=true");
 	        	sql.append(" AND DB_ID=");
-	        	log.info(owner.databaseCache==null?"DB cache is null":"DB cache is not null");
-	        	log.info(session.getProgressMonitor()==null?"Monitor is null":"Monitor is not null");
-	        	log.info(owner.databaseCache.getObject(session.getProgressMonitor(), owner, dbName)==null?"Object is null":"WTF??????");
-				sql.append(owner.databaseCache.getObject(session.getProgressMonitor(), owner, dbName).getID());
+				sql.append(owner.databaseCache.getObject(session.getProgressMonitor(), owner, dbName).getId());
 			} catch (DBException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				log.debug("Error in XuguDataSource.RoleCache.prepareObjectsStatement()", e);
 			}
         	return session.prepareStatement(sql.toString());      
         }

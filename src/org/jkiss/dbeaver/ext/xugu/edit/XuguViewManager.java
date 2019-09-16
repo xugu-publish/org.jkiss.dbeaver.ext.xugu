@@ -28,12 +28,9 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
-import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.XuguMessages;
 import org.jkiss.dbeaver.ext.xugu.XuguUtils;
-import org.jkiss.dbeaver.ext.xugu.edit.XuguSynonymManager.NewSynonymDialog;
 import org.jkiss.dbeaver.ext.xugu.model.XuguSchema;
-import org.jkiss.dbeaver.ext.xugu.model.XuguSynonym;
 import org.jkiss.dbeaver.ext.xugu.model.XuguView;
 import org.jkiss.dbeaver.ext.xugu.views.XuguWarningDialog;
 import org.jkiss.dbeaver.model.DBPDataSource;
@@ -46,11 +43,11 @@ import org.jkiss.dbeaver.model.impl.DBSObjectCache;
 import org.jkiss.dbeaver.model.impl.edit.SQLDatabasePersistAction;
 import org.jkiss.dbeaver.model.impl.sql.edit.SQLObjectEditor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.dbeaver.model.sql.SQLUtils;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.ui.UITask;
 import org.jkiss.dbeaver.ui.UIUtils;
 import org.jkiss.utils.CommonUtils;
-
 import java.util.List;
 import java.util.Map;
 
@@ -67,9 +64,7 @@ public class XuguViewManager extends SQLObjectEditor<XuguView, XuguSchema> {
         return FEATURE_EDITOR_ON_CREATE;
     }
 
-    @Override
-    protected void validateObjectProperties(ObjectChangeCommand command)
-        throws DBException
+    protected void validateObjectProperties(ObjectChangeCommand command) throws DBException
     {
         if (CommonUtils.isEmpty(command.getObject().getName())) {
             throw new DBException("View name cannot be empty");
@@ -83,22 +78,23 @@ public class XuguViewManager extends SQLObjectEditor<XuguView, XuguSchema> {
     @Override
     public DBSObjectCache<? extends DBSObject, XuguView> getObjectsCache(XuguView object)
     {
-        return (DBSObjectCache) object.getSchema().viewCache;
+        return (DBSObjectCache<? extends DBSObject, XuguView>) object.getSchema().viewCache;
     }
-
+    
     @Override
-    protected XuguView createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, XuguSchema parent, Object copyFrom)
+    protected XuguView createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final Object container,Object from,  Map<String, Object> options)
     {
+    	XuguSchema schema = (XuguSchema)container;
     	return new UITask<XuguView>() {
             @Override
             protected XuguView runTask() {
-                NewViewDialog dialog = new NewViewDialog(UIUtils.getActiveWorkbenchShell(), parent);
+                NewViewDialog dialog = new NewViewDialog(UIUtils.getActiveWorkbenchShell(), schema);
                 if (dialog.open() != IDialogConstants.OK_ID) {
                     return null;
                 }
             	XuguView newView = dialog.getView();
-            	boolean replace = newView.isReplace();
-            	boolean force = newView.isForce();
+            	boolean replace = dialog.getViewReplace();
+            	boolean force = dialog.getViewRorce();
             	newView.setViewText("CREATE " + (replace?"OR REPLACE ":"") + (force?"FORCE ":"") + "VIEW " +newView.getFullyQualifiedName(DBPEvaluationContext.DDL) + " AS\nSELECT");
                 return newView;
             }
@@ -114,95 +110,52 @@ public class XuguViewManager extends SQLObjectEditor<XuguView, XuguSchema> {
     @Override
     protected void addObjectModifyActions(DBRProgressMonitor monitor, List<DBEPersistAction> actionList, ObjectChangeCommand command, Map<String, Object> options)
     {
-        createOrReplaceViewQuery(monitor, actionList, command);
+    	if (command.getProperties().size() > 1 || command.getProperty("comment") == null) 
+    	{
+    		createOrReplaceViewQuery(monitor, actionList, command);
+    	}
     }
 
+    @Override
+    protected void addObjectExtraActions(DBRProgressMonitor monitor, List<DBEPersistAction> actions, NestedObjectCommand<XuguView, PropertyHandler> command, Map<String, Object> options) {
+        if (command.getProperty("comment") != null) {
+        	StringBuilder desc = new StringBuilder(100);
+        	desc.append("COMMENT ON VIEW ");
+        	desc.append(command.getObject().getName());
+        	desc.append(" IS ");
+        	desc.append(SQLUtils.quoteString(command.getObject(), command.getObject().getComment()));
+        	
+        	log.debug("[Xugu] Construct add view comment sql: " + desc.toString());
+            actions.add(new SQLDatabasePersistAction("Comment View", desc.toString()));
+        }
+    }
+    
     @Override
     protected void addObjectDeleteActions(List<DBEPersistAction> actions, ObjectDeleteCommand command, Map<String, Object> options)
     {
     	String sql = "DROP VIEW " + command.getObject().getFullyQualifiedName(DBPEvaluationContext.DDL);
-    	if(XuguConstants.LOG_PRINT_LEVEL<1) {
-        	log.info("Xugu Plugin: Construct drop view sql: "+sql);
-        }
-        actions.add(
-            new SQLDatabasePersistAction("Drop view", sql) //$NON-NLS-2$
-        );
+    	
+    	log.debug("[Xugu] Construct drop view sql: "+sql);
+        actions.add(new SQLDatabasePersistAction("Drop view", sql));
     }
 
     private void createOrReplaceViewQuery(DBRProgressMonitor monitor, List<DBEPersistAction> actions, DBECommandComposite<XuguView, PropertyHandler> command)
     {
         XuguView view = command.getObject();
 
-        boolean replace = view.isReplace();
-        boolean force = view.isForce();
-        if (replace) {
-        	//增加replace关键字的语句
-        	if(view.getViewText().toUpperCase().indexOf("REPLACE")==-1) {
-        		String newText = view.getViewText();
-        		newText = newText.substring(0, newText.toUpperCase().indexOf("CREATE")+6)+" OR REPLACE"+newText.substring(newText.indexOf("CREATE")+6);
-        		view.setViewText(newText);
-        	}
-        }else {
-        	//删除replace关键字的语句
-        	if(view.getViewText().toUpperCase().indexOf("REPLACE")!=-1) {
-        		String newText = view.getViewText();
-        		newText = newText.substring(0, newText.toUpperCase().indexOf("CREATE")+6)+newText.substring(newText.indexOf("REPLACE")+7);
-        		view.setViewText(newText);
-        	}
-        }
-        if(force) {
-        	//增加force关键字的语句
-        	if(view.getViewText().toUpperCase().indexOf("FORCE")==-1) {
-        		String newText = view.getViewText();
-        		int index1 = newText.indexOf("CREATE");
-        		int index2 = newText.indexOf("REPLACE");
-        		if(index2!=-1) {
-        			newText = newText.substring(0, index2+7)+" FORCE"+newText.substring(index2+7);
-        		}else {
-        			newText = newText.substring(0, index1+6)+" FORCE"+newText.substring(index1+6);
-        		}
-        		view.setViewText(newText);
-        	}
-        }else {
-        	//删除force关键字
-        	if(view.getViewText().toUpperCase().indexOf("FORCE")!=-1) {
-        		String newText = view.getViewText();
-        		int index1 = newText.indexOf("CREATE");
-        		int index2 = newText.indexOf("REPLACE");
-        		if(index2!=-1) {
-        			newText = newText.substring(0, index2+7)+newText.substring(newText.indexOf("FORCE")+5);
-        		}else {
-        			newText = newText.substring(0, index1+6)+newText.substring(newText.indexOf("FORCE")+5);
-        		}
-        		view.setViewText(newText);
-        	}
-        }
-        if(actions.size()!=0) {
-        	actions.remove(0);
-        }
-        if(XuguConstants.LOG_PRINT_LEVEL<1) {
-        	log.info("Xugu Plugin: Construct create view sql: "+view.getViewText());
-        }
+        view.setViewText(view.getViewText());
+        
+        log.debug("[Xugu] Construct create view sql: " + view.getViewText());
         actions.add(0, new SQLDatabasePersistAction("Create view", view.getViewText()));
-        boolean hasComment = command.getProperty("comment") != null;
-        if (hasComment) {
-        	String sql = "COMMENT ON VIEW " + view.getFullyQualifiedName(DBPEvaluationContext.DDL) +
-                    " IS '" + view.getComment() + "'";
-        	if(XuguConstants.LOG_PRINT_LEVEL<1) {
-            	log.info("Xugu Plugin: Construct add view comment sql: "+view.getViewText());
-            }
-            actions.add(new SQLDatabasePersistAction(
-                "Comment table",
-                sql));
-        }
-        System.out.println("VVVView "+view.getName());
     }
     
     static class NewViewDialog extends Dialog {
     	
     	private XuguView view;
         private Text nameText;
-        private Button replaceCheck;
+        private boolean viewReplace;
+        private boolean viewRorce;
+		private Button replaceCheck;
         private Button forceCheck;
 
         public NewViewDialog(Shell parentShell, XuguSchema dataSource)
@@ -216,6 +169,22 @@ public class XuguViewManager extends SQLObjectEditor<XuguView, XuguSchema> {
             return view;
         }
         
+        public boolean getViewReplace() {
+			return viewReplace;
+		}
+
+		public void setViewReplace(boolean viewReplace) {
+			this.viewReplace = viewReplace;
+		}
+
+		public boolean getViewRorce() {
+			return viewRorce;
+		}
+
+		public void setViewRorce(boolean viewRorce) {
+			this.viewRorce = viewRorce;
+		}
+
         @Override
         protected boolean isResizable()
         {
@@ -254,15 +223,14 @@ public class XuguViewManager extends SQLObjectEditor<XuguView, XuguSchema> {
         	
     		if(XuguUtils.checkString(nameText.getText())) {
     			view.setName(DBObjectNameCaseTransformer.transformObjectName(view, nameText.getText()));
-    			view.setForce(forceCheck.getSelection());
-    			view.setReplace(replaceCheck.getSelection());
+    			this.viewReplace=replaceCheck.getSelection();
+    			this.viewRorce=forceCheck.getSelection();
                 super.okPressed();
     		}else {
     			XuguWarningDialog warnDialog = new XuguWarningDialog(UIUtils.getActiveWorkbenchShell(), "View name cannot be null");
         		warnDialog.open();
     		}
         }
-
     }
 }
 

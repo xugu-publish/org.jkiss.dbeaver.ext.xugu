@@ -20,17 +20,10 @@ package org.jkiss.dbeaver.ext.xugu.editors;
 import org.eclipse.jface.action.IContributionManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
-import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.ext.xugu.model.XuguUser;
-import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
-import org.jkiss.dbeaver.model.runtime.load.DatabaseLoadService;
-import org.jkiss.dbeaver.ui.LoadingJob;
 import org.jkiss.dbeaver.ui.controls.ObjectEditorPageControl;
 import org.jkiss.dbeaver.ui.editors.AbstractDatabaseObjectEditor;
 import org.jkiss.dbeaver.ui.editors.DatabaseEditorUtils;
-
-import java.lang.reflect.InvocationTargetException;
-import java.util.List;
 
 /**
  * @author Maple4Real

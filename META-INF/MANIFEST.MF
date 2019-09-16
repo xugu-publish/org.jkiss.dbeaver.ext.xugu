@@ -1,8 +1,9 @@
 Manifest-Version: 1.0
+Automatic-Module-Name: org.jkiss.dbeaver.ext.xugu
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.jkiss.dbeaver.ext.xugu;singleton:=true
-Bundle-Version: 1.0.0
+Bundle-Version: 1.0.0.qualifier
 Bundle-Release-Date: 20190215
 Bundle-Activator: org.jkiss.dbeaver.ext.xugu.Activator
 Require-Bundle: org.eclipse.ui,
@@ -23,4 +24,9 @@ Bundle-Vendor: %Bundle-Vendor
 Bundle-ClassPath: .,
  lib/xugu-permission-meta-1.0.jar,
  lib/out-jar-1.0.jar,
+<<<<<<< HEAD
+=======
+ lib/cloudjdbc-11.0.2.jar,
+>>>>>>> refs/remotes/origin/master
  lib/xugu-table-ddl-1.0.jar
+

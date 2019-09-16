@@ -80,6 +80,7 @@ public class XuguTableConstraint extends XuguTableConstraintBase {
         	this.enable = JDBCUtils.safeGetBoolean(dbResult, "ENABLE");
         	this.valid = JDBCUtils.safeGetBoolean(dbResult, "VALID");
         	this.cons_name = JDBCUtils.safeGetString(dbResult, "CONS_NAME");
+        	
             String s1 = JDBCUtils.safeGetString(dbResult, "MATCH_TYPE");
             if(s1!=null) {
             	this.match_type = s1.charAt(0);
@@ -161,20 +162,20 @@ public class XuguTableConstraint extends XuguTableConstraintBase {
     public static DBSEntityConstraintType getConstraintType(String code)
     {
         switch (code) {
+	        case "C":
+	        	return DBSEntityConstraintType.CHECK;
+	        case "P":
+	        	return DBSEntityConstraintType.PRIMARY_KEY;
+	        case "U":
+	        	return DBSEntityConstraintType.UNIQUE_KEY;
 	        case "F":
 	            return DBSEntityConstraintType.FOREIGN_KEY;
+	        case "N":
+	        	return DBSEntityConstraintType.NOT_NULL;
+	        case "D":
+	        	return XuguConstants.CONSTRAINT_DEFAULT;
 	        case "R":
                 return XuguConstants.CONSTRAINT_REF_COLUMN;
-	        case "C":
-                return DBSEntityConstraintType.CHECK;
-	        case "D":
-                return XuguConstants.CONSTRAINT_DEFAULT;
-	        case "U":
-                return DBSEntityConstraintType.UNIQUE_KEY;
-            case "P":
-                return DBSEntityConstraintType.PRIMARY_KEY;
-            case "N":
-                return XuguConstants.CONSTRAINT_NOT_NULL;
             default:
                 log.debug("Unsupported Xugu constraint type: " + code);
                 return DBSEntityConstraintType.CHECK;

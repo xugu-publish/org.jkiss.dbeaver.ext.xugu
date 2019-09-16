@@ -19,6 +19,9 @@ package org.jkiss.dbeaver.ext.xugu.model;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.ext.xugu.data.XuguBinaryFormatter;
+import org.jkiss.dbeaver.model.DBConstants;
+import org.jkiss.dbeaver.model.DBPDataKind;
+import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.data.DBDBinaryFormatter;
 import org.jkiss.dbeaver.model.exec.jdbc.JDBCDatabaseMetaData;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCDataSource;
@@ -26,11 +29,13 @@ import org.jkiss.dbeaver.model.impl.jdbc.JDBCSQLDialect;
 import org.jkiss.dbeaver.model.impl.sql.BasicSQLDialect;
 import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
 import org.jkiss.dbeaver.model.sql.SQLConstants;
+import org.jkiss.dbeaver.model.struct.DBSTypedObject;
 import org.jkiss.dbeaver.model.struct.rdb.DBSProcedure;
 import org.jkiss.utils.ArrayUtils;
+import org.jkiss.utils.CommonUtils;
 import org.jkiss.dbeaver.ext.xugu.XuguConstants;
-
 import java.util.Arrays;
+import java.util.Locale;
 
 /**
  * Xugu SQL dialect
@@ -340,6 +345,55 @@ class XuguSQLDialect extends JDBCSQLDialect {
     @Override
     public String[] getExecuteKeywords() {
         return EXEC_KEYWORDS;
+    }
+    
+    @Override
+    public String getColumnTypeModifiers(@NotNull DBPDataSource dataSource, @NotNull DBSTypedObject column, @NotNull String typeName, @NotNull DBPDataKind dataKind) {
+    	String ret = null;
+    	ret = super.getColumnTypeModifiers(dataSource, column, typeName, dataKind);
+    	typeName = CommonUtils.notEmpty(typeName).toUpperCase(Locale.ENGLISH);
+    	if (dataKind == DBPDataKind.STRING) {
+    		int precision = CommonUtils.toInt(column.getPrecision());
+            if (precision > 1) {
+                ret = "(" + precision + ')';
+            }
+        } else if (dataKind == DBPDataKind.DATETIME) {
+            if (typeName.equals("INTERVAL SECOND") 
+            		|| typeName.equals("INTERVAL DAY TO SECOND") 
+            		|| typeName.equals("INTERVAL HOUR TO SECOND") 
+            		|| typeName.equals("INTERVAL MINUTE TO SECOND")) {
+                Integer scale = column.getScale();
+                int precision = CommonUtils.toInt(column.getPrecision());
+                if (precision == 0) {
+                    precision = (int) column.getMaxLength();
+                    if (precision > 0) {
+                        // FIXME: max length is actually length in character.
+                        // FIXME: On Oracle it returns bigger values than maximum (#1767)
+                        // FIXME: in other DBs it equals to precision in most cases
+                        //precision--; // One character for sign?
+                    }
+                }
+                if (scale != null && scale >= 0 && precision >= 0 && !(scale == 0 && precision == 0)) {
+                    ret = "(" + precision + ',' + scale + ')';
+                }
+            } else if (typeName.equals("TIMESTAMP")
+            		|| typeName.equals("INTERVAL YEAR")
+            		|| typeName.equals("INTERVAL MONTH")
+            		|| typeName.equals("INTERVAL DAY")
+            		|| typeName.equals("INTERVAL HOUR")
+            		|| typeName.equals("INTERVAL MINUTE")
+            		|| typeName.equals("INTERVAL YEAR TO MONTH")
+            		|| typeName.equals("INTERVAL DAY TO HOUR")
+            		|| typeName.equals("INTERVAL DAY TO MINUTE")
+            		|| typeName.equals("INTERVAL HOUR TO MINUTE")) {
+                // Bit string?
+                int precision = CommonUtils.toInt(column.getPrecision());
+                if (precision > 1) {
+                    ret = "(" + precision + ')';
+                }
+            }
+        }
+		return ret;
     }
 
     @NotNull

@@ -9,6 +9,7 @@ import org.jkiss.dbeaver.model.exec.jdbc.JDBCStatement;
 import org.jkiss.dbeaver.model.exec.jdbc.JDBCPreparedStatement;
 import org.jkiss.dbeaver.model.exec.jdbc.JDBCResultSet;
 import org.jkiss.dbeaver.model.exec.plan.DBCPlan;
+import org.jkiss.dbeaver.model.exec.plan.DBCPlanNode;
 import org.jkiss.dbeaver.runtime.jobs.InvalidateJob;
 import org.jkiss.utils.IntKeyMap;
 import org.jkiss.utils.SecurityUtils;
@@ -18,6 +19,7 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Xugu execution plan analyser
@@ -48,7 +50,6 @@ public class XuguPlanAnalyser implements DBCPlan {
         return "EXPLAIN "+query;
     }
     
-    @Override
     public Collection<XuguPlanNode> getPlanNodes()
     {
         return rootNodes;
@@ -59,7 +60,6 @@ public class XuguPlanAnalyser implements DBCPlan {
     {
         String planQuery = getPlanQueryString();
         try {           
-        	System.out.println("PPPPPPPPPPlan "+planQuery);
             // Explain plan
         	JDBCStatement dbStat = session.createStatement();
             // Read explained plan
@@ -78,4 +78,14 @@ public class XuguPlanAnalyser implements DBCPlan {
             throw new DBCException(e, session.getDataSource());
         }
     }
+
+	public Object getPlanFeature(String feature) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public List<? extends DBCPlanNode> getPlanNodes(Map<String, Object> options) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

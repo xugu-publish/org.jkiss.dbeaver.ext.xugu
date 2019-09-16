@@ -42,7 +42,7 @@ public enum XuguObjectType implements DBSObjectType {
 	DIRECTORY("DIRECTORY", null, DBSObject.class, null),
 	EVALUATION_CONTEXT("EVALUATION CONTEXT", null, DBSObject.class, null),
     FOREIGN_KEY ("FOREIGN KEY", DBIcon.TREE_FOREIGN_KEY, XuguTableForeignKey.class, null), // fake object
-	FUNCTION("7", DBIcon.TREE_PROCEDURE, XuguProcedureStandalone.class, new ObjectFinder() {
+	FUNCTION("FUNCTION", DBIcon.TREE_PROCEDURE, XuguProcedureStandalone.class, new ObjectFinder() {
         @Override
         public XuguProcedureStandalone findObject(DBRProgressMonitor monitor, XuguSchema schema, String objectName) throws DBException
         {
@@ -74,7 +74,7 @@ public enum XuguObjectType implements DBSObjectType {
 	MATERIALIZED_VIEW("MATERIALIZED VIEW", null, DBSObject.class, null),
 	OPERATOR("OPERATOR", null, DBSObject.class, null),
 	//package的obj_type为
-	PACKAGE("18", DBIcon.TREE_PACKAGE, XuguPackage.class, new ObjectFinder() {
+	PACKAGE("PACKAGE", DBIcon.TREE_PACKAGE, XuguPackage.class, new ObjectFinder() {
         @Override
         public XuguPackage findObject(DBRProgressMonitor monitor, XuguSchema schema, String objectName) throws DBException
         {
@@ -82,7 +82,7 @@ public enum XuguObjectType implements DBSObjectType {
         }
     }),
 	//package body当作package处理
-	PACKAGE_BODY("18", DBIcon.TREE_PACKAGE, XuguPackage.class, new ObjectFinder() {
+	PACKAGE_BODY("PACKAGE BODY", DBIcon.TREE_PACKAGE, XuguPackage.class, new ObjectFinder() {
         @Override
         public XuguPackage findObject(DBRProgressMonitor monitor, XuguSchema schema, String objectName) throws DBException
         {
@@ -90,7 +90,7 @@ public enum XuguObjectType implements DBSObjectType {
         }
     }),
 	//procedure的obj_type为7
-	PROCEDURE("7", DBIcon.TREE_PROCEDURE, XuguProcedureStandalone.class, new ObjectFinder() {
+	PROCEDURE("PROCEDURE", DBIcon.TREE_PROCEDURE, XuguProcedureStandalone.class, new ObjectFinder() {
         @Override
         public XuguProcedureStandalone findObject(DBRProgressMonitor monitor, XuguSchema schema, String objectName) throws DBException
         {
@@ -124,7 +124,7 @@ public enum XuguObjectType implements DBSObjectType {
         }
     }),
 	//table的OBJ_TYPE为5
-	TABLE("5", DBIcon.TREE_TABLE, XuguTable.class, new ObjectFinder() {
+	TABLE("TABLE", DBIcon.TREE_TABLE, XuguTable.class, new ObjectFinder() {
         @Override
         public XuguTableBase findObject(DBRProgressMonitor monitor, XuguSchema schema, String objectName) throws DBException
         {
@@ -133,7 +133,7 @@ public enum XuguObjectType implements DBSObjectType {
     }),
 	TABLE_PARTITION("TABLE PARTITION", null, DBSObject.class, null),
 	//trigger的OBJ_TYPE为11
-	TRIGGER("11", DBIcon.TREE_TRIGGER, XuguTrigger.class, null),
+	TRIGGER("TRIGGER", DBIcon.TREE_TRIGGER, XuguTrigger.class, null),
 //	TYPE("TYPE", DBIcon.TREE_DATA_TYPE, XuguDataType.class, new ObjectFinder() {
 //        @Override
 //        public XuguDataType findObject(DBRProgressMonitor monitor, XuguSchema schema, String objectName) throws DBException
@@ -149,7 +149,7 @@ public enum XuguObjectType implements DBSObjectType {
 //        }
 //    }),
 	//view的OBJ_TYPE为9
-	VIEW("9", DBIcon.TREE_VIEW, XuguView.class, new ObjectFinder() {
+	VIEW("VIEW", DBIcon.TREE_VIEW, XuguView.class, new ObjectFinder() {
         @Override
         public XuguView findObject(DBRProgressMonitor monitor, XuguSchema schema, String objectName) throws DBException
         {

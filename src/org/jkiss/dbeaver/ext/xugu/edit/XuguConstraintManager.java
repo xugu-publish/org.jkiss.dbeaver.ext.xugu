@@ -19,16 +19,9 @@ package org.jkiss.dbeaver.ext.xugu.edit;
 
 import java.util.List;
 import java.util.Map;
-
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Text;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.ext.xugu.XuguMessages;
-import org.jkiss.dbeaver.ext.xugu.XuguUtils;
 import org.jkiss.dbeaver.ext.xugu.model.*;
 import org.jkiss.dbeaver.model.DBPEvaluationContext;
 import org.jkiss.dbeaver.model.DBUtils;
@@ -37,21 +30,19 @@ import org.jkiss.dbeaver.model.edit.DBEPersistAction;
 import org.jkiss.dbeaver.model.impl.DBSObjectCache;
 import org.jkiss.dbeaver.model.impl.edit.DBECommandAbstract;
 import org.jkiss.dbeaver.model.impl.edit.SQLDatabasePersistAction;
-import org.jkiss.dbeaver.model.impl.sql.edit.SQLObjectEditor.*;
 import org.jkiss.dbeaver.model.impl.sql.edit.struct.SQLConstraintManager;
 import org.jkiss.dbeaver.model.messages.ModelMessages;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
-import org.jkiss.dbeaver.model.struct.DBSEntity;
 import org.jkiss.dbeaver.model.struct.DBSEntityAttribute;
 import org.jkiss.dbeaver.model.struct.DBSEntityAttributeRef;
 import org.jkiss.dbeaver.model.struct.DBSEntityConstraintType;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.ui.UITask;
-import org.jkiss.dbeaver.ui.UIUtils;
 import org.jkiss.dbeaver.ui.editors.object.struct.EditConstraintPage;
+import org.jkiss.utils.CommonUtils;
 import org.jkiss.dbeaver.DBException;
-import org.jkiss.dbeaver.ext.xugu.XuguConstants;
+
 /**
  * @author Maple4Real
  * 约束管理器
@@ -65,12 +56,12 @@ public class XuguConstraintManager extends SQLConstraintManager<XuguTableConstra
     {
         return object.getParentObject().getSchema().constraintCache;
     }
-
+    
     @Override
-    protected XuguTableConstraint createDatabaseObject(
-        DBRProgressMonitor monitor, DBECommandContext context, final XuguTableBase parent,
-        Object from)
+    protected XuguTableConstraint createDatabaseObject( DBRProgressMonitor monitor, DBECommandContext context, final Object container,Object from,  Map<String, Object> options)
     {
+    	XuguTableBase parent = (XuguTableBase) container;
+    	 
         return new UITask<XuguTableConstraint>() {
             @Override
             protected XuguTableConstraint runTask() {
@@ -93,6 +84,7 @@ public class XuguConstraintManager extends SQLConstraintManager<XuguTableConstra
                     editPage.getConstraintType(),
                     editPage.getConstraintExpression(),
                     editPage.isEnableConstraint() ? XuguObjectStatus.ENABLED : XuguObjectStatus.DISABLED);
+                constraint.setEnable(constraint.getStatus() == XuguObjectStatus.ENABLED);
                 int colIndex = 1;
                 for (DBSEntityAttribute tableColumn : editPage.getSelectedAttributes()) {
                     constraint.addColumn(
@@ -104,20 +96,6 @@ public class XuguConstraintManager extends SQLConstraintManager<XuguTableConstra
                 return constraint;
             }
         }.execute();
-    }
-
-    @Override
-    protected String getDropConstraintPattern(XuguTableConstraint constraint)
-    {
-        String clause = "CONSTRAINT"; //$NON-NLS-1$;
-/*
-        if (constraint.getConstraintType() == DBSEntityConstraintType.PRIMARY_KEY) {
-            clause = "PRIMARY KEY"; //$NON-NLS-1$
-        } else {
-            clause = "CONSTRAINT"; //$NON-NLS-1$
-        }
-*/
-        return "ALTER TABLE " + PATTERN_ITEM_TABLE +" DROP " + clause + " " + PATTERN_ITEM_CONSTRAINT; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
 
     @NotNull
@@ -135,15 +113,22 @@ public class XuguConstraintManager extends SQLConstraintManager<XuguTableConstra
     {
     	XuguTableConstraint constraint = (XuguTableConstraint) command.getObject();
     	XuguTableBase table = constraint.getTable();
-    	String sql = "ALTER TABLE " + table.getFullyQualifiedName(DBPEvaluationContext.DDL) + " ADD " + getNestedDeclaration(monitor, table, command, options) +
-                " "  + (constraint.isEnable()? "ENABLE" : "DISABLE");
-    	if(XuguConstants.LOG_PRINT_LEVEL<1) {
-        	log.info("Xugu Plugin: Construct create constraint sql: "+sql);
-        }
-        actions.add(
-                new SQLDatabasePersistAction(
-                    ModelMessages.model_jdbc_create_new_constraint, sql
-                	));
+    	StringBuilder decl = new StringBuilder(100);
+    	decl.append("ALTER TABLE ");
+    	decl.append(table.getFullyQualifiedName(DBPEvaluationContext.DDL));
+    	decl.append(" ADD ");
+    	decl.append(getNestedDeclaration(monitor, table, command, options));
+    	decl.append(";");
+    	decl.append(CommonUtils.getLineSeparator());
+    	
+    	decl.append("ALTER TABLE ");
+    	decl.append(table.getFullyQualifiedName(DBPEvaluationContext.DDL));
+    	decl.append(constraint.isEnable()? " ENABLE" : " DISABLE");
+    	decl.append(" CONSTRAINT ");
+    	decl.append(constraint.getName());
+
+    	log.debug("[Xugu] Construct create constraint sql: "+ decl.toString());
+        actions.add(new SQLDatabasePersistAction(ModelMessages.model_jdbc_create_new_constraint, decl.toString()));
     }
     
     @Override
@@ -151,9 +136,8 @@ public class XuguConstraintManager extends SQLConstraintManager<XuguTableConstra
     	XuguTableConstraint constraint = (XuguTableConstraint) command.getObject();
     	XuguTableBase table = constraint.getTable();
     	String sql = "ALTER TABLE " + table.getFullyQualifiedName(DBPEvaluationContext.DDL) + (constraint.isEnable()? " ENABLE" : " DISABLE") +" CONSTRAINT "+ constraint.getName();
-    	if(XuguConstants.LOG_PRINT_LEVEL<1) {
-        	log.info("Xugu Plugin: Construct alter constraint sql: "+sql);
-        }
+
+    	log.debug("[Xugu] Construct alter constraint sql: "+sql);
     	actionList.add(
                 new SQLDatabasePersistAction(
                 		"Alter constraint", sql

@@ -2,7 +2,6 @@ package org.jkiss.dbeaver.ext.xugu.edit;
 
 import java.util.List;
 import java.util.Map;
-
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.graphics.Point;
@@ -15,7 +14,6 @@ import org.eclipse.swt.widgets.Text;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.ext.xugu.XuguMessages;
 import org.jkiss.dbeaver.ext.xugu.XuguUtils;
-import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.model.XuguSchema;
 import org.jkiss.dbeaver.ext.xugu.model.XuguSynonym;
 import org.jkiss.dbeaver.ext.xugu.views.XuguWarningDialog;
@@ -32,8 +30,9 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.ui.UITask;
 import org.jkiss.dbeaver.ui.UIUtils;
+import org.jkiss.utils.CommonUtils;
 /**
- * @author Maple4Real
+ * @author xugu-publish
  * 同义词管理器
  * 进行同义词的创建和删除，不支持修改
  * 包含一个内部界面类，用于进行属性设定
@@ -45,13 +44,27 @@ public class XuguSynonymManager extends SQLObjectEditor<XuguSynonym, XuguSchema>
         return FEATURE_EDITOR_ON_CREATE;
     }
 	
+    protected void validateObjectProperties(ObjectChangeCommand command) throws DBException
+    {
+        if (CommonUtils.isEmpty(command.getObject().getName())) {
+            throw new DBException("Synonym name cannot be empty");
+        }
+    }
+
 	@Override
-	protected XuguSynonym createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context,
-			final XuguSchema parent, Object copyFrom) throws DBException {
+	public DBSObjectCache<? extends DBSObject, XuguSynonym> getObjectsCache(XuguSynonym object) {
+		// TODO Auto-generated method stub
+		return object.getSchema().synonymCache;
+	}
+	
+	@Override
+	protected XuguSynonym createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final Object container, Object from, Map<String, Object> options) throws DBException 
+	{
+		XuguSchema schema = (XuguSchema)container;
 		return new UITask<XuguSynonym>() {
             @Override
             protected XuguSynonym runTask() {
-                NewSynonymDialog dialog = new NewSynonymDialog(UIUtils.getActiveWorkbenchShell(), parent);
+                NewSynonymDialog dialog = new NewSynonymDialog(UIUtils.getActiveWorkbenchShell(), schema);
                 if (dialog.open() != IDialogConstants.OK_ID) {
                     return null;
                 }
@@ -69,9 +82,8 @@ public class XuguSynonymManager extends SQLObjectEditor<XuguSynonym, XuguSchema>
 			sql += "PUBLIC ";
 		}
 		sql += "SYNONYM " + synonym.getName() + " FOR " + synonym.getTargetName();
-		if(XuguConstants.LOG_PRINT_LEVEL<1) {
-        	log.info("Xugu Plugin: Construct create synonym sql: "+sql);
-        }
+		
+		log.debug("[Xugu] Construct create synonym sql: "+sql);
 		actions.add(new SQLDatabasePersistAction("Create synonym", sql));
 	}
 	
@@ -84,24 +96,15 @@ public class XuguSynonymManager extends SQLObjectEditor<XuguSynonym, XuguSchema>
 			sql += "PUBLIC ";
 		}
 		sql+="SYNONYM " + DBUtils.getQuotedIdentifier(synonym);
-		if(XuguConstants.LOG_PRINT_LEVEL<1) {
-        	log.info("Xugu Plugin: Construct drop synonym sql: "+sql);
-        }
-		actions.add(
-            new SQLDatabasePersistAction("Drop synonym",
-                sql));
+		
+		log.debug("[Xugu] Construct drop synonym sql: "+ sql);
+		actions.add(new SQLDatabasePersistAction("Drop synonym", sql));
 	}
 
 	@Override
 	public void renameObject(DBECommandContext commandContext, XuguSynonym object, String newName) throws DBException {
 		// TODO Auto-generated method stub
 		throw new DBException("Direct synonym rename is not yet implemented in XuguDB. You should use export/import functions for that.");   
-	}
-	
-	@Override
-	public DBSObjectCache<? extends DBSObject, XuguSynonym> getObjectsCache(XuguSynonym object) {
-		// TODO Auto-generated method stub
-		return object.getSchema().synonymCache;
 	}
 	
 	static class NewSynonymDialog extends Dialog {
@@ -168,12 +171,7 @@ public class XuguSynonymManager extends SQLObjectEditor<XuguSynonym, XuguSchema>
         		warnDialog.open();
         	}
         }
-
     }
-
-	
-
-
 }
 
 

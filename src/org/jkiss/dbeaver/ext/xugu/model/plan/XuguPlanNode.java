@@ -32,31 +32,20 @@
 
 package org.jkiss.dbeaver.ext.xugu.model.plan;
 
-
-
+import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.ext.xugu.XuguMessages;
+import org.jkiss.dbeaver.ext.xugu.XuguUtils;
 import org.jkiss.dbeaver.ext.xugu.model.XuguDataSource;
-
 import org.jkiss.dbeaver.model.exec.plan.DBCPlanNode;
-
+import org.jkiss.dbeaver.model.exec.plan.DBCPlanNodeKind;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
-
 import org.jkiss.dbeaver.model.meta.Property;
-
 import org.jkiss.utils.IntKeyMap;
-
-
-
 import java.sql.ResultSet;
-
 import java.sql.SQLException;
-
 import java.util.ArrayList;
-
 import java.util.Collection;
-
 import java.util.List;
-
-
 
 /**
 
@@ -72,11 +61,12 @@ public class XuguPlanNode implements DBCPlanNode {
     private String planPath;
     private String objectName;
 
+    static protected final Log log = Log.getLog(XuguPlanNode.class);
+    
     public XuguPlanNode(XuguDataSource dataSource, ResultSet dbResult) {
     	this.dataSource = dataSource;
     	if(dbResult!=null) {
     		this.planPath = JDBCUtils.safeGetString(dbResult, "plan_path");
-    		System.out.println("PPPPPPPPPath "+this.planPath);
     		this.objectName = "plan path";
     		this.parent = null;
     		this.nested = null;
@@ -115,4 +105,39 @@ public class XuguPlanNode implements DBCPlanNode {
     {
         return planPath;
     }
+
+	@Override
+	public String getNodeName() {
+		// TODO Auto-generated method stub
+		XuguUtils.createDBException(XuguMessages.unsupported_methods);
+		return null;
+	}
+
+	@Override
+	public String getNodeType() {
+		// TODO Auto-generated method stub
+		XuguUtils.createDBException(XuguMessages.unsupported_methods);
+		return null;
+	}
+
+	@Override
+	public String getNodeCondition() {
+		// TODO Auto-generated method stub
+		XuguUtils.createDBException(XuguMessages.unsupported_methods);
+		return null;
+	}
+
+	@Override
+	public String getNodeDescription() {
+		// TODO Auto-generated method stub
+		XuguUtils.createDBException(XuguMessages.unsupported_methods);
+		return null;
+	}
+
+	@Override
+	public DBCPlanNodeKind getNodeKind() {
+		// TODO Auto-generated method stub
+		XuguUtils.createDBException(XuguMessages.unsupported_methods);
+		return null;
+	}
 }

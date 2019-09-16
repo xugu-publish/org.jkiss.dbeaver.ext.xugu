@@ -36,8 +36,8 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
-import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.XuguMessages;
+import org.jkiss.dbeaver.ext.xugu.model.XuguObjectType;
 import org.jkiss.dbeaver.ext.xugu.model.XuguTableBase;
 import org.jkiss.dbeaver.ext.xugu.model.XuguTableColumn;
 import org.jkiss.dbeaver.ext.xugu.model.XuguTrigger;
@@ -54,7 +54,6 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.ui.UITask;
 import org.jkiss.dbeaver.ui.UIUtils;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -74,10 +73,11 @@ public class XuguTriggerManager extends SQLTriggerManager<XuguTrigger, XuguTable
     {
         return object.getTable().triggerCache;
     }
-
+    
     @Override
-    protected XuguTrigger createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final XuguTableBase parent, Object copyFrom)
+    protected XuguTrigger createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final Object container, Object from, Map<String, Object> options)
     {
+    	XuguTableBase parent = (XuguTableBase)container;
         return new UITask<XuguTrigger>() {
             @Override
             protected XuguTrigger runTask() {
@@ -95,15 +95,13 @@ public class XuguTriggerManager extends SQLTriggerManager<XuguTrigger, XuguTable
     protected void addObjectDeleteActions(List<DBEPersistAction> actions, ObjectDeleteCommand command, Map<String, Object> options)
     {
     	String sql = "DROP TRIGGER " + command.getObject().getFullyQualifiedName(DBPEvaluationContext.DDL);
-    	if(XuguConstants.LOG_PRINT_LEVEL<1) {
-        	log.info("Xugu Plugin: Construct drop trigger sql: "+sql);
-        }
+    	
+    	log.debug("[Xugu] Construct drop trigger sql: "+sql);
         actions.add(
             new SQLDatabasePersistAction("Drop trigger",sql) //$NON-NLS-2$
         );
     }
 
-    @Override
     protected void createOrReplaceTriggerQuery(List<DBEPersistAction> actions, XuguTrigger trigger)
     {
         String source = XuguUtils.normalizeSourceName(trigger, false);
@@ -138,9 +136,8 @@ public class XuguTriggerManager extends SQLTriggerManager<XuguTrigger, XuguTable
             		type+ 
             		("FOR EACH ROW".equals(trigger.getTriggerType())?" WHEN("+realCondition+") \n":" \n")+
             		source;
-            if(XuguConstants.LOG_PRINT_LEVEL<1) {
-            	log.info("Xugu Plugin: Construct create trigger sql: "+source);
-            }
+            
+            log.debug("[Xugu] Construct create trigger sql: "+source);
             actions.add(new SQLDatabasePersistAction("Create trigger", source, true)); //$NON-NLS-2$
 //            trigger.setPersisted(true);
         }
@@ -200,7 +197,7 @@ public class XuguTriggerManager extends SQLTriggerManager<XuguTrigger, XuguTable
             
             parentTypeText = UIUtils.createLabelText(composite, XuguMessages.dialog_trigger_parent_type, null);
             parentTypeText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-            parentTypeText.setText(table.getType()==0?"TABLE":"VIEW");
+            parentTypeText.setText(table.getType().getTypeName());
             parentTypeText.setEditable(false);
             
             parentNameText = UIUtils.createLabelText(composite, XuguMessages.dialog_trigger_parent_name, null);
@@ -252,7 +249,7 @@ public class XuguTriggerManager extends SQLTriggerManager<XuguTrigger, XuguTable
 //            triggerTimingAfter = UIUtils.createRadioButton(timeBox, "After", 2, null);
 //            triggerTimingAfter.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             //当创建视图触发器时，不展示timing界面
-            if(table.getType()!=0) {
+            if(table.getType().getTypeName().equals(XuguObjectType.VIEW.getTypeName())) {
             	triggerTimingCombo.setVisible(false);
             }
             
@@ -328,7 +325,7 @@ public class XuguTriggerManager extends SQLTriggerManager<XuguTrigger, XuguTable
     			trigger.setName(DBObjectNameCaseTransformer.transformObjectName(trigger, nameText.getText()));
                 trigger.setObjectType(parentTypeText.getText());
                 //当创建视图触发器时，timing自动设为instead of
-                if(table.getType()!=0) {
+                if(table.getType().getTypeName().equals(XuguObjectType.VIEW.getTypeName())) {
                 	trigger.setTriggerTime(2);
                 }else {
                 	trigger.setTriggerTime(triggerTimingCombo.getText());
@@ -372,6 +369,12 @@ public class XuguTriggerManager extends SQLTriggerManager<XuguTrigger, XuguTable
         }
 
     }
+
+	@Override
+	protected void createOrReplaceTriggerQuery(List<DBEPersistAction> actions, XuguTrigger trigger, boolean create) {
+		// TODO Auto-generated method stub
+		XuguUtils.createDBException(XuguMessages.unsupported_methods);
+	}
 
 }
 

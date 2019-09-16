@@ -16,7 +16,6 @@
  */
 package org.jkiss.dbeaver.ext.xugu.model;
 
-import org.jkiss.dbeaver.Log;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.DBPSaveableObject;
@@ -25,13 +24,10 @@ import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.utils.CommonUtils;
 
 /**
- * Abstract xugu object
+ * 虚谷数据库对象抽象类
  */
 public abstract class XuguObject<PARENT extends DBSObject> implements DBSObject, DBPSaveableObject
 {
-    private static final Log log = Log.getLog(XuguObject.class);
-
-
     protected final PARENT parent;
     protected String name;
     private boolean persisted;

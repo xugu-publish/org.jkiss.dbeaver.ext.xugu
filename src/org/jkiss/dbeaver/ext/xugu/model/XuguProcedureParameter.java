@@ -76,7 +76,6 @@ public class XuguProcedureParameter implements DBSProcedureParameter, DBSTypedOb
         if(dbResult!=null) {
         	this.define = JDBCUtils.safeGetString(dbResult, "DEFINE");
         }
-        
     }
 
     @Nullable

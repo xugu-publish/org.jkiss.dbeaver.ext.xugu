@@ -34,7 +34,6 @@ public class XuguSchedulerJobArgument implements DBSParameter
         this.paramNum = JDBCUtils.safeGetInt(dbResult, "JOB_PARAM_NUM");
         this.paramDefine = JDBCUtils.safeGetString(dbResult, "JOB_ACTION");
         this.type = "";
-        System.out.println("JOB_PARAM"+this.paramDefine);
     }
 
     @Nullable

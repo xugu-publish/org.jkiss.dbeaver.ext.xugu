@@ -38,8 +38,6 @@ public class XuguConstants {
     public static final int DEFAULT_PORT = 5138;
     public static final String DEFAULT_HOST = "localhost";
     public static final String CMD_COMPILE = "org.jkiss.dbeaver.ext.xugu.code.compile"; //$NON-NLS-1$
-    //日志打印级别 0输出所有 大于1则不输出info类型日志
-    public static final int LOG_PRINT_LEVEL = 0;
 
     public static final String SCHEMA_SYS = "SYS";
     public static final String VIEW_ALL_SOURCE = "ALL_SOURCE";
@@ -85,6 +83,7 @@ public class XuguConstants {
     public static final DBSIndexType INDEX_TYPE_BTREE = new DBSIndexType("0", "BTree");
     public static final DBSIndexType INDEX_TYPE_RTREE = new DBSIndexType("1", "RTree");
     public static final DBSIndexType INDEX_TYPE_FULL_TEXT = new DBSIndexType("2","Full text");
+    public static final DBSIndexType INDEX_TYPE_BITMAP = new DBSIndexType("3","Bitmap");
     
     public static final String COL_OWNER = "OWNER";
     public static final String COL_TABLE_NAME = "TABLE_NAME";
@@ -101,9 +100,10 @@ public class XuguConstants {
     public static final String PREF_DISABLE_SCRIPT_ESCAPE_PROCESSING = "xugu.disable.script.escape";
     public static final String PREF_KEY_DDL_FORMAT = "xugu.ddl.format";
     
-    public static final DBSEntityConstraintType CONSTRAINT_DEFAULT = new DBSEntityConstraintType("D","Constraint that indicates a default value", null, false, false, false);
-    public static final DBSEntityConstraintType CONSTRAINT_NOT_NULL = new DBSEntityConstraintType("N","Constraint that indicates this column can not be null", null, false, false, false);
-    public static final DBSEntityConstraintType CONSTRAINT_REF_COLUMN = new DBSEntityConstraintType("F", "Constraint that involves a REF column", null, false, false, false);
+    // 默认值约束
+    public static final DBSEntityConstraintType CONSTRAINT_DEFAULT = new DBSEntityConstraintType("xugu.default", "DEFAULT", XuguMessages.model_struct_default, false, false, false, false); //$NON-NLS-1$
+    // 引用外键约束
+    public static final DBSEntityConstraintType CONSTRAINT_REF_COLUMN = new DBSEntityConstraintType("xugu.ref.column", "Referential integrity", XuguMessages.model_struct_ref_column, false, false, false, false); //$NON-NLS-1$
 
     public static final int DATA_TYPE_TIMESTAMP_WITH_TIMEZONE = 101;
     public static final int DATA_TYPE_TIMESTAMP_WITH_LOCAL_TIMEZONE = 102;

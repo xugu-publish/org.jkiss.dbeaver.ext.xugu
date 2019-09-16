@@ -3,7 +3,6 @@ package org.jkiss.dbeaver.ext.xugu.edit;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
-
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.graphics.Point;
@@ -15,14 +14,12 @@ import org.eclipse.swt.widgets.Text;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.ext.xugu.XuguMessages;
 import org.jkiss.dbeaver.ext.xugu.XuguUtils;
-import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.model.XuguDataSource;
 import org.jkiss.dbeaver.ext.xugu.model.XuguTablespace;
 import org.jkiss.dbeaver.ext.xugu.views.XuguWarningDialog;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.edit.DBECommandContext;
-import org.jkiss.dbeaver.model.edit.DBEObjectRenamer;
 import org.jkiss.dbeaver.model.edit.DBEPersistAction;
 import org.jkiss.dbeaver.model.impl.DBObjectNameCaseTransformer;
 import org.jkiss.dbeaver.model.impl.DBSObjectCache;
@@ -47,6 +44,11 @@ public class XuguTablespaceManager extends SQLObjectEditor<XuguTablespace, XuguD
 	}
 	
 	@Override
+    public boolean canCreateObject(Object container) {
+        return false;
+    }
+	
+	@Override
     public boolean canEditObject(XuguTablespace object)
     {
         return false;
@@ -64,9 +66,11 @@ public class XuguTablespaceManager extends SQLObjectEditor<XuguTablespace, XuguD
 		return object.getDataSource().getTablespaceCache();
 	}
 	
+	
 	@Override
-    protected XuguTablespace createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final XuguDataSource parent, Object copyFrom)
+    protected XuguTablespace createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final Object container, Object from, Map<String, Object> options)
     {
+		XuguDataSource parent = (XuguDataSource)container;
         return new UITask<XuguTablespace>() {
             @Override
             protected XuguTablespace runTask() {
@@ -93,9 +97,8 @@ public class XuguTablespaceManager extends SQLObjectEditor<XuguTablespace, XuguD
         	sql += " ON ALL NODE";
         }
         sql += " DATAFILE '"+tablespace.getFilePath()+"'";
-        if(XuguConstants.LOG_PRINT_LEVEL<1) {
-        	log.info("Xugu Plugin: Construct add tablespace sql: "+sql);
-        }
+        
+        log.debug("[Xugu] Construct add tablespace sql: "+sql);
         actions.add(new SQLDatabasePersistAction("Create Tablespace", sql));
     }
 
@@ -103,9 +106,8 @@ public class XuguTablespaceManager extends SQLObjectEditor<XuguTablespace, XuguD
     protected void addObjectDeleteActions(List<DBEPersistAction> actions, ObjectDeleteCommand command, Map<String, Object> options)
     {
     	String sql = "DROP TABLESPACE " + DBUtils.getQuotedIdentifier(command.getObject());
-    	if(XuguConstants.LOG_PRINT_LEVEL<1) {
-        	log.info("Xugu Plugin: Construct drop tablespace sql: "+sql);
-        }
+    	
+    	log.debug("[Xugu] Construct drop tablespace sql: "+sql);
         actions.add(
             new SQLDatabasePersistAction("Drop Tablespace",
                sql) //$NON-NLS-2$
@@ -118,9 +120,8 @@ public class XuguTablespaceManager extends SQLObjectEditor<XuguTablespace, XuguD
     	if (command.getProperties().size() > 1 || command.getProperty("comment") == null) {
             StringBuilder query = new StringBuilder("ALTER TABLESPACE "); //$NON-NLS-1$
             query.append(command.getObject().getName()).append(" "); //$NON-NLS-1$
-            if(XuguConstants.LOG_PRINT_LEVEL<1) {
-            	log.info("Xugu Plugin: Construct alter tablespace sql: "+query.toString());
-            }
+            
+            log.debug("[Xugu] Construct alter tablespace sql: "+query.toString());
             actionList.add(new SQLDatabasePersistAction(query.toString()));
         }
     }
@@ -199,6 +200,5 @@ public class XuguTablespaceManager extends SQLObjectEditor<XuguTablespace, XuguD
         		warnDialog.open();
         	}
         }
-
     }
 }
