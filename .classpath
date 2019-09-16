@@ -9,7 +9,6 @@
 	<classpathentry kind="src" path="src/"/>
 	<classpathentry exported="true" kind="lib" path="lib/xugu-permission-meta-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/out-jar-1.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/cloudjdbcV1002.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/xugu-table-ddl-1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/xugu-table-ddl-1.0.jar" sourcepath="lib/xugu-table-ddl-1.0.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
