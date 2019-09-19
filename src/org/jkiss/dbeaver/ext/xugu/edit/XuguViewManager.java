@@ -28,7 +28,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
-import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.XuguMessages;
 import org.jkiss.dbeaver.ext.xugu.XuguUtils;
 import org.jkiss.dbeaver.ext.xugu.model.XuguSchema;
@@ -125,9 +124,8 @@ public class XuguViewManager extends SQLObjectEditor<XuguView, XuguSchema> {
         	desc.append(command.getObject().getName());
         	desc.append(" IS ");
         	desc.append(SQLUtils.quoteString(command.getObject(), command.getObject().getComment()));
-        	if(XuguConstants.LOG_PRINT_LEVEL<1) {
-            	log.info("Xugu Plugin: Construct add view comment sql: " + desc.toString());
-            }
+        	
+        	log.debug("[Xugu] Construct add view comment sql: " + desc.toString());
             actions.add(new SQLDatabasePersistAction("Comment View", desc.toString()));
         }
     }
@@ -136,9 +134,8 @@ public class XuguViewManager extends SQLObjectEditor<XuguView, XuguSchema> {
     protected void addObjectDeleteActions(List<DBEPersistAction> actions, ObjectDeleteCommand command, Map<String, Object> options)
     {
     	String sql = "DROP VIEW " + command.getObject().getFullyQualifiedName(DBPEvaluationContext.DDL);
-    	if(XuguConstants.LOG_PRINT_LEVEL<1) {
-        	log.info("Xugu Plugin: Construct drop view sql: "+sql);
-        }
+    	
+    	log.debug("[Xugu] Construct drop view sql: "+sql);
         actions.add(new SQLDatabasePersistAction("Drop view", sql));
     }
 
@@ -148,9 +145,7 @@ public class XuguViewManager extends SQLObjectEditor<XuguView, XuguSchema> {
 
         view.setViewText(view.getViewText());
         
-        if(XuguConstants.LOG_PRINT_LEVEL<1) {
-        	log.info("Xugu Plugin: Construct create view sql: " + view.getViewText());
-        }
+        log.debug("[Xugu] Construct create view sql: " + view.getViewText());
         actions.add(0, new SQLDatabasePersistAction("Create view", view.getViewText()));
     }
     

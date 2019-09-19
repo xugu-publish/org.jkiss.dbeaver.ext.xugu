@@ -2,9 +2,7 @@ package org.jkiss.dbeaver.ext.xugu.edit;
 
 import java.util.List;
 import java.util.Map;
-
 import org.jkiss.dbeaver.DBException;
-import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.model.XuguSchema;
 import org.jkiss.dbeaver.ext.xugu.model.XuguUDT;
 import org.jkiss.dbeaver.model.DBPDataSource;
@@ -79,9 +77,8 @@ public class XuguUDTManager extends SQLObjectEditor<XuguUDT, XuguSchema>{
 			// TODO Auto-generated catch block
 			log.error(e.getMessage(), e);
 		}
-		if(XuguConstants.LOG_PRINT_LEVEL<1) {
-        	log.info("Xugu Plugin: Construct create UDT sql: "+sql);
-        }
+		
+		log.debug("[Xugu] Construct create UDT sql: "+sql);
 		actions.add(new SQLDatabasePersistAction("Create UDT", sql));
 	}
 	
@@ -93,9 +90,8 @@ public class XuguUDTManager extends SQLObjectEditor<XuguUDT, XuguSchema>{
         	desc.append(command.getObject().getName());
         	desc.append(" IS ");
         	desc.append(SQLUtils.quoteString(command.getObject(), command.getObject().getComment()));
-        	if(XuguConstants.LOG_PRINT_LEVEL<1) {
-            	log.info("Xugu Plugin: Construct add package comment sql: " + desc.toString());
-            }
+        	
+        	log.debug("[Xugu] Construct add package comment sql: " + desc.toString());
             actions.add(new SQLDatabasePersistAction("Comment Package", desc.toString()));
         }
     }
@@ -104,9 +100,8 @@ public class XuguUDTManager extends SQLObjectEditor<XuguUDT, XuguSchema>{
 	protected void addObjectDeleteActions(List<DBEPersistAction> actions,
 			SQLObjectEditor<XuguUDT, XuguSchema>.ObjectDeleteCommand command, Map<String, Object> options) {
 		String sql = "DROP TYPE " + DBUtils.getQuotedIdentifier(command.getObject());
-		if(XuguConstants.LOG_PRINT_LEVEL<1) {
-        	log.info("Xugu Plugin: Construct drop UDT sql: "+sql);
-        }
+		
+		log.debug("[Xugu] Construct drop UDT sql: "+sql);
 		actions.add(
             new SQLDatabasePersistAction("Drop UDT",
                 sql) //$NON-NLS-2$

@@ -148,11 +148,24 @@ public class XuguStructureAssistant implements DBSStructureAssistant
         final boolean hasConstraints = objectTypesList.contains(XuguObjectType.CONSTRAINT);
 
         // Load tables
-        try (JDBCPreparedStatement dbStat = session.prepareStatement(
-            "SELECT OWNER, TABLE_NAME, CONSTRAINT_NAME, CONSTRAINT_TYPE\n" +
-                "FROM SYS.ALL_CONSTRAINTS\n" +
-                "WHERE CONSTRAINT_NAME like ?" + (!hasFK ? " AND CONSTRAINT_TYPE<>'R'" : "") +
-                (schema != null ? " AND OWNER=?" : ""))) {
+        StringBuilder decl = new StringBuilder(100);
+        decl.append("SELECT usr.user_name AS OWNER, tab.table_name,cons.cons_name AS constraint_name,cons.cons_type AS CONSTRAINT_TYPE");
+        decl.append(" FROM ");
+        decl.append(schema.getRoleFlag());
+        decl.append("_constraints cons ");
+        decl.append(" LEFT JOIN ");
+        decl.append(schema.getRoleFlag());
+        decl.append("_tables tab ON cons.table_id=tab.table_id ");
+        decl.append(" LEFT JOIN ");
+        decl.append(schema.getRoleFlag());
+        decl.append("_users usr ON usr.user_id=tab.user_id");
+        decl.append(" WHERE cons.db_id=CURRENT_DB_ID ");
+        decl.append(" and CONSTRAINT_NAME like ?");
+        decl.append((!hasFK ? " AND CONSTRAINT_TYPE<>'R'" : ""));
+        decl.append((schema != null ? " AND OWNER=?" : ""));
+        
+        log.debug("[Xugu] Constraints Information: " + decl.toString());
+        try (JDBCPreparedStatement dbStat = session.prepareStatement(decl.toString())) {
             dbStat.setString(1, constrNameMask);
             if (schema != null) {
                 dbStat.setString(2, schema.getName());
@@ -233,15 +246,33 @@ public class XuguStructureAssistant implements DBSStructureAssistant
         objectTypeClause.append(",'").append(XuguObjectType.SYNONYM.getTypeName()).append("'");
 
         // Seek for objects (join with public synonyms)
-        try (JDBCPreparedStatement dbStat = session.prepareStatement(
-            "SELECT DISTINCT OWNER,OBJECT_NAME,OBJECT_TYPE FROM (SELECT OWNER,OBJECT_NAME,OBJECT_TYPE FROM ALL_OBJECTS WHERE " +
-                "OBJECT_TYPE IN (" + objectTypeClause + ") AND OBJECT_NAME LIKE ? " +
-                (schema == null ? "" : " AND OWNER=?") +
-                "UNION ALL\n" +
-            "SELECT O.OWNER,O.OBJECT_NAME,O.OBJECT_TYPE\n" +
-                "FROM ALL_SYNONYMS S,ALL_OBJECTS O\n" +
-                "WHERE O.OWNER=S.TABLE_OWNER AND O.OBJECT_NAME=S.TABLE_NAME AND S.OWNER='PUBLIC' AND S.SYNONYM_NAME LIKE ?)" +
-                "\nORDER BY OBJECT_NAME")) {
+        StringBuilder decl = new StringBuilder(100);
+        decl.append("select owner,object_name,object_type from (");
+        decl.append("(SELECT usr.user_name AS OWNER,obj.obj_name AS object_name,obj.obj_type AS object_type");
+        decl.append(" FROM ");
+        decl.append(schema.getRoleFlag());
+        decl.append("_objects obj ");
+        decl.append(" LEFT JOIN ");
+        decl.append(schema.getRoleFlag());
+        decl.append("_users usr ON usr.user_id = obj.user_id ");
+        decl.append(" WHERE obj.db_id=CURRENT_DB_ID ");
+        decl.append(" OBJ_TYPE IN (\" + objectTypeClause + \") AND OBJ_NAME LIKE ? ");
+        decl.append((schema != null ? " AND OWNER=?" : ""));
+        decl.append(")");
+        decl.append(" union all ");
+        decl.append("(SELECT usr.user_name AS OWNER,syn.syno_name AS object_name,'SYNONYM' AS object_type");
+        decl.append(" FROM ");
+        decl.append(schema.getRoleFlag());
+        decl.append("_synonyms syn ");
+        decl.append(" LEFT JOIN ");
+        decl.append(schema.getRoleFlag());
+        decl.append("_users usr ON usr.user_id = syn.user_id ");
+        decl.append(" WHERE syn.db_id=CURRENT_DB_ID ");
+        decl.append(" owner='PUBLIC' AND S.SYNO_NAME LIKE ? )");
+        decl.append(") order by object_name");
+        
+        log.debug("[Xugu] Objects Information: " + decl.toString());
+        try (JDBCPreparedStatement dbStat = session.prepareStatement(decl.toString())) {
             if (!caseSensitive) {
                 objectNameMask = objectNameMask.toUpperCase();
             }

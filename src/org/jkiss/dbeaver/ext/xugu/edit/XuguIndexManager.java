@@ -83,7 +83,7 @@ public class XuguIndexManager extends SQLIndexManager<XuguTableIndex, XuguTableP
             protected XuguTableIndex runTask() {
             	List<DBSIndexType> indexTypes = new ArrayList<>();
             	indexTypes.add(XuguConstants.INDEX_TYPE_BTREE);
-            	indexTypes.add(XuguConstants.INDEX_TYPE_RTREE);
+            	//indexTypes.add(XuguConstants.INDEX_TYPE_RTREE);
             	indexTypes.add(XuguConstants.INDEX_TYPE_FULL_TEXT);
             	indexTypes.add(XuguConstants.INDEX_TYPE_BITMAP);
             	EditIndexPage editPage = new EditIndexPage(
@@ -101,6 +101,7 @@ public class XuguIndexManager extends SQLIndexManager<XuguTableIndex, XuguTableP
                 index.setName(DBObjectNameCaseTransformer.transformName(table.getDataSource(), idxName.toString()));
                 index.setUnique(editPage.isUnique());
                 index.setIndexType(editPage.getIndexType());
+                index.setIs_local(true);
                 int colIndex = 1;
                 for (DBSEntityAttribute tableColumn : editPage.getSelectedAttributes()) {
             		index.addColumn(

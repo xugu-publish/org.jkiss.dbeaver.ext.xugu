@@ -19,7 +19,6 @@ package org.jkiss.dbeaver.ext.xugu.model;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.model.DBPRefreshableObject;
 import org.jkiss.dbeaver.model.exec.jdbc.JDBCPreparedStatement;
 import org.jkiss.dbeaver.model.exec.jdbc.JDBCResultSet;
@@ -122,9 +121,8 @@ public class XuguTablespace extends XuguGlobalObject implements DBPRefreshableOb
         	SQLUtils.appendFirstClause(desc, true);
         	desc.append("SPACE_ID=");
         	desc.append(owner.getSpaceID());
-            if(XuguConstants.LOG_PRINT_LEVEL<1) {
-            	log.info("Xugu Plugin: Construct view tablespace sql: "+ desc.toString());
-            }
+            
+            log.debug("[Xugu] Construct view tablespace sql: "+ desc.toString());
             JDBCPreparedStatement dbStat = session.prepareStatement(desc.toString());
             
             return dbStat;

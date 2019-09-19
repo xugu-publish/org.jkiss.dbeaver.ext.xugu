@@ -43,7 +43,6 @@ import org.jkiss.dbeaver.model.struct.DBSObjectState;
 import org.jkiss.dbeaver.model.struct.rdb.DBSTableForeignKey;
 import org.jkiss.dbeaver.model.struct.rdb.DBSTableIndex;
 import org.jkiss.utils.CommonUtils;
-import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.XuguUtils;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -372,9 +371,8 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
             	builder.append(owner.getId());
             	builder.append("\n ORDER BY TRIG_NAME");
         	}
-        	if(XuguConstants.LOG_PRINT_LEVEL<1) {
-            	log.info("Xugu Plugin: Construct select triggers sql: "+builder.toString());
-            }
+        	
+        	log.debug("[Xugu] Construct select triggers sql: "+builder.toString());
             JDBCPreparedStatement dbStat = session.prepareStatement(builder.toString());
             return dbStat;
         }
@@ -412,9 +410,8 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
         		}
         		sql.append(")");
         	}
-        	if(XuguConstants.LOG_PRINT_LEVEL<1) {
-            	log.info("Xugu Plugin: Construct select trigger columns sql: "+sql.toString());
-            }
+        	
+        	log.debug("[Xugu] Construct select trigger columns sql: "+sql.toString());
             JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
             return dbStat;
         }

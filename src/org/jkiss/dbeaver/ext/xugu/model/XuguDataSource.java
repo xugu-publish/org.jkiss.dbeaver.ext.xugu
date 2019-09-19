@@ -399,7 +399,6 @@ public class XuguDataSource extends JDBCDataSource
 
 //        OutJarClass ooo = new OutJarClass();
 //        String tempStr = ooo.printInfo("world");
-//        log.info("WWWWWWWWWWWWTFFFFFFFFFF"+tempStr);
         DBPConnectionConfiguration connectionInfo = getContainer().getConnectionConfiguration();
         
         {
@@ -803,7 +802,7 @@ public class XuguDataSource extends JDBCDataSource
     static class DatabaseCache extends JDBCStructLookupCache<XuguDataSource, XuguDatabase, XuguSchema> {
         
         public DatabaseCache() {
-			super("DATABASE_NAME");
+			super("DB_NAME");
 		}
         
         //缓存库信息

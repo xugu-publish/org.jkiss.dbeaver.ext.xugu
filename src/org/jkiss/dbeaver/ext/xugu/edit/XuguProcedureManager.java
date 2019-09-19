@@ -20,7 +20,6 @@ package org.jkiss.dbeaver.ext.xugu.edit;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.ext.xugu.model.*;
 import org.jkiss.dbeaver.DBException;
-import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPEvaluationContext;
 import org.jkiss.dbeaver.model.edit.DBECommandContext;
@@ -145,9 +144,8 @@ public class XuguProcedureManager extends SQLObjectEditor<XuguProcedureStandalon
         	desc.append(command.getObject().getName());
         	desc.append(" IS ");
         	desc.append(SQLUtils.quoteString(command.getObject(), command.getObject().getComment()));
-        	if(XuguConstants.LOG_PRINT_LEVEL<1) {
-            	log.info("Xugu Plugin: Construct add procedure comment sql: " + desc.toString());
-            }
+        	
+        	log.debug("[Xugu] Construct add procedure comment sql: " + desc.toString());
             actions.add(new SQLDatabasePersistAction("Comment Procedure", desc.toString()));
         }
     }
@@ -157,9 +155,8 @@ public class XuguProcedureManager extends SQLObjectEditor<XuguProcedureStandalon
     {
         final XuguProcedureStandalone object = objectDeleteCommand.getObject();
         String sql = "DROP " + object.getProcedureType().name() + " " + object.getFullyQualifiedName(DBPEvaluationContext.DDL);
-        if(XuguConstants.LOG_PRINT_LEVEL<1) {
-        	log.info("Xugu Plugin: Construct drop procedure sql: "+sql);
-        }
+        
+        log.debug("[Xugu] Construct drop procedure sql: "+sql);
         actions.add(new SQLDatabasePersistAction("Drop procedure",sql));
     }
 
@@ -178,9 +175,8 @@ public class XuguProcedureManager extends SQLObjectEditor<XuguProcedureStandalon
         }
         int index = source.indexOf(keyWord);
         source = "CREATE OR REPLACE " + keyWord.toUpperCase() + source.substring(index+keyWord.length());
-        if(XuguConstants.LOG_PRINT_LEVEL<1) {
-        	log.info("Xugu Plugin: Construct create procedure sql: "+source);
-        }
+        
+        log.debug("[Xugu] Construct create procedure sql: "+source);
         actionList.add(new XuguObjectValidateAction(procedure, XuguObjectType.PROCEDURE, "Create procedure", source)); //$NON-NLS-2$
     }
 

@@ -19,7 +19,6 @@ package org.jkiss.dbeaver.ext.xugu.edit;
 
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
-import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.model.XuguDataType;
 import org.jkiss.dbeaver.ext.xugu.model.XuguSchema;
 import org.jkiss.dbeaver.ext.xugu.model.XuguTableBase;
@@ -104,9 +103,8 @@ public class XuguTableColumnManager extends SQLTableColumnManager<XuguTableColum
     	if(command.getProperty("comment")!=null && !"".equals(command.getProperty("comment"))) {
     		query += " comment '"+command.getObject().getComment(monitor)+"'";
     	}
-    	if(XuguConstants.LOG_PRINT_LEVEL<1) {
-    		log.info("Xugu Plugin: Construct create table column sql: "+query);
-    	}
+    	
+    	log.debug("[Xugu] Construct create table column sql: "+query);
     	actions.add(
     			new SQLDatabasePersistAction(
     					ModelMessages.model_jdbc_create_new_table_column,
@@ -140,9 +138,8 @@ public class XuguTableColumnManager extends SQLTableColumnManager<XuguTableColum
         			}
         			String sql = "COMMENT ON COLUMN " + column.getTable().getFullyQualifiedName(DBPEvaluationContext.DDL) + "." + DBUtils.getQuotedIdentifier(column) +
         					" IS '" + column.getComment(new VoidProgressMonitor()) + "'";
-        			if(XuguConstants.LOG_PRINT_LEVEL<1) {
-        				log.info("Xugu Plugin: Construct alter column comment sql: "+sql);
-        			}
+        			
+        			log.debug("[Xugu] Construct alter column comment sql: "+sql);
         			actionList.add(new SQLDatabasePersistAction(
         					"Comment column",sql));
         		} else {
@@ -166,9 +163,8 @@ public class XuguTableColumnManager extends SQLTableColumnManager<XuguTableColum
         				sql += getXuguNestedDeclaration(monitor, column.getTable(), command, options);
         				break;
         			}
-        			if(XuguConstants.LOG_PRINT_LEVEL<1) {
-        				log.info("Xugu Plugin: Construct alter table column sql: "+sql);
-        			}
+        			
+        			log.debug("[Xugu] Construct alter table column sql: "+sql);
         			actionList.add(new SQLDatabasePersistAction("Modify column",sql)); 
         		}
         	}
@@ -275,9 +271,8 @@ public class XuguTableColumnManager extends SQLTableColumnManager<XuguTableColum
         String sql = "ALTER TABLE " + column.getTable().getFullyQualifiedName(DBPEvaluationContext.DDL) + " RENAME COLUMN " +
                 DBUtils.getQuotedIdentifier(column.getDataSource(), command.getOldName()) + " TO " +
                 DBUtils.getQuotedIdentifier(column.getDataSource(), command.getNewName());
-        if(XuguConstants.LOG_PRINT_LEVEL<1) {
-        	log.info("Xugu Plugin: Construct rename table column sql: "+sql);
-        }
+        
+        log.debug("[Xugu] Construct rename table column sql: "+sql);
         actions.add(
             new SQLDatabasePersistAction(
                 "Rename column",
