@@ -37,7 +37,7 @@ public abstract class XuguPartitionBase<PARENT extends DBSObject> extends XuguOb
     
     private String partiValue;
     private int partiNo;
-    private boolean online;
+    protected boolean online;
     private String partiKey;
     private int partiType;
     private int autoPartiType;
@@ -77,13 +77,13 @@ public abstract class XuguPartitionBase<PARENT extends DBSObject> extends XuguOb
         }
     }
     
-    @Property(viewable = true, order = 1, updatable = true, editable=true)
+    @Property(viewable = true, order = 1, updatable = false, editable=true)
     public int getPartiNo()
     {
         return partiNo;
     }
     
-    @Property(viewable=true, order=2, updatable=true, editable=true)
+    @Property(viewable=false, order=2, updatable=false, editable=true)
     public String getPartiType() {
     	switch(partiType) {
     	case 1:
@@ -116,7 +116,7 @@ public abstract class XuguPartitionBase<PARENT extends DBSObject> extends XuguOb
     	}
     }
     
-    @Property(viewable=true, order=3, updatable=true, editable=true)
+    @Property(viewable=true, order=3, updatable=false, editable=true)
     public String getPartiKey() {
     	return partiKey;
     }
@@ -125,7 +125,7 @@ public abstract class XuguPartitionBase<PARENT extends DBSObject> extends XuguOb
     	this.partiKey = partiKey;
     }
     
-    @Property(viewable = true, order = 4, updatable=true, editable=true)
+    @Property(viewable = true, order = 4, updatable=false, editable=true)
     public String getPartiValue()
     {
     	if(partiType==3)
@@ -153,7 +153,7 @@ public abstract class XuguPartitionBase<PARENT extends DBSObject> extends XuguOb
     	}
     }
     
-    @Property(viewable = true, order = 5, updatable=true, editable=true)
+    @Property(viewable = true, order = 5, updatable=false, editable=true)
     public String getAutoPartiType() {
     	switch(this.autoPartiType) {
     	case 1:
@@ -189,7 +189,7 @@ public abstract class XuguPartitionBase<PARENT extends DBSObject> extends XuguOb
     	}
     }
     
-    @Property(viewable = true, order = 6, updatable=true, editable=true)
+    @Property(viewable = true, order = 6, updatable=false, editable=true)
     public Integer getAutoPartiSpan()
     {
     	if(!this.isAuto)

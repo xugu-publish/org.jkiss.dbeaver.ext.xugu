@@ -150,7 +150,7 @@ public class XuguTablePartitionManager extends SQLObjectEditor<XuguTablePartitio
     		StringBuilder sql = new StringBuilder("ALTER TABLE ");
         	sql.append(command.getObject().getParentObject().getName());
         	sql.append(" SET PARTITION ");
-        	sql.append(command.getObject().getName());
+        	sql.append("\"" + command.getObject().getName()+ "\"");
         	sql.append((boolean)command.getProperty("online")?" ONLINE":" OFFLINE");
         	
         	log.debug("[Xugu] Construct alter table partition sql: "+sql.toString());
