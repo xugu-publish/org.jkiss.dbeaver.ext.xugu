@@ -275,13 +275,7 @@ public class XuguUtils {
         monitor.beginTask("Load sources for " + objectType + " '" + objectFullName + "'...", 1);
         Connection conn = object.getDataSource().getConnection();
         Parsing pp = new Parsing();
-<<<<<<< HEAD
-        log.info("use out method");
-        String ddl = pp.loadDDL(conn, object.getSchema().getName(), object.getName());
-        log.info("out method done");
-=======
         String ddl = pp.loadDDL((com.xugu.cloudjdbc.Connection)conn, object.getSchema().getName(), object.getName());
->>>>>>> refs/remotes/origin/master
         return ddl;
     }
 
