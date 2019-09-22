@@ -275,9 +275,7 @@ public class XuguUtils {
         monitor.beginTask("Load sources for " + objectType + " '" + objectFullName + "'...", 1);
         Connection conn = object.getDataSource().getConnection();
         Parsing pp = new Parsing();
-
         String ddl = pp.loadDDL((com.xugu.cloudjdbc.Connection)conn, object.getSchema().getName(), object.getName());
-
         return ddl;
     }
 
