@@ -17,11 +17,12 @@
 package org.jkiss.dbeaver.ext.xugu.model;
 
 import org.jkiss.dbeaver.DBException;
-//import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.ext.xugu.model.XuguTableBase.TriggerCache;
+import org.jkiss.dbeaver.model.DBPEvaluationContext;
 import org.jkiss.dbeaver.model.meta.Association;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
-
+import org.jkiss.dbeaver.model.struct.DBSObject;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,6 +37,7 @@ public class XuguTrigger extends XuguTriggerBase<XuguTableBase>
 {
     private XuguSchema ownerSchema;
     private List<String> includeCols;
+    private final TriggerCache triggerCache = new TriggerCache();
     
     public XuguTrigger(XuguTableBase table, String name)
     {
@@ -56,11 +58,11 @@ public class XuguTrigger extends XuguTriggerBase<XuguTableBase>
     @Property(viewable = true, order = 3)
     public String getObjName()
     {
-        return parent.getName();
+        return parent.getFullyQualifiedName(DBPEvaluationContext.DDL);
     }
     
     @Override
-    @Property(viewable = true, order = 4)
+    //@Property(viewable = true, order = 4)
     public XuguTableBase getTable()
     {
         return parent;
@@ -111,6 +113,25 @@ public class XuguTrigger extends XuguTriggerBase<XuguTableBase>
 	@Override
 	public void setObjectDefinitionText(String source) {
 		super.setObjectDefinitionText(source);
+	}
+
+	@Override
+	@Property(hidden = true, editable = true, updatable = true, order = -1)
+	public String getExtendedDefinitionText(DBRProgressMonitor monitor) throws DBException {
+		// TODO Auto-generated method stub
+		return define;
+	}
+
+	public void setExtendedDefinitionText(String source)
+    {
+        this.define = source;
+    }
+	
+	@Override
+	public DBSObject refreshObject(DBRProgressMonitor monitor) throws DBException {
+		// TODO Auto-generated method stub
+		this.triggerCache.clearCache();
+		return null;
 	}
 
 }

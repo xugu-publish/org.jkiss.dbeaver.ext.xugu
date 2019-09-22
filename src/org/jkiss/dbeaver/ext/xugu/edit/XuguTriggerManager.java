@@ -43,7 +43,9 @@ import org.jkiss.dbeaver.ext.xugu.model.XuguTableColumn;
 import org.jkiss.dbeaver.ext.xugu.model.XuguTrigger;
 import org.jkiss.dbeaver.ext.xugu.views.XuguWarningDialog;
 import org.jkiss.dbeaver.ext.xugu.XuguUtils;
+import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPEvaluationContext;
+import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.edit.DBECommandContext;
 import org.jkiss.dbeaver.model.edit.DBEPersistAction;
 import org.jkiss.dbeaver.model.impl.DBObjectNameCaseTransformer;
@@ -51,9 +53,12 @@ import org.jkiss.dbeaver.model.impl.DBSObjectCache;
 import org.jkiss.dbeaver.model.impl.edit.SQLDatabasePersistAction;
 import org.jkiss.dbeaver.model.impl.sql.edit.struct.SQLTriggerManager;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
+import org.jkiss.dbeaver.model.sql.SQLUtils;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.ui.UITask;
 import org.jkiss.dbeaver.ui.UIUtils;
+import org.jkiss.utils.CommonUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -67,6 +72,13 @@ import java.util.Iterator;
  * 包含一个内部界面类，用于进行属性设定
  */
 public class XuguTriggerManager extends SQLTriggerManager<XuguTrigger, XuguTableBase> {
+	
+	@Override
+	public long getMakerOptions(DBPDataSource dataSource)
+	{
+		return FEATURE_EDITOR_ON_CREATE;
+	}
+	 
     @Nullable
     @Override
     public DBSObjectCache<? extends DBSObject, XuguTrigger> getObjectsCache(XuguTrigger object)
@@ -74,6 +86,13 @@ public class XuguTriggerManager extends SQLTriggerManager<XuguTrigger, XuguTable
         return object.getTable().triggerCache;
     }
     
+    protected void validateObjectProperties(ObjectChangeCommand command) throws DBException
+    {
+        if (CommonUtils.isEmpty(command.getObject().getName())) {
+            throw new DBException("Trigger name cannot be empty");
+        }
+    }
+
     @Override
     protected XuguTrigger createDatabaseObject(DBRProgressMonitor monitor, DBECommandContext context, final Object container, Object from, Map<String, Object> options)
     {
@@ -91,7 +110,45 @@ public class XuguTriggerManager extends SQLTriggerManager<XuguTrigger, XuguTable
         }.execute();
     }
 
+	@Override
+    protected void addObjectCreateActions(DBRProgressMonitor monitor, List<DBEPersistAction> actions, ObjectCreateCommand command, Map<String, Object> options)
+    {
+		createOrReplaceTriggerQuery(actions, command.getObject());
+	    	
+    }
+	
+	// 修改模式名称
     @Override
+    protected void addObjectRenameActions(DBRProgressMonitor monitor, List<DBEPersistAction> actionList, ObjectRenameCommand command, Map<String, Object> options)
+    { 
+    	StringBuilder desc = new StringBuilder(100);
+    	if (!CommonUtils.isEmpty(command.getNewName())) 
+        {
+            desc.append("ALTER TRIGGER ");
+            desc.append(DBUtils.getQuotedIdentifier(command.getObject().getDataSource(), command.getOldName()));
+            desc.append(" RENAME TO ");
+            desc.append(DBUtils.getQuotedIdentifier(command.getObject().getDataSource(), command.getNewName().toUpperCase()));
+        }
+    	
+    	log.debug("[Xugu] Construct rename schema sql: " + desc.toString());
+    	actionList.add(new SQLDatabasePersistAction("rename schema", desc.toString()));
+    }
+
+    @Override
+    protected void addObjectExtraActions(DBRProgressMonitor monitor, List<DBEPersistAction> actions, NestedObjectCommand<XuguTrigger, PropertyHandler> command, Map<String, Object> options) {
+        if (command.getProperty("comment") != null) {
+        	StringBuilder desc = new StringBuilder(100);
+        	desc.append("COMMENT ON TRIGGER ");
+        	desc.append(command.getObject().getFullyQualifiedName(DBPEvaluationContext.DDL));
+        	desc.append(" IS ");
+        	desc.append(SQLUtils.quoteString(command.getObject(), command.getObject().getComment()));
+        	
+        	log.debug("[Xugu] Construct add trigger comment sql: " + desc.toString());
+            actions.add(new SQLDatabasePersistAction("Comment Trigger", desc.toString()));
+        }
+    }
+    
+	@Override
     protected void addObjectDeleteActions(List<DBEPersistAction> actions, ObjectDeleteCommand command, Map<String, Object> options)
     {
     	String sql = "DROP TRIGGER " + command.getObject().getFullyQualifiedName(DBPEvaluationContext.DDL);
@@ -105,6 +162,12 @@ public class XuguTriggerManager extends SQLTriggerManager<XuguTrigger, XuguTable
     protected void createOrReplaceTriggerQuery(List<DBEPersistAction> actions, XuguTrigger trigger)
     {
         String source = XuguUtils.normalizeSourceName(trigger, false);
+        try {
+			source = trigger.getExtendedDefinitionText(new VoidProgressMonitor());
+		} catch (DBException e) {
+			// TODO Auto-generated catch block
+			log.error(e);
+		}
         if (source == null || source.equals("")) {
             return;
         }
@@ -130,9 +193,9 @@ public class XuguTriggerManager extends SQLTriggerManager<XuguTrigger, XuguTable
             String condition = trigger.getTriggerCondition();
             String realCondition = condition!=null?"".equals(condition)?null:condition:null;
             source = "CREATE OR REPLACE TRIGGER "+
-            		trigger.getName()+" \n"+
+            		trigger.getFullyQualifiedName(DBPEvaluationContext.DDL)+" \n"+
             		timing+" "+event+targetCols+
-            		" ON "+trigger.getTable().getName()+" \n"+
+            		" ON "+trigger.getTable().getFullyQualifiedName(DBPEvaluationContext.DDL)+" \n"+
             		type+ 
             		("FOR EACH ROW".equals(trigger.getTriggerType())?" WHEN("+realCondition+") \n":" \n")+
             		source;
@@ -186,7 +249,7 @@ public class XuguTriggerManager extends SQLTriggerManager<XuguTrigger, XuguTable
         @Override
         protected Control createDialogArea(Composite parent)
         {
-            getShell().setText(XuguMessages.dialog_synonym_create_title);
+            getShell().setText(XuguMessages.dialog_trigger_create_title);
 
             Control container = super.createDialogArea(parent);
             Composite composite = UIUtils.createPlaceholder((Composite) container, 1, 5);
@@ -194,6 +257,7 @@ public class XuguTriggerManager extends SQLTriggerManager<XuguTrigger, XuguTable
             
             nameText = UIUtils.createLabelText(composite, XuguMessages.dialog_trigger_name, null);
             nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+            nameText.setEditable(true);
             
             parentTypeText = UIUtils.createLabelText(composite, XuguMessages.dialog_trigger_parent_type, null);
             parentTypeText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -202,7 +266,7 @@ public class XuguTriggerManager extends SQLTriggerManager<XuguTrigger, XuguTable
             
             parentNameText = UIUtils.createLabelText(composite, XuguMessages.dialog_trigger_parent_name, null);
             parentNameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-            parentNameText.setText(table.getName());
+            parentNameText.setText(table.getFullyQualifiedName(DBPEvaluationContext.DDL));
             parentNameText.setEditable(false);
             
             Composite eventBox = UIUtils.createPlaceholder(composite, 4, 1);
@@ -218,8 +282,8 @@ public class XuguTriggerManager extends SQLTriggerManager<XuguTrigger, XuguTable
             
             triggerTypeCombo = UIUtils.createLabelCombo(composite, XuguMessages.dialog_trigger_type, 0);
             triggerTypeCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-            triggerTypeCombo.add("ROW");
-            triggerTypeCombo.add("STATEMENT");
+            triggerTypeCombo.add(XuguMessages.dialog_trigger_type_row);
+            triggerTypeCombo.add(XuguMessages.dialog_trigger_type_statement);
             triggerTypeCombo.addSelectionListener(new SelectionListener() {
 				@Override
 				public void widgetSelected(SelectionEvent e) {
@@ -238,16 +302,8 @@ public class XuguTriggerManager extends SQLTriggerManager<XuguTrigger, XuguTable
             triggerTimingCombo = UIUtils.createLabelCombo(composite, XuguMessages.dialog_trigger_timing, 0);
             triggerTimingCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             triggerTimingCombo.add("BEFORE");
-            triggerTimingCombo.add("INSTEAD OF");
             triggerTimingCombo.add("AFTER");
-//            Composite timeBox = UIUtils.createPlaceholder(composite, 3, 1);
-//            timeBox.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-//            CLabel timeLabel = UIUtils.createInfoLabel(timeBox, "Trigger Timing:");
-//            timeLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-//            triggerTimingBefore = UIUtils.createRadioButton(timeBox, "Before", 1, null);
-//            triggerTimingBefore.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-//            triggerTimingAfter = UIUtils.createRadioButton(timeBox, "After", 2, null);
-//            triggerTimingAfter.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+            triggerTimingCombo.add("INSTEAD OF");
             //当创建视图触发器时，不展示timing界面
             if(table.getType().getTypeName().equals(XuguObjectType.VIEW.getTypeName())) {
             	triggerTimingCombo.setVisible(false);
@@ -295,7 +351,7 @@ public class XuguTriggerManager extends SQLTriggerManager<XuguTrigger, XuguTable
 								while(it.hasNext()){
 									XuguTableColumn col = it.next();
 									TableItem item = new TableItem(colListTable, SWT.NONE);  
-									item.setText(new String[] {col.getName(), col.getDataType().toString(), col.getPrecision()+"", col.getScale()+"", col.getDefaultValue()});
+									item.setText(new String[] {col.getName(), col.getDataType().toString(), col.getPrecision()==null?"":String.valueOf(col.getPrecision()), col.getScale()==null?"":String.valueOf(col.getScale()), col.getDefaultValue()});
 								}
 							}
 							//调整表格大小
@@ -318,54 +374,54 @@ public class XuguTriggerManager extends SQLTriggerManager<XuguTrigger, XuguTable
         @Override
         protected void okPressed()
         {
-        	if(XuguUtils.checkString(nameText.getText())) {
-        		String source = "\nBEGIN\n\nEND";
-                //设置父对象信息
-                this.trigger = new XuguTrigger(table, ""); 
+    		if(XuguUtils.checkString(nameText.getText())) {
+    			String source = "\nBEGIN\n\nEND";
+    			//设置父对象信息
+    			this.trigger = new XuguTrigger(table, ""); 
     			trigger.setName(DBObjectNameCaseTransformer.transformObjectName(trigger, nameText.getText()));
-                trigger.setObjectType(parentTypeText.getText());
-                //当创建视图触发器时，timing自动设为instead of
-                if(table.getType().getTypeName().equals(XuguObjectType.VIEW.getTypeName())) {
-                	trigger.setTriggerTime(2);
-                }else {
-                	trigger.setTriggerTime(triggerTimingCombo.getText());
-                }
-//                trigger.setTriggerTime(Integer.parseInt(triggerTimingBefore.getData().toString()));
-                trigger.setTriggerCondition(triggerConditionText.getText());
-                if(triggerTypeCombo.getSelectionIndex()>-1) {
-                	trigger.setTriggerType(triggerTypeCombo.getSelectionIndex()+1);
-                }
-                int event=0;
-                if(triggerEventInsert.getSelection()) {
-                	event += 1;
-                }
-                if(triggerEventUpdate.getSelection()) {
-                	event += 2;
-                }
-                if(triggerEventDelete.getSelection()) {
-                	event += 4;
-                }
-                trigger.setTriggeringEvent(event);
-                trigger.setObjectDefinitionText(source);
-                //加载列信息
-                TableItem[] cols = colListTable.getItems();
-                if(cols!=null) {
-                	int sum = cols.length;
-                    int i=0;
-                    ArrayList<String> includeCols = new ArrayList<String>();
-                    while(i<sum) {
-                    	if(cols[i].getChecked()) {
-                    		includeCols.add(cols[i].getText(0));
-                    	}
-                    	i++;
-                    }
-                    trigger.setIncludeColumns(includeCols);
-                }
-                super.okPressed();
-        	}else {
-        		XuguWarningDialog warnDialog = new XuguWarningDialog(UIUtils.getActiveWorkbenchShell(), "Trigger name cannot be null");
-        		warnDialog.open();
-        	}
+    			trigger.setObjectType(parentTypeText.getText());
+    			//当创建视图触发器时，timing自动设为instead of
+    			if(table.getType().getTypeName().equals(XuguObjectType.VIEW.getTypeName())) {
+    				trigger.setTriggerTime(2);
+    			}else {
+    				trigger.setTriggerTime(triggerTimingCombo.getText());
+    			}
+    			
+    			trigger.setTriggerCondition(triggerConditionText.getText());
+    			if(triggerTypeCombo.getSelectionIndex()>-1) {
+    				trigger.setTriggerType(triggerTypeCombo.getSelectionIndex()+1);
+    			}
+    			int event=0;
+    			if(triggerEventInsert.getSelection()) {
+    				event += 1;
+    			}
+    			if(triggerEventUpdate.getSelection()) {
+    				event += 2;
+    			}
+    			if(triggerEventDelete.getSelection()) {
+    				event += 4;
+    			}
+    			trigger.setTriggeringEvent(event);
+    			trigger.setObjectDefinitionText(source);
+    			//加载列信息
+    			TableItem[] cols = colListTable.getItems();
+    			if(cols!=null) {
+    				int sum = cols.length;
+    				int i=0;
+    				ArrayList<String> includeCols = new ArrayList<String>();
+    				while(i<sum) {
+    					if(cols[i].getChecked()) {
+    						includeCols.add(cols[i].getText(0));
+    					}
+    					i++;
+    				}
+    				trigger.setIncludeColumns(includeCols);
+    			}
+    			super.okPressed();
+    		}else {
+    			XuguWarningDialog warnDialog = new XuguWarningDialog(UIUtils.getActiveWorkbenchShell(), "Trigger name cannot be null");
+    			warnDialog.open();
+    		}
         }
 
     }

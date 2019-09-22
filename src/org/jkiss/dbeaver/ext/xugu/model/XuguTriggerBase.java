@@ -7,10 +7,14 @@ import org.jkiss.dbeaver.ext.xugu.model.source.XuguSourceObject;
 import org.jkiss.dbeaver.model.DBPEvaluationContext;
 import org.jkiss.dbeaver.model.DBPNamedObject;
 import org.jkiss.dbeaver.model.DBPQualifiedObject;
+import org.jkiss.dbeaver.model.DBPRefreshableObject;
+import org.jkiss.dbeaver.model.DBPScriptObjectExt;
 import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.edit.DBEPersistAction;
 import org.jkiss.dbeaver.model.exec.DBCException;
+import org.jkiss.dbeaver.model.impl.DBObjectNameCaseTransformer;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
+import org.jkiss.dbeaver.model.meta.IPropertyCacheValidator;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSObject;
@@ -18,13 +22,14 @@ import org.jkiss.dbeaver.model.struct.DBSObjectState;
 import org.jkiss.dbeaver.model.struct.rdb.DBSTrigger;
 import org.jkiss.dbeaver.ext.xugu.XuguUtils;
 import java.sql.ResultSet;
+import java.sql.Timestamp;
 import java.util.Map;
 
 /**
  * @author Maple4Real
  *   触发器基类，包含触发器基本信息
  */
-public abstract class XuguTriggerBase<PARENT extends DBSObject> extends XuguObject<PARENT> implements DBSTrigger, DBPQualifiedObject, XuguSourceObject
+public abstract class XuguTriggerBase<PARENT extends DBSObject> extends XuguObject<PARENT> implements DBSTrigger, DBPQualifiedObject, XuguSourceObject, DBPScriptObjectExt, DBPRefreshableObject
 {
     public enum BaseObjectType {
         TABLE,
@@ -54,18 +59,28 @@ public abstract class XuguTriggerBase<PARENT extends DBSObject> extends XuguObje
     private int triggerType;
     private int triggeringEvent;
     private int triggerTime;
-    private int obj_id;
+    private int id;
     private String refName;
     private XuguObjectStatus status;
     private boolean valid;
     private boolean deleted;
-    private String define;
+    protected String define;
     private String allDefine;
     private String triggerCondition;
+    private String comment;
+    private Timestamp createTime;
     
     public XuguTriggerBase(PARENT parent, String name)
     {
         super(parent, name, false);
+    }
+    
+    public static class CommentsValidator implements IPropertyCacheValidator<XuguTriggerBase> {
+        @Override
+        public boolean isPropertyCached(XuguTriggerBase object, Object propertyId)
+        {
+            return object.comment != null;
+        }
     }
 
     public XuguTriggerBase(
@@ -81,19 +96,27 @@ public abstract class XuguTriggerBase<PARENT extends DBSObject> extends XuguObje
         this.triggerCondition = JDBCUtils.safeGetString(dbResult, "TRIG_COND");
         //根据obj_id获取？是否代表列id？
         if(parent.getType().getTypeName().equals(XuguObjectType.TABLE.getTypeName())) {
-        	this.obj_id = JDBCUtils.safeGetInt(dbResult, "TABLE_ID");
+        	this.id = JDBCUtils.safeGetInt(dbResult, "TABLE_ID");
         }else {
-        	this.obj_id = JDBCUtils.safeGetInt(dbResult, "VIEW_ID");
+        	this.id = JDBCUtils.safeGetInt(dbResult, "VIEW_ID");
         }
         this.status = JDBCUtils.safeGetBoolean(dbResult, "ENABLE")?XuguObjectStatus.ENABLED:XuguObjectStatus.DISABLED;
         this.valid = JDBCUtils.safeGetBoolean(dbResult, "VALID");
         this.allDefine = JDBCUtils.safeGetString(dbResult, "DEFINE");
         this.define = allDefine.substring(allDefine.indexOf("BEGIN"));
+        this.comment = JDBCUtils.safeGetString(dbResult, "COMMENTS");
+        this.createTime = JDBCUtils.safeGetTimestamp(dbResult, "CREATE_TIME");
     }
 
     @NotNull
+    @Property(viewable = false, editable = false, valueTransformer = DBObjectNameCaseTransformer.class, order = -1)
+	public int getId() {
+		return id;
+	}
+
+    @NotNull
     @Override
-    @Property(viewable = true, editable = false, updatable = false, order = 1)
+    @Property(viewable = true, editable = true, updatable = false, valueTransformer = DBObjectNameCaseTransformer.class, order = 1)
     public String getName()
     {
         return super.getName();
@@ -109,7 +132,7 @@ public abstract class XuguTriggerBase<PARENT extends DBSObject> extends XuguObje
     	this.objectType = BaseObjectType.valueOf(type);
     }
     
-    @Property(viewable = true, editable = false, updatable = false, order = 5)
+    @Property(viewable = true, editable = false, updatable = false, order = 4)
     public String getTriggerType()
     {
     	switch(triggerType) {
@@ -126,7 +149,7 @@ public abstract class XuguTriggerBase<PARENT extends DBSObject> extends XuguObje
     	this.triggerType = type;
     }
     
-    @Property(viewable = true, editable = false, updatable = false, order = 6)
+    @Property(viewable = true, editable = false, updatable = false, order = 7)
     public String getTriggerCondition() {
     	return this.triggerCondition;
     }
@@ -135,7 +158,7 @@ public abstract class XuguTriggerBase<PARENT extends DBSObject> extends XuguObje
     	this.triggerCondition = condition;
     }
     
-    @Property(viewable = true, editable = false, updatable = false, order = 7)
+    @Property(viewable = true, editable = false, updatable = false, order = 5)
     public String getTriggeringEvent()
     {
     	switch(triggeringEvent) {
@@ -164,7 +187,7 @@ public abstract class XuguTriggerBase<PARENT extends DBSObject> extends XuguObje
     	this.triggeringEvent = event;
     }
     
-    @Property(viewable = true, editable = false, updatable = false, order = 8)
+    @Property(viewable = true, editable = false, updatable = false, order = 6)
     public String getTriggerTime()
     {
     	switch(triggerTime) {
@@ -175,7 +198,7 @@ public abstract class XuguTriggerBase<PARENT extends DBSObject> extends XuguObje
     	case 4:
     		return "AFTER";
     	default:
-    		return "NOT SUPPORTED "+triggerTime;
+    		return "INSTEAD OF";
     	}
     }
     
@@ -201,7 +224,7 @@ public abstract class XuguTriggerBase<PARENT extends DBSObject> extends XuguObje
     
     @Nullable
     @Override
-    @Property(multiline = true, order = 8)
+    //@Property(viewable = false, editable = true, updatable = false, multiline = true, order = 8)
     public String getDescription()
     {
         return allDefine;
@@ -224,6 +247,31 @@ public abstract class XuguTriggerBase<PARENT extends DBSObject> extends XuguObje
     public void setObjectDefinitionText(String source)
     {
         this.define = source;
+    }
+    
+    @NotNull
+    @Property(viewable = true, editable = false, valueTransformer = DBObjectNameCaseTransformer.class, order = 9)
+    public Timestamp getCreateTime() {
+    	return createTime;
+    }
+    
+
+    @NotNull
+    @Property(viewable = true, editable = true, updatable = true, valueTransformer = DBObjectNameCaseTransformer.class, order = 10)
+    public String getComment()
+    {
+    	return comment;
+    }
+    
+    @NotNull
+    @Property(viewable = true, editable = false, valueTransformer = DBObjectNameCaseTransformer.class, order = 11)
+    public boolean isValid() {
+    	return valid;
+    }
+    
+    public void setComment(String comment)
+    {
+        this.comment = comment;
     }
 
     @NotNull

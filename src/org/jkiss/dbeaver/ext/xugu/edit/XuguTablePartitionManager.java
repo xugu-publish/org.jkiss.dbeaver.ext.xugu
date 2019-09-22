@@ -26,6 +26,7 @@ import org.jkiss.dbeaver.ext.xugu.model.XuguTablePartition;
 import org.jkiss.dbeaver.ext.xugu.model.XuguTablePhysical;
 import org.jkiss.dbeaver.ext.xugu.views.XuguWarningDialog;
 import org.jkiss.dbeaver.model.DBPDataSource;
+import org.jkiss.dbeaver.model.DBPEvaluationContext;
 import org.jkiss.dbeaver.model.edit.DBECommandContext;
 import org.jkiss.dbeaver.model.edit.DBEPersistAction;
 import org.jkiss.dbeaver.model.impl.DBObjectNameCaseTransformer;
@@ -96,8 +97,9 @@ public class XuguTablePartitionManager extends SQLObjectEditor<XuguTablePartitio
 		//修改已存在表的分区时新增修改语句
 		if(command.getObject().getParentObject().isPersisted() == true) {
 			StringBuilder sql = new StringBuilder();
+			
 			sql.append("ALTER TABLE ");
-	    	sql.append(command.getObject().getParentObject().getName());
+	    	sql.append(command.getObject().getParentObject().getFullyQualifiedName(DBPEvaluationContext.DDL));
 	    	sql.append(" ADD PARTITION ");
 	    	sql.append(command.getObject().getName());
 	    	switch(command.getObject().getPartiType()) {
@@ -129,7 +131,7 @@ public class XuguTablePartitionManager extends SQLObjectEditor<XuguTablePartitio
     	//当表存在时才可进行删除action
     	if(command.getObject().getParentObject().isPersisted() == true) {
     		StringBuilder sql = new StringBuilder("ALTER TABLE ");
-        	sql.append(command.getObject().getParentObject().getName());
+    		sql.append(command.getObject().getParentObject().getFullyQualifiedName(DBPEvaluationContext.DDL));
         	sql.append(" DROP PARTITION ");
         	sql.append(command.getObject().getName());
         	
@@ -148,7 +150,7 @@ public class XuguTablePartitionManager extends SQLObjectEditor<XuguTablePartitio
     	//当表存在时才可进行修改action
     	if(command.getObject().getParentObject().isPersisted() == true && command.getProperty("online") != null) {
     		StringBuilder sql = new StringBuilder("ALTER TABLE ");
-        	sql.append(command.getObject().getParentObject().getName());
+    		sql.append(command.getObject().getParentObject().getFullyQualifiedName(DBPEvaluationContext.DDL));
         	sql.append(" SET PARTITION ");
         	sql.append("\"" + command.getObject().getName()+ "\"");
         	sql.append((boolean)command.getProperty("online")?" ONLINE":" OFFLINE");

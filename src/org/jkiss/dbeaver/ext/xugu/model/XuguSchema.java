@@ -993,6 +993,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         	sql.append("_SEQUENCES");
         	sql.append(" WHERE DB_ID=");
         	sql.append(owner.getDBID(owner, session));
+        	sql.append(" is_sys=false");
         	sql.append(" ORDER BY SEQ_NAME");
         	
         	log.debug("Xugu sequence metadata: "+sql.toString());

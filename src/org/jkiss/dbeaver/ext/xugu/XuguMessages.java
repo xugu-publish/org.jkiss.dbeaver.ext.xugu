@@ -88,6 +88,8 @@ public class XuguMessages extends NLS {
 	public static String dialog_trigger_event_insert;
 	public static String dialog_trigger_event_update;
 	public static String dialog_trigger_event_delete;
+	public static String dialog_trigger_type_row;
+	public static String dialog_trigger_type_statement;
 	public static String dialog_trigger_type;
 	public static String dialog_trigger_timing;
 	public static String dialog_trigger_condition;
