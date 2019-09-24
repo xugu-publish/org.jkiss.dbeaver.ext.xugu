@@ -86,6 +86,6 @@ public class XuguPlanAnalyser implements DBCPlan {
 
 	public List<? extends DBCPlanNode> getPlanNodes(Map<String, Object> options) {
 		// TODO Auto-generated method stub
-		return null;
+		return rootNodes;
 	}
 }
