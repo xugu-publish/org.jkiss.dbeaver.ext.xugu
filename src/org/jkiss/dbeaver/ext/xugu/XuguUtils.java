@@ -369,15 +369,46 @@ public class XuguUtils {
         throws DBCException
     {
         try (JDBCSession session = DBUtils.openMetaSession(monitor, object, "Refresh state of " + objectType.getTypeName() + " '" + object.getName() + "'")) {
-            try (JDBCPreparedStatement dbStat = session.prepareStatement(
-                "SELECT * FROM ALL_OBJECTS WHERE OBJ_TYPE=? AND SCHEMA_ID=? AND OBJ_NAME=?")) {
+        	String validSQL = "";
+        	switch(objectType) {
+        	case TABLE:
+        		validSQL = "SELECT VALID FROM ALL_TABLES WHERE SCHEMA_ID=? AND TABLE_NAME=?";
+        		break;
+        	case VIEW:
+        		validSQL = "SELECT VALID FROM ALL_VIEWS WHERE SCHEMA_ID=? AND VIEW_NAME=?";
+        		break;
+        	case PACKAGE:
+        		validSQL = "SELECT VALID FROM ALL_PACKAGES WHERE SCHEMA_ID=? AND PACK_NAME=?";
+        		break;
+        	case PROCEDURE:
+        		validSQL = "SELECT VALID FROM ALL_PROCEDURES WHERE SCHEMA_ID=? AND PROC_NAME=? AND RET_TYPE IS NULL";
+        		break;
+        	case FUNCTION:
+        		validSQL = "SELECT VALID FROM ALL_PROCEDURES WHERE SCHEMA_ID=? AND PROC_NAME=? AND RET_TYPE IS NOT NULL";
+        		break;
+        	case SYNONYM:
+        		validSQL = "SELECT VALID FROM ALL_SYNONYMS WHERE SCHEMA_ID=? AND SYNO_NAME=?";
+        		break;
+        	case INDEX:
+        		validSQL = "SELECT VALID FROM ALL_INDEXES WHERE TABLE_ID=? AND INDEX_NAME=?";
+        		break;
+        	case SEQUENCE:
+        		validSQL = "SELECT VALID FROM ALL_SEQUENCES WHERE SCHEMA_ID=? AND SEQ_NAME=?";
+        		break;
+        	case TRIGGER:
+        		validSQL = "SELECT VALID FROM ALL_TRIGGERS WHERE SCHEMA_ID=? AND TRIG_NAME=?";
+        		break;
+        		default:
+        			validSQL = "SELECT VALID FROM ALL_TABLES WHERE SCHEMA_ID=? AND TABLE_NAME=?";
+        			break;
+        	}
+            try (JDBCPreparedStatement dbStat = session.prepareStatement(validSQL)) {
                 //在xugu数据库中 obj_type字段为int类型
-            	dbStat.setString(1, objectType.getTypeName());
-                dbStat.setLong(2, object.getSchema().getId());
-                dbStat.setString(3, DBObjectNameCaseTransformer.transformObjectName(object, object.getName()));
+                dbStat.setLong(1, objectType == XuguObjectType.INDEX? object.getSchema().getId() : object.getSchema().getId());
+                dbStat.setString(2, DBObjectNameCaseTransformer.transformObjectName(object, object.getName()));
                 try (JDBCResultSet dbResult = dbStat.executeQuery()) {
                     if (dbResult.next()) {
-                        return true;
+                        return dbResult.getBoolean(1);
                     } else {
                         log.warn(objectType.getTypeName() + " '" + object.getName() + "' not found in system dictionary");
                         return false;

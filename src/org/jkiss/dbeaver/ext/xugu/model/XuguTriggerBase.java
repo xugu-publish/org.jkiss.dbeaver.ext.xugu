@@ -63,7 +63,6 @@ public abstract class XuguTriggerBase<PARENT extends DBSObject> extends XuguObje
     private String refName;
     private XuguObjectStatus status;
     private boolean valid;
-    private boolean deleted;
     protected String define;
     private String allDefine;
     private String triggerCondition;

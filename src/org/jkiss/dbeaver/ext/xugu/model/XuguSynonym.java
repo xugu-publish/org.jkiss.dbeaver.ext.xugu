@@ -43,7 +43,6 @@ public class XuguSynonym extends XuguSchemaObject implements DBSAlias {
     private String targetName;
     private boolean isPublic;
     private boolean valid;
-    private boolean deleted;
     private Timestamp createTime;
 
     public XuguSynonym(XuguSchema schema, String name)
@@ -167,14 +166,6 @@ public class XuguSynonym extends XuguSchemaObject implements DBSAlias {
 
 	public void setValid(boolean valid) {
 		this.valid = valid;
-	}
-
-	public boolean isDeleted() {
-		return deleted;
-	}
-
-	public void setDeleted(boolean deleted) {
-		this.deleted = deleted;
 	}
 
 	public void setCreateTime(Timestamp createTime) {
