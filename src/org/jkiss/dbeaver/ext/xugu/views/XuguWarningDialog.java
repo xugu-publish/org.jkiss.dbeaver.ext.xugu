@@ -32,7 +32,7 @@ public class XuguWarningDialog extends Dialog{
     @Override
     protected Control createDialogArea(Composite parent)
     {
-        getShell().setText(XuguMessages.dialog_schema_create_title);
+        getShell().setText(XuguMessages.dialog_warn_title);
 
         Control container = super.createDialogArea(parent);
         Composite composite = UIUtils.createPlaceholder((Composite) container, 2, 5);
