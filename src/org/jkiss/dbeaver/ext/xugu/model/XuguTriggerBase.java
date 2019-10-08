@@ -63,7 +63,6 @@ public abstract class XuguTriggerBase<PARENT extends DBSObject> extends XuguObje
     private String refName;
     private XuguObjectStatus status;
     private boolean valid;
-    private boolean deleted;
     protected String define;
     private String allDefine;
     private String triggerCondition;
@@ -149,7 +148,7 @@ public abstract class XuguTriggerBase<PARENT extends DBSObject> extends XuguObje
     	this.triggerType = type;
     }
     
-    @Property(viewable = true, editable = false, updatable = false, order = 7)
+    @Property(viewable = true, editable = true, updatable = true, order = 7)
     public String getTriggerCondition() {
     	return this.triggerCondition;
     }
