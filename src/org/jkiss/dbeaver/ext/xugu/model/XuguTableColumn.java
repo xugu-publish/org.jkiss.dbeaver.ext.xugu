@@ -64,7 +64,7 @@ public class XuguTableColumn extends JDBCTableColumn<XuguTableBase> implements D
     private String colHistory;
     private int domainID;
     private boolean deleted;
-    private boolean isVirtual;
+	private boolean isVirtual;
     private double repetRate;
     private double dispersion;
     private String maxVal;
@@ -304,6 +304,14 @@ public class XuguTableColumn extends JDBCTableColumn<XuguTableBase> implements D
     {
         return hidden;
     }
+
+    public boolean isDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(boolean deleted) {
+		this.deleted = deleted;
+	}
 
     public static class ColumnDataTypeListProvider implements IPropertyValueListProvider<XuguTableColumn> {
 

@@ -43,7 +43,6 @@ public class XuguSequence extends XuguSchemaObject implements DBSSequence {
     private boolean flagOrder;
     private boolean isSys;
 	private boolean valid;
-    private boolean deleted;
     private Timestamp createTime;
     private String comment;
     
@@ -74,7 +73,6 @@ public class XuguSequence extends XuguSchemaObject implements DBSSequence {
         this.flagOrder = JDBCUtils.safeGetBoolean(dbResult, "IS_ORDER");
         this.isSys = JDBCUtils.safeGetBoolean(dbResult, "IS_SYS");
         this.valid = JDBCUtils.safeGetBoolean(dbResult, "VALID");
-        this.deleted = JDBCUtils.safeGetBoolean(dbResult, "DELETED");
 
         this.createTime = JDBCUtils.safeGetTimestamp(dbResult, "CREATE_TIME");
         this.comment = JDBCUtils.safeGetString(dbResult, "COMMENTS");
@@ -204,14 +202,6 @@ public class XuguSequence extends XuguSchemaObject implements DBSSequence {
 
 	public void setValid(boolean valid) {
 		this.valid = valid;
-	}
-
-	public boolean isDeleted() {
-		return deleted;
-	}
-
-	public void setDeleted(boolean deleted) {
-		this.deleted = deleted;
 	}
 
 	public void setCreateTime(Timestamp createTime) {

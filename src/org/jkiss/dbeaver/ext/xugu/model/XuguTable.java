@@ -78,7 +78,6 @@ public class XuguTable extends XuguTablePhysical implements DBPScriptObject
     private boolean on_commit_del;
     private boolean ena_trans;
     private boolean ena_logging;
-    private boolean deleted;
     private int acl_mask;
 
     public XuguTable(XuguSchema schema, String name)
@@ -286,10 +285,6 @@ public class XuguTable extends XuguTablePhysical implements DBPScriptObject
 
 	public boolean isEna_logging() {
 		return ena_logging;
-	}
-
-	public boolean isDeleted() {
-		return deleted;
 	}
 
 	public int getAcl_mask() {

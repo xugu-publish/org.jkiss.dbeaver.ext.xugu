@@ -439,20 +439,21 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
     public Collection<DBSObject> getChildren(@NotNull DBRProgressMonitor monitor)
         throws DBException
     {
-        List<DBSObject> children = new ArrayList<>();
+        List<DBSObject> children = new ArrayList<DBSObject>();
         children.addAll(tableCache.getAllObjects(monitor, this));
         children.addAll(viewCache.getAllObjects(monitor, this));
-        children.addAll(constraintCache.getAllObjects(monitor, this));
-        children.addAll(foreignKeyCache.getAllObjects(monitor, this));
-//        children.addAll(triggerCache.getAllObjects(monitor, this));
-        children.addAll(indexCache.getAllObjects(monitor, this));
-//        children.addAll(dataTypeCache.getAllObjects(monitor, this));
+        //children.addAll(constraintCache.getAllObjects(monitor, this));
+        //children.addAll(foreignKeyCache.getAllObjects(monitor, this));
+        //children.addAll(triggerCache.getAllObjects(monitor, this));
+        //children.addAll(indexCache.getAllObjects(monitor, this));
+        //children.addAll(dataTypeCache.getAllObjects(monitor, this));
         children.addAll(sequenceCache.getAllObjects(monitor, this));
         children.addAll(packageCache.getAllObjects(monitor, this));
         children.addAll(synonymCache.getAllObjects(monitor, this));
         children.addAll(udtCache.getAllObjects(monitor, this));
-//        children.addAll(dbLinkCache.getAllObjects(monitor, this));
+        //children.addAll(dbLinkCache.getAllObjects(monitor, this));
         children.addAll(schedulerJobCache.getAllObjects(monitor, this));
+        
         return children;
     }
 
@@ -524,8 +525,8 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         indexCache.clearCache();
         packageCache.clearCache();
         proceduresCache.clearCache();
-//        triggerCache.clearCache();
-//        dataTypeCache.clearCache();
+        //triggerCache.clearCache();
+        //dataTypeCache.clearCache();
         sequenceCache.clearCache();
         synonymCache.clearCache();
         udtCache.clearCache();
@@ -585,10 +586,10 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         	StringBuilder sql = new StringBuilder();
         	sql.append("SELECT * FROM ");
 			sql.append(owner.roleFlag);
-			sql.append("_TABLES WHERE SCHEMA_ID=");
-			sql.append(owner.id);
-			sql.append(" AND DB_ID=");
+			sql.append("_TABLES WHERE DB_ID=");
 			sql.append(owner.getDBID(owner, session));
+			sql.append(" AND SCHEMA_ID=");
+			sql.append(owner.id);
         	//当有检索条件时 只查询指定表 用于新建表之后的刷新工作
         	if(object!=null) {
         		sql.append(" AND TABLE_ID = ");
@@ -993,7 +994,7 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         	sql.append("_SEQUENCES");
         	sql.append(" WHERE DB_ID=");
         	sql.append(owner.getDBID(owner, session));
-        	sql.append(" is_sys=false");
+        	sql.append(" and is_sys=false");
         	sql.append(" ORDER BY SEQ_NAME");
         	
         	log.debug("Xugu sequence metadata: "+sql.toString());
@@ -1020,10 +1021,10 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         	StringBuilder sql = new StringBuilder();
         	sql.append("SELECT * FROM ");
         	sql.append(owner.roleFlag);
-        	sql.append("_PROCEDURES WHERE SCHEMA_ID=");
-        	sql.append(owner.id);
-        	sql.append(" AND DB_ID=");
+        	sql.append("_PROCEDURES WHERE DB_ID=");
         	sql.append(owner.getDBID(owner, session));
+        	sql.append(" AND SCHEMA_ID=");
+        	sql.append(owner.id);
         	//当有检索条件时 只查询指定表 用于新建表之后的刷新工作
         	if(object!=null) {
         		sql.append(" AND PROC_ID = ");
@@ -1056,11 +1057,10 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         	StringBuilder sql = new StringBuilder();
         	sql.append("SELECT * FROM ");
         	sql.append(owner.roleFlag);
-        	sql.append("_PACKAGES WHERE SCHEMA_ID=");
-        	sql.append(owner.id);
-        	sql.append(" AND DB_ID=");
+        	sql.append("_PACKAGES WHERE DB_ID=");
         	sql.append(owner.getDBID(owner, session));
-        	
+        	sql.append(" AND SCHEMA_ID=");
+        	sql.append(owner.id);
         	log.debug("Xugu package metadata: "+sql.toString());
             JDBCPreparedStatement dbStat = session.prepareStatement(sql.toString());
             return dbStat;
@@ -1161,10 +1161,10 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         	StringBuilder sql = new StringBuilder();
         	sql.append("SELECT * FROM ");
         	sql.append(owner.roleFlag);
-        	sql.append("_VIEWS WHERE SCHEMA_ID=");
-        	sql.append(owner.getId());
-        	sql.append(" AND DB_ID=");
+        	sql.append("_VIEWS WHERE DB_ID=");
         	sql.append(owner.getDBID(owner, session));
+        	sql.append(" AND SCHEMA_ID=");
+        	sql.append(owner.getId());
         	if(object!=null) {
         		sql.append(" AND VIEW_ID=");
         		sql.append(object.getId());
