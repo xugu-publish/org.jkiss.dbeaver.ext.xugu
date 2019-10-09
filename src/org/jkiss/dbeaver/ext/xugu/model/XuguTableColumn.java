@@ -124,6 +124,7 @@ public class XuguTableColumn extends JDBCTableColumn<XuguTableBase> implements D
                 this.tableID = JDBCUtils.safeGetInt(dbResult, "VIEW_ID");
                 this.colNo = JDBCUtils.safeGetInt(dbResult, "COL_NO");
                 this.colName = JDBCUtils.safeGetString(dbResult, "COL_NAME");
+                this.timeStamp_t = JDBCUtils.safeGetString(dbResult, "TIMESTAMP_T");
                 this.typeName = JDBCUtils.safeGetString(dbResult, "TYPE_NAME");
                 this.varying = JDBCUtils.safeGetBoolean(dbResult, "VARYING");
                 setName(this.colName);
@@ -132,12 +133,12 @@ public class XuguTableColumn extends JDBCTableColumn<XuguTableBase> implements D
         	//对数据类型、精度标度进行统一处理
         	if("DATETIME".equals(this.typeName)) {
         		String t = JDBCUtils.safeGetString(dbResult, "TIMESTAMP_T");
-        		if("n".equals(t)) {
-        			this.typeName = "DATETIME";
-        		}else {
-        			this.typeName = "TIMESTAMP";
-        		}
-        	}
+        			if("n".equals(t)) {
+        				this.typeName = "DATETIME";
+        			}else {
+        				this.typeName = "TIMESTAMP";
+        			}					
+				}
         	else if("CHAR".equals(this.typeName)){
         		boolean v = JDBCUtils.safeGetBoolean(dbResult, "VARYING");
         		if(v) {
