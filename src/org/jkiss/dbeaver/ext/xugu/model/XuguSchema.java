@@ -994,6 +994,8 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         	sql.append("_SEQUENCES");
         	sql.append(" WHERE DB_ID=");
         	sql.append(owner.getDBID(owner, session));
+        	sql.append(" AND SCHEMA_ID=");
+        	sql.append(owner.getId());
         	sql.append(" and is_sys=false");
         	sql.append(" ORDER BY SEQ_NAME");
         	

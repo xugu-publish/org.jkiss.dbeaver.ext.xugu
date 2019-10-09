@@ -312,10 +312,10 @@ public class XuguDataSource extends JDBCDataSource
         return role == null ? connectionInfo.getUserName() : connectionInfo.getUserName() + " AS " + role;
     }
 
-    @Override
-    protected DBPDataSourceInfo createDataSourceInfo(@NotNull JDBCDatabaseMetaData metaData) {
-        return new JDBCDataSourceInfo(metaData);
-    }
+//    @Override
+//    protected DBPDataSourceInfo createDataSourceInfo(@NotNull JDBCDatabaseMetaData metaData) {
+//        return new JDBCDataSourceInfo(metaData);
+//    }
 
     @Override
     public ErrorType discoverErrorType(@NotNull Throwable error) {
@@ -865,18 +865,18 @@ public class XuguDataSource extends JDBCDataSource
         	//xfc 根据owner的用户角色选取不同的语句来查询schema
         	schemasQuery.append("select s.schema_id,s.schema_name,u.user_name,s.comments from ");
         	try {
-	        	if(owner.getRoleFlag()!=null && !"NULL".equals(owner.getRoleFlag())) {
-	        		schemasQuery.append(owner.getRoleFlag());
-	        	}else {
+//	        	if(owner.getRoleFlag()!=null && !"NULL".equals(owner.getRoleFlag())) {
+//	        		schemasQuery.append(owner.getRoleFlag());
+//	        	}else {
 	        		schemasQuery.append("ALL");
-	        	}
+//	        	}
 	        	schemasQuery.append("_SCHEMAS s");
 	        	schemasQuery.append(",");
-	        	if(owner.getRoleFlag()!=null && !"NULL".equals(owner.getRoleFlag())) {
-	        		schemasQuery.append(owner.getRoleFlag());
-	        	}else {
+//	        	if(owner.getRoleFlag()!=null && !"NULL".equals(owner.getRoleFlag())) {
+//	        		schemasQuery.append(owner.getRoleFlag());
+//	        	}else {
 	        		schemasQuery.append("ALL");
-	        	}
+//	        	}
 	        	schemasQuery.append("_USERS u");
 	        	schemasQuery.append(" where s.user_id=u.user_id and s.db_id=");
 				schemasQuery.append(owner.databaseCache.getObject(session.getProgressMonitor(), owner, dbName).getId());
@@ -884,7 +884,7 @@ public class XuguDataSource extends JDBCDataSource
 					schemasQuery.append(" and s.schema_name =");
 					schemasQuery.append(SQLUtils.quoteString(schema, schema.getName()));
 				}
-				schemasQuery.append(" order by s.schema_id asc");
+				schemasQuery.append(" order by s.schema_id asc limit 5");
 				log.debug("模式信息："+schemasQuery.toString());
 			} catch (DBException e) {
 				// TODO Auto-generated catch block

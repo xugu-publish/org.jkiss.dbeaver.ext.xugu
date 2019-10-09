@@ -45,7 +45,7 @@ public class XuguConstants {
     public static final String VIEW_DBA_TAB_PRIVS = "DBA_TAB_PRIVS";
 
     public static final String[] SYSTEM_SCHEMAS = {
-        "SYSDBA",
+//        "SYSDBA",
         "SYSAUDITOR",
         "SYSSSO",
         "GUEST",

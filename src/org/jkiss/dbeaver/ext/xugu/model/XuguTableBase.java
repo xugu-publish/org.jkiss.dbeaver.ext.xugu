@@ -254,13 +254,13 @@ public abstract class XuguTableBase extends JDBCTable<XuguDataSource, XuguSchema
     {
         getContainer().constraintCache.clearObjectCache(this);
         //刷新表
-//        if(this.tableType.getTypeName().equals(XuguObjectType.TABLE.getTypeName())) {
+        if(this.tableType.getTypeName().equals(XuguObjectType.TABLE.getTypeName())) {
         	return getContainer().tableCache.refreshObject(monitor, getContainer(), this);
-//        }
+        }
         //刷新视图
-//        else {
-//        	return getContainer().viewCache.refreshObject(monitor, getContainer(), (XuguView) this);
-//        }
+        else {
+        	return getContainer().viewCache.refreshObject(monitor, getContainer(), (XuguView) this);
+        }
         
     }
 
