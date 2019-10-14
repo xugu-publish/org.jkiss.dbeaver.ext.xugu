@@ -156,14 +156,14 @@ public class XuguConnectionPage extends ConnectionPageAbstract implements ICompo
         passwordText.setLayoutData(gd);
         passwordText.addModifyListener(textListener);
         
-        roleCombo = UIUtils.createLabelCombo(addrGroup, XuguMessages.dialog_connection_server_role, SWT.DROP_DOWN);
+        roleCombo = UIUtils.createLabelCombo(addrGroup, XuguMessages.dialog_connection_server_role, SWT.READ_ONLY);
         roleCombo.add(XuguMessages.dialog_connection_role_sysdba);
         roleCombo.add(XuguMessages.dialog_connection_role_dba);
         roleCombo.add(XuguMessages.dialog_connection_role_normal);
-
+        roleCombo.select(1);
         UIUtils.createHorizontalLine(addrGroup, 2, 10);
 
-        serverTimezoneCombo = UIUtils.createLabelCombo(addrGroup, XuguMessages.dialog_connection_server_timezone, SWT.DROP_DOWN);
+        serverTimezoneCombo = UIUtils.createLabelCombo(addrGroup, XuguMessages.dialog_connection_server_timezone, SWT.READ_ONLY);
         serverTimezoneCombo.add(XuguMessages.dialog_connection_auto_detect);
         {
             String[] tzList = TimeZone.getAvailableIDs();

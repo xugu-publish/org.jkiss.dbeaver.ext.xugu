@@ -216,13 +216,13 @@ public class XuguSchemaManager extends SQLObjectEditor<XuguSchema, XuguDataSourc
             getShell().setText(XuguMessages.dialog_schema_create_title);
 
             Control container = super.createDialogArea(parent);
-            Composite composite = UIUtils.createPlaceholder((Composite) container, 2, 5);
+            Composite composite = UIUtils.createPlaceholder((Composite) container, 2, 3);
             composite.setLayoutData(new GridData(GridData.FILL_BOTH));
 
             nameText = UIUtils.createLabelText(composite, XuguMessages.dialog_schema_name, null);
             nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-            schemaOwner = UIUtils.createLabelCombo(composite, XuguMessages.dialog_schema_user, 0);
+            schemaOwner = UIUtils.createLabelCombo(composite, XuguMessages.dialog_schema_user, 8);
             schemaOwner.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             try {
 				Collection<XuguUser> userList = this.dataSource.userCache.getAllObjects(monitor, this.dataSource);
@@ -237,7 +237,7 @@ public class XuguSchemaManager extends SQLObjectEditor<XuguSchema, XuguDataSourc
 				e.printStackTrace();
 			}
             
-            UIUtils.createInfoLabel(composite, XuguMessages.dialog_schema_create_info, GridData.FILL_HORIZONTAL, 2);
+            UIUtils.createInfoLabel(composite, XuguMessages.dialog_schema_create_info, GridData.FILL_HORIZONTAL, 4);
 
             return parent;
         }

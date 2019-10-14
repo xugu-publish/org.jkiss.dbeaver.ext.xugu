@@ -246,72 +246,71 @@ public class XuguStructureAssistant implements DBSStructureAssistant
         objectTypeClause.append(",'").append(XuguObjectType.SYNONYM.getTypeName()).append("'");
 
         // Seek for objects (join with public synonyms)
-        StringBuilder decl = new StringBuilder(100);
-        decl.append("select owner,object_name,object_type from (");
-        decl.append("(SELECT usr.user_name AS OWNER,obj.obj_name AS object_name,obj.obj_type AS object_type");
-        decl.append(" FROM ");
-        decl.append(schema.getRoleFlag());
-        decl.append("_objects obj ");
-        decl.append(" LEFT JOIN ");
-        decl.append(schema.getRoleFlag());
-        decl.append("_users usr ON usr.user_id = obj.user_id ");
-        decl.append(" WHERE obj.db_id=CURRENT_DB_ID ");
-        decl.append(" OBJ_TYPE IN (\" + objectTypeClause + \") AND OBJ_NAME LIKE ? ");
-        decl.append((schema != null ? " AND OWNER=?" : ""));
-        decl.append(")");
-        decl.append(" union all ");
-        decl.append("(SELECT usr.user_name AS OWNER,syn.syno_name AS object_name,'SYNONYM' AS object_type");
-        decl.append(" FROM ");
-        decl.append(schema.getRoleFlag());
-        decl.append("_synonyms syn ");
-        decl.append(" LEFT JOIN ");
-        decl.append(schema.getRoleFlag());
-        decl.append("_users usr ON usr.user_id = syn.user_id ");
-        decl.append(" WHERE syn.db_id=CURRENT_DB_ID ");
-        decl.append(" owner='PUBLIC' AND S.SYNO_NAME LIKE ? )");
-        decl.append(") order by object_name");
-        
-        log.debug("[Xugu] Objects Information: " + decl.toString());
-        try (JDBCPreparedStatement dbStat = session.prepareStatement(decl.toString())) {
-            if (!caseSensitive) {
-                objectNameMask = objectNameMask.toUpperCase();
-            }
-            dbStat.setString(1, objectNameMask);
-            if (schema != null) {
-                dbStat.setString(2, schema.getName());
-            }
-            dbStat.setString(schema != null ? 3 : 2, objectNameMask);
-            dbStat.setFetchSize(DBConstants.METADATA_FETCH_SIZE);
-            try (JDBCResultSet dbResult = dbStat.executeQuery()) {
-                while (objects.size() < maxResults && dbResult.next()) {
-                    if (session.getProgressMonitor().isCanceled()) {
-                        break;
-                    }
-                    final String schemaName = JDBCUtils.safeGetString(dbResult, "OWNER");
-                    final String objectName = JDBCUtils.safeGetString(dbResult, "OBJECT_NAME");
-                    final String objectTypeName = JDBCUtils.safeGetString(dbResult, "OBJECT_TYPE");
-                    final XuguObjectType objectType = XuguObjectType.getByType(objectTypeName);
-                    if (objectType != null && objectType != XuguObjectType.SYNONYM && objectType.isBrowsable() && xuguObjectTypes.contains(objectType)) {
-                        XuguSchema objectSchema = dataSource.getSchema(session.getProgressMonitor(), schemaName);
-                        if (objectSchema == null) {
-                            log.debug("Schema '" + schemaName + "' not found. Probably was filtered");
-                            continue;
-                        }
-                        objects.add(new AbstractObjectReference(objectName, objectSchema, null, objectType.getTypeClass(), objectType) {
-                            @Override
-                            public DBSObject resolveObject(DBRProgressMonitor monitor) throws DBException {
-                                XuguSchema tableSchema = (XuguSchema) getContainer();
-                                DBSObject object = objectType.findObject(session.getProgressMonitor(), tableSchema, objectName);
-                                if (object == null) {
-                                    throw new DBException(objectTypeName + " '" + objectName + "' not found in schema '" + tableSchema.getName() + "'");
-                                }
-                                return object;
-                            }
-                        });
-                    }
-                }
-            }
-        }
+//        StringBuilder decl = new StringBuilder(100);
+//        decl.append("select owner,object_name,object_type from (");
+//        decl.append("(SELECT usr.user_name AS OWNER,obj.obj_name AS object_name,obj.obj_type AS object_type");
+//        decl.append(" FROM ");
+//        decl.append(schema.getRoleFlag());
+//        decl.append("_objects obj ");
+//        decl.append(" LEFT JOIN ");
+//        decl.append(schema.getRoleFlag());
+//        decl.append("_users usr ON usr.user_id = obj.user_id ");
+//        decl.append(" WHERE obj.db_id=CURRENT_DB_ID ");
+//        decl.append(" OBJ_TYPE IN (\" + objectTypeClause + \") AND OBJ_NAME LIKE ? ");
+//        decl.append((schema != null ? " AND OWNER=?" : ""));
+//        decl.append(")");
+//        decl.append(" union all ");
+//        decl.append("(SELECT usr.user_name AS OWNER,syn.syno_name AS object_name,'SYNONYM' AS object_type");
+//        decl.append(" FROM ");
+//        decl.append(schema.getRoleFlag());
+//        decl.append("_synonyms syn ");
+//        decl.append(" LEFT JOIN ");
+//        decl.append(schema.getRoleFlag());
+//        decl.append("_users usr ON usr.user_id = syn.user_id ");
+//        decl.append(" WHERE syn.db_id=CURRENT_DB_ID ");
+//        decl.append(" owner='PUBLIC' AND S.SYNO_NAME LIKE ? )");
+//        decl.append(") order by object_name");
+//        log.debug("[Xugu] Objects Information: " + decl.toString());
+//        try (JDBCPreparedStatement dbStat = session.prepareStatement(decl.toString())) {
+//            if (!caseSensitive) {
+//                objectNameMask = objectNameMask.toUpperCase();
+//            }
+//            dbStat.setString(1, objectNameMask);
+//            if (schema != null) {
+//                dbStat.setString(2, schema.getName());
+//            }
+//            dbStat.setString(schema != null ? 3 : 2, objectNameMask);
+//            dbStat.setFetchSize(DBConstants.METADATA_FETCH_SIZE);
+//            try (JDBCResultSet dbResult = dbStat.executeQuery()) {
+//                while (objects.size() < maxResults && dbResult.next()) {
+//                    if (session.getProgressMonitor().isCanceled()) {
+//                        break;
+//                    }
+//                    final String schemaName = JDBCUtils.safeGetString(dbResult, "OWNER");
+//                    final String objectName = JDBCUtils.safeGetString(dbResult, "OBJECT_NAME");
+//                    final String objectTypeName = JDBCUtils.safeGetString(dbResult, "OBJECT_TYPE");
+//                    final XuguObjectType objectType = XuguObjectType.getByType(objectTypeName);
+//                    if (objectType != null && objectType != XuguObjectType.SYNONYM && objectType.isBrowsable() && xuguObjectTypes.contains(objectType)) {
+//                        XuguSchema objectSchema = dataSource.getSchema(session.getProgressMonitor(), schemaName);
+//                        if (objectSchema == null) {
+//                            log.debug("Schema '" + schemaName + "' not found. Probably was filtered");
+//                            continue;
+//                        }
+//                        objects.add(new AbstractObjectReference(objectName, objectSchema, null, objectType.getTypeClass(), objectType) {
+//                            @Override
+//                            public DBSObject resolveObject(DBRProgressMonitor monitor) throws DBException {
+//                                XuguSchema tableSchema = (XuguSchema) getContainer();
+//                                DBSObject object = objectType.findObject(session.getProgressMonitor(), tableSchema, objectName);
+//                                if (object == null) {
+//                                    throw new DBException(objectTypeName + " '" + objectName + "' not found in schema '" + tableSchema.getName() + "'");
+//                                }
+//                                return object;
+//                            }
+//                        });
+//                    }
+//                }
+//            }
+//        }
     }
 
 	@Override

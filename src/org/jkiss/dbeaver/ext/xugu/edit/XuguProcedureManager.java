@@ -110,7 +110,7 @@ public class XuguProcedureManager extends SQLObjectEditor<XuguProcedureStandalon
                 desc.append("-- Procedure/Function body --");
                 desc.append(GeneralUtils.getDefaultLineSeparator());
                 desc.append("END ");
-                desc.append(editPage.getProcedureName());
+//                desc.append(editPage.getProcedureName());
                 desc.append(";");
                 
                 procedure.setName(editPage.getProcedureName());
@@ -167,14 +167,14 @@ public class XuguProcedureManager extends SQLObjectEditor<XuguProcedureStandalon
             return;
         }
         //强制增加CREATE OR REPLACE关键字
-        String keyWord = XuguObjectType.PROCEDURE.getTypeName().equals(procedure.getProcedureType().toString())?XuguObjectType.PROCEDURE.getTypeName():XuguObjectType.FUNCTION.getTypeName();
-    	Pattern p = Pattern.compile("("+keyWord+")", Pattern.CASE_INSENSITIVE);
-        Matcher m = p.matcher(source);
-        if(m.find()) {
-        	keyWord = m.group(0);
-        }
-        int index = source.indexOf(keyWord);
-        source = "CREATE OR REPLACE " + keyWord.toUpperCase() + source.substring(index+keyWord.length());
+//        String keyWord = XuguObjectType.PROCEDURE.getTypeName().equals(procedure.getProcedureType().toString())?XuguObjectType.PROCEDURE.getTypeName():XuguObjectType.FUNCTION.getTypeName();
+//    	Pattern p = Pattern.compile("("+keyWord+")", Pattern.CASE_INSENSITIVE);
+//        Matcher m = p.matcher(source);
+//        if(m.find()) {
+//        	keyWord = m.group(0);
+//        }
+//        int index = source.indexOf(keyWord);
+//        source = "CREATE OR REPLACE " + keyWord.toUpperCase() + source.substring(index+keyWord.length());
         
         log.debug("[Xugu] Construct create procedure sql: "+source);
         actionList.add(new XuguObjectValidateAction(procedure, XuguObjectType.PROCEDURE, "Create procedure", source)); //$NON-NLS-2$

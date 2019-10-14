@@ -168,9 +168,13 @@ public class XuguUDT extends XuguSchemaObject
 
 	@Override
 	public String getTypeName() {
-		if(this.name.indexOf(".")!=-1) {
-			return this.name.split(".")[1];
-		}else {
+		if (name!=null) {
+			if(this.name.indexOf(".")!=-1) {
+				return this.name.split(".")[1];
+			}else {
+				return this.name;
+			}			
+		} else {
 			return this.name;
 		}
 	}

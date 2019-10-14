@@ -439,6 +439,7 @@ public class XuguDataSource extends JDBCDataSource
         throws DBException {
         super.refreshObject(monitor);
 
+        this.databaseCache.clearCache();
         this.schemaCache.clearCache();
         this.tablespaceCache.clearCache();
         this.userCache.clearCache();
@@ -799,7 +800,7 @@ public class XuguDataSource extends JDBCDataSource
     }
     
     //数据库缓存
-    static class DatabaseCache extends JDBCStructLookupCache<XuguDataSource, XuguDatabase, XuguSchema> {
+    public static class DatabaseCache extends JDBCStructLookupCache<XuguDataSource, XuguDatabase, XuguSchema> {
         
         public DatabaseCache() {
 			super("DB_NAME");

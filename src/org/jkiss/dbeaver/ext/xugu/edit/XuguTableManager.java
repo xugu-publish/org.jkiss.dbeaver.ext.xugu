@@ -121,7 +121,7 @@ public class XuguTableManager extends SQLTableManager<XuguTable, XuguSchema> imp
             //对字段注释做额外处理
             String commentInfo = (String) nestedCommand.getProperty("comment");
             String realComment = "";
-            if(!"".equals(commentInfo)) {
+            if(commentInfo!=null) {
             	realComment = " COMMENT '"+commentInfo+"'";
             }
             final String nestedDeclaration = nestedCommand.getNestedDeclaration(monitor, table, options)+realComment;

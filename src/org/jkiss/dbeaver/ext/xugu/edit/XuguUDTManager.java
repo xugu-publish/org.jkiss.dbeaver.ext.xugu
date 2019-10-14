@@ -59,6 +59,7 @@ public class XuguUDTManager extends SQLObjectEditor<XuguUDT, XuguSchema>{
                 }
 
                 XuguUDT udt = new XuguUDT(schema, page.getEntityName());
+                udt.setTypeName(page.getEntityName());
                 udt.setObjectDefinitionText("CREATE TYPE "+page.getEntityName()+" AS OBJECT");
                 udt.setExtendedDefinitionText("CREATE TYPE "+page.getEntityName()+" AS ");
                 udt.setValid(true);
@@ -73,6 +74,8 @@ public class XuguUDTManager extends SQLObjectEditor<XuguUDT, XuguSchema>{
 		String sql = null;
 		try {
 			sql = udt.getObjectDefinitionText(monitor, options);
+			sql += "\n";
+			sql += udt.getExtendedDefinitionText(monitor);
 		} catch (DBException e) {
 			// TODO Auto-generated catch block
 			log.error(e.getMessage(), e);

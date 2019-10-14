@@ -26,11 +26,14 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.ext.xugu.XuguMessages;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.model.XuguDataSource;
 import org.jkiss.dbeaver.ext.xugu.model.XuguDatabase;
+import org.jkiss.dbeaver.ext.xugu.model.XuguSchema;
 import org.jkiss.dbeaver.ext.xugu.views.XuguWarningDialog;
 import org.jkiss.dbeaver.ext.xugu.XuguUtils;
 import org.jkiss.dbeaver.model.DBPDataSource;
@@ -39,11 +42,15 @@ import org.jkiss.dbeaver.model.edit.DBEPersistAction;
 import org.jkiss.dbeaver.model.impl.DBObjectNameCaseTransformer;
 import org.jkiss.dbeaver.model.impl.DBSObjectCache;
 import org.jkiss.dbeaver.model.impl.edit.SQLDatabasePersistAction;
+import org.jkiss.dbeaver.model.impl.jdbc.JDBCDataSource;
 import org.jkiss.dbeaver.model.impl.sql.edit.SQLObjectEditor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.dbeaver.model.struct.DBSDataType;
+import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.ui.UITask;
 import org.jkiss.dbeaver.ui.UIUtils;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -56,6 +63,7 @@ import java.util.Map;
  */
 public class XuguDatabaseManager extends SQLObjectEditor<XuguDatabase, XuguDataSource> {
 
+	Control container;
     @Override
     public long getMakerOptions(DBPDataSource dataSource)
     {
@@ -107,8 +115,16 @@ public class XuguDatabaseManager extends SQLObjectEditor<XuguDatabase, XuguDataS
 
         log.debug("[Xugu] Construct create database sql: "+sql.toString());
         actions.add(new SQLDatabasePersistAction("Create database", sql));
+        
+        try {
+        	XuguDataSource sg = new XuguDataSource(monitor, null);
+        	sg.refreshObject(monitor);
+		} catch (DBException e) {
+			e.printStackTrace();
+		}
+      
     }
-
+    
     @Override
     protected void addObjectDeleteActions(List<DBEPersistAction> actions, ObjectDeleteCommand command, Map<String, Object> options)
     {
@@ -159,16 +175,16 @@ public class XuguDatabaseManager extends SQLObjectEditor<XuguDatabase, XuguDataS
             nameText = UIUtils.createLabelText(composite, XuguMessages.dialog_database_name, null);
             nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             
-            charsetCombo = UIUtils.createLabelCombo(composite, XuguMessages.dialog_database_charset, 0);
+            charsetCombo = UIUtils.createLabelCombo(composite, XuguMessages.dialog_database_charset, 8);
             for(int i=0; i<XuguConstants.DEFAULT_CHAR_SET.length; i++) {
             	charsetCombo.add(XuguConstants.DEFAULT_CHAR_SET[i]);
             }
             
-            isAddCombo = UIUtils.createLabelCombo(composite, XuguMessages.dialog_database_prefix, 0);
+            isAddCombo = UIUtils.createLabelCombo(composite, XuguMessages.dialog_database_prefix, 8);
             isAddCombo.add("+");
             isAddCombo.add("-");
             
-            hourCombo = UIUtils.createLabelCombo(composite, XuguMessages.dialog_database_hour, 0);
+            hourCombo = UIUtils.createLabelCombo(composite, XuguMessages.dialog_database_hour, 8);
             for(int i=0; i<24; i++) {
             	if(i<10) {
             		hourCombo.add("0"+i);
@@ -177,7 +193,7 @@ public class XuguDatabaseManager extends SQLObjectEditor<XuguDatabase, XuguDataS
             	}
             }
             
-            minuteCombo = UIUtils.createLabelCombo(composite, XuguMessages.dialog_database_minute, 0);
+            minuteCombo = UIUtils.createLabelCombo(composite, XuguMessages.dialog_database_minute, 8);
             for(int i=0; i<60; i++) {
             	if(i<10) {
             		minuteCombo.add("0"+i);

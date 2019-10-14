@@ -234,7 +234,7 @@ public class XuguTablePartitionManager extends SQLObjectEditor<XuguTablePartitio
             nameText = UIUtils.createLabelText(composite, XuguMessages.dialog_tablePartition_name, null);
             nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             
-            typeCombo = UIUtils.createLabelCombo(composite, XuguMessages.dialog_tablePartition_type, 0);
+            typeCombo = UIUtils.createLabelCombo(composite, XuguMessages.dialog_tablePartition_type, 8);
             typeCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             typeCombo.add("LIST");
             typeCombo.add("RANGE");
@@ -244,7 +244,7 @@ public class XuguTablePartitionManager extends SQLObjectEditor<XuguTablePartitio
             valueText = UIUtils.createLabelText(composite, XuguMessages.dialog_tablePartition_value, null);
             valueText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             
-            colCombo = UIUtils.createLabelCombo(composite, XuguMessages.dialog_tablePartition_col_Combo_label, 0);
+            colCombo = UIUtils.createLabelCombo(composite, XuguMessages.dialog_tablePartition_col_Combo_label, 8);
             colCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             //加载字段信息
             try {
