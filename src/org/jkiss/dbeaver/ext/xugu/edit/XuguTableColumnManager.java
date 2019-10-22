@@ -17,6 +17,7 @@
  */
 package org.jkiss.dbeaver.ext.xugu.edit;
 
+import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.ext.xugu.model.XuguDataType;
@@ -54,6 +55,8 @@ import java.util.Map;
  * 进行字段的创建，修改和删除（均相当于修改表结构）
  */
 public class XuguTableColumnManager extends SQLTableColumnManager<XuguTableColumn, XuguTableBase> implements DBEObjectRenamer<XuguTableColumn> {
+
+    String first = null;
 
     @Nullable
     @Override
@@ -147,25 +150,29 @@ public class XuguTableColumnManager extends SQLTableColumnManager<XuguTableColum
         			switch(key) {
         			case "defaultValue":
         				if(command.getProperty("defaultValue").equals("")) {
-        					sql += column.getName() + " DROP DEFAULT";
+        					sql += "\"" + column.getName() + "\"" + " DROP DEFAULT";
         				}else {
-        					sql += column.getName() +" SET DEFAULT '" + command.getProperty("defaultValue")+"'";
+        					sql += "\"" + column.getName() + "\"" +" SET DEFAULT '" + command.getProperty("defaultValue")+"'";
         				}
         				break;
         			case "required":
         				if((boolean)command.getProperty("required")) {
-        					sql += column.getName() +" SET NOT NULL";
+        					sql +=  "\"" + column.getName() + "\"" +" SET NOT NULL";
         				}else {
-        					sql += column.getName() +" DROP NOT NULL";
+        					sql += "\"" + column.getName() + "\"" +" DROP NOT NULL";
         				}
         				break;
         			default:
         				sql += getXuguNestedDeclaration(monitor, column.getTable(), command, options);
         				break;
         			}
-        			
-        			log.debug("[Xugu] Construct alter table column sql: "+sql);
-        			actionList.add(new SQLDatabasePersistAction("Modify column",sql)); 
+        			if (first!=null&&first.equals(sql)) {
+						continue;
+					} else {
+						first = sql;
+						log.debug("[Xugu] Construct alter table column sql: "+sql);
+						actionList.add(new SQLDatabasePersistAction("Modify column",sql)); 
+					}
         		}
         	}
         }

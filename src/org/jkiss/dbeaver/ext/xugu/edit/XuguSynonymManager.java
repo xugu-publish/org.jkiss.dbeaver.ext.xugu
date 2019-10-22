@@ -81,7 +81,7 @@ public class XuguSynonymManager extends SQLObjectEditor<XuguSynonym, XuguSchema>
 		if(synonym.isPublic()) {
 			sql += "PUBLIC ";
 		}
-		sql += "SYNONYM " + synonym.getName() + " FOR " + synonym.getTargetName();
+		sql += "SYNONYM " + synonym.getParentObject().getName() + "." + synonym.getName() + " FOR " + synonym.getTargetName();
 		
 		log.debug("[Xugu] Construct create synonym sql: "+sql);
 		actions.add(new SQLDatabasePersistAction("Create synonym", sql));
@@ -95,7 +95,7 @@ public class XuguSynonymManager extends SQLObjectEditor<XuguSynonym, XuguSchema>
 		if(synonym.isPublic()) {
 			sql += "PUBLIC ";
 		}
-		sql+="SYNONYM " + DBUtils.getQuotedIdentifier(synonym);
+		sql+="SYNONYM " + synonym.getParentObject().getName() + "." + DBUtils.getQuotedIdentifier(synonym);
 		
 		log.debug("[Xugu] Construct drop synonym sql: "+ sql);
 		actions.add(new SQLDatabasePersistAction("Drop synonym", sql));

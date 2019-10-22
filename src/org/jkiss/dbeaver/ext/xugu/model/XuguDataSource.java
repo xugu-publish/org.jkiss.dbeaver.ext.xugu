@@ -885,7 +885,7 @@ public class XuguDataSource extends JDBCDataSource
 					schemasQuery.append(" and s.schema_name =");
 					schemasQuery.append(SQLUtils.quoteString(schema, schema.getName()));
 				}
-				schemasQuery.append(" order by s.schema_id asc limit 5");
+				schemasQuery.append(" order by s.schema_id asc");
 				log.debug("模式信息："+schemasQuery.toString());
 			} catch (DBException e) {
 				// TODO Auto-generated catch block

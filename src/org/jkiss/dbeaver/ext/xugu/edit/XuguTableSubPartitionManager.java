@@ -82,7 +82,7 @@ public class XuguTableSubPartitionManager extends SQLObjectEditor<XuguTableSubPa
 		new UITask<String>() {
 			@Override
 			protected String runTask() {
-				WarningDialog dialog2 = new WarningDialog(UIUtils.getActiveWorkbenchShell(), "You can not add partition on a table without any partitions");       
+				WarningDialog dialog2 = new WarningDialog(UIUtils.getActiveWorkbenchShell(), "不能再没有任何分区的表上新建分区");       
                 if (dialog2.open() != IDialogConstants.OK_ID) {
                     return null;
                 }
@@ -148,7 +148,7 @@ public class XuguTableSubPartitionManager extends SQLObjectEditor<XuguTableSubPa
     	}
     }
     
-    static class WarningDialog extends Dialog{
+    public static class WarningDialog extends Dialog{
     	private String warningInfo;
     	public WarningDialog(Shell parentShell, String info)
         {
@@ -215,7 +215,7 @@ public class XuguTableSubPartitionManager extends SQLObjectEditor<XuguTableSubPa
             nameText = UIUtils.createLabelText(composite, XuguMessages.dialog_tablePartition_name, null);
             nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             
-            typeCombo = UIUtils.createLabelCombo(composite, "Type", 0);
+            typeCombo = UIUtils.createLabelCombo(composite, "Type", 8);
             typeCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             typeCombo.add("LIST");
             typeCombo.add("RANGE");
@@ -224,7 +224,7 @@ public class XuguTableSubPartitionManager extends SQLObjectEditor<XuguTableSubPa
             valueText = UIUtils.createLabelText(composite, XuguMessages.dialog_tablePartition_value, null);
             valueText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             
-            colCombo = UIUtils.createLabelCombo(composite, "column", 0);
+            colCombo = UIUtils.createLabelCombo(composite, "column", 8);
             colCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             try {
 				Collection<XuguTableColumn> cols = table.getAttributes(monitor);

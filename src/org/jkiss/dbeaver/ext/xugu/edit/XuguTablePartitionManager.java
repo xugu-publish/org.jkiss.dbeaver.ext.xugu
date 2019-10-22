@@ -56,38 +56,38 @@ public class XuguTablePartitionManager extends SQLObjectEditor<XuguTablePartitio
     {
 		XuguTablePhysical parent = (XuguTablePhysical)container;
 		//禁止对没有分区定义的表进行添加分区操作
-		if(parent.partitionCache!=null || parent.isPersisted()==false) {
-			return new UITask<XuguTablePartition>() {
-	            @Override
-	            protected XuguTablePartition runTask() {
-	            	NewTablePartitionDialog dialog = new NewTablePartitionDialog(UIUtils.getActiveWorkbenchShell(), monitor, parent);
-	                if (dialog.open() != IDialogConstants.OK_ID) {
-	                    return null;
-	                }
-	                XuguTablePartition newTablePartition = dialog.getTablePartition();
-	                if(parent.isPersisted()) {
-	                	ArrayList<XuguTablePartition> partList = (ArrayList<XuguTablePartition>) parent.partitionCache.getCachedObjects();
-	                    if(partList.size()!=0) {
-	                    	XuguTablePartition model = partList.get(0);
-	                    	newTablePartition.setPartiType(model.getPartiType());
-	                    	newTablePartition.setPartiKey(model.getPartiKey());
-	                    }
-	                }
-	                return newTablePartition;
-	            }
-			}.execute();
+		if(parent.isPersisted()==true&&parent.partitionCache.getCachedObjects().size()==0) {
+			new UITask<String>() {
+				@Override
+				protected String runTask() {
+					WarningDialog dialog2 = new WarningDialog(UIUtils.getActiveWorkbenchShell(), "不能再没有任何分区的表上新建分区");       
+					if (dialog2.open() != IDialogConstants.OK_ID) {
+						return null;
+					}
+					return null;
+				}
+			}.execute();   
+			return null;
 		}
-		new UITask<String>() {
+		return new UITask<XuguTablePartition>() {
 			@Override
-			protected String runTask() {
-				WarningDialog dialog2 = new WarningDialog(UIUtils.getActiveWorkbenchShell(), "You can not add partition on a table without any partitions");       
-                if (dialog2.open() != IDialogConstants.OK_ID) {
-                    return null;
-                }
-				return null;
+			protected XuguTablePartition runTask() {
+				NewTablePartitionDialog dialog = new NewTablePartitionDialog(UIUtils.getActiveWorkbenchShell(), monitor, parent);
+				if (dialog.open() != IDialogConstants.OK_ID) {
+					return null;
+				}
+				XuguTablePartition newTablePartition = dialog.getTablePartition();
+				if(parent.isPersisted()) {
+					ArrayList<XuguTablePartition> partList = (ArrayList<XuguTablePartition>) parent.partitionCache.getCachedObjects();
+					if(partList.size()!=0) {
+						XuguTablePartition model = partList.get(0);
+						newTablePartition.setPartiType(model.getPartiType());
+						newTablePartition.setPartiKey(model.getPartiKey());
+					}
+				}
+				return newTablePartition;
 			}
-    	}.execute();   
-    	return null;
+		}.execute();
     }
 
 	@Override
@@ -301,13 +301,13 @@ public class XuguTablePartitionManager extends SQLObjectEditor<XuguTablePartitio
     					if((index = text.indexOf(newCol))!=-1) {
     						text = text.substring(0, index)+text.substring(index+newCol.length());
     						//处理首尾逗号
-    						if(text.indexOf(",")==0) {
-    							text = text.substring(1);
-    						}else if(text.lastIndexOf(",")==text.length()-1) {
-    							text = text.substring(0, text.length()-1);
-    						}
+//    						if(text.indexOf(",")==0) {
+//    							text = text.substring(1);
+//    						}else if(text.lastIndexOf(",")==text.length()-1) {
+//    							text = text.substring(0, text.length()-1);
+//    						}
     						//处理位于中间的逗号
-    						text.replaceAll(",,", ",");
+//    						text.replaceAll(",,", ",");
     					}
     				}
     				colText.setText(text);

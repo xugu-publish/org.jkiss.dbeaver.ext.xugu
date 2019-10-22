@@ -16,6 +16,8 @@
  */
 package org.jkiss.dbeaver.ext.xugu.views;
 
+import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogPage;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
@@ -28,17 +30,19 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.Text;
 import org.jkiss.dbeaver.ext.xugu.Activator;
 import org.jkiss.dbeaver.ext.xugu.XuguConstants;
 import org.jkiss.dbeaver.ext.xugu.XuguMessages;
-import org.jkiss.dbeaver.ext.xugu.XuguUtils;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.ui.ICompositeDialogPage;
+import org.jkiss.dbeaver.ui.UITask;
 import org.jkiss.dbeaver.ui.UIUtils;
 import org.jkiss.dbeaver.ui.controls.TextWithOpenFolder;
 import org.jkiss.dbeaver.ui.dialogs.connection.ClientHomesSelector;
@@ -46,7 +50,6 @@ import org.jkiss.dbeaver.ui.dialogs.connection.ConnectionPageAbstract;
 import org.jkiss.dbeaver.ui.dialogs.connection.DriverPropertiesDialogPage;
 import org.jkiss.utils.CommonUtils;
 
-import java.util.Arrays;
 import java.util.Locale;
 import java.util.TimeZone;
 /**
@@ -157,10 +160,9 @@ public class XuguConnectionPage extends ConnectionPageAbstract implements ICompo
         passwordText.addModifyListener(textListener);
         
         roleCombo = UIUtils.createLabelCombo(addrGroup, XuguMessages.dialog_connection_server_role, SWT.READ_ONLY);
+        roleCombo.add(XuguMessages.dialog_connection_role_normal);
         roleCombo.add(XuguMessages.dialog_connection_role_sysdba);
         roleCombo.add(XuguMessages.dialog_connection_role_dba);
-        roleCombo.add(XuguMessages.dialog_connection_role_normal);
-        roleCombo.select(1);
         UIUtils.createHorizontalLine(addrGroup, 2, 10);
 
         serverTimezoneCombo = UIUtils.createLabelCombo(addrGroup, XuguMessages.dialog_connection_server_timezone, SWT.READ_ONLY);
@@ -240,7 +242,7 @@ public class XuguConnectionPage extends ConnectionPageAbstract implements ICompo
             passwordText.setText(CommonUtils.notEmpty(connectionInfo.getUserPassword()));
         }
         if (roleCombo != null) {
-            roleCombo.select(2);
+            roleCombo.setText(CommonUtils.notEmpty(connectionInfo.getServerName()));
         }
         if (serverTimezoneCombo != null) {
             String tzProp = connectionInfo.getProviderProperty(XuguConstants.PROP_SERVER_TIMEZONE);
@@ -275,6 +277,7 @@ public class XuguConnectionPage extends ConnectionPageAbstract implements ICompo
         if (passwordText != null) {
             connectionInfo.setUserPassword(passwordText.getText());
         }
+        connectionInfo.setServerName(roleCombo.getText());
         if (serverTimezoneCombo != null) {
             if (serverTimezoneCombo.getSelectionIndex() == 0 || CommonUtils.isEmpty(serverTimezoneCombo.getText())) {
                 connectionInfo.removeProviderProperty(XuguConstants.PROP_SERVER_TIMEZONE);
@@ -283,13 +286,52 @@ public class XuguConnectionPage extends ConnectionPageAbstract implements ICompo
             }
         }
         //xfc 根据下拉框设置用户选择的角色
-        connectionInfo.setProviderProperty(XuguConstants.PROP_INTERNAL_LOGON, roleCombo.getText().toUpperCase(Locale.ENGLISH));
+        if (roleCombo.getText().equals("SYSDBA")&&(!connectionInfo.getUserName().equals("SYSDBA")||!dbText.getText().equals("SYSTEM"))) {
+        	new UITask<String>() {
+        		@Override
+        		protected String runTask() {
+        			WarningDialog dialog2 = new WarningDialog(UIUtils.getActiveWorkbenchShell(), "登陆失败，SYSDBA角色仅针对系统库超级管理员开放");       
+        			if (dialog2.open() != IDialogConstants.OK_ID) {
+        				return null;
+        			}
+        			return null;
+        		}
+        	}.execute(); 
+        	} else {
+			connectionInfo.setProviderProperty(XuguConstants.PROP_INTERNAL_LOGON, roleCombo.getText().toUpperCase(Locale.ENGLISH));						
+		}
+//        if (roleCombo.getText()=="SYSDBA"||) {
+//			
+//		} 
         
 //        if (homesSelector != null) {
 //              connectionInfo.setClientHomeId(homesSelector.getSelectedHome());
 //        }
     }
 
+    static class WarningDialog extends Dialog{
+    	private String warningInfo;
+    	public WarningDialog(Shell parentShell, String info)
+        {
+    		super(parentShell);
+    		this.warningInfo = info;
+        }
+    	@Override
+        protected Control createDialogArea(Composite parent)
+        {
+            getShell().setText(XuguMessages.dialog_connection_connection);
+
+            Control container = super.createDialogArea(parent);
+            Composite composite = UIUtils.createPlaceholder((Composite) container, 2, 5);
+            composite.setLayoutData(new GridData(GridData.FILL_BOTH));
+            
+            Label infoText = UIUtils.createLabel(composite, "Warning:"+this.warningInfo);
+            infoText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+            
+            return parent;
+        }
+    }
+    
     private void updateUI()
     {
         if (activated) {

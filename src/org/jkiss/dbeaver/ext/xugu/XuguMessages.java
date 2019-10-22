@@ -47,6 +47,7 @@ public class XuguMessages extends NLS {
 	public static String dialog_connection_role_normal;
 	public static String dialog_connection_auto_detect;
 	public static String dialog_connection_local_client;
+	public static String dialog_connection_connection;
 	public static String dialog_warn_title;
 	public static String dialog_database_name;
 	public static String dialog_database_charset;

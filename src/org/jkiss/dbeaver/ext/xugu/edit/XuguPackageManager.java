@@ -86,12 +86,12 @@ public class XuguPackageManager extends SQLObjectEditor<XuguPackage, XuguSchema>
                 	schema,
                     packName);
                 xuguPackage.setObjectDefinitionText(
-                    "CREATE OR REPLACE PACKAGE " + packName + "\n" +
+                    "CREATE OR REPLACE PACKAGE " + schema.getName() + "." + packName + "\n" +
                     "AS\n" +
                     "-- Package header\n" +
                     "END " + packName +";");
                 xuguPackage.setExtendedDefinitionText(
-                    "CREATE OR REPLACE PACKAGE BODY " + packName + "\n" +
+                    "CREATE OR REPLACE PACKAGE BODY " + schema.getName() + "." + packName + "\n" +
                         "AS\n" +
                         "-- Package body\n" +
                         "END " + packName +";");

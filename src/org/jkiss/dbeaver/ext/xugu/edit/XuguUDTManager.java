@@ -60,8 +60,8 @@ public class XuguUDTManager extends SQLObjectEditor<XuguUDT, XuguSchema>{
 
                 XuguUDT udt = new XuguUDT(schema, page.getEntityName());
                 udt.setTypeName(page.getEntityName());
-                udt.setObjectDefinitionText("CREATE TYPE "+page.getEntityName()+" AS OBJECT");
-                udt.setExtendedDefinitionText("CREATE TYPE "+page.getEntityName()+" AS ");
+                udt.setObjectDefinitionText("CREATE TYPE "+ schema.getName() + "." + page.getEntityName()+" AS OBJECT");
+                udt.setExtendedDefinitionText("CREATE TYPE BODY "+ schema.getName() + "."+ page.getEntityName()+" AS ");
                 udt.setValid(true);
                 return udt;
             }

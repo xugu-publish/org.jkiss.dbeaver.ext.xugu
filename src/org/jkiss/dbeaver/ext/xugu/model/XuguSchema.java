@@ -585,7 +585,8 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         	//xfc 根据schema name 查询所有表信息
         	StringBuilder sql = new StringBuilder();
         	sql.append("SELECT * FROM ");
-			sql.append(owner.roleFlag);
+//			sql.append(owner.roleFlag);
+        	sql.append("all");
 			sql.append("_TABLES WHERE DB_ID=");
 			sql.append(owner.getDBID(owner, session));
 			sql.append(" AND SCHEMA_ID=");
@@ -626,10 +627,12 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         	//xfc 修改了获取列信息的sql
             StringBuilder sql = new StringBuilder(500);
             sql.append("SELECT COL.*,TAB.TABLE_NAME FROM ");
-        	sql.append(owner.roleFlag);
+//        	sql.append(owner.roleFlag);
+        	sql.append("all");
         	sql.append("_COLUMNS COL");
         	sql.append(" LEFT JOIN ");
-        	sql.append(owner.roleFlag);
+//        	sql.append(owner.roleFlag);
+        	sql.append("all");
         	sql.append("_TABLES TAB ON TAB.TABLE_ID=COL.TABLE_ID");
         	sql.append(" WHERE COL.DB_ID=");
         	sql.append(owner.getDBID(owner, session));
@@ -677,11 +680,14 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         	//xfc 修改了获取约束信息的sql
             StringBuilder sql = new StringBuilder(500);
             sql.append("SELECT DISTINCT *, DEFINE AS COL_NAME, table_name FROM ");
-        	sql.append(owner.roleFlag);
+//        	sql.append(owner.roleFlag);
+        	sql.append("all");
         	sql.append("_CONSTRAINTS INNER JOIN (SELECT s.SCHEMA_NAME, t.TABLE_ID,t.table_name FROM ");
-            sql.append(owner.roleFlag);
+//            sql.append(owner.roleFlag);
+        	sql.append("all");
             sql.append("_SCHEMAS s INNER JOIN ");
-            sql.append(owner.roleFlag);
+//            sql.append(owner.roleFlag);
+        	sql.append("all");
             sql.append("_TABLES t USING(SCHEMA_ID) ");
             if (forTable != null) {
                 sql.append("WHERE TABLE_ID=");
@@ -797,20 +803,25 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
             sql.append("SELECT f.*,s.schema_name,t.table_name, f.DEFINE AS COL_NAME,"
             		+ " t2.TABLE_NAME AS REF_TABLE_NAME,"
             		+ " f2.CONS_NAME AS REF_NAME FROM ");
-        	sql.append(owner.roleFlag);
+//        	sql.append(owner.roleFlag);
+        	sql.append("all");
         	sql.append("_CONSTRAINTS f INNER JOIN (SELECT s.SCHEMA_NAME, t.TABLE_ID, t.table_name FROM ");
-            sql.append(owner.roleFlag);
+//            sql.append(owner.roleFlag);
+        	sql.append("all");
             sql.append("_SCHEMAS s INNER JOIN ");
-            sql.append(owner.roleFlag);
+//            sql.append(owner.roleFlag);
+        	sql.append("all");
             sql.append("_TABLES t USING(SCHEMA_ID) ");
             if (forTable != null) {
                 sql.append("WHERE TABLE_ID=");
                 sql.append(forTable.getId());
             }
             sql.append(") USING(TABLE_ID) INNER JOIN (SELECT t2.TABLE_NAME, t2.TABLE_ID FROM ");
-            sql.append(owner.roleFlag);
+//            sql.append(owner.roleFlag);
+        	sql.append("all");
             sql.append("_TABLES t2) ON f.REF_TABLE_ID=t2.TABLE_ID JOIN ");
-            sql.append(owner.roleFlag);
+//            sql.append(owner.roleFlag);
+        	sql.append("all");
             sql.append("_CONSTRAINTS f2 ON f.REF_TABLE_ID=f2.TABLE_ID ");
             sql.append("WHERE CONS_TYPE='F' AND DB_ID=");
             sql.append(owner.getDBID(owner, session));
@@ -892,10 +903,12 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         	//xfc 修改了获取索引信息的sql
             StringBuilder sql = new StringBuilder();
             sql.append("SELECT IDX.*,TAB.TABLE_NAME FROM ");
-            sql.append(owner.roleFlag);
+//          sql.append(owner.roleFlag);
+        	sql.append("all");
             sql.append("_INDEXES IDX ");
             sql.append(" LEFT JOIN ");
-            sql.append(owner.roleFlag);
+//            sql.append(owner.roleFlag);
+        	sql.append("all");
             sql.append("_TABLES TAB ON IDX.TABLE_ID=TAB.TABLE_ID ");
             sql.append(" WHERE IDX.DB_ID=");
             sql.append(owner.getDBID(owner, session));
@@ -990,7 +1003,8 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         	//xfc 修改了获取sequence信息的sql
         	StringBuilder sql = new StringBuilder();
         	sql.append("SELECT * FROM ");
-        	sql.append(owner.roleFlag);
+//        	sql.append(owner.roleFlag);
+        	sql.append("all");
         	sql.append("_SEQUENCES");
         	sql.append(" WHERE DB_ID=");
         	sql.append(owner.getDBID(owner, session));
@@ -1022,7 +1036,8 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
             //xfc 修改了获取存储过程信息的sql语句
         	StringBuilder sql = new StringBuilder();
         	sql.append("SELECT * FROM ");
-        	sql.append(owner.roleFlag);
+//        	sql.append(owner.roleFlag);
+        	sql.append("all");
         	sql.append("_PROCEDURES WHERE DB_ID=");
         	sql.append(owner.getDBID(owner, session));
         	sql.append(" AND SCHEMA_ID=");
@@ -1058,7 +1073,8 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         	//xfc 修改了获取所有包信息的sql语句
         	StringBuilder sql = new StringBuilder();
         	sql.append("SELECT * FROM ");
-        	sql.append(owner.roleFlag);
+//        	sql.append(owner.roleFlag);
+        	sql.append("all");
         	sql.append("_PACKAGES WHERE DB_ID=");
         	sql.append(owner.getDBID(owner, session));
         	sql.append(" AND SCHEMA_ID=");
@@ -1087,10 +1103,12 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         	//xfc 修改了获取同义词信息的语句
         	StringBuilder sql = new StringBuilder();
         	sql.append("select syn.*,sch.schema_name from ");
-        	sql.append(owner.roleFlag);
+//        	sql.append(owner.roleFlag);
+        	sql.append("all");
         	sql.append("_SYNONYMS syn ");
         	sql.append("left join ");
-        	sql.append(owner.roleFlag);
+//        	sql.append(owner.roleFlag);
+        	sql.append("all");
         	sql.append("_SCHEMAS sch ");
         	sql.append("on syn.targ_sche_id=sch.schema_id ");
         	sql.append("WHERE SYN.SCHEMA_ID=");
@@ -1122,9 +1140,11 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         	//xfc 修改了获取同义词信息的语句
         	StringBuilder sql = new StringBuilder();
         	sql.append("SELECT t.*,s.schema_name FROM ");
-        	sql.append(owner.roleFlag);
+//        	sql.append(owner.roleFlag);
+        	sql.append("all");
         	sql.append("_TYPES t left join ");
-        	sql.append(owner.roleFlag);
+//        	sql.append(owner.roleFlag);
+        	sql.append("all");
         	sql.append("_SCHEMAS s on t.schema_id=s.schema_id ");
         	sql.append("WHERE t.SCHEMA_ID=");
         	sql.append(owner.id);
@@ -1162,7 +1182,8 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         	//xfc 修改了获取所有视图信息的sql
         	StringBuilder sql = new StringBuilder();
         	sql.append("SELECT * FROM ");
-        	sql.append(owner.roleFlag);
+//        	sql.append(owner.roleFlag);
+        	sql.append("all");
         	sql.append("_VIEWS WHERE DB_ID=");
         	sql.append(owner.getDBID(owner, session));
         	sql.append(" AND SCHEMA_ID=");
@@ -1192,10 +1213,12 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         	//xfc 修改了获取列信息的sql
             StringBuilder sql = new StringBuilder(500);
             sql.append("SELECT COL.*,VW.VIEW_NAME FROM ");
-        	sql.append(owner.roleFlag);
+//        	sql.append(owner.roleFlag);
+        	sql.append("all");
         	sql.append("_VIEW_COLUMNS COL ");
         	sql.append(" LEFT JOIN ");
-        	sql.append(owner.roleFlag);
+//        	sql.append(owner.roleFlag);
+        	sql.append("all");
         	sql.append("_VIEWS VW ON VW.VIEW_ID=COL.VIEW_ID ");
         	sql.append(" WHERE VW.DB_ID=");
         	sql.append(owner.getDBID(owner, session));
@@ -1235,7 +1258,8 @@ public class XuguSchema extends XuguGlobalObject implements DBSSchema, DBPRefres
         	//xfc 修改了获取所有job信息的sql语句
         	StringBuilder sql = new StringBuilder();
         	sql.append("SELECT * FROM ");
-        	sql.append(owner.roleFlag);
+//        	sql.append(owner.roleFlag);
+        	sql.append("all");
         	sql.append("_JOBS WHERE DB_ID=");
         	sql.append(owner.getDBID(owner, session));
         	
