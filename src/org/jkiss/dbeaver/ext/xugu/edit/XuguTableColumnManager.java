@@ -167,6 +167,7 @@ public class XuguTableColumnManager extends SQLTableColumnManager<XuguTableColum
         				break;
         			}
         			if (first!=null&&first.equals(sql)) {
+        				first = "";
 						continue;
 					} else {
 						first = sql;
