@@ -102,7 +102,7 @@ public class XuguUDTManager extends SQLObjectEditor<XuguUDT, XuguSchema>{
 	@Override
 	protected void addObjectDeleteActions(List<DBEPersistAction> actions,
 			SQLObjectEditor<XuguUDT, XuguSchema>.ObjectDeleteCommand command, Map<String, Object> options) {
-		String sql = "DROP TYPE " + DBUtils.getQuotedIdentifier(command.getObject());
+		String sql = "DROP TYPE " + command.getObject().getParentObject().getName() +"."+ DBUtils.getQuotedIdentifier(command.getObject());
 		
 		log.debug("[Xugu] Construct drop UDT sql: "+sql);
 		actions.add(

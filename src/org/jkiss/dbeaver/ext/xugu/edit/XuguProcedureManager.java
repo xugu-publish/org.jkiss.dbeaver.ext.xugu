@@ -87,7 +87,7 @@ public class XuguProcedureManager extends SQLObjectEditor<XuguProcedureStandalon
                 desc.append("CREATE OR REPLACE ");
                 desc.append(editPage.getProcedureType());
                 desc.append(" ");
-                desc.append(procedure.getSchema().getOwner());
+                desc.append(procedure.getSchema().getName());
                 desc.append(".");
                 desc.append(editPage.getProcedureName());
                 if(editPage.getProcedureType().equals(DBSProcedureType.PROCEDURE)) 

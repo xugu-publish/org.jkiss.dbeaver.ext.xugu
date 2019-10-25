@@ -42,7 +42,7 @@ import java.util.Locale;
  */
 class XuguSQLDialect extends JDBCSQLDialect {
 
-    public static final String[] EXEC_KEYWORDS = new String[]{ "call" };
+    public static final String[] EXEC_KEYWORDS = new String[]{ "EXEC" };
 
     public static final String[] XUGU_NON_TRANSACTIONAL_KEYWORDS = ArrayUtils.concatArrays(
         BasicSQLDialect.NON_TRANSACTIONAL_KEYWORDS,
@@ -443,7 +443,7 @@ class XuguSQLDialect extends JDBCSQLDialect {
     @Override
     protected String getStoredProcedureCallInitialClause(DBSProcedure proc) {
         String schemaName = proc.getParentObject().getName();
-        return "CALL " + schemaName + "." + proc.getName();
+        return "EXEC " + schemaName + "." + proc.getName();
     }
 
     @Override

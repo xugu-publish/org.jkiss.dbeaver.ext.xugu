@@ -225,173 +225,186 @@ public class XuguTablePartitionManager extends SQLObjectEditor<XuguTablePartitio
         @Override
         protected Control createDialogArea(Composite parent)
         {
-            getShell().setText(XuguMessages.dialog_tablePartition_create_title);
-
-            Control container = super.createDialogArea(parent);
-            Composite composite = UIUtils.createPlaceholder((Composite) container, 2, 5);
-            composite.setLayoutData(new GridData(GridData.FILL_BOTH));
-
-            nameText = UIUtils.createLabelText(composite, XuguMessages.dialog_tablePartition_name, null);
-            nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-            
-            typeCombo = UIUtils.createLabelCombo(composite, XuguMessages.dialog_tablePartition_type, 8);
-            typeCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-            typeCombo.add("LIST");
-            typeCombo.add("RANGE");
-            typeCombo.add("HASH");
-            typeCombo.add("AUTOMATIC");
-            
-            valueText = UIUtils.createLabelText(composite, XuguMessages.dialog_tablePartition_value, null);
-            valueText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-            
-            colCombo = UIUtils.createLabelCombo(composite, XuguMessages.dialog_tablePartition_col_Combo_label, 8);
-            colCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+          
             //加载字段信息
             try {
 				Collection<XuguTableColumn> cols = table.getAttributes(monitor);
-				Iterator<XuguTableColumn> it = cols.iterator();		
-				while(it.hasNext()) {
-					String name = it.next().getName();
-					colCombo.add(name);
+				if (cols==null) {
+					new UITask<String>() {
+						@Override
+						protected String runTask() {
+							WarningDialog dialog2 = new WarningDialog(UIUtils.getActiveWorkbenchShell(), "需先设置表的列信息");       
+							if (dialog2.open() != IDialogConstants.OK_ID) {
+								return null;
+							}
+							return null;
+						}
+					}.execute();   					
+				}else {
+					  getShell().setText(XuguMessages.dialog_tablePartition_create_title);
+
+			            Control container = super.createDialogArea(parent);
+			            Composite composite = UIUtils.createPlaceholder((Composite) container, 2, 5);
+			            composite.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+			            nameText = UIUtils.createLabelText(composite, XuguMessages.dialog_tablePartition_name, null);
+			            nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+			            
+			            typeCombo = UIUtils.createLabelCombo(composite, XuguMessages.dialog_tablePartition_type, 8);
+			            typeCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+			            typeCombo.add("LIST");
+			            typeCombo.add("RANGE");
+			            typeCombo.add("HASH");
+			            typeCombo.add("AUTOMATIC");
+			            
+			            valueText = UIUtils.createLabelText(composite, XuguMessages.dialog_tablePartition_value, null);
+			            valueText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+			            
+			            colCombo = UIUtils.createLabelCombo(composite, XuguMessages.dialog_tablePartition_col_Combo_label, 8);
+			            colCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+					Iterator<XuguTableColumn> it = cols.iterator();	
+					while(it.hasNext()) {
+						String name = it.next().getName();
+						colCombo.add(name);
+					}	 addCol = UIUtils.createPushButton(composite, XuguMessages.dialog_tablePartition_add_col, null);
+		            addCol.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		            
+		            removeCol = UIUtils.createPushButton(composite, XuguMessages.dialog_tablePartition_remove_col, null);
+		            removeCol.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		            
+		            colText = UIUtils.createLabelText(composite, XuguMessages.dialog_tablePartition_col_Text_label, null);
+		            colText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		            
+		            addCol.addSelectionListener(new SelectionListener() {
+		    			@Override
+		    			public void widgetSelected(SelectionEvent e) {
+		    				// TODO Auto-generated method stub
+		    				String text = colText.getText();
+		    				String newCol = colCombo.getText();
+		    				//追加新的字段 前提是新字段名不存在于字段文本框内容中
+		    				if(text!=null && !"".equals(text)) {
+		    					if(text.indexOf(newCol)==-1) {
+		    						text += ","+colCombo.getText();
+		    					}
+		    				}else {
+		    					text = colCombo.getText();
+		    				}
+		    				colText.setText(text);
+		    			}
+		    			@Override
+		    			public void widgetDefaultSelected(SelectionEvent e) {
+		    				// do nothing
+		    			}	
+		            });
+		            removeCol.addSelectionListener(new SelectionListener() {
+		    			@Override
+		    			public void widgetSelected(SelectionEvent e) {
+		    				// TODO Auto-generated method stub
+		    				String text = colText.getText();
+		    				String newCol = colCombo.getText();
+		    				//删除已有字段 前提是新字段名存在于字段文本框内容中
+		    				if(text!=null && !"".equals(text)) {
+		    					int index;
+		    					if((index = text.indexOf(newCol))!=-1) {
+		    						text = text.substring(0, index)+text.substring(index+newCol.length());
+		    						//处理首尾逗号
+//		    						if(text.indexOf(",")==0) {
+//		    							text = text.substring(1);
+//		    						}else if(text.lastIndexOf(",")==text.length()-1) {
+//		    							text = text.substring(0, text.length()-1);
+//		    						}
+		    						//处理位于中间的逗号
+//		    						text.replaceAll(",,", ",");
+		    					}
+		    				}
+		    				colText.setText(text);
+		    			}
+		    			@Override
+		    			public void widgetDefaultSelected(SelectionEvent e) {
+		    				// do nothing
+		    			}	
+		            });
+		            
+		            autoTypeCombo = UIUtils.createLabelCombo(composite, XuguMessages.dialog_tablePartition_col_AutoType_label, 0);
+		            autoTypeCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		            autoTypeCombo.add("YEAR");
+		            autoTypeCombo.add("MONTH");
+		            autoTypeCombo.add("DAY");
+		            autoTypeCombo.add("HOUR");
+		            
+		            autoSpanText = UIUtils.createLabelText(composite, XuguMessages.dialog_tablePartition_col_AutoSpan_label, null);
+		            autoSpanText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		            
+		            //默认禁用autoTypeCombo和autoSpanText
+		            autoTypeCombo.setEnabled(false);
+		            autoSpanText.setEnabled(false);
+		            
+		            //如果表已存在且分区也存在则对属性进行预设
+		            if(table.isPersisted()) {
+		            	try {
+							Collection<XuguTablePartition> parts = table.getPartitions(monitor);
+							if(parts!=null) {
+								if(parts.iterator().hasNext()) {
+									XuguTablePartition part = parts.iterator().next();
+									String partType = part.getPartiType();
+									String partKey = part.getPartiKey();
+									typeCombo.setText(partType);
+									partKey = partKey.replaceAll("\"", "");
+									colText.setText(partKey);
+									typeCombo.setEnabled(false);
+									colCombo.setEnabled(false);
+									colText.setEnabled(false);
+									addCol.setEnabled(false);
+									removeCol.setEnabled(false);
+									if("AUTOMATIC".equals(partType)) {
+										autoTypeCombo.setText(part.getAutoPartiType());
+										autoSpanText.setText(part.getAutoPartiSpan().toString());
+									}
+									autoTypeCombo.setEnabled(false);
+									autoSpanText.setEnabled(false);
+								}
+							}
+						} catch (DBException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+		            }
+		            
+		            //监听typeCombo，当属性为automatic时，运行设置自动扩展分区属性
+		            typeCombo.addSelectionListener(new SelectionListener() {
+		            	//根据选中类型做出动作
+						@Override
+						public void widgetSelected(SelectionEvent e) {
+							String nowType = typeCombo.getText();
+							if("AUTOMATIC".equals(nowType) || "HASH".equals(nowType)) {
+								autoTypeCombo.setEnabled(true);
+								autoSpanText.setEnabled(true);
+								colText.setEnabled(false);
+								addCol.setEnabled(false);
+								removeCol.setEnabled(false);
+							}else {
+								autoTypeCombo.setEnabled(false);
+								autoSpanText.setEnabled(false);
+								colText.setEnabled(true);
+								addCol.setEnabled(true);
+								removeCol.setEnabled(true);
+							}
+						}
+						@Override
+						public void widgetDefaultSelected(SelectionEvent e) {
+							// do nothing
+						}
+		            });
+		            
+		            UIUtils.createInfoLabel(composite, XuguMessages.dialog_tablePartition_create_info, GridData.FILL_HORIZONTAL, 2);
+
+		            return parent;				
 				}
 			} catch (DBException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-            
-            addCol = UIUtils.createPushButton(composite, XuguMessages.dialog_tablePartition_add_col, null);
-            addCol.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-            
-            removeCol = UIUtils.createPushButton(composite, XuguMessages.dialog_tablePartition_remove_col, null);
-            removeCol.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-            
-            colText = UIUtils.createLabelText(composite, XuguMessages.dialog_tablePartition_col_Text_label, null);
-            colText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-            
-            addCol.addSelectionListener(new SelectionListener() {
-    			@Override
-    			public void widgetSelected(SelectionEvent e) {
-    				// TODO Auto-generated method stub
-    				String text = colText.getText();
-    				String newCol = colCombo.getText();
-    				//追加新的字段 前提是新字段名不存在于字段文本框内容中
-    				if(text!=null && !"".equals(text)) {
-    					if(text.indexOf(newCol)==-1) {
-    						text += ","+colCombo.getText();
-    					}
-    				}else {
-    					text = colCombo.getText();
-    				}
-    				colText.setText(text);
-    			}
-    			@Override
-    			public void widgetDefaultSelected(SelectionEvent e) {
-    				// do nothing
-    			}	
-            });
-            removeCol.addSelectionListener(new SelectionListener() {
-    			@Override
-    			public void widgetSelected(SelectionEvent e) {
-    				// TODO Auto-generated method stub
-    				String text = colText.getText();
-    				String newCol = colCombo.getText();
-    				//删除已有字段 前提是新字段名存在于字段文本框内容中
-    				if(text!=null && !"".equals(text)) {
-    					int index;
-    					if((index = text.indexOf(newCol))!=-1) {
-    						text = text.substring(0, index)+text.substring(index+newCol.length());
-    						//处理首尾逗号
-//    						if(text.indexOf(",")==0) {
-//    							text = text.substring(1);
-//    						}else if(text.lastIndexOf(",")==text.length()-1) {
-//    							text = text.substring(0, text.length()-1);
-//    						}
-    						//处理位于中间的逗号
-//    						text.replaceAll(",,", ",");
-    					}
-    				}
-    				colText.setText(text);
-    			}
-    			@Override
-    			public void widgetDefaultSelected(SelectionEvent e) {
-    				// do nothing
-    			}	
-            });
-            
-            autoTypeCombo = UIUtils.createLabelCombo(composite, XuguMessages.dialog_tablePartition_col_AutoType_label, 0);
-            autoTypeCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-            autoTypeCombo.add("YEAR");
-            autoTypeCombo.add("MONTH");
-            autoTypeCombo.add("DAY");
-            autoTypeCombo.add("HOUR");
-            
-            autoSpanText = UIUtils.createLabelText(composite, XuguMessages.dialog_tablePartition_col_AutoSpan_label, null);
-            autoSpanText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-            
-            //默认禁用autoTypeCombo和autoSpanText
-            autoTypeCombo.setEnabled(false);
-            autoSpanText.setEnabled(false);
-            
-            //如果表已存在且分区也存在则对属性进行预设
-            if(table.isPersisted()) {
-            	try {
-					Collection<XuguTablePartition> parts = table.getPartitions(monitor);
-					if(parts!=null) {
-						if(parts.iterator().hasNext()) {
-							XuguTablePartition part = parts.iterator().next();
-							String partType = part.getPartiType();
-							String partKey = part.getPartiKey();
-							typeCombo.setText(partType);
-							partKey = partKey.replaceAll("\"", "");
-							colText.setText(partKey);
-							typeCombo.setEnabled(false);
-							colCombo.setEnabled(false);
-							colText.setEnabled(false);
-							addCol.setEnabled(false);
-							removeCol.setEnabled(false);
-							if("AUTOMATIC".equals(partType)) {
-								autoTypeCombo.setText(part.getAutoPartiType());
-								autoSpanText.setText(part.getAutoPartiSpan().toString());
-							}
-							autoTypeCombo.setEnabled(false);
-							autoSpanText.setEnabled(false);
-						}
-					}
-				} catch (DBException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-            }
-            
-            //监听typeCombo，当属性为automatic时，运行设置自动扩展分区属性
-            typeCombo.addSelectionListener(new SelectionListener() {
-            	//根据选中类型做出动作
-				@Override
-				public void widgetSelected(SelectionEvent e) {
-					String nowType = typeCombo.getText();
-					if("AUTOMATIC".equals(nowType) || "HASH".equals(nowType)) {
-						autoTypeCombo.setEnabled(true);
-						autoSpanText.setEnabled(true);
-						colText.setEnabled(false);
-						addCol.setEnabled(false);
-						removeCol.setEnabled(false);
-					}else {
-						autoTypeCombo.setEnabled(false);
-						autoSpanText.setEnabled(false);
-						colText.setEnabled(true);
-						addCol.setEnabled(true);
-						removeCol.setEnabled(true);
-					}
-				}
-				@Override
-				public void widgetDefaultSelected(SelectionEvent e) {
-					// do nothing
-				}
-            });
-            
-            UIUtils.createInfoLabel(composite, XuguMessages.dialog_tablePartition_create_info, GridData.FILL_HORIZONTAL, 2);
-
-            return parent;
+			return null;                   
         }
 
         @Override
