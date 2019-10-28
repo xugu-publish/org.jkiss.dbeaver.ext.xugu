@@ -88,7 +88,7 @@ public class XuguUDT extends XuguSchemaObject
     
     @NotNull
     @Override
-    @Property(viewable = true, editable = true, valueTransformer = DBObjectNameCaseTransformer.class, order = 2)
+    @Property(viewable = true, editable = false, valueTransformer = DBObjectNameCaseTransformer.class, order = 2)
     public String getName()
     {
         return this.typeName;

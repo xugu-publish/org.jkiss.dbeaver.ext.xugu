@@ -90,7 +90,7 @@ public class XuguUDTManager extends SQLObjectEditor<XuguUDT, XuguSchema>{
         if (command.getProperty("comment") != null) {
         	StringBuilder desc = new StringBuilder(100);
         	desc.append("COMMENT ON TYPE ");
-        	desc.append(command.getObject().getName());
+        	desc.append(command.getObject().getSchema().getName()+"."+command.getObject().getName());
         	desc.append(" IS ");
         	desc.append(SQLUtils.quoteString(command.getObject(), command.getObject().getComment()));
         	

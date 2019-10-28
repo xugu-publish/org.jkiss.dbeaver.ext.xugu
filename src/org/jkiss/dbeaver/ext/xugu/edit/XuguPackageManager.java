@@ -89,12 +89,12 @@ public class XuguPackageManager extends SQLObjectEditor<XuguPackage, XuguSchema>
                     "CREATE OR REPLACE PACKAGE " + schema.getName() + "." + packName + "\n" +
                     "AS\n" +
                     "-- Package header\n" +
-                    "END " + packName +";");
+                    "END;" );
                 xuguPackage.setExtendedDefinitionText(
                     "CREATE OR REPLACE PACKAGE BODY " + schema.getName() + "." + packName + "\n" +
                         "AS\n" +
                         "-- Package body\n" +
-                        "END " + packName +";");
+                        "END;");
                 xuguPackage.setValid(true);
                 return xuguPackage;
             }
@@ -121,7 +121,7 @@ public class XuguPackageManager extends SQLObjectEditor<XuguPackage, XuguSchema>
         if (command.getProperty("comment") != null) {
         	StringBuilder desc = new StringBuilder(100);
         	desc.append("COMMENT ON PACKAGE ");
-        	desc.append(command.getObject().getName());
+        	desc.append(command.getObject().getSchema().getName()+"."+command.getObject().getName());
         	desc.append(" IS ");
         	desc.append(SQLUtils.quoteString(command.getObject(), command.getObject().getComment()));
         	

@@ -164,6 +164,7 @@ public class XuguConnectionPage extends ConnectionPageAbstract implements ICompo
         roleCombo.add(XuguMessages.dialog_connection_role_sysdba);
         roleCombo.add(XuguMessages.dialog_connection_role_dba);
         UIUtils.createHorizontalLine(addrGroup, 2, 10);
+        roleCombo.select(0);
 
         serverTimezoneCombo = UIUtils.createLabelCombo(addrGroup, XuguMessages.dialog_connection_server_timezone, SWT.READ_ONLY);
         serverTimezoneCombo.add(XuguMessages.dialog_connection_auto_detect);
@@ -286,20 +287,20 @@ public class XuguConnectionPage extends ConnectionPageAbstract implements ICompo
             }
         }
         //xfc 根据下拉框设置用户选择的角色
-        if (roleCombo.getText().equals("SYSDBA")&&(!connectionInfo.getUserName().equals("SYSDBA")||!dbText.getText().equals("SYSTEM"))) {
-        	new UITask<String>() {
-        		@Override
-        		protected String runTask() {
-        			WarningDialog dialog2 = new WarningDialog(UIUtils.getActiveWorkbenchShell(), "登陆失败，SYSDBA角色仅针对系统库超级管理员开放");       
-        			if (dialog2.open() != IDialogConstants.OK_ID) {
-        				return null;
-        			}
-        			return null;
-        		}
-        	}.execute(); 
-        	} else {
+//        if (roleCombo.getText().equals("SYSDBA")&&(!connectionInfo.getUserName().equals("SYSDBA")||!dbText.getText().equals("SYSTEM"))) {
+//        	new UITask<String>() {
+//        		@Override
+//        		protected String runTask() {
+//        			WarningDialog dialog2 = new WarningDialog(UIUtils.getActiveWorkbenchShell(), "登陆失败，SYSDBA角色仅针对系统库超级管理员开放");       
+//        			if (dialog2.open() != IDialogConstants.OK_ID) {
+//        				return null;
+//        			}
+//        			return null;
+//        		}
+//        	}.execute(); 
+//        	} else {
 			connectionInfo.setProviderProperty(XuguConstants.PROP_INTERNAL_LOGON, roleCombo.getText().toUpperCase(Locale.ENGLISH));						
-		}
+//		}
 //        if (roleCombo.getText()=="SYSDBA"||) {
 //			
 //		} 
